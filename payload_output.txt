@@ -1,0 +1,35 @@
+
+
+[90mΓöî[39m   create-payload-app 
+[90mΓöé[39m
+[32mΓùç[39m  [0m[0m [90mΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓò«[39m
+[90mΓöé[39m  [2m[22m                                             [90mΓöé[39m
+[90mΓöé[39m  [2mWelcome to Payload. Let's create a project![22m  [90mΓöé[39m
+[90mΓöé[39m  [2m[22m                                             [90mΓöé[39m
+[90mΓö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓò»[39m
+[90mΓöé[39m
+[32mΓùç[39m   Γû▓ Next.js  project detected!
+[?25l[90mΓöé[39m
+[36mΓùå[39m  Install Payload in this project?
+[36mΓöé[39m  [32mΓùÅ[39m Yes [2m/[22m [2mΓùï[22m [2mNo[22m
+[36mΓöö[39m
+[999D[4A[1B[J[32mΓùç[39m  Install Payload in this project?
+[90mΓöé[39m  [2mYes[22m
+[?25h[90mΓöé[39m
+[33mΓû▓[39m  
+[90mΓöé[39m  Next Steps:
+[90mΓöé[39m  
+[90mΓöé[39m  Payload does not support a top-level layout.tsx file in the app directory.
+[90mΓöé[39m  
+[90mΓöé[39m  To continue:
+[90mΓöé[39m  
+[90mΓöé[39m  - Create a new directory in ./src\app such as ./src\app/(app)
+[90mΓöé[39m  - Move all files from ./src\app into that directory
+[90mΓöé[39m  
+[90mΓöé[39m  It is recommended to do this from your IDE if your app has existing file references.
+[90mΓöé[39m  
+[90mΓöé[39m  Once moved, rerun the create-payload-app command again.
+[90mΓöé[39m  
+[90mΓöé[39m
+[90mΓöö[39m   Have feedback?  Visit us on GitHub: https://github.com/payloadcms/payload.
+

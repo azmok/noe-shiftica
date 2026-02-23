@@ -1,0 +1,253 @@
+NOE SHIFTICA
+ブランド・コンセプトシート  /  Brand Concept Sheet — Final
+ver. 3.0  —  2025  ｜  Finalized
+01 ｜ ブランド名の由来
+Noe（ノエ）
+語源：Noesis（ノエシス）— ギリシャ語で「直観的知性・本質への理解」
+意味：表層ではなく、本質を掴む認識力
+ニュアンス：知的でありながら感覚的。論理と直観が交差するところ
+Shiftica（シフティカ）
+構成：Shift（変化・転換）＋ -ica（ラテン語的語尾 / 学術・美学の体系）
+意味：変化を設計する体系 / 美しく転換させる知的構造
+ニュアンス：単なるデザインではなく、ブランドや思考そのものを「シフト」させる
+ブランド名が体現する本質
+「本質を見抜き、美しく変換する」— Noesisの洞察力 × Shiftの変換力
+クライアントのビジョンを表面的に整えるのではなく、深層から再設計する
+02 ｜ フィロソフィー / Philosophy
+WantToを形にする。自分の思うように生きたいと願う人・ビジネスのために、視覚と言語と構造で世界観を設計する。
+デザインは「飾り」ではなく「思考の可視化」である
+美しさと論理は対立しない。両立させることが本当の設計
+クライアントのビジネスを「稼ぐため」だけでなく「楽しく稼ぐため」のものにする
+表層のトレンドを追わず、本質から構築する
+03 ｜ 私のスタンス
+透明性と誠実さを制作の原則とする。
+やらないこと
+不要な月額費用を請求しない
+中身の分からない管理費を取らない
+何もしていないのに発生する請求をしない
+やること
+必要な費用は「何のために・誰に・いくらかかるか」を必ず事前に説明する
+分からない点はいつでも質問を受け付け、納得してから進める
+クライアントの利益を最優先に、最適な提案をする
+04 ｜ ターゲット層
+年代・性別では分けない。「マインドセット」で定義する。
+自分のWantToをビジネスで実現しようとしている人・しようとし始めた人
+「稼ぐためだけじゃない、楽しく稼ぎたい」という種を心に持っている人
+現状のブランドや見せ方に「何か足りない」と感じているクリエイター・起業家
+ロゴ・Web・ポスターなど、ビジュアルアイデンティティを一から作りたい人
+感度の高いビジネスオーナー・フリーランス・スタートアップ（日本語圏メイン）
+05 ｜ 提供サービス & Tech Stack
+サービス
+ブランディングWebサイト制作（世界観ごと設計するサイト）
+ロゴデザイン / ビジュアルアイデンティティ（VI）
+ポスター・グラフィックデザイン
+ブランドコンセプト設計・言語化サポート（オプション）
+Tech Stack
+Frontend：Next.js（App Router）— 高速表示・SEO・将来の機能追加に強い
+CMS：Payload CMS — ブログ・コンテンツ更新が簡単。運用コスト低減
+Database：Neon（Serverless Postgres）— 小さく始めて大きく育てられる
+Infrastructure：Netlify / Firebase App Hosting
+Storage：Cloudflare R2
+Quality Check：Claude.ai — セキュリティ・バグ・抜け漏れを自動チェック
+06 ｜ 価格プラン / Pricing
+「高品質 × 低価格 × 短納期」を同時に叶える。従来50万〜数百万円クラスの体験価値を15万円〜で実現。
+月額保守
+¥5,000〜¥10,000 / 月（サーバー維持・軽微な修正・運用サポート込）
+大幅な構成変更・方向性の変更は別途お見積り
+ランニングコスト（実費）
+年間約¥6,000〜（サーバー＋ドメイン）— Noe Shifticaへの支払いではなく各社への直接支払い
+この費用を払わないとサイトは表示されなくなる（実店舗の「場所代」と同じ）
+※ 利用外部サービス：Netlify / Firebase（ホスティング）、Cloudflare R2（メディア）、GitHub（ソース管理）
+07 ｜ 制作フロー & 納期
+短納期の鍵は「迷いを潰す設計」と「AIでの反復高速化」。
+対応時間・連絡手段
+連絡手段：LINE または メール
+対応時間：11:00〜19:00（夜間・即時対応は保証なし）
+ヒアリング完了・素材提出・着手金入金 = Day 1（制作開始）
+08 ｜ キャッチコピー — 確定
+構成の意図
+英語大見出し「Design the Shift.」— ブランド哲学を直撃。短く記憶に残る
+日本語サブ「脱テンプレ。「その先」へ。」— Pain pointを突きながら未来を示す
+ボディコピー — 具体的な価値（AI・納期・価格）を補足。論理で押さえる
+09 ｜ カラーパレット 
+補色デュオトーン。黄緑の鋭さ×紫の深さ。前衛的でエッジが効いた、Noe Shifticaの世界観にもっとも合致する組み合わせ。
+Anti Gravity IDE 入力値：Primary #CCDD00 / Secondary #6B2DA0 / Background #0C0418 / Glow #E8FF6A / Accent #A060D0 / Neutral #2A1040 / TextSub #7A886A
+タイポグラフィ
+見出し（JP）：Noto Serif JP / 游明朝 — 知性・格調
+見出し（EN）：PP Neue Montreal / Neue Haas Grotesk — Swiss系グロテスク
+本文：Noto Sans JP — 読みやすさ最優先
+アクセント英字：Inter / Space Grotesk — テック感
+10 ｜ ロゴ — 確定 & 整合性
+Palette B 整合性チェック結果
+推奨ロゴバリエーション
+White版（現行）— Void Dark / Plum Carbon背景専用
+Acid Lime版（#CCDD00）— ブランドカラー統一。粒子アニメとの連動演出に使える（追加制作推奨）
+黒版 — White背景のLightセクション用（追加制作推奨）
+11 ｜ Three.js アニメーション — 確定
+黒に近いVoid Dark背景の上に、Lime〜Neon Hazeの粒子が漂う構成。Orchidの粒子を少量混ぜることで奥行きを出す。
+参考実装：threejs.org/examples/#webgl_points_sprites / Codrops particle系チュートリアル
+12 ｜ ウェブサイト設計方針 & サイトマップ — 確定
+LP セクション詳細
+Hero — Three.js粒子系アニメ × 「Design the Shift.」× 脱テンプレ。「その先」へ。
+Concept — AI × Designという制作スタイル。3つの柱（AIで速く / 本質から設計 / 最新技術）
+How it Works — 5ステップ制作フロー（Hearing→Design→Build→QA→Launch）
+Pricing — Lite / Standard / Premium 3プラン＋保守・ランニングコスト説明
+Contact — フォーム＋「まず話しましょう」コピー
+UX / インタラクション
+スクロールで世界観が展開 — GSAP / ScrollTrigger パラレックス
+Three.js粒子系アニメーション — ロゴへの引き寄せインタラクション
+タイポグラフィアニメーション — 文字が組み合わさるように出現
+カーソルカスタマイズ — ブランドの独自性を演出
+ローディング画面 — ブランド名とシンプルなアニメーション
+13 ｜ 参考サイト
+14 ｜ ヒアリングシート（項目概要）
+別紙参照
+主要確認項目
+基本情報：氏名、会社名、業種、メールアドレス、既存サイトURL 
+ドメイン名
+ビジネス目標：目的（問い合わせ / 予約 / EC / 採用 etc.）/ 月間目標数・売上・LTV
+バリュープロポジション：誰に / 何を / なぜあなた / 証拠（実績・数字）
+ページ構成・機能：必要ページ / CMS / ブログ / 予約 / フォーム / 多言語 / 決済 etc.
+SEO：狙いキーワード（最大10個）/ 対応エリア / GA4・Search Console導入有無
+素材完全支給（必須）：ロゴ（.ai/.svg）/ 写真（2,000px以上）/ 文章原稿 / 連絡先情報
+丸投げも〇。その場合の、最低項目
+基本情報：氏名、会社名、業種、メールアドレス、既存サイトURL 
+ドメイン名
+Websiteに必要な機能(ブログの有無など)、
+Websiteに求める雰囲気(かわいい、かっこいい、クリエイティブ、ミニマルなど)
+プラン
+制作費（目安）
+想定内容
+納期目安
+Lite
+¥150,000〜
+LP・名刺代わりのサイト。スピード重視パッケージ
+約1〜2週間
+Standard
+¥350,000〜
+コーポレートサイト。フルデザイン＋CMS導入
+約3〜4週間
+Premium
+要相談
+多機能・システム連携。AI運用自動化フルパック
+要相談
+STEP
+フェーズ
+内容
+01
+Hearing
+ヒアリングシート記入 + Discovery Call（任意15〜30分）。目的・ターゲット・参考サイトを確認し迷いを最初に潰す
+02
+Design
+方向性を1本に絞りAwwwards水準のデザインに。テンプレートは使わない
+03
+Build
+Next.js × Payload CMS × Neonで実装。表示速度・SEO・運用性をすべて両立
+04
+QA Check
+Claude.aiによる自動品質チェック。セキュリティ・バグ・抜け漏れをAIが二重確認
+05
+Launch
+公開。その後も月額保守プランで継続サポート
+✦ CONFIRMED  Design the Shift.  /  脱テンプレ。「その先」へ。
+Design the Shift.
+脱テンプレ。「その先」へ。
+AI×最新技術で、あなたのビジネスに必要な「見た目」と「体験」を設計します。
+テンプレートではなく、あなただけの世界観を。最短1週間、15万円〜。
+✦ CONFIRMED  Palette B  ｜  Acid Lime × Deep Violet  ｜  生命と深層
+Primary — Acid Lime
+#CCDD00
+CTA / 強調 / アニメ光源 / 粒子色メイン
+Secondary — Deep Violet
+#6B2DA0
+見出し / ナビ / メインブランドカラー
+Background — Void Dark
+#0C0418
+ダーク背景。宇宙感・深度
+Glow — Neon Haze
+#E8FF6A
+Three.js粒子の発光色・グロー
+Accent Light — Orchid
+#A060D0
+ホバー / サブ強調 / リンク
+Neutral — Plum Carbon
+#2A1040
+カード背景 / セクション区切り
+Text Sub — Sage Violet
+#7A886A
+注釈 / キャプション / メタ情報
+✦ CONFIRMED  極太Swiss Groteskタイプ × 格子状細線グラフィック  ｜  Palette Bと高相性◎
+判定
+項目
+詳細
+◎
+Void Dark背景
+現行ロゴをそのまま使用可能。完全一致
+◎
+Plum Carbon背景
+馴染みながら視認性◎
+◎
+フォント×パレット
+極太Groteskは幾何学・テック系。Void Dark背景に完璧に映える
+◎
+グラフィック×Three.js
+格子状細線と粒子系アニメが世界観直結。粒子がロゴに引き寄せられるインタラクション推奨
+△
+Lime / White背景
+白ロゴは消える → 黒ロゴ版またはViolet版の追加制作を推奨
+✦ CONFIRMED  粒子系（Particle System）｜ Acid Lime × Neon Haze発光 × Void Dark背景
+パラメータ
+推奨値 / 方向性
+粒子数
+3,000〜8,000個（密すぎず、疎すぎず）
+粒子カラー
+#CCDD00（70%）/ #E8FF6A（20%）/ #A060D0（10%）
+サイズ
+1.0〜3.0（ランダム。大粒と小粒を混在）
+動き
+sin/cosベースの緩やかな浮遊。マウスに引き寄せられる（repulsion + attraction）
+発光
+THREE.AdditiveBlending — 粒子が重なるほど明るく発光
+スクロール連動
+GSAP ScrollTrigger — 粒子が収束→拡散。Heroを抜けるとフェードアウト
+カメラ
+PerspectiveCamera / マウス追従で微妙にtilt
+ロゴ連動（推奨）
+粒子がロゴの形状に引き寄せられるインタラクションで世界観を強化
+✦ CONFIRMED  LP（5セクション）/ About / Blog  ｜  Works は後から追加
+ページ
+セクション
+主な目的
+LP（/）
+Hero / Concept / How it Works / Pricing / Contact
+認知→理解→信頼→CTA の一気通貫
+About（/about）
+Opening / 名前の由来 / Philosophy / Stance / How I Work / CTA
+ブランド人格の確立・信頼の深掘り
+Blog（/blog）
+記事一覧 / 記事詳細
+SEO・専門性の証明・長期集客
+Works（後から追加）
+制作事例一覧 / 事例詳細
+実績による信頼構築
+サイト名
+URL
+参考にしたい要素
+linear.app
+https://linear.app
+超ミニマル・ダークUI・テック×洗練。コピーのトーンが参考
+vercel.com
+https://vercel.com
+白×黒のシャープな構成。スクロールアニメ・グリッド使いが秀逸
+Stefan Vitasovic
+https://vitasovic.com
+Swiss print × 動的タイポグラフィ。最も近い世界観
+Locomotive Scroll
+https://locomotivemtl.github.io/locomotive-scroll
+スムーススクロール × パラレックスの見本
+Awwwards Portfolio
+https://www.awwwards.com/websites/portfolio/
+受賞ポートフォリオ群。月1チェック推奨
+Codrops
+https://tympanus.net/codrops
+Three.js・GSAPのインタラクション実装例の宝庫

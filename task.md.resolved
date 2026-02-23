@@ -1,0 +1,26 @@
+# Noe Shiftica Webサイト構築タスク
+
+## 1. 要件定義と準備
+- [ ] プロジェクト内のワークフロー・スキルの確認 (`firecrawl`, `ui-ux-pro-max` 等)
+- [ ] `NS_LP,About,SiteMap.docx` の読み込みと解析
+- [ ] `NS_ConceptSheet_v3_Final.docx` の読み込みと解析
+- [ ] 既存プロジェクト構成の確認
+
+## 2. 実装計画 (PLANNING)
+- [ ] ドキュメントを元にした `implementation_plan.md` の作成
+- [ ] デザインシステムとテーマの設定 (黒と白のロゴを使用)
+- [ ] ユーザー承認の取得
+
+## 3. 実装 (EXECUTION)
+- [ ] ベースとなるフロントエンド環境の構築 (Next.js/Vite等、既存環境があればそれに合わせる)
+- [ ] グローバルスタイルとTailwind/Vanilla CSSの設定
+- [ ] 共通コンポーネントの実装
+- [ ] ランディングページ(LP)の実装
+- [ ] Aboutページの実装
+- [ ] その他サイトマップに基づくページの実装
+- [ ] マイクロアニメーションとインタラクションの追加 (ui-ux-pro-maxに基づく)
+
+## 4. 検証 (VERIFICATION)
+- [ ] 動作確認とレスポンシブデザインのテスト
+- [ ] SEOの最適化確認
+- [ ] `walkthrough.md` の作成と最終確認
