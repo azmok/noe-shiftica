@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { Button } from "./components/ui/Button";
@@ -12,6 +13,8 @@ import { PastelTopology } from "./components/PastelTopology";
 export default function HomePage() {
   const { scrollYProgress } = useScroll();
   const yHero = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fade In variants
   const fadeIn: any = {
@@ -394,8 +397,39 @@ export default function HomePage() {
             variants={fadeIn}
             className="bg-[#111111]/30 border border-[#888888]/30 p-8 md:p-12 rounded-3xl"
           >
-            {/* 簡易的なプレースホルダーフォーム */}
-            <form className="space-y-6">
+            {/* コンタクトフォーム */}
+            <form className="space-y-6" onSubmit={async (e) => {
+              e.preventDefault();
+              setIsSubmitting(true);
+              const formData = new FormData(e.currentTarget);
+              const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                message: formData.get('message'),
+                budget: formData.get('budget'),
+                timeline: formData.get('timeline'),
+              };
+
+              try {
+                const res = await fetch('/api/contact', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(data),
+                });
+
+                if (res.ok) {
+                  router.push('/contact/success');
+                } else {
+                  const errorData = await res.json();
+                  alert(errorData.error || '送信に失敗しました。');
+                  setIsSubmitting(false);
+                }
+              } catch (error) {
+                console.error(error);
+                alert('送信に失敗しました。');
+                setIsSubmitting(false);
+              }
+            }}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="name" className="text-xs text-white/70">
@@ -404,8 +438,10 @@ export default function HomePage() {
                   <input
                     type="text"
                     id="name"
+                    name="name"
                     required
-                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] transition-colors"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
@@ -415,8 +451,10 @@ export default function HomePage() {
                   <input
                     type="email"
                     id="email"
+                    name="email"
                     required
-                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] transition-colors"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
                   />
                 </div>
               </div>
@@ -427,9 +465,11 @@ export default function HomePage() {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   rows={5}
                   required
-                  className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] transition-colors resize-none"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors resize-none"
                 ></textarea>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -439,7 +479,9 @@ export default function HomePage() {
                   </label>
                   <select
                     id="budget"
-                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] transition-colors appearance-none"
+                    name="budget"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
                   >
                     <option value="">選択してください</option>
                     <option value="15">〜15万</option>
@@ -455,20 +497,24 @@ export default function HomePage() {
                   <input
                     type="text"
                     id="timeline"
+                    name="timeline"
+                    disabled={isSubmitting}
                     placeholder="例：3ヶ月以内"
-                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] transition-colors"
+                    className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
                   />
                 </div>
               </div>
               <div className="pt-6 text-center">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  className="w-full md:w-auto px-12"
-                >
-                  送信する
-                </Button>
+                <div className={isSubmitting ? "opacity-50 pointer-events-none" : ""}>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    className="w-full md:w-auto px-12"
+                  >
+                    {isSubmitting ? '送信中...' : '送信する'}
+                  </Button>
+                </div>
                 <p className="text-xs text-white/40 mt-6">
                   対応時間：11:00〜19:00 ｜ 返信は原則24時間以内
                 </p>
