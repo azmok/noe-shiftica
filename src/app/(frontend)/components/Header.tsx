@@ -20,9 +20,9 @@ export function Header() {
   }, []);
 
   const navLinks = [
-    { name: "Concept", href: "#concept" },
-    { name: "How It Works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
+    { name: "Concept", href: "/#concept" },
+    { name: "How It Works", href: "/#how-it-works" },
+    { name: "Pricing", href: "/#pricing" },
     { name: "About", href: "/about" },
     { name: "Blog", href: "/blog" },
   ];
@@ -55,7 +55,7 @@ export function Header() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FFFFFF] transition-all group-hover:w-full"></span>
             </Link>
           ))}
-          <Button href="#contact" variant="primary" size="sm">
+          <Button href="/#contact" variant="primary" size="sm">
             Contact Us
           </Button>
         </nav>
@@ -89,7 +89,7 @@ export function Header() {
               </Link>
             ))}
             <Button
-              href="#contact"
+              href="/#contact"
               variant="primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >

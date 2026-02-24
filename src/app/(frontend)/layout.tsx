@@ -51,7 +51,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`}>
+    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`} data-scroll-behavior="smooth">
       <body>
         <CustomCursor />
         <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>

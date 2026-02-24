@@ -7,6 +7,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { Button } from "./components/ui/Button";
 import clsx from "clsx";
+import { PastelTopology } from "./components/PastelTopology";
 
 export default function HomePage() {
   const { scrollYProgress } = useScroll();
@@ -24,10 +25,15 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen text-white overflow-hidden relative selection:bg-[#FFFFFF] selection:text-[#050505]">
+      <div
+        className="fixed inset-0 w-full h-full opacity-[0.07] pointer-events-none z-20"
+        style={{ background: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
+      />
       <Header />
 
       {/* 1. Hero Section */}
       <section className="relative h-screen flex flex-col justify-center items-center text-center px-6">
+        <PastelTopology />
         <motion.div
           style={{ y: yHero }}
           className="z-10 max-w-6xl mx-auto flex flex-col items-center"
@@ -50,40 +56,6 @@ export default function HomePage() {
           >
             本質を設計する。世界観を転換する。
           </motion.h2>
-          <motion.p
-            custom={3}
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed"
-          >
-            AIと最新技術を武器に、あなたのビジネスに必要な「見た目」と「体験」を設計します。
-            <br className="hidden md:block" />
-            テンプレートではなく、あなただけの世界観を。最短1週間、15万円〜。
-          </motion.p>
-          <motion.div
-            custom={4}
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            className="flex flex-col sm:flex-row gap-4 items-center"
-          >
-            <Button href="#contact" variant="primary" size="lg">
-              無料相談を予約する
-            </Button>
-            <Button href="#works" variant="outline" size="lg">
-              実績を見る ↓
-            </Button>
-          </motion.div>
-          <motion.p
-            custom={5}
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            className="mt-6 text-xs text-white/50"
-          >
-            返信は24時間以内 ・ 相談無料 ・ 押し売りなし
-          </motion.p>
         </motion.div>
 
         {/* Scroll Indicator */}
@@ -96,6 +68,49 @@ export default function HomePage() {
           <span className="text-xs tracking-widest uppercase">Scroll</span>
           <div className="w-[1px] h-12 bg-gradient-to-b from-white/50 to-transparent"></div>
         </motion.div>
+      </section>
+
+      {/* 1.5. Intro Section */}
+      <section className="relative pt-20 pb-32 px-6 z-10">
+        <div className="container mx-auto max-w-6xl flex flex-col items-center text-center">
+          <motion.p
+            custom={1}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={fadeIn}
+            className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed"
+          >
+            AIと最新技術を武器に、あなたのビジネスに必要な「見た目」と「体験」を設計します。
+            <br className="hidden md:block" />
+            テンプレートではなく、あなただけの世界観を。最短1週間、15万円〜。
+          </motion.p>
+          <motion.div
+            custom={2}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={fadeIn}
+            className="flex flex-col sm:flex-row gap-4 items-center"
+          >
+            <Button href="#contact" variant="primary" size="lg">
+              無料相談を予約する
+            </Button>
+            <Button href="#works" variant="outline" size="lg">
+              実績を見る ↓
+            </Button>
+          </motion.div>
+          <motion.p
+            custom={3}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={fadeIn}
+            className="mt-6 text-xs text-white/50"
+          >
+            返信は24時間以内 ・ 相談無料 ・ 押し売りなし
+          </motion.p>
+        </div>
       </section>
 
       {/* 2. Concept Section */}
