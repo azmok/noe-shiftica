@@ -1,23 +1,22 @@
-# Settings for Backend (on Cloud Run).
-# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
+kind: "AppHostingYaml"
+apiVersion: "v1"
+
+# Cloud Run の設定（現状のまま）
 runConfig:
   minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
 
-# Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
+# 環境変数とシークレットの紐付け
+environmentVariables:
+  # Secret Manager から読み込むもの（安全）
+  - variable: PAYLOAD_SECRET
+    secret: PAYLOAD_SECRET
+  - variable: RESEND_API_KEY
+    secret: RESEND_API_KEY
 
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  # 直接値を書いてもいいもの
+  - variable: CONTACT_EMAIL
+    value: "info@noe-shiftica.com"
+  
+  # データベース（本番用のURLが決まったらここに書くか Secret に入れる）
+  - variable: DATABASE_URL
+    value: "postgres://azuma:mysecretpassword@127.0.0.1:5432/myblogdb"
