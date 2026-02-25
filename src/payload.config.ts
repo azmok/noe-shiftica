@@ -22,7 +22,7 @@ const config = buildConfig({
   },
   collections: [Users, Media, Categories, Posts],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'a-dummy-secret-for-build-bypass-only-12345',
+  secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
