@@ -16,7 +16,10 @@ environmentVariables:
   # 直接値を書いてもいいもの
   - variable: CONTACT_EMAIL
     value: "info@noe-shiftica.com"
-  
+
   # データベース（本番用のURLが決まったらここに書くか Secret に入れる）
   - variable: DATABASE_URL
-    value: "postgres://azuma:mysecretpassword@127.0.0.1:5432/myblogdb"
+    secret: DATABASE_URL
+env:
+  - variable: DATABASE_URL
+    secret: DATABASE_URL

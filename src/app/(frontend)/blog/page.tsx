@@ -5,6 +5,8 @@ import Link from "next/link";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 
+export const dynamic = 'force-dynamic';
+
 export default async function BlogPage() {
   const payload = await getPayload({ config: configPromise });
   const posts = await payload.find({
