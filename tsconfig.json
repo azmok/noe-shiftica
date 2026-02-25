@@ -41,6 +41,7 @@
   ],
   "exclude": [
     "node_modules",
-    "functions"
+    "functions",
+    "NS_v3.1"
   ]
 }

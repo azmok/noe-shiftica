@@ -1,0 +1,787 @@
+
+> web@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 25 errors:
+./node_modules/@payloadcms/next/dist/prod/styles.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import traces:
+  App Route:
+    ./node_modules/@payloadcms/next/dist/prod/styles.css
+    ./src/app/(payload)/api/[...slug]/route.ts
+
+  Client Component Browser:
+    ./node_modules/@payloadcms/next/dist/prod/styles.css [Client Component Browser]
+    ./src/app/(payload)/layout.tsx [Server Component]
+
+
+./node_modules/@payloadcms/richtext-lexical/dist/exports/client/bundled.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/richtext-lexical/dist/exports/client/bundled.css [Client Component Browser]
+    ./node_modules/@payloadcms/richtext-lexical/dist/exports/client/Field-HJGV32KA.js [Client Component Browser]
+    ./node_modules/@payloadcms/richtext-lexical/dist/exports/client/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/richtext-lexical/dist/exports/client/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/richtext-lexical/dist/field/bundled.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/bundled.css [Client Component Browser]
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/Diff/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Banner/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Banner/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Banner/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Banner/index.js [Server Component]
+    ./node_modules/@payloadcms/next/dist/views/List/renderListViewSlots.js [Server Component]
+    ./node_modules/@payloadcms/next/dist/views/List/index.js [Server Component]
+    ./node_modules/@payloadcms/next/dist/views/Root/getRouteData.js [Server Component]
+    ./node_modules/@payloadcms/next/dist/views/Root/index.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Button/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Card/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Card/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Card/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Card/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/FieldDiffContainer/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/FieldDiffContainer/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/FieldDiffContainer/index.js [Server Component]
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/Diff/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/FieldDiffLabel/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/FieldDiffLabel/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/FieldDiffLabel/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/elements/FieldDiffContainer/index.js [Server Component]
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/Diff/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/HTMLDiff/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/HTMLDiff/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/HTMLDiff/index.js [Server Component]
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/Diff/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Locked/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Popup/PopupTrigger/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Popup/PopupTrigger/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Popup/PopupTrigger/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Popup/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Popup/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Popup/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Popup/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/elements/Tooltip/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/elements/Tooltip/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Tooltip/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Check/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Check/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Check/index.js [Server Component]
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/Diff/converters/listitem/index.js [Server Component]
+    ./node_modules/@payloadcms/richtext-lexical/dist/field/Diff/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Chevron/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Chevron/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Chevron/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Edit/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Edit/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Edit/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Link/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Link/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Link/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Lock/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Lock/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Lock/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Locked/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Plus/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Plus/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Plus/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/Swap/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/Swap/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/Swap/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/icons/X/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/icons/X/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/icons/X/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/elements/Button/index.js [Server Component]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.scss.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/widgets/CollectionCards/index.js [Server Component]
+    ./src/app/(payload)/admin/importMap.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./node_modules/react-image-crop/dist/ReactCrop.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/react-image-crop/dist/ReactCrop.css [Client Component Browser]
+    ./node_modules/@payloadcms/ui/dist/exports/client/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/next/dist/templates/Default/Wrapper/index.js [Client Component Browser]
+    ./node_modules/@payloadcms/next/dist/templates/Default/Wrapper/index.js [Server Component]
+    ./node_modules/@payloadcms/next/dist/templates/Default/index.js [Server Component]
+    ./node_modules/@payloadcms/next/dist/views/Root/index.js [Server Component]
+    ./src/app/(payload)/admin/[[...segments]]/page.tsx [Server Component]
+
+
+./src/app/(frontend)/styles.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/(frontend)/styles.css [Client Component Browser]
+    ./src/app/(frontend)/layout.tsx [Server Component]
+
+
+./src/app/(payload)/custom.scss.css
+Error evaluating Node.js code
+Error: Cannot find module '../lightningcss.linux-x64-gnu.node'
+Require stack:
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/node/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/@tailwindcss/postcss/dist/index.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[root-of-the-server]__51225daf._.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/chunks/[turbopack]_runtime.js
+- /mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/.next/build/postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1383:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1192:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:328:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1463:12)]
+    [at require (node:internal/modules/helpers:147:16)]
+    [at Object.<anonymous> (/mnt/c/Users/genta/projects/NoeShiftica/NS_v3.1/node_modules/lightningcss/node/index.js:22:22)]
+    [at Module._compile (node:internal/modules/cjs/loader:1706:14)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/(payload)/custom.scss.css [Client Component Browser]
+    ./src/app/(payload)/layout.tsx [Server Component]
+
+
+    at ignore-listed frames
