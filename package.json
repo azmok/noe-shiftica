@@ -12,7 +12,9 @@
   "dependencies": {
     "@payloadcms/db-postgres": "^3.77.0",
     "@payloadcms/next": "^3.77.0",
+    "@payloadcms/plugin-cloud-storage": "^3.77.0",
     "@payloadcms/richtext-lexical": "^3.77.0",
+    "@payloadcms/storage-gcs": "^3.77.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@types/three": "^0.183.1",

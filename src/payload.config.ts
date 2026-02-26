@@ -4,6 +4,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { gcsStorage } from '@payloadcms/storage-gcs'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -32,7 +33,18 @@ const config = buildConfig({
     },
   }),
   sharp,
-  plugins: [],
+  plugins: [
+    gcsStorage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.GCS_BUCKET || '',
+      options: {
+        projectId: process.env.GCS_PROJECT_ID,
+        keyFilename: process.env.GCS_KEYFILE_PATH,
+      },
+    }),
+  ],
 }).catch(e => {
   console.error("PAYLOAD CONFIG ERROR:", e);
   throw e;
