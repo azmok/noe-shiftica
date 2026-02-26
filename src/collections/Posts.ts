@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { slugField } from 'payload-plugin-slug'
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
@@ -18,14 +19,19 @@ export const Posts: CollectionConfig = {
             type: 'text',
             required: true,
         },
-        {
-            name: 'slug',
-            type: 'text',
-            required: true,
-            admin: {
-                position: 'sidebar',
+        ...slugField('title', {
+            slugOverrides: {
+                admin: {
+                    position: 'sidebar',
+                    hidden: true,
+                },
             },
-        },
+            checkboxOverrides: {
+                admin: {
+                    hidden: true,
+                },
+            },
+        }),
         {
             name: 'author',
             type: 'relationship',
