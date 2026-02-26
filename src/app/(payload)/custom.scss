@@ -1,0 +1,87 @@
+/* 
+  Make the image "Edit" and "Delete" (Remove) buttons in Payload CMS Media Tab much more prominent and user-friendly. By default, Payload hides them or makes them very small.
+  These buttons are typically contained in file-details__main-detail -> file-details__remove and upload-actions.
+*/
+
+.file-details {
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 8px;
+  padding: 8px;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: var(--theme-elevation-400);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &__remove {
+    /* Make the delete X button always visible and more prominent */
+    opacity: 1 !important;
+    background-color: var(--theme-error-100) !important;
+    color: var(--theme-error-500) !important;
+    border: 1px solid var(--theme-error-200) !important;
+    transform: scale(1.1);
+    
+    &:hover {
+      background-color: var(--theme-error-500) !important;
+      color: white !important;
+      transform: scale(1.2);
+    }
+  }
+}
+
+/* Edit button within the upload actions */
+.upload-actions {
+  gap: 8px !important;
+  margin-top: 8px;
+
+  button {
+    opacity: 1 !important; /* Force visible */
+    background-color: var(--theme-elevation-150) !important;
+    border: 1px solid var(--theme-elevation-250) !important;
+    border-radius: 4px;
+    padding: 6px 12px !important;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      background-color: var(--theme-elevation-250) !important;
+      transform: translateY(-1px);
+    }
+    
+    /* Make the button look like a primary action */
+    &.edit-upload {
+      background-color: var(--theme-success-100) !important;
+      color: var(--theme-success-700) !important;
+      border-color: var(--theme-success-200) !important;
+      
+      &:hover {
+        background-color: var(--theme-success-500) !important;
+        color: white !important;
+      }
+    }
+  }
+}
+
+/* Overall thumbnail cards in the gallery view */
+.thumbnail-card {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  position: relative; /* Ensure children can position absolutely if needed */
+
+  &:hover {
+    border-color: var(--theme-primary-500);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Make the label larger and easier to read */
+  &__label {
+    padding: 12px !important;
+    font-weight: 500;
+    font-size: 14px;
+  }
+}
