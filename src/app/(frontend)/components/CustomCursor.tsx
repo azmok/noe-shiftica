@@ -71,6 +71,10 @@ export function CustomCursor() {
     const handleMouseOver = (e: MouseEvent) => {
       let target = e.target as HTMLElement;
       let relatedTarget = e.relatedTarget as HTMLElement;
+
+      // .blog-posts クラスを持つ要素（ブログカード等）はホバー時の変形効果を無効化する
+      if (target.closest(".blog-posts")) return;
+
       const interactiveEl = target.closest("a, button, [role='button']") as HTMLElement;
 
       if (
@@ -102,6 +106,10 @@ export function CustomCursor() {
     const handleMouseOut = (e: MouseEvent) => {
       let target = e.target as HTMLElement;
       let relatedTarget = e.relatedTarget as HTMLElement;
+
+      // .blog-posts クラスを持つ要素（ブログカード等）はホバー時の変形効果を無効化する
+      if (target.closest(".blog-posts")) return;
+
       const interactiveEl = target.closest("a, button, [role='button']");
       if (interactiveEl || window.getComputedStyle(target).cursor === "pointer") {
         if (interactiveEl && relatedTarget && interactiveEl.contains(relatedTarget)) {
@@ -130,7 +138,10 @@ export function CustomCursor() {
   useEffect(() => {
     if (isMobile) return;
 
+    let isMounted = true;
+
     const loop = () => {
+      if (!isMounted) return;
       if (stateRef.current === "springing") {
         const tx = mouseX.current - 13;
         const ty = mouseY.current - 13;
@@ -154,7 +165,10 @@ export function CustomCursor() {
     };
 
     loopRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(loopRef.current);
+    return () => {
+      isMounted = false;
+      cancelAnimationFrame(loopRef.current);
+    };
   }, [isMobile, cursorX, cursorY]);
 
   // ホバー対象が存在する場合のみ、固定位置へのスムーズな吸着アニメーションを発火

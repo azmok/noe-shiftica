@@ -91,7 +91,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#contact"
+                  href="/#contact"
                   className="text-white/80 text-xs"
                 >
                   Contact Us

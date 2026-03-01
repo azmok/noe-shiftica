@@ -52,7 +52,7 @@ export default async function BlogPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {posts.docs.map((post: any) => (
-                <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
+                <Link href={`/blog/${post.slug}`} key={post.id} className="block group blog-posts">
                   <div className="bg-[#111111]/30 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:bg-[#111111]/60 hover:border-white/20 h-full flex flex-col">
                     <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-[var(--color-primary)] transition-colors">
                       {post.title}

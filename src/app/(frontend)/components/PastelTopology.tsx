@@ -131,9 +131,11 @@ export function PastelTopology() {
         const core = new THREE.Mesh(coreGeo, coreMat);
         scene.add(core);
 
+        let isMounted = true;
         let animationFrameId: number;
 
         const animate = () => {
+            if (!isMounted) return;
             animationFrameId = requestAnimationFrame(animate);
             const time = performance.now() * 0.0005;
             material.uniforms.uTime.value = time * 2.0;
@@ -159,6 +161,7 @@ export function PastelTopology() {
         window.addEventListener('resize', handleResize);
 
         return () => {
+            isMounted = false;
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationFrameId);
 
@@ -179,6 +182,7 @@ export function PastelTopology() {
             });
 
             renderer.dispose();
+            renderer.forceContextLoss();
 
             if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
                 containerRef.current.removeChild(renderer.domElement);
