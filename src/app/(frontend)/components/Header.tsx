@@ -10,14 +10,31 @@ import { Button } from "./ui/Button";
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+
+      // Hide on scroll down, show on scroll up (after 50px threshold)
+      if (currentScrollY > 50) {
+        if (currentScrollY > lastScrollY) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+      } else {
+        setIsVisible(true);
+      }
+
+      setIsScrolled(currentScrollY > 50);
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const navLinks = [
     { name: "Concept", href: "/#concept" },
@@ -29,10 +46,12 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-[#050505]/80 backdrop-blur-md py-4" : "bg-transparent py-6"}`}
+      className={`fixed top-0 left-0 w-full z-50 bg-transparent transition-all duration-300 transform ${isVisible ? "translate-y-0" : "md:-translate-y-full"
+        }`}
     >
-      <div className="container mx-auto px-6 max-w-7xl flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 z-50">
+      <div className="w-full mx-auto px-6 flex items-center justify-between bg-white/5 backdrop-blur-[5px] transition-all duration-300">
+        {/* Logo (Hidden on mobile) */}
+        <Link href="/" className="hidden md:flex items-center gap-2 relative z-[110]">
           <Image
             src="/assets/NS_logo_White.jpg"
             alt="Noe Shiftica"
@@ -59,7 +78,7 @@ export function Header() {
 
         {/* Mobile Nav Toggle */}
         <button
-          className="md:hidden z-50 text-white p-2"
+          className="md:hidden relative z-[110] text-white p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -73,7 +92,7 @@ export function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 h-[100dvh] w-screen bg-[#050505] z-[100] flex flex-col items-center justify-center space-y-8"
+            className="fixed inset-0 h-[100dvh] w-screen bg-transparent backdrop-blur-md z-[100] flex flex-col items-center justify-center space-y-8"
           >
             {navLinks.map((link) => (
               <Link

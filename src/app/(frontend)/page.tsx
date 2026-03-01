@@ -46,7 +46,7 @@ export default function HomePage() {
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-            className="hero-h1"
+            className="hero-h1 heading-1"
           >
             Design the Shift.
           </motion.h1>

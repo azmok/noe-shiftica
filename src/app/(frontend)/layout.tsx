@@ -11,7 +11,7 @@ const notoSans = Noto_Sans_JP({
 });
 
 const notoSerif = Noto_Serif_JP({
-  weight: ["400", "700"],
+  weight: ["200", "300", "400", "500", "600", "700", "900"],
   subsets: ["latin"],
   variable: "--font-serif",
   display: "swap",
@@ -52,6 +52,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
   return (
     <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`} data-scroll-behavior="smooth">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet" />
+      </head>
       <body>
         <CustomCursor />
         <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
