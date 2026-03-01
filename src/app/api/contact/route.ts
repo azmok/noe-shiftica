@@ -5,6 +5,13 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key_for_build_
 
 export async function POST(request: Request) {
     try {
+        const apiKey = process.env.RESEND_API_KEY || 're_dummy_key_for_build_bypass';
+        const maskedApiKey = apiKey.length > 8 ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : apiKey;
+
+        console.log(`[DEBUG] POST /api/contact. Used API Key: ${maskedApiKey} (length: ${apiKey.length})`);
+        console.log(`[DEBUG] Is dummy key used?: ${apiKey === 're_dummy_key_for_build_bypass'}`);
+        console.log(`[DEBUG] RESEND_API_KEY from env: ${process.env.RESEND_API_KEY ? 'Set' : 'Not set'}`);
+
         const { name, email, message, budget, timeline } = await request.json();
 
         if (!name || !email || !message) {
