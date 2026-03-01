@@ -161,11 +161,25 @@ export function PastelTopology() {
         return () => {
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationFrameId);
+
+            // シーン内のすべてのオブジェクトに対してメモリ解放を徹底的に行う
+            scene.traverse((object) => {
+                if (object instanceof THREE.Mesh) {
+                    if (object.geometry) {
+                        object.geometry.dispose();
+                    }
+                    if (object.material) {
+                        if (Array.isArray(object.material)) {
+                            object.material.forEach(material => material.dispose());
+                        } else {
+                            object.material.dispose();
+                        }
+                    }
+                }
+            });
+
             renderer.dispose();
-            geometry.dispose();
-            material.dispose();
-            coreGeo.dispose();
-            coreMat.dispose();
+
             if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
                 containerRef.current.removeChild(renderer.domElement);
             }

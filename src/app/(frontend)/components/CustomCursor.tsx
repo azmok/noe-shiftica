@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 export function CustomCursor() {
@@ -14,6 +15,7 @@ export function CustomCursor() {
     borderRadius: string;
   } | null>(null);
 
+  const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
 
   // 遅延をなくすために React State を経由せず Motion Value を直接更新する
@@ -33,6 +35,14 @@ export function CustomCursor() {
   const yAnimRef = useRef<any>(null);
 
   const loopRef = useRef<number>(0);
+
+  // パス名（ページ遷移）が変わった際に、強制的にカーソルの残存ホバー状態をキャンセルする
+  useEffect(() => {
+    setHoveredElProps(null);
+    stateRef.current = "normal";
+    xAnimRef.current?.stop();
+    yAnimRef.current?.stop();
+  }, [pathname]);
 
   useEffect(() => {
     // Check if device is mobile, touch-enabled, or simulated in dev tools
