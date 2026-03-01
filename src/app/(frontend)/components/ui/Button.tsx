@@ -17,17 +17,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles =
       "inline-flex items-center justify-center rounded-full font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#050505] disabled:opacity-50 disabled:pointer-events-none";
 
-    // Using inline styles/raw classes corresponding to Palette B for now
-    // a:hover のグローバルスタイルを上書きしつつ、自身のホバー反転をTailwindで定義
+    // a:hover のグローバルスタイルを上書きしつつ、自身のホバー反転をTailwindで定義 (hoverエフェクト削除済)
     const variants = {
       primary:
-        "bg-[#050505] text-[#FFFFFF] border border-[#FFFFFF] hover:!bg-[#FFFFFF] hover:!text-[#050505] focus:ring-[#FFFFFF]",
+        "bg-[#050505] text-[#FFFFFF] border border-[#FFFFFF] focus:ring-[#FFFFFF]",
       secondary:
-        "bg-[#555555] text-white hover:!bg-white hover:!text-[#050505] focus:ring-[#555555]",
+        "bg-[#555555] text-white focus:ring-[#555555]",
       outline:
-        "border-2 border-[#FFFFFF] text-[#FFFFFF] hover:!bg-[#FFFFFF] hover:!text-[#050505] focus:ring-[#FFFFFF]",
+        "border-2 border-[#FFFFFF] text-[#FFFFFF] focus:ring-[#FFFFFF]",
       ghost:
-        "text-white hover:!bg-white hover:!text-[#050505] focus:ring-white",
+        "text-white focus:ring-white",
     };
 
     const sizes = {
@@ -40,7 +39,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       baseStyles,
       variants[variant],
       sizes[size],
-      "hover-lift",
       className,
     );
 

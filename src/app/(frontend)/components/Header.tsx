@@ -49,15 +49,12 @@ export function Header() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-xs font-medium text-white/80 hover:text-[#FFFFFF] transition-colors relative group"
+              className="text-xs font-medium text-white/80 rounded-full"
+              style={{ padding: '0.5em 1em' }}
             >
               {link.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FFFFFF] transition-all group-hover:w-full"></span>
             </Link>
           ))}
-          <Button href="/#contact" variant="primary" size="sm">
-            Contact Us
-          </Button>
         </nav>
 
         {/* Mobile Nav Toggle */}
@@ -76,25 +73,19 @@ export function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 bg-[#050505] z-40 flex flex-col items-center justify-center space-y-8"
+            className="fixed inset-0 h-[100dvh] w-screen bg-[#050505] z-[100] flex flex-col items-center justify-center space-y-8"
           >
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-2xl font-serif text-white hover:text-[#FFFFFF] transition-colors"
+                className="text-2xl font-serif text-white rounded-full"
+                style={{ padding: '0.5em 1em' }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
-            <Button
-              href="/#contact"
-              variant="primary"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Contact Us
-            </Button>
           </motion.div>
         )}
       </AnimatePresence>

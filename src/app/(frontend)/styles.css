@@ -25,7 +25,6 @@
 
 * {
   box-sizing: border-box;
-  cursor: none !important;
 }
 
 html {
@@ -49,12 +48,19 @@ body {
   margin: 0;
   color: var(--foreground);
 
-  /* カスタムカーソル用の準備（後でThree.js等のcanvasで隠す可能性がある場合は適宜調整） */
-  cursor: none;
-
   @media (max-width: 1024px) {
     font-size: 15px;
     line-height: 24px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+
+  body {
+    cursor: none;
   }
 }
 
@@ -114,22 +120,14 @@ p {
 a {
   color: currentColor;
   text-decoration: none;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
 
   &:focus {
-    opacity: 0.8;
     outline: none;
     outline: 2px solid var(--color-primary);
-    /* アクセシビリティ対応 focus-states */
     outline-offset: 2px;
   }
 
   &:active {
-    opacity: 0.7;
     outline: none;
   }
 }
@@ -138,18 +136,7 @@ svg {
   vertical-align: middle;
 }
 
-/* Base Utility Classes for Interaction & Micro-animations */
-.hover-lift {
-  transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.2s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(204, 221, 0, 0.15);
-  /* Primary color shadow */
-}
+/* Base Utility Classes removed */
 
 /* カスタムカーソル要素用のスタイル (Google Design風) */
 .custom-cursor {
@@ -160,8 +147,8 @@ svg {
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  mix-blend-mode: exclusion;
-  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  /* differenceと白背景で反転効果 */
 }
 
 .hero-h1 {
@@ -204,5 +191,3 @@ h2.hero-h2.heading-2 {
   /* border: 1px solid red; */
   width: 100%;
 }
-
-h2.hero-h2.heading-2 {}

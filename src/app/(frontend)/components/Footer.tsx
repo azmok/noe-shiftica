@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,15 +9,7 @@ export function Footer() {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2 space-y-4">
-            <Link href="/" className="inline-block">
-              <Image
-                src="/assets/NS_logo_White.jpg"
-                alt="Noe Shiftica"
-                width={180}
-                height={40}
-                className="h-8 md:h-10 w-auto opacity-90"
-              />
-            </Link>
+
             <p className="text-white/60 text-xs max-w-sm leading-relaxed">
               Design the Shift.
               <br />
@@ -42,7 +33,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#services"
-                  className="text-white/80 hover:text-white transition-colors text-xs"
+                  className="text-white/80 text-xs"
                 >
                   Services
                 </Link>
@@ -50,7 +41,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#pricing"
-                  className="text-white/80 hover:text-white transition-colors text-xs"
+                  className="text-white/80 text-xs"
                 >
                   Pricing
                 </Link>
@@ -58,7 +49,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/blog"
-                  className="text-white/80 hover:text-white transition-colors text-xs"
+                  className="text-white/80 text-xs"
                 >
                   Journal / Tech Blog
                 </Link>
@@ -84,7 +75,7 @@ export function Footer() {
                 <Link
                   href="https://github.com"
                   target="_blank"
-                  className="text-white/80 hover:text-white transition-colors text-xs"
+                  className="text-white/80 text-xs"
                 >
                   GitHub
                 </Link>
@@ -93,7 +84,7 @@ export function Footer() {
                 <Link
                   href="https://linkedin.com"
                   target="_blank"
-                  className="text-white/80 hover:text-white transition-colors text-xs"
+                  className="text-white/80 text-xs"
                 >
                   LinkedIn
                 </Link>
@@ -101,7 +92,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#contact"
-                  className="text-white/80 hover:text-white transition-colors text-xs"
+                  className="text-white/80 text-xs"
                 >
                   Contact Us
                 </Link>
@@ -117,13 +108,13 @@ export function Footer() {
           <div className="flex gap-6">
             <Link
               href="/privacy"
-              className="text-white/50 hover:text-white text-xs transition-colors"
+              className="text-white/50 text-xs"
             >
               Privacy Policy
             </Link>
             <Link
               href="/terms"
-              className="text-white/50 hover:text-white text-xs transition-colors"
+              className="text-white/50 text-xs"
             >
               Terms of Service
             </Link>
