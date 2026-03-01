@@ -17,7 +17,7 @@ export async function POST(request: Request) {
         const contactEmail = process.env.CONTACT_EMAIL || 'info@noe-shiftica.com';
 
         // 1. お客様への自動返信メール
-        const customerEmailData = await resend.emails.send({
+        const { data: customerData, error: customerError } = await resend.emails.send({
             from: 'Noe Shiftica <info@noe-shiftica.com>',
             to: [email],
             subject: '【Noe Shiftica】お問い合わせを受け付けました',
@@ -34,8 +34,13 @@ export async function POST(request: Request) {
       `,
         });
 
+        if (customerError) {
+            console.error('Resend Error (Customer Email):', customerError);
+            return NextResponse.json({ error: '自動返信メールの送信に失敗しました。', details: customerError }, { status: 500 });
+        }
+
         // 2. 管理者への通知メール
-        const adminEmailData = await resend.emails.send({
+        const { data: adminData, error: adminError } = await resend.emails.send({
             from: 'Noe Shiftica <info@noe-shiftica.com>',
             to: [contactEmail],
             subject: `【新規お問い合わせ】${name} 様より`,
@@ -51,7 +56,12 @@ export async function POST(request: Request) {
       `,
         });
 
-        return NextResponse.json({ success: true, customerEmailData, adminEmailData });
+        if (adminError) {
+            console.error('Resend Error (Admin Email):', adminError);
+            return NextResponse.json({ error: '管理者宛の通知メールの送信に失敗しました。', details: adminError }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true, customerData, adminData });
     } catch (error) {
         console.error('Contact form error:', error);
         return NextResponse.json(

@@ -49,18 +49,8 @@ export function Header() {
       className={`fixed top-0 left-0 w-full z-50 bg-transparent transition-all duration-300 transform ${isVisible ? "translate-y-0" : "md:-translate-y-full"
         }`}
     >
-      <div className="w-full mx-auto px-6 flex items-center justify-between bg-white/5 backdrop-blur-[5px] transition-all duration-300">
-        {/* Logo (Hidden on mobile) */}
-        <Link href="/" className="hidden md:flex items-center gap-2 relative z-[110]">
-          <Image
-            src="/assets/NS_logo_White.jpg"
-            alt="Noe Shiftica"
-            width={180}
-            height={40}
-            className="h-7 md:h-8 w-auto opacity-90"
-            priority
-          />
-        </Link>
+      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 bg-white/5 backdrop-blur-[5px] transition-all duration-300`}>
+
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
@@ -75,6 +65,18 @@ export function Header() {
             </Link>
           ))}
         </nav>
+
+        {/* Logo (Hidden on mobile) */}
+        <Link href="/" className="hidden md:flex items-center gap-2 relative z-[110]">
+          <Image
+            src="/assets/NS_logo_White.jpg"
+            alt="Noe Shiftica"
+            width={180}
+            height={40}
+            className="h-7 md:h-8 w-auto opacity-90"
+            priority
+          />
+        </Link>
 
         {/* Mobile Nav Toggle */}
         <button
