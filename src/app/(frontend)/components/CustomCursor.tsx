@@ -17,6 +17,7 @@ export function CustomCursor() {
 
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const [isHoveringFeatured, setIsHoveringFeatured] = useState(false);
 
   // 遅延をなくすために React State を経由せず Motion Value を直接更新する
   const cursorX = useMotionValue(-100);
@@ -39,6 +40,7 @@ export function CustomCursor() {
   // パス名（ページ遷移）が変わった際に、強制的にカーソルの残存ホバー状態をキャンセルする
   useEffect(() => {
     setHoveredElProps(null);
+    setIsHoveringFeatured(false);
     stateRef.current = "normal";
     xAnimRef.current?.stop();
     yAnimRef.current?.stop();
@@ -72,8 +74,12 @@ export function CustomCursor() {
       let target = e.target as HTMLElement;
       let relatedTarget = e.relatedTarget as HTMLElement;
 
-      // .blog-posts クラスを持つ要素（ブログカード等）はホバー時の変形効果を無効化する
-      if (target.closest(".blog-posts")) return;
+      // .blog-posts クラスを持つ要素（ブログカード等）や .posts.featured はホバー時の変形効果を無効化する
+      if (target.closest(".posts.featured")) {
+        setIsHoveringFeatured(true);
+      }
+
+      if (target.closest(".blog-posts") || target.closest(".posts.featured")) return;
 
       const interactiveEl = target.closest("a, button, [role='button']") as HTMLElement;
 
@@ -107,8 +113,15 @@ export function CustomCursor() {
       let target = e.target as HTMLElement;
       let relatedTarget = e.relatedTarget as HTMLElement;
 
-      // .blog-posts クラスを持つ要素（ブログカード等）はホバー時の変形効果を無効化する
-      if (target.closest(".blog-posts")) return;
+      const featured = target.closest(".posts.featured");
+      if (featured) {
+        if (!relatedTarget || !featured.contains(relatedTarget)) {
+          setIsHoveringFeatured(false);
+        }
+      }
+
+      // .blog-posts クラスを持つ要素（ブログカード等）や .posts.featured はホバー時の変形効果を無効化する
+      if (target.closest(".blog-posts") || target.closest(".posts.featured")) return;
 
       const interactiveEl = target.closest("a, button, [role='button']");
       if (interactiveEl || window.getComputedStyle(target).cursor === "pointer") {
@@ -201,7 +214,11 @@ export function CustomCursor() {
 
   return (
     <motion.div
-      className={clsx("custom-cursor", hoveredElProps && "active")}
+      className={clsx(
+        "custom-cursor",
+        hoveredElProps && "active",
+        isHoveringFeatured && "featured-hover"
+      )}
       // x, y は MotionValue を紐づけて React State から完全に切り離す
       style={{
         x: cursorX,

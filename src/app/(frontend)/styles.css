@@ -7,6 +7,7 @@
   --color-background-void: #050505;
   --color-glow: #E8FF6A;
   --color-accent: #A060D0;
+  --color-accent: #A060D0;
   --color-neutral-plum: #2A1040;
   --color-text-sub: #7A886A;
 
@@ -21,6 +22,13 @@
   --background: var(--color-background-void);
   --foreground: #ffffff;
   /* 完全なる白でコントラストを最強に */
+
+  /* Colors - Neuromorphic for /blog */
+  --color-neu-bg-light: #eef2f6;
+  --color-neu-bg-dark: #101622;
+  --color-neu-primary: #CCDD00;
+  --color-neu-light: #ffffff;
+  --color-neu-dark: #d1d9e6;
 }
 
 * {
@@ -151,6 +159,11 @@ svg {
   /* differenceと白背景で反転効果 */
 }
 
+.custom-cursor.featured-hover {
+  background-color: var(--color-neu-bg-light) !important;
+  mix-blend-mode: normal !important;
+}
+
 .hero-h1.heading-1 {
   font-family: var(--font-serif);
   font-size: clamp(2.5rem, 12vw, 7rem);
@@ -204,4 +217,35 @@ h2.hero-h2.heading-2 {
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
+}
+
+/* Neuromorphic Utilities for /blog */
+.neu-flat {
+  background: var(--color-neu-bg-light);
+  box-shadow: 6px 6px 12px var(--color-neu-dark), -6px -6px 12px var(--color-neu-light);
+}
+
+.neu-pressed {
+  background: var(--color-neu-bg-light);
+  box-shadow: inset 4px 4px 8px var(--color-neu-dark), inset -4px -4px 8px var(--color-neu-light);
+}
+
+.neu-btn {
+  background: linear-gradient(145deg, #ffffff, #d6dae0);
+  box-shadow: 5px 5px 10px var(--color-neu-dark), -5px -5px 10px var(--color-neu-light);
+  transition: all 0.2s ease;
+}
+
+.neu-btn:active {
+  box-shadow: inset 5px 5px 10px var(--color-neu-dark), inset -5px -5px 10px var(--color-neu-light);
+}
+
+.neu-btn-primary {
+  background: var(--color-neu-primary);
+  box-shadow: 5px 5px 10px #aebcd6, -5px -5px 10px var(--color-neu-light);
+  color: white;
+}
+
+.neu-btn-primary:hover {
+  opacity: 0.9;
 }
