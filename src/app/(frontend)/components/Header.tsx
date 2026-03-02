@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -12,6 +13,19 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const pathname = usePathname();
+
+  // URLが変わったタイミングで表示状態やスクロール位置をリセットする
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsVisible(true);
+    // setTimeout なしだと前ページのスクロール位置が評価される場合があるため、遅延して現在のスクロール位置を反映
+    const timer = setTimeout(() => {
+      setIsScrolled(window.scrollY > 50);
+      setLastScrollY(window.scrollY);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => {

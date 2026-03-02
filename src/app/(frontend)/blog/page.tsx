@@ -5,7 +5,9 @@ import Link from "next/link";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 
-export const dynamic = 'force-dynamic';
+// 'force-dynamic'を削除することで、ビルド時に静的生成（SSG）され、オンデマンドISRの恩恵を受けられるようにします。
+// 記事が更新された時の revalidatePath により裏側で再生成されます。
+export const revalidate = 86400; // フォールバックとして24時間ごとに再検証（任意）
 
 export default async function BlogPage() {
   const payload = await getPayload({ config: configPromise });

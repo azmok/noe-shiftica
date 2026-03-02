@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { slugField } from 'payload-plugin-slug'
+import { revalidatePath } from 'next/cache'
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
@@ -12,6 +13,29 @@ export const Posts: CollectionConfig = {
     },
     access: {
         read: () => true,
+    },
+    hooks: {
+        afterChange: [
+            ({ doc, operation }) => {
+                if (operation === 'create' || operation === 'update') {
+                    // ブログ一覧ページと各記事ページのキャッシュを破棄し、次回アクセス時に静的生成(SSG)させる
+                    revalidatePath('/blog');
+                    if (doc.slug) {
+                        revalidatePath(`/blog/${doc.slug}`);
+                    }
+                }
+                return doc;
+            }
+        ],
+        afterDelete: [
+            ({ doc }) => {
+                revalidatePath('/blog');
+                if (doc.slug) {
+                    revalidatePath(`/blog/${doc.slug}`);
+                }
+                return doc;
+            }
+        ]
     },
     fields: [
         {

@@ -8,7 +8,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
+// 事前ビルド（SSG）するslugのリストを返す関数
+export async function generateStaticParams() {
+    const payload = await getPayload({ config: configPromise });
+    const posts = await payload.find({
+        collection: "posts",
+        depth: 0,
+        limit: 100, // 必要に応じて上限を調整
+    });
+
+    return posts.docs.map((post) => ({
+        slug: post.slug || "",
+    }));
+}
 
 export default async function BlogPostPage({
     params,

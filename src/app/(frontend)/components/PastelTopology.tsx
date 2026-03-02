@@ -182,7 +182,10 @@ export function PastelTopology() {
             });
 
             renderer.dispose();
-            renderer.forceContextLoss();
+
+            // forceContextLoss を呼ぶとブラウザのWebGLキャパシティやNext.jsの高速な再レンダリング時にコンテキスト復帰が間に合わず
+            // 背景が真っ白になる原因になるため削除
+            // renderer.forceContextLoss();
 
             if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
                 containerRef.current.removeChild(renderer.domElement);
