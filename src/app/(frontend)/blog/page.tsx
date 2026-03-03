@@ -63,11 +63,21 @@ export default async function BlogPage() {
                   <Link href={`/blog/${featuredPost.slug}`} className="block posts featured">
                     <div className="neu-flat p-6 rounded-[2rem] flex flex-col lg:flex-row gap-8 items-center group cursor-pointer transition-transform hover:-translate-y-1">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
-                        <div
-                          className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                          style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuAd6WHAIUYC2RmapvNyd7OP93dLOQT9bYKpD-XXG9dP5CoerdTQt3xLyU46lvkz4-KmXFEmf2tdhBBN-nAHJGXMkmYcsnvp3G5cvAYW6a7ihq-o9WZPtF4n3TewgWIvilitSfR5dOIqCToMuwA2b4H4-8JihDELlHYtFgzvuj75FQkTCUIOX1q66Do7v_GcH4tJ809fLoYkjBSzoOTsKnximdzKFJtm5fRuCiuc5rptutWcRv5MMX6ulvp9eHAE_DjGc7OJ-Kc0jMk')` }}
-                        ></div>
+                        {(() => {
+                          const img = (featuredPost.heroImage || featuredPost.coverImage);
+                          if (img && typeof img === 'object' && 'url' in img && img.url) {
+                            return (
+                              <>
+                                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
+                                <div
+                                  className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                  style={{ backgroundImage: `url('${img.url}')` }}
+                                ></div>
+                              </>
+                            );
+                          }
+                          return <BlogFallbackHero />;
+                        })()}
                       </div>
                       <div className="flex flex-col gap-5 w-full lg:w-1/2 lg:pr-6">
                         <div className="flex items-center gap-2">
@@ -137,10 +147,18 @@ export default async function BlogPage() {
                         <Link href={`/blog/${post.slug}`} key={post.id} className="block group font-sans blog-posts">
                           <article className="neu-flat rounded-2xl p-4 flex flex-col gap-4 relative transition-all duration-300 hover:scale-[1.02] hover:z-10 h-full">
                             <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative bg-slate-200">
-                              <div
-                                className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                style={{ backgroundImage: `url('${bgImage}')` }}
-                              ></div>
+                              {(() => {
+                                const img = (post.heroImage || post.coverImage);
+                                if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                  return (
+                                    <div
+                                      className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                      style={{ backgroundImage: `url('${img.url}')` }}
+                                    ></div>
+                                  );
+                                }
+                                return <BlogFallbackHero />;
+                              })()}
                             </div>
                             <div className="flex flex-col flex-1 px-2 pb-2">
                               <span className="text-xs font-bold text-[var(--color-neu-primary)] mb-2 uppercase tracking-wide">Journal</span>

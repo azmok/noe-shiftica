@@ -104,17 +104,21 @@ export default async function BlogPostPage({
                             {/* Hero Image / Header visual gap */}
                             <div className="w-full h-64 md:h-96 rounded-2xl overflow-hidden mb-10 shadow-inner p-2 bg-slate-200/50">
                                 <div className="w-full h-full rounded-xl overflow-hidden relative">
-                                    {post.heroImage && typeof post.heroImage === 'object' && 'url' in post.heroImage ? (
-                                        <>
-                                            <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
-                                            <div
-                                                className="w-full h-full bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
-                                                style={{ backgroundImage: `url('${post.heroImage.url}')` }}
-                                            ></div>
-                                        </>
-                                    ) : (
-                                        <BlogFallbackHero />
-                                    )}
+                                    {(() => {
+                                        const img = (post.heroImage || post.coverImage);
+                                        if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                            return (
+                                                <>
+                                                    <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
+                                                    <div
+                                                        className="w-full h-full bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
+                                                        style={{ backgroundImage: `url('${img.url}')` }}
+                                                    ></div>
+                                                </>
+                                            );
+                                        }
+                                        return <BlogFallbackHero />;
+                                    })()}
                                 </div>
                             </div>
 
