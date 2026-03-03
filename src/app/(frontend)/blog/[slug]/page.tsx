@@ -1,6 +1,7 @@
 import React from "react";
 import { Header } from "../../components/Header";
 import { Footer } from "../../components/Footer";
+import { BlogFallbackHero } from "../../components/BlogFallbackHero";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { RichText } from '@payloadcms/richtext-lexical/react';
@@ -98,11 +99,17 @@ export default async function BlogPostPage({
                             {/* Hero Image / Header visual gap */}
                             <div className="w-full h-64 md:h-96 rounded-2xl overflow-hidden mb-10 shadow-inner p-2 bg-slate-200/50">
                                 <div className="w-full h-full rounded-xl overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
-                                    <div
-                                        className="w-full h-full bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
-                                        style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuAvYhs1ksNNt8t6TR2_Q-CJmf-7332lgpEOPFd7JcNDcPl88KvUB2gYvzahfmaP-2cN0oS-lxvfpVVebj8S5tsNj5vrr0xyJ-XEvfDmffiHxTsyVXB0DYwBjmFYpjqtPu0bkHRIZBg6anzhv_Vurkrl-6LBETHWTWvEuQiJe72r575V7i0iu6vTYHNxi_0vnxlK1Rk2d9RBmA7XBaRmDNvgfotsS_n0HV5lymzHvbjtGnR-2Qa735WqjLoeqRD0m2d-wEO2ae-hN7s')` }}
-                                    ></div>
+                                    {post.heroImage && typeof post.heroImage === 'object' && 'url' in post.heroImage ? (
+                                        <>
+                                            <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
+                                            <div
+                                                className="w-full h-full bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
+                                                style={{ backgroundImage: `url('${post.heroImage.url}')` }}
+                                            ></div>
+                                        </>
+                                    ) : (
+                                        <BlogFallbackHero />
+                                    )}
                                 </div>
                             </div>
 
@@ -149,25 +156,7 @@ export default async function BlogPostPage({
                 </div>
             </main>
 
-            {/* Neuromorphic Footer Custom for Blog */}
-            <footer className="neu-flat mt-auto py-12 px-6 lg:px-40 border-t border-white/50">
-                <div className="max-w-[960px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-                        <span>© {new Date().getFullYear()} Noe Shiftica. All rights reserved.</span>
-                    </div>
-                    <div className="flex gap-6">
-                        <a href="#" className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-500 hover:text-[var(--color-neu-primary)] transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-                        </a>
-                        <a href="#" className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-500 hover:text-[var(--color-neu-primary)] transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 11a9 9 0 0 1 9 9" /><path d="M4 4a16 16 0 0 1 16 16" /><circle cx="5" cy="19" r="1" /></svg>
-                        </a>
-                        <a href="#" className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-500 hover:text-[var(--color-neu-primary)] transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
-                        </a>
-                    </div>
-                </div>
-            </footer>
+            <Footer variant="blog" />
         </div>
     );
 }

@@ -1,9 +1,17 @@
-import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  lexicalEditor,
+  FixedToolbarFeature,
+  HeadingFeature,
+  LinkFeature,
+  BoldFeature,
+  ItalicFeature,
+  ParagraphFeature,
+} from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { gcsStorage } from '@payloadcms/storage-gcs'
 
 import { Users } from './collections/Users'
@@ -22,7 +30,12 @@ const config = buildConfig({
     },
   },
   collections: [Users, Media, Categories, Posts],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      FixedToolbarFeature(),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || 'dummy-secret-key-for-build-bypass-only-xxx',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

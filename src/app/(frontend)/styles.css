@@ -249,3 +249,30 @@ h2.hero-h2.heading-2 {
 .neu-btn-primary:hover {
   opacity: 0.9;
 }
+
+/* Dark Neuromorphic Utilities (Optimized for #050505) */
+.neu-dark-flat {
+  background: #050505;
+  box-shadow: 6px 6px 12px #000000, -6px -6px 12px #121212;
+}
+
+.neu-dark-pressed {
+  background: #050505;
+  box-shadow: inset 4px 4px 8px #000000, inset -4px -4px 8px #121212;
+}
+
+.neu-dark-btn {
+  background: linear-gradient(145deg, #060606, #040404);
+  box-shadow: 5px 5px 10px #000000, -5px -5px 10px #0c0c0c;
+  transition: all 0.2s ease;
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.neu-dark-btn:active {
+  box-shadow: inset 5px 5px 10px #0a0e16, inset -5px -5px 10px #161e2e;
+}
+
+nav a{
+  line-height: 1;
+}

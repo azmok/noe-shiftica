@@ -283,13 +283,13 @@ export default function HomePage() {
               {
                 name: "Lite",
                 price: "¥150,000〜",
-                desc: "LP・名刺代わりのサイト\nスピード重視パッケージ",
+                desc: "LP・ポートフォリオ\nスピード重視パッケージ",
                 time: "納期：約1〜2週間",
               },
               {
                 name: "Standard",
                 price: "¥350,000〜",
-                desc: "コーポレートサイト\nフルデザイン＋CMS導入",
+                desc: "コーポレートサイト\nCMS(ブログ等)導入",
                 time: "納期：約3〜4週間",
                 popular: true,
               },

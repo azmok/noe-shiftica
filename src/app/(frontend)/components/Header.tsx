@@ -72,8 +72,7 @@ export function Header() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-xs font-medium text-white/80 rounded-full"
-              style={{ padding: '0.5em 1em' }}
+              className="text-xs font-medium text-white/80 rounded-full px-5 py-[11px]"
             >
               {link.name}
             </Link>
@@ -94,10 +93,17 @@ export function Header() {
 
         {/* Mobile Nav Toggle */}
         <button
-          className="md:hidden relative z-[110] text-white p-2"
+          className="md:hidden relative z-[110] text-white p-2 flex items-center gap-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMobileMenuOpen ? (
+            <>
+              <span className="text-xs font-bold uppercase tracking-widest">Close</span>
+              <X size={24} />
+            </>
+          ) : (
+            <Menu size={24} />
+          )}
         </button>
       </div>
 
