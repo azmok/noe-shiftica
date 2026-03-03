@@ -8,7 +8,12 @@ export const Posts: CollectionConfig = {
         useAsTitle: 'title',
         livePreview: {
             // プレビューしたい実際のフロントエンドのURLを指定する
-            url: ({ data }) => `http://localhost:3000/blog/${data.slug}?preview=true`,
+            url: ({ data }) => {
+                const url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+                // 新規作成時は slug がないので、プレビュー側で適切にハンドルさせる、
+                // または Payload のプレビュー機能自体にボタンを出させるために URL を返す
+                return `${url}/blog/${data?.slug || 'preview'}?preview=true`;
+            },
         }
     },
     access: {

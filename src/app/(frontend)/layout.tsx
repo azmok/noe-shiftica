@@ -51,7 +51,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`} data-scroll-behavior="smooth">
+    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

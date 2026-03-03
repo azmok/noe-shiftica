@@ -11,16 +11,21 @@ import { ArrowLeft } from "lucide-react";
 
 // 事前ビルド（SSG）するslugのリストを返す関数
 export async function generateStaticParams() {
-    const payload = await getPayload({ config: configPromise });
-    const posts = await payload.find({
-        collection: "posts",
-        depth: 0,
-        limit: 100, // 必要に応じて上限を調整
-    });
+    try {
+        const payload = await getPayload({ config: configPromise });
+        const posts = await payload.find({
+            collection: "posts",
+            depth: 0,
+            limit: 100, // 必要に応じて上限を調整
+        });
 
-    return posts.docs.map((post) => ({
-        slug: post.slug || "",
-    }));
+        return posts.docs.map((post) => ({
+            slug: post.slug || "",
+        }));
+    } catch (error) {
+        console.error("Failed to generateStaticParams for blog posts (expected in some build environments):", error);
+        return [];
+    }
 }
 
 export default async function BlogPostPage({

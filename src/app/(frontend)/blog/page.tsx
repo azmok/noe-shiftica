@@ -11,13 +11,18 @@ import configPromise from "@payload-config";
 export const revalidate = 86400; // フォールバックとして24時間ごとに再検証（任意）
 
 export default async function BlogPage() {
-  const payload = await getPayload({ config: configPromise });
-  const posts = await payload.find({
-    collection: "posts",
-    depth: 1,
-    limit: 10,
-    sort: "-publishedAt",
-  });
+  let posts: any = { docs: [] };
+  try {
+    const payload = await getPayload({ config: configPromise });
+    posts = await payload.find({
+      collection: "posts",
+      depth: 1,
+      limit: 10,
+      sort: "-publishedAt",
+    });
+  } catch (error) {
+    console.error("Failed to fetch posts for BlogPage (expected in some build environments):", error);
+  }
 
   const featuredPost = posts.docs.length > 0 ? posts.docs[0] : null;
   const recentPosts = posts.docs.slice(1);
@@ -194,25 +199,7 @@ export default async function BlogPage() {
         </div>
       </main>
 
-      {/* Neuromorphic Footer Custom for Blog */}
-      <footer className="neu-flat mt-auto py-12 px-6 lg:px-40 border-t border-white/50">
-        <div className="max-w-[960px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 text-slate-400 text-sm">
-            <span>© {new Date().getFullYear()} Noe Shiftica. All rights reserved.</span>
-          </div>
-          <div className="flex gap-6">
-            <a href="#" className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-500 hover:text-[var(--color-neu-primary)] transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-            </a>
-            <a href="#" className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-500 hover:text-[var(--color-neu-primary)] transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 11a9 9 0 0 1 9 9" /><path d="M4 4a16 16 0 0 1 16 16" /><circle cx="5" cy="19" r="1" /></svg>
-            </a>
-            <a href="#" className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-500 hover:text-[var(--color-neu-primary)] transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer variant="blog" />
     </div>
   );
 }
