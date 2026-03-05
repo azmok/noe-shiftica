@@ -52,10 +52,11 @@ const config = buildConfig({
       collections: {
         media: true,
       },
-      bucket: process.env.GCS_BUCKET || '',
+      bucket: process.env.GCS_BUCKET || (process.env.FIREBASE_CONFIG ? JSON.parse(process.env.FIREBASE_CONFIG).storageBucket : 'noe-shiftica.firebasestorage.app'),
       options: {
-        projectId: process.env.GCS_PROJECT_ID,
-        keyFilename: process.env.GCS_KEYFILE_PATH,
+        projectId: process.env.GCS_PROJECT_ID || (process.env.FIREBASE_CONFIG ? JSON.parse(process.env.FIREBASE_CONFIG).projectId : 'noe-shiftica'),
+        // In Firebase App Hosting, Application Default Credentials are used automatically, so omit keyFilename if not defined locally
+        ...(process.env.GCS_KEYFILE_PATH ? { keyFilename: process.env.GCS_KEYFILE_PATH } : {}),
       },
     }),
     markdownImportPlugin(),
