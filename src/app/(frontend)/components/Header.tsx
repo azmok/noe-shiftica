@@ -29,6 +29,12 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
+      // If mobile menu is open, don't hide the header
+      if (isMobileMenuOpen) {
+        setIsVisible(true);
+        return;
+      }
+
       const currentScrollY = window.scrollY;
 
       // Hide on scroll down, show on scroll up (after 50px threshold)
@@ -48,7 +54,7 @@ export function Header() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, isMobileMenuOpen]);
 
   const navLinks = [
     { name: "Concept", href: "/#concept" },
@@ -60,10 +66,10 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 bg-transparent transition-all duration-300 transform ${isVisible ? "translate-y-0" : "md:-translate-y-full"
+      className={`fixed top-0 left-0 w-full z-50 bg-transparent transition-all duration-300 transform ${isVisible ? "translate-y-0" : "-translate-y-full"
         }`}
     >
-      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 bg-white/5 backdrop-blur-[5px] transition-all duration-300`}>
+      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 bg-transparent md:bg-white/5 backdrop-blur-[5px] transition-all duration-300 relative z-[120]`}>
 
 
         {/* Desktop Nav */}
@@ -93,8 +99,12 @@ export function Header() {
 
         {/* Mobile Nav Toggle */}
         <button
-          className="md:hidden relative z-[110] text-white p-2 flex items-center gap-2"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden relative z-[130] text-white p-2 flex items-center gap-2"
+          onClick={() => {
+            const nextState = !isMobileMenuOpen;
+            setIsMobileMenuOpen(nextState);
+            if (nextState) setIsVisible(true);
+          }}
         >
           {isMobileMenuOpen ? (
             <>
@@ -114,7 +124,7 @@ export function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 h-[100dvh] w-screen bg-transparent backdrop-blur-md z-[100] flex flex-col items-center justify-center space-y-8"
+            className="fixed inset-0 h-[100dvh] w-screen bg-transparent backdrop-blur-md z-[110] flex flex-col items-center justify-center space-y-8"
           >
             {navLinks.map((link) => (
               <Link

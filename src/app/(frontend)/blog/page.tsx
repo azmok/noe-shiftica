@@ -188,7 +188,7 @@ export default async function BlogPage() {
           )}
 
           {/* Newsletter Section */}
-          <section className="mt-16 mb-8">
+          {/* <section className="mt-16 mb-8">
             <div className="neu-flat rounded-[2rem] p-8 lg:p-12 relative overflow-hidden">
               <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
                 <div className="max-w-md text-center lg:text-left">
@@ -212,7 +212,7 @@ export default async function BlogPage() {
                 </div>
               </div>
             </div>
-          </section>
+          </section> */}
 
         </div>
       </main>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noe Shiftica | Refined Fallback</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --text: #ffffff;
+            --accent: #f4f4f4;
+            --grain-opacity: 0.04;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", -apple-system, system-ui, sans-serif;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        /* --- Sophisticated Noise Overlay --- */
+        .noise::before {
+            content: "";
+            position: fixed;
+            top: -100%; left: -100%;
+            width: 300%; height: 300%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            animation: grain 8s steps(10) infinite;
+            z-index: 100;
+        }
+
+        @keyframes grain {
+            0%, 100% { transform:translate(0, 0) }
+            10% { transform:translate(-5%, -10%) }
+            30% { transform:translate(3%, -15%) }
+            50% { transform:translate(12%, 9%) }
+            70% { transform:translate(9%, 4%) }
+            90% { transform:translate(-10%, 7%) }
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 50%, #111 0%, #0a0a0a 100%);
+        }
+
+        /* The Cognitive Grid (Enhanced) */
+        .grid-layer {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 5vw 5vw;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+        }
+
+        /* Typography: "Noe Shiftica" */
+        .brand-container {
+            z-index: 10;
+            text-align: center;
+        }
+
+        .brand-name {
+            font-size: clamp(3rem, 12vw, 8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.04em;
+            line-height: 0.85;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .brand-name span {
+            display: block;
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* The "Shift" Effect */
+        .brand-name .shift {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+            margin-left: 2rem;
+            font-style: italic;
+        }
+
+        /* SVG Neural Flow: Organic & Sophisticated */
+        .neural-svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.25;
+            filter: blur(1px);
+        }
+
+        .synapse {
+            fill: none;
+            stroke: var(--text);
+            stroke-width: 0.5;
+            opacity: 0.4;
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
+            animation: flow 20s linear infinite;
+        }
+
+        @keyframes flow {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Floating Info (Architectural detail) */
+        .meta-data {
+            position: absolute;
+            bottom: 40px;
+            left: 5%;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: rgba(255,255,255,0.4);
+            writing-mode: vertical-rl;
+        }
+    </style>
+</head>
+<body class="noise">
+
+    <section class="hero">
+        <div class="grid-layer"></div>
+        
+        <svg class="neural-svg" viewBox="0 0 1000 1000">
+            <path class="synapse" d="M0,500 C200,450 400,550 500,500 S800,450 1000,500" style="animation-duration: 15s;"/>
+            <path class="synapse" d="M0,520 C250,480 450,580 550,520 S850,480 1000,520" style="animation-duration: 25s; opacity: 0.1;"/>
+            <path class="synapse" d="M500,0 C550,200 450,400 500,500 S550,800 500,1000" style="animation-duration: 20s; opacity: 0.2;"/>
+        </svg>
+
+        <div class="brand-container">
+            <h1 class="brand-name">
+                <span>Noe</span>
+                <span class="shift">Shiftica</span>
+            </h1>
+        </div>
+
+        <div class="meta-data">
+            Cognitive Science // Neural Dynamics // Est. 2026
+        </div>
+    </section>
+
+</body>
+</html>

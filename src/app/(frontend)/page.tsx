@@ -319,11 +319,11 @@ export default function HomePage() {
                     RECOMMENDED
                   </div>
                 )}
-                <h3 className="text-2xl font-serif font-bold mb-2">
+                <h3 className="text-2xl !font-inconsolata font-bold mb-2">
                   {plan.name}
                 </h3>
                 <div className="mb-6 pb-6 border-b border-white/10">
-                  <span className="text-4xl font-bold font-mono text-[#FFFFFF]">
+                  <span className="text-4xl font-bold !font-inconsolata text-[#FFFFFF]">
                     {plan.price}
                   </span>
                 </div>
@@ -360,8 +360,7 @@ export default function HomePage() {
             </p>
             <p className="text-white/50 text-xs leading-relaxed">
               ＊
-              別途、年間約6,000円のランニングコスト（サーバー＋ドメイン費用）がかかります。これはNoe
-              Shifticaへの支払いではなく、各サービス会社への直接のお支払いです。
+              別途、年間約6,000円のランニングコスト（サーバー＋ドメイン費用）がかかります。各サービス会社への直接のお支払いです。
             </p>
           </motion.div>
         </div>

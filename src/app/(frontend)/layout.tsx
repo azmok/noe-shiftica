@@ -1,5 +1,5 @@
 import React from "react";
-import { Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
+import { Noto_Sans_JP, Noto_Serif_JP, Inconsolata } from "next/font/google";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
 
@@ -14,6 +14,12 @@ const notoSerif = Noto_Serif_JP({
   weight: ["200", "300", "400", "500", "600", "700", "900"],
   subsets: ["latin"],
   variable: "--font-serif",
+  display: "swap",
+});
+
+const inconsolata = Inconsolata({
+  subsets: ["latin"],
+  variable: "--font-inconsolata",
   display: "swap",
 });
 
@@ -51,11 +57,25 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable} ${inconsolata.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(d) {
+                var config = {
+                  kitId: 'jtq7dsy',
+                  scriptTimeout: 3000,
+                  async: true
+                },
+                h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\\bwf-loading\\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+              })(document);
+            `,
+          }}
+        />
       </head>
       <body>
         <CustomCursor />

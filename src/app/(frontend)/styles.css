@@ -12,10 +12,34 @@
   --color-text-sub: #7A886A;
 
   /* Typography */
-  --font-sans: "Noto Sans JP", "Inter", sans-serif;
-  --font-serif:
-    "PP Neue Montreal", "Space Grotesk", "Noto Serif JP", "游明朝", serif;
+    --font-sans: 
+    "source-han-sans-japanese", /* Adobe Fonts */
+    "Helvetica Neue", /* macOS/iOS, Helvetica fallback */
+    Arial, /* Windows, Helvetica fallback */
+    "Hiragino Kaku Gothic ProN", /* older macOS/iOS */
+    "Hiragino Sans", /* macOS/iOS */
+    "BIZ UDPGothic", /* modern Windows, very clean */
+    Meiryo, /* older Windows */
+    "Yu Gothic", /* Windows/macOS */
+    YuGothic, /* Windows/macOS fallback */
+    "Noto Sans JP", /* Ubuntu/Linux and those who install it */
+    sans-serif;
+
+    --font-serif:
+    "source-han-sans-japanese", /* Adobe Fonts (Unified Sans Look) */
+    "PP Neue Montreal", /* Custom English font */
+    "Space Grotesk", /* Custom English font */
+    "Noto Serif JP", /* Ubuntu/Linux and those who install it */
+    "Hiragino Mincho ProN", /* macOS/iOS */
+    "Yu Mincho", /* Windows/macOS */
+    YuMincho, /* Windows/macOS fallback */
+    "BIZ UDPMincho", /* modern Windows */
+    "MS PMincho", /* older Windows */
+    "游明朝", /* Windows/macOS Japanese name fallback */
+    serif;
+
   --font-mono: "Roboto Mono", monospace;
+  --font-inconsolata: var(--font-inconsolata), monospace;
 }
 
 :root {
@@ -174,6 +198,7 @@ svg {
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #ffc0cb 0%, #89cff0 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 30px rgba(137, 207, 240, 0.3));
   line-height: 1.3;
