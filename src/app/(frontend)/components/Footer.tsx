@@ -14,7 +14,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
     <footer
       className={`w-full pt-16 pb-8 px-6 mt-32 position-relative z-10 transition-colors duration-300 ${isBlog
         ? "bg-[var(--color-neu-bg-light)] border-t border-white/50"
-        : "bg-[#050505] border-t border-white/10"
+        : "bg-[#050505] text-white border-t border-white/10"
         }`}
     >
       <div className="container mx-auto max-w-7xl">
@@ -37,7 +37,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
             >
               Navigation
             </h3>
-            <ul className="space-y-3">
+            <ul className="navigation-area space-y-3">
               {[
                 { name: "About", href: "/about" },
                 { name: "Services", href: "/#services" },
@@ -66,7 +66,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
             >
               Connect
             </h3>
-            <ul className="space-y-3">
+            <ul className="connet-area space-y-3">
               {[
                 { name: "X (Twitter)", href: "https://twitter.com", target: "_blank" },
                 { name: "GitHub", href: "https://github.com", target: "_blank" },
