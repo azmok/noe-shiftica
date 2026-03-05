@@ -45,6 +45,7 @@
   "exclude": [
     "node_modules",
     "functions",
-    "NS_v3.1"
+    "NS_v3.1",
+    "test-*.ts"
   ]
 }
