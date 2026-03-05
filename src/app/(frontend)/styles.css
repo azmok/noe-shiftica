@@ -21,15 +21,13 @@
     "BIZ UDPGothic", /* modern Windows, very clean */
     Meiryo, /* older Windows */
     "Yu Gothic", /* Windows/macOS */
-    YuGothic, /* Windows/macOS fallback */
-    "Noto Sans JP", /* Ubuntu/Linux and those who install it */
+    "YuGothic", /* Windows/macOS fallback */
     sans-serif;
 
     --font-serif:
     "source-han-serif-japanese", /* Adobe Fonts */
     "PP Neue Montreal", /* Custom English font */
     "Space Grotesk", /* Custom English font */
-    "Noto Serif JP", /* Ubuntu/Linux and those who install it */
     "Hiragino Mincho ProN", /* macOS/iOS */
     "Yu Mincho", /* Windows/macOS */
     YuMincho, /* Windows/macOS fallback */

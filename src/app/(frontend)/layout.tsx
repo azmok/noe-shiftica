@@ -1,21 +1,7 @@
 import React from "react";
-import { Noto_Sans_JP, Noto_Serif_JP, Inconsolata } from "next/font/google";
+import { Inconsolata } from "next/font/google";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
-
-const notoSans = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const notoSerif = Noto_Serif_JP({
-  weight: ["200", "300", "400", "500", "600", "700", "900"],
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-});
 
 const inconsolata = Inconsolata({
   subsets: ["latin"],
@@ -57,11 +43,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable} ${inconsolata.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="ja" className={inconsolata.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
