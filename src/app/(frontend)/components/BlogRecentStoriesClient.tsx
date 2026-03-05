@@ -21,8 +21,8 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                     <button
                         onClick={() => setViewMode("grid")}
                         className={`size-10 rounded-full flex items-center justify-center transition-all ${viewMode === "grid"
-                                ? "neu-pressed text-[var(--color-neu-primary)]"
-                                : "neu-btn text-slate-600 hover:text-[var(--color-neu-primary)]"
+                            ? "neu-pressed text-[var(--color-neu-primary)]"
+                            : "neu-btn text-slate-600 hover:text-[var(--color-neu-primary)]"
                             }`}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>
@@ -30,8 +30,8 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                     <button
                         onClick={() => setViewMode("list")}
                         className={`size-10 rounded-full flex items-center justify-center transition-all ${viewMode === "list"
-                                ? "neu-pressed text-[var(--color-neu-primary)]"
-                                : "neu-btn text-slate-600 hover:text-[var(--color-neu-primary)]"
+                            ? "neu-pressed text-[var(--color-neu-primary)]"
+                            : "neu-btn text-slate-600 hover:text-[var(--color-neu-primary)]"
                             }`}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" x2="21" y1="6" y2="6" /><line x1="8" x2="21" y1="12" y2="12" /><line x1="8" x2="21" y1="18" y2="18" /><line x1="3" x2="3.01" y1="6" y2="6" /><line x1="3" x2="3.01" y1="12" y2="12" /><line x1="3" x2="3.01" y1="18" y2="18" /></svg>
@@ -50,12 +50,12 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                             <article className="neu-flat rounded-2xl p-4 flex flex-col gap-4 relative transition-all duration-300 hover:scale-[1.02] hover:z-10 h-full">
                                 <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative bg-slate-200">
                                     {(() => {
-                                        const img = (post.heroImage || post.coverImage);
-                                        if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                        const img = (post.heroUrl || post.coverUrl);
+                                        if (img) {
                                             return (
                                                 <div
                                                     className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                                    style={{ backgroundImage: `url('${img.url}')` }}
+                                                    style={{ backgroundImage: `url('${img}')` }}
                                                 ></div>
                                             );
                                         }
@@ -84,12 +84,12 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                             <article className="neu-flat rounded-2xl p-4 flex gap-6 relative transition-all duration-300 hover:translate-x-1">
                                 <div className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden relative bg-slate-200">
                                     {(() => {
-                                        const img = (post.heroImage || post.coverImage);
-                                        if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                        const img = (post.heroUrl || post.coverUrl);
+                                        if (img) {
                                             return (
                                                 <div
                                                     className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                                    style={{ backgroundImage: `url('${img.url}')` }}
+                                                    style={{ backgroundImage: `url('${img}')` }}
                                                 ></div>
                                             );
                                         }

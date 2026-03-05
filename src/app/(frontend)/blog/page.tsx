@@ -4,34 +4,23 @@ import { Footer } from "../components/Footer";
 import { BlogFallbackHero } from "../components/BlogFallbackHero";
 import { BlogRecentStoriesClient } from "../components/BlogRecentStoriesClient";
 import Link from "next/link";
-import { getPayload } from "payload";
-import configPromise from "@payload-config";
+import { getPostsByStatus } from "@/lib/db";
 
-// 'force-dynamic'を削除することで、ビルド時に静的生成（SSG）され、オンデマンドISRの恩恵を受けられるようにします。
-// 記事が更新された時の revalidatePath により裏側で再生成されます。
-export const revalidate = 86400; // フォールバックとして24時間ごとに再検証（任意）
+// 記事が更新された時の revalidatePath により再生成されます
+export const revalidate = 86400;
 
 export default async function BlogPage() {
-  let posts: any = { docs: [] };
+  // posts テーブルの _status = 'published' の記事のみ直接クエリ
+  // Payload CMS のドラフトバージョン管理を完全にバイパスする
+  let posts: Awaited<ReturnType<typeof getPostsByStatus>> = [];
   try {
-    const payload = await getPayload({ config: configPromise });
-    posts = await payload.find({
-      collection: "posts",
-      depth: 1,
-      limit: 10,
-      sort: "-publishedAt",
-      where: {
-        _status: {
-          equals: 'published',
-        },
-      },
-    });
+    posts = await getPostsByStatus('published');
   } catch (error) {
-    console.error("Failed to fetch posts for BlogPage (expected in some build environments):", error);
+    console.error("Failed to fetch posts:", error);
   }
 
-  const featuredPost = posts.docs.length > 0 ? posts.docs[0] : null;
-  const recentPosts = posts.docs.slice(1);
+  const featuredPost = posts.length > 0 ? posts[0] : null;
+  const recentPosts = posts.slice(1);
 
   return (
     <div className="bg-[var(--color-neu-bg-light)] text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-[var(--color-neu-primary)] selection:text-white">
@@ -46,7 +35,7 @@ export default async function BlogPage() {
       <main className="flex-grow px-6 lg:px-40 py-24 md:py-32 relative z-10">
         <div className="max-w-[960px] mx-auto flex flex-col gap-10 mt-8">
 
-          {posts.docs.length === 0 ? (
+          {posts.length === 0 ? (
             <div className="text-center p-12 neu-flat rounded-2xl w-full">
               <h3 className="text-2xl font-bold mb-4 text-slate-800">
                 No articles yet
@@ -70,14 +59,14 @@ export default async function BlogPage() {
                     <div className="neu-flat p-6 rounded-[2rem] flex flex-col lg:flex-row gap-8 items-center group cursor-pointer transition-transform hover:-translate-y-1">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
-                          const img = (featuredPost.heroImage || featuredPost.coverImage);
-                          if (img && typeof img === 'object' && 'url' in img && img.url) {
+                          if (featuredPost.heroUrl || featuredPost.coverUrl) {
+                            const imgUrl = featuredPost.heroUrl || featuredPost.coverUrl;
                             return (
                               <>
                                 <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
                                 <div
                                   className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                  style={{ backgroundImage: `url('${img.url}')` }}
+                                  style={{ backgroundImage: `url('${imgUrl}')` }}
                                 ></div>
                               </>
                             );
