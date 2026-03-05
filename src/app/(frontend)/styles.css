@@ -13,7 +13,7 @@
 
   /* Typography */
     --font-sans: 
-    "source-han-sans-japanese", /* Adobe Fonts */
+    "source-han-sans-japanese", /* Adobe Fonts - ExtraLight / Light default */
     "Helvetica Neue", /* macOS/iOS, Helvetica fallback */
     Arial, /* Windows, Helvetica fallback */
     "Hiragino Kaku Gothic ProN", /* older macOS/iOS */
@@ -38,12 +38,23 @@
 
   --font-mono: "Roboto Mono", monospace;
   --font-inconsolata: var(--font-inconsolata), monospace;
+
+  /* Font Weights Customizations (-100 applied everywhere) */
+  --font-weight-thin: 100;
+  --font-weight-extralight: 100; /* Was 200 */
+  --font-weight-light: 200;      /* Was 300 */
+  --font-weight-normal: 300;     /* Was 400 */
+  --font-weight-medium: 400;     /* Was 500 */
+  --font-weight-semibold: 500;   /* Was 600 */
+  --font-weight-bold: 600;       /* Was 700 */
+  --font-weight-extrabold: 700;  /* Was 800 */
+  --font-weight-black: 800;      /* Was 900 */
 }
 
 .oxanium-heading {
   font-family: "Oxanium", sans-serif !important;
   font-optical-sizing: auto;
-  font-weight: 700;
+  font-weight: 600;
   font-style: normal;
 }
 
@@ -114,7 +125,7 @@ h4,
 h5,
 h6 {
   font-family: var(--font-sans);
-  font-weight: 900;
+  font-weight: 800;
   /* Extra Bold / Black に近いウェイトでインパクトを出す */
   letter-spacing: -0.02em;
   /* タイトルを少し詰めて塊感を出す */
@@ -196,7 +207,7 @@ svg {
 .hero-h1.heading-1 {
   font-family: var(--font-serif);
   font-size: clamp(2.5rem, 12vw, 7rem);
-  font-weight: 600;
+  font-weight: 500;
   font-optical-sizing: auto;
   /* バリアブルフォントの調整用 */
   margin: 0;
@@ -210,7 +221,7 @@ svg {
 
   @media (max-width: 768px) {
     font-size: 4.5rem;
-    font-weight: 700;
+    font-weight: 600;
   }
 }
 
@@ -241,7 +252,7 @@ h2.hero-h2.heading-2 {
   text-align: right;
   /* border: 1px solid red; */
   width: 100%;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1;
 
   @media (max-width: 768px) {
