@@ -125,7 +125,7 @@ export function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 h-[100dvh] w-screen bg-transparent z-[110] flex flex-col items-center justify-center"
+            className="isolate　fixed inset-0 h-[100dvh] w-screen bg-transparent z-[110] flex flex-col items-center justify-center"
           >
             {/* 背景ボカシ専用のレイヤー */}
             <div

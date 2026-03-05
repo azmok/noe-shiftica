@@ -10,18 +10,18 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
     return (
-        <div className="min-h-screen bg-[#050505] text-[#ffffff] font-sans">
+        <div className="min-h-screen bg-white text-slate-800 font-sans">
             <Header />
 
             <main className="container mx-auto max-w-4xl pt-32 pb-20 px-6">
-                <div className="neu-dark-flat rounded-3xl p-8 md:p-12 mb-12">
-                    <h1 className="text-3xl md:text-4xl mb-8 text-[#ffffff] font-serif font-bold">
+                <div className="neu-flat rounded-3xl p-8 md:p-12 mb-12">
+                    <h1 className="text-3xl md:text-4xl mb-8 text-slate-900 font-serif font-bold">
                         プライバシーポリシー
                     </h1>
 
-                    <div className="space-y-12 text-[15px] font-[200] leading-relaxed text-[#ffffff]/80">
+                    <div className="space-y-12 text-[15px] font-[200] leading-relaxed text-slate-600">
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-[#ffffff] border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
                                 1. はじめに
                             </h2>
                             <p>
@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-[#ffffff] border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
                                 2. 収集する情報
                             </h2>
                             <p>
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-[#ffffff] border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
                                 3. 利用目的
                             </h2>
                             <p>
@@ -61,7 +61,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-[#ffffff] border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
                                 4. 情報の管理と保護
                             </h2>
                             <p>
@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-[#ffffff] border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
                                 5. クッキー（Cookie）の使用
                             </h2>
                             <p>
@@ -79,22 +79,22 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-[#ffffff] border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
                                 6. お問い合わせ窓口
                             </h2>
                             <p>
                                 本ポリシーに関するお問い合わせは、以下の窓口までお願いいたします。
                             </p>
-                            <div className="mt-4 p-6 neu-dark-pressed rounded-xl inline-block">
-                                <p className="m-0 font-bold">Noe Shiftica お問い合わせ窓口</p>
-                                <p className="m-0 text-xs">Email: info@noeshiftica.com</p>
+                            <div className="mt-4 p-6 neu-pressed rounded-xl inline-block">
+                                <p className="m-0 font-bold text-slate-800">Noe Shiftica お問い合わせ窓口</p>
+                                <p className="m-0 text-xs text-slate-500">Email: info@noeshiftica.com</p>
                             </div>
                         </section>
                     </div>
                 </div>
 
                 <div className="text-center">
-                    <Link href="/" className="neu-dark-btn px-8 py-3 rounded-full text-xs font-bold inline-block">
+                    <Link href="/" className="neu-btn px-8 py-3 rounded-full text-xs font-bold inline-block text-slate-700">
                         トップページへ戻る
                     </Link>
                 </div>
