@@ -106,7 +106,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-weight: 900;
   /* Extra Bold / Black に近いウェイトでインパクトを出す */
   letter-spacing: -0.02em;
@@ -182,8 +182,8 @@ svg {
 }
 
 .custom-cursor.featured-hover {
-  background-color: var(--color-neu-bg-light) !important;
-  mix-blend-mode: normal !important;
+  background-color: #ffffff !important;
+  mix-blend-mode: difference !important;
 }
 
 .hero-h1.heading-1 {
