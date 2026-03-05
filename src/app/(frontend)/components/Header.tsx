@@ -68,9 +68,9 @@ export function Header() {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${isScrolled ? "bg-black/10 backdrop-blur-md" : "bg-transparent"}`}
+        } ${isScrolled ? "bg-black/0 backdrop-blur-[3px] shadow-[0_0px_12px_rgba(200,200,200,0.05)]" : "bg-transparent"}`}
     >
-      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 transition-all duration-500 relative z-[120] ${isScrolled ? "bg-white/5 backdrop-blur-[5px]" : "bg-transparent"}`}>
+      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 transition-all duration-500 relative z-[120] ${isScrolled ? "" : "bg-transparent"}`}>
 
 
         {/* Desktop Nav */}
