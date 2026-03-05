@@ -47,6 +47,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

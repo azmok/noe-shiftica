@@ -40,6 +40,13 @@
   --font-inconsolata: var(--font-inconsolata), monospace;
 }
 
+.oxanium-heading {
+  font-family: "Oxanium", sans-serif !important;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
 :root {
   --background: var(--color-background-void);
   --foreground: #ffffff;

@@ -46,7 +46,7 @@ export default function HomePage() {
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-            className="hero-h1 heading-1"
+            className="hero-h1 heading-1 oxanium-heading"
           >
             Design the Shift.
           </motion.h1>
@@ -126,7 +126,7 @@ export default function HomePage() {
             variants={fadeIn}
             className="mb-20 text-center md:text-left max-w-3xl"
           >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 heading-2">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 heading-2 oxanium-heading">
               AI × Design.
               <br />
               <span className="text-xl md:text-2xl font-sans text-[#FFFFFF] block mt-4 font-normal">
@@ -188,7 +188,7 @@ export default function HomePage() {
             variants={fadeIn}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 heading-2">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 heading-2 oxanium-heading">
               How it Works.
             </h2>
             <p className="text-xl text-[#FFFFFF]">
@@ -265,7 +265,7 @@ export default function HomePage() {
             variants={fadeIn}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 heading-2">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 heading-2 oxanium-heading">
               Pricing
             </h2>
             <p className="text-xl text-[#FFFFFF] mb-6">
@@ -376,7 +376,7 @@ export default function HomePage() {
             variants={fadeIn}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 heading-2">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 heading-2 oxanium-heading">
               Let's Work Together.
             </h2>
             <p className="text-xl text-[#FFFFFF] mb-6">まず話しましょう。</p>
