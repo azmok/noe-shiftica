@@ -20,6 +20,11 @@ export default async function BlogPage() {
       depth: 1,
       limit: 10,
       sort: "-publishedAt",
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
     });
   } catch (error) {
     console.error("Failed to fetch posts for BlogPage (expected in some build environments):", error);

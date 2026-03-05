@@ -16,7 +16,12 @@ export async function generateStaticParams() {
         const posts = await payload.find({
             collection: "posts",
             depth: 0,
-            limit: 100, // 必要に応じて上限を調整
+            limit: 100,
+            where: {
+                _status: {
+                    equals: 'published',
+                },
+            },
         });
 
         return posts.docs.map((post) => ({
@@ -42,6 +47,9 @@ export default async function BlogPostPage({
         where: {
             slug: {
                 equals: decodeURIComponent(slug),
+            },
+            _status: {
+                equals: 'published',
             },
         },
         depth: 1,
