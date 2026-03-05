@@ -125,19 +125,21 @@ export function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 h-[100dvh] w-screen bg-transparent backdrop-blur-md z-[110] flex flex-col items-center justify-center space-y-8"
+            className="fixed inset-0 h-[100dvh] w-screen bg-transparent backdrop-blur-md z-[110] flex flex-col items-center justify-center"
           >
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-2xl font-serif text-white rounded-full"
-                style={{ padding: '0.5em 1em' }}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
+            <div className="bg-black/10 backdrop-blur-[2px] p-10 rounded-3xl flex flex-col items-center space-y-6 border border-white/5 shadow-2xl">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-2xl font-serif text-white rounded-full transition-colors hover:text-primary"
+                  style={{ padding: '0.2em 0.5em' }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
