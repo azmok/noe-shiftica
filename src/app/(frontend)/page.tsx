@@ -39,14 +39,14 @@ export default function HomePage() {
         <PastelTopology />
         <motion.div
           style={{ y: yHero }}
-          className="z-10 max-w-6xl mx-auto flex flex-col items-center"
+          className="z-10 hero-container w-full"
         >
           <motion.h1
             custom={1}
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-            className="hero-h1 heading-1 oxanium-heading"
+            className="hero-h1 heading-1 oxanium-heading text-right"
           >
             Design the Shift.
           </motion.h1>
@@ -55,7 +55,7 @@ export default function HomePage() {
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-            className="hero-h2 heading-2"
+            className="hero-h2 heading-2 text-right"
           >
             本質を設計する。世界観を転換する。
           </motion.h2>

@@ -18,6 +18,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
+import { markdownImportPlugin } from './plugins/markdownImport'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -57,6 +58,7 @@ const config = buildConfig({
         keyFilename: process.env.GCS_KEYFILE_PATH,
       },
     }),
+    markdownImportPlugin(),
   ],
 }).catch(e => {
   console.error("PAYLOAD CONFIG ERROR:", e);
