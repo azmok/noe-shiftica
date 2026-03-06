@@ -74,9 +74,9 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                         <span className="text-xs text-slate-400 font-medium">
                                             {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('ja-JP') : ''}
                                         </span>
-                                        <button className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-600 group-hover:text-[var(--color-neu-primary)] group-hover:translate-x-1 transition-all">
+                                        <span className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-600 group-hover:text-[var(--color-neu-primary)] group-hover:translate-x-1 transition-all">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-                                        </button>
+                                        </span>
                                     </div>
                                 </div>
                             </article>
@@ -108,9 +108,9 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                     </h3>
                                 </div>
                                 <div className="flex items-center">
-                                    <button className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-600 group-hover:text-[var(--color-neu-primary)] transition-all">
+                                    <span className="size-10 rounded-full neu-btn flex items-center justify-center text-slate-600 group-hover:text-[var(--color-neu-primary)] transition-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-                                    </button>
+                                    </span>
                                 </div>
                             </article>
                         )}

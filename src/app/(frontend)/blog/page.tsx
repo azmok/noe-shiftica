@@ -90,10 +90,10 @@ export default async function BlogPage() {
                           {"最新の記事をお届けします。クリックして本文をお読みください。"}
                         </p>
                         <div className="pt-2">
-                          <button className="neu-btn-primary h-12 px-8 rounded-xl inline-flex items-center justify-center gap-2 text-white font-bold transition-all hover:shadow-blue-500/40">
+                          <div className="neu-btn-primary h-12 px-8 rounded-xl inline-flex items-center justify-center gap-2 text-white font-bold transition-all hover:shadow-blue-500/40">
                             Read Article
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-                          </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -117,33 +117,6 @@ export default async function BlogPage() {
               <BlogRecentStoriesClient recentPosts={recentPosts} />
             </>
           )}
-
-          {/* Newsletter Section */}
-          {/* <section className="mt-16 mb-8">
-            <div className="neu-flat rounded-[2rem] p-8 lg:p-12 relative overflow-hidden">
-              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-                <div className="max-w-md text-center lg:text-left">
-                  <h2 className="text-2xl font-bold text-slate-800 mb-3">Join our community</h2>
-                  <p className="text-slate-500">最新のデザイン考察や技術情報をメールでお届けします。</p>
-                </div>
-                <div className="w-full max-w-md">
-                  <form className="flex flex-col sm:flex-row gap-4">
-                    <input
-                      className="flex-1 neu-pressed rounded-xl border-none px-6 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-neu-primary)]/20"
-                      placeholder="Your email address"
-                      type="email"
-                    />
-                    <button
-                      className="neu-btn-primary rounded-xl px-8 py-3 font-bold text-white shadow-lg hover:translate-y-px transition-transform"
-                      type="button"
-                    >
-                      Subscribe
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </section> */}
 
         </div>
       </main>
