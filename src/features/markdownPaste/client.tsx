@@ -7,7 +7,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
 import { useEffect } from 'react'
 import { createHeadlessEditor } from '@lexical/headless'
-import { $getSelection, $isRangeSelection, $getRoot } from 'lexical'
+import { $getSelection, $isRangeSelection, $getRoot, $parseSerializedNode } from 'lexical'
 
 const MarkdownPastePlugin = () => {
     const [editor] = useLexicalComposerContext()
@@ -34,11 +34,16 @@ const MarkdownPastePlugin = () => {
                         )
                     }, { discrete: true })
 
-                    // パースされたノードを取得
-                    const nodes = headlessEditor.getEditorState().read(() => $getRoot().getChildren())
+                    // パースされたノードをシリアライズして取得（エディタ間でのノード移送のため）
+                    const serializedNodes = headlessEditor.getEditorState().read(() =>
+                        $getRoot().getChildren().map(node => node.exportJSON())
+                    )
 
-                    if (nodes.length > 0) {
+                    if (serializedNodes.length > 0) {
                         editor.update(() => {
+                            // シリアライズされたデータから現在のエディタ用のノードを再成型
+                            const nodes = serializedNodes.map(serializedNode => $parseSerializedNode(serializedNode))
+
                             const selection = $getSelection()
                             if ($isRangeSelection(selection)) {
                                 selection.insertNodes(nodes)
