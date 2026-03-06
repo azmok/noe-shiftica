@@ -7,7 +7,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
 import { useEffect } from 'react'
 import { createHeadlessEditor } from '@lexical/headless'
-import { $getSelection, $isRangeSelection, $getRoot, $parseSerializedNode } from 'lexical'
+import { $getRoot, $parseSerializedNode, $insertNodes } from 'lexical'
 
 const MarkdownPastePlugin = () => {
     const [editor] = useLexicalComposerContext()
@@ -44,12 +44,10 @@ const MarkdownPastePlugin = () => {
                             // シリアライズされたデータから現在のエディタ用のノードを再成型
                             const nodes = serializedNodes.map(serializedNode => $parseSerializedNode(serializedNode))
 
-                            const selection = $getSelection()
-                            if ($isRangeSelection(selection)) {
-                                selection.insertNodes(nodes)
-                            } else {
-                                $getRoot().append(...nodes)
-                            }
+                            // $insertNodesを使用することで、テーブルなどのブロックノードが
+                            // 正しく（例えばパラグラフを分割して）挿入されるようになる。
+                            // これにより "Expected node TableNode of type table to have a block ancestor" エラーを防ぐ。
+                            $insertNodes(nodes)
                         })
                         return true // デフォルトのペーストをキャンセル
                     }
