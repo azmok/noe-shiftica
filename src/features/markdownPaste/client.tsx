@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 import { createHeadlessEditor } from '@lexical/headless'
 import { $getRoot, $parseSerializedNode, $insertNodes } from 'lexical'
 
-const DEBUG = true // ★ DEBUG FLAG — set to false when done debugging
+const DEBUG = false // ★ DEBUG FLAG — set to false when done debugging
 
 /**
  * Sanitize clipboard text for reliable markdown table parsing.
