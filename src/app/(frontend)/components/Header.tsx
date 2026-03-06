@@ -8,7 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "./ui/Button";
 
-export function Header() {
+interface HeaderProps {
+  alwaysBackdrop?: boolean;
+  hideTopThreshold?: number;
+}
+
+export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -18,11 +23,18 @@ export function Header() {
   // URLが変わったタイミングで表示状態やスクロール位置をリセットする
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setIsVisible(true);
+
     // setTimeout なしだと前ページのスクロール位置が評価される場合があるため、遅延して現在のスクロール位置を反映
     const timer = setTimeout(() => {
-      setIsScrolled(window.scrollY > 50);
-      setLastScrollY(window.scrollY);
+      const initialScrollY = window.scrollY;
+      setIsScrolled(initialScrollY > 50);
+      setLastScrollY(initialScrollY);
+
+      if (hideTopThreshold > 0 && initialScrollY < hideTopThreshold) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
     }, 50);
     return () => clearTimeout(timer);
   }, [pathname]);
@@ -39,17 +51,24 @@ export function Header() {
       const threshold = window.innerHeight - 80; // Trigger slightly before the second section
 
       // Hide on scroll down, show on scroll up (after a small threshold for visibility toggling)
+      let shouldBeVisible = true;
+
       if (currentScrollY > 50) {
         if (currentScrollY > lastScrollY && currentScrollY > threshold) {
-          setIsVisible(false);
+          shouldBeVisible = false;
         } else {
-          setIsVisible(true);
+          shouldBeVisible = true;
         }
       } else {
-        setIsVisible(true);
+        shouldBeVisible = true;
       }
 
-      setIsScrolled(currentScrollY > threshold);
+      if (hideTopThreshold > 0 && currentScrollY < hideTopThreshold) {
+        shouldBeVisible = false;
+      }
+
+      setIsVisible(shouldBeVisible);
+      setIsScrolled(currentScrollY > 50);
       setLastScrollY(currentScrollY);
     };
 
@@ -65,12 +84,14 @@ export function Header() {
     { name: "Blog", href: "/blog" },
   ];
 
+  const hasBackdrop = alwaysBackdrop || isScrolled;
+
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${isScrolled ? "bg-black/0 backdrop-blur-[3px] shadow-[0_0px_12px_rgba(200,200,200,0.05)]" : "bg-transparent"}`}
+        } ${hasBackdrop ? "bg-black/0 backdrop-blur-[8px] shadow-[0_0px_12px_rgba(200,200,200,0.05)] border-b border-white/5" : "bg-transparent"}`}
     >
-      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 transition-all duration-500 relative z-[120] ${isScrolled ? "" : "bg-transparent"}`}>
+      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 transition-all duration-500 relative z-[120] ${hasBackdrop ? "" : "bg-transparent"}`}>
 
 
         {/* Desktop Nav */}

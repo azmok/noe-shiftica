@@ -105,7 +105,7 @@ export default async function BlogPostPage({
             {/* Header contrast background */}
             <div className="absolute top-0 left-0 w-full h-[120px] bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none z-40"></div>
 
-            <Header />
+            <Header alwaysBackdrop={true} />
 
             <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mt-8">

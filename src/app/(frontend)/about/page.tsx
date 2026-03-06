@@ -19,7 +19,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen text-white relative selection:bg-[#FFFFFF] selection:text-[#050505]">
-      <Header />
+      <Header alwaysBackdrop={true} hideTopThreshold={400} />
 
       {/* 1. Hero Section */}
       <section className="pt-48 pb-20 px-6">

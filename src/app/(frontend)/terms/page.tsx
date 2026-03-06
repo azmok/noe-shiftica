@@ -11,7 +11,7 @@ export const metadata = {
 export default function TermsOfServicePage() {
     return (
         <div className="min-h-screen bg-white text-slate-800 font-sans">
-            <Header />
+            <Header alwaysBackdrop={true} />
 
             <main className="container mx-auto max-w-4xl pt-32 pb-20 px-6">
                 <div className="neu-flat rounded-3xl p-8 md:p-12 mb-12">
