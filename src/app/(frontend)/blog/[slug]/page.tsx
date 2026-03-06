@@ -62,6 +62,44 @@ export default async function BlogPostPage({
 
     const post = posts.docs[0];
 
+    // Fetch Previous and Next posts
+    let prevPost = null;
+    let nextPost = null;
+
+    if (post.publishedAt) {
+        const prevPostsRes = await payload.find({
+            collection: "posts",
+            where: {
+                publishedAt: {
+                    less_than: post.publishedAt,
+                },
+                _status: {
+                    equals: 'published',
+                },
+            },
+            sort: '-publishedAt',
+            limit: 1,
+            depth: 0,
+        });
+        prevPost = prevPostsRes.docs[0] || null;
+
+        const nextPostsRes = await payload.find({
+            collection: "posts",
+            where: {
+                publishedAt: {
+                    greater_than: post.publishedAt,
+                },
+                _status: {
+                    equals: 'published',
+                },
+            },
+            sort: 'publishedAt',
+            limit: 1,
+            depth: 0,
+        });
+        nextPost = nextPostsRes.docs[0] || null;
+    }
+
     return (
         <div className="bg-[var(--color-neu-bg-light)] text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-[var(--color-neu-primary)] selection:text-white overflow-x-hidden">
             {/* Header contrast background */}
@@ -104,7 +142,7 @@ export default async function BlogPostPage({
                                     {post.title}
                                 </h1>
 
-                                <p className="text-lg text-slate-500 leading-relaxed max-w-2xl mb-2">
+                                <p className="text-base text-slate-400 leading-relaxed max-w-2xl mb-2">
                                     ここで最新の考察やニュースをお届けします。読み進めて詳細をご確認ください。
                                 </p>
                             </div>
@@ -153,20 +191,41 @@ export default async function BlogPostPage({
 
                         {/* Post Navigation */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 mb-8">
-                            <Link href="/blog" className="neu-btn p-6 rounded-2xl group block text-left">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block group-hover:text-[var(--color-neu-primary)] transition-colors flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                                    Back to Top
-                                </span>
-                                <h4 className="text-lg font-bold text-slate-700 leading-snug">Journal 一覧へ戻る</h4>
-                            </Link>
-                            <Link href="/blog" className="neu-btn p-6 rounded-2xl group block text-right">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block group-hover:text-[var(--color-neu-primary)] transition-colors flex items-center justify-end gap-1">
-                                    Latest Entry
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-                                </span>
-                                <h4 className="text-lg font-bold text-slate-700 leading-snug">最新の記事を読む</h4>
-                            </Link>
+                            {prevPost ? (
+                                <Link href={`/blog/${prevPost.slug}`} className="neu-btn p-6 rounded-2xl group flex flex-col items-start">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-[var(--color-neu-primary)] transition-colors flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                                        Previous
+                                    </span>
+                                    <h4 className="text-lg font-bold text-slate-700 leading-snug line-clamp-2 text-left">{prevPost.title}</h4>
+                                </Link>
+                            ) : (
+                                <Link href="/blog" className="neu-btn p-6 rounded-2xl group flex flex-col items-start">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-[var(--color-neu-primary)] transition-colors flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                                        Back to Top
+                                    </span>
+                                    <h4 className="text-lg font-bold text-slate-700 leading-snug text-left">Journal 一覧へ戻る</h4>
+                                </Link>
+                            )}
+
+                            {nextPost ? (
+                                <Link href={`/blog/${nextPost.slug}`} className="neu-btn p-6 rounded-2xl group flex flex-col items-end">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-[var(--color-neu-primary)] transition-colors flex items-center gap-1">
+                                        Next
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                    </span>
+                                    <h4 className="text-lg font-bold text-slate-700 leading-snug line-clamp-2 text-right">{nextPost.title}</h4>
+                                </Link>
+                            ) : (
+                                <Link href="/blog" className="neu-btn p-6 rounded-2xl group flex flex-col items-end">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-[var(--color-neu-primary)] transition-colors flex items-center gap-1">
+                                        Back to Top
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                    </span>
+                                    <h4 className="text-lg font-bold text-slate-700 leading-snug text-right">Journal 一覧へ戻る</h4>
+                                </Link>
+                            )}
                         </div>
 
                     </article>
