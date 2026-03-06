@@ -79,7 +79,7 @@ export function Header() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-xs font-medium text-white/80 rounded-full px-5 py-[11px]"
+              className="text-xs rounded-full px-5 py-[11px]"
             >
               {link.name}
             </Link>

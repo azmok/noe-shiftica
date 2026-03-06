@@ -10,6 +10,7 @@
   --color-accent: #A060D0;
   --color-neutral-plum: #2A1040;
   --color-text-sub: #7A886A;
+  --color-text-sub2: #919191;
 
   /* Typography */
     --font-sans: 
@@ -320,4 +321,13 @@ h2.hero-h2.heading-2 {
 
 nav a{
   line-height: 1;
+  color: var(--color-text-sub2);
+}
+
+header {
+  letter-spacing: 1.8px;
+  font-weight: 200;
+}
+footer{
+  color: var(--color-text-sub2);
 }
