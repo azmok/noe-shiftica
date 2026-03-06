@@ -5,7 +5,7 @@ import {
   LinkFeature,
   BoldFeature,
   ItalicFeature,
-  ParagraphFeature,
+  ParagraphFeature
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -19,6 +19,7 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { markdownImportPlugin } from './plugins/markdownImport'
+import { MarkdownPasteFeature } from './features/markdownPaste/server'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -35,6 +36,7 @@ const config = buildConfig({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       FixedToolbarFeature(),
+      MarkdownPasteFeature(),
     ],
   }),
   secret: process.env.PAYLOAD_SECRET || 'dummy-secret-key-for-build-bypass-only-xxx',
