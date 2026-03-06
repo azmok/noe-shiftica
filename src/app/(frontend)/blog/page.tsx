@@ -5,6 +5,7 @@ import { BlogFallbackHero } from "../components/BlogFallbackHero";
 import { BlogRecentStoriesClient } from "../components/BlogRecentStoriesClient";
 import Link from "next/link";
 import { getPostsByStatus } from "@/lib/db";
+import { GcsImage } from "@/lib/GcsImage";
 
 // 記事が更新された時の revalidatePath により再生成されます
 export const revalidate = 86400;
@@ -59,15 +60,17 @@ export default async function BlogPage() {
                     <div className="neu-flat p-6 rounded-[2rem] flex flex-col lg:flex-row gap-8 items-center group cursor-pointer transition-transform hover:-translate-y-1">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
-                          if (featuredPost.heroUrl || featuredPost.coverUrl) {
-                            const imgUrl = featuredPost.heroUrl || featuredPost.coverUrl;
+                          const imgUrl = (featuredPost.heroUrl || featuredPost.coverUrl);
+                          if (imgUrl) {
                             return (
                               <>
-                                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10"></div>
-                                <div
-                                  className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                  style={{ backgroundImage: `url('${imgUrl}')` }}
-                                ></div>
+                                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10 pointer-events-none" />
+                                <GcsImage
+                                  src={imgUrl}
+                                  alt={featuredPost.title}
+                                  priority
+                                  className="group-hover:scale-110"
+                                />
                               </>
                             );
                           }

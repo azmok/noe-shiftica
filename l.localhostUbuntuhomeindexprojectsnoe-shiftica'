@@ -1,0 +1,5 @@
+[33md298a8c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m [summary with Antigravity agent] タイトルからスラッグを自動生成する機能を追加（日本語タイトルはGoogle翻訳で英語に変換してスラッグ化）
+[33m2c7c520[m [summary with Antigravity agent] ImportButtonのLexicalエディタ状態更新をuseField/setValueに変更してMarkdownインポート後の表示バグを修正
+[33md7c5264[m [summary with Antigravity agent] Navbarのスクロール挙動と背景ぼかし効果（about, blog, privacy, terms）を改善
+[33mc545070[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m [summary with Antigravity agent] Reactのハイドレーションエラー(Error 418)を修正するため、Link内のbuttonタグをdiv/spanへ置換
+[33m44b8f00[m [summary with Antigravity agent] ブログ記事の前後の記事へのリンク追加と、Payloadのpostsコレクション一覧の表示エラーを修正

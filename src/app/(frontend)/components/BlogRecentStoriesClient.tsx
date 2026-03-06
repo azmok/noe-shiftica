@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { BlogFallbackHero } from "./BlogFallbackHero";
+import { GcsImage } from "@/lib/GcsImage";
 
 interface BlogRecentStoriesClientProps {
     recentPosts: any[];
@@ -50,13 +51,15 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                             <article className="neu-flat rounded-2xl p-4 flex flex-col gap-4 relative transition-all duration-300 hover:scale-[1.02] hover:z-10 h-full">
                                 <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative bg-slate-200">
                                     {(() => {
-                                        const img = (post.heroUrl || post.coverUrl);
+                                        // Use medium-sized variant for grid cards if available, fall back to original
+                                        const img = (post.heroMediumUrl || post.heroUrl || post.coverMediumUrl || post.coverUrl);
                                         if (img) {
                                             return (
-                                                <div
-                                                    className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                                    style={{ backgroundImage: `url('${img}')` }}
-                                                ></div>
+                                                <GcsImage
+                                                    src={img}
+                                                    alt={post.title}
+                                                    className="group-hover:scale-110"
+                                                />
                                             );
                                         }
                                         return <BlogFallbackHero />;
@@ -84,13 +87,15 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                             <article className="neu-flat rounded-2xl p-4 flex gap-6 relative transition-all duration-300 hover:translate-x-1">
                                 <div className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden relative bg-slate-200">
                                     {(() => {
-                                        const img = (post.heroUrl || post.coverUrl);
+                                        // Use thumbnail variant for list view small images
+                                        const img = (post.heroThumbnailUrl || post.heroUrl || post.coverThumbnailUrl || post.coverUrl);
                                         if (img) {
                                             return (
-                                                <div
-                                                    className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                                    style={{ backgroundImage: `url('${img}')` }}
-                                                ></div>
+                                                <GcsImage
+                                                    src={img}
+                                                    alt={post.title}
+                                                    className="group-hover:scale-110"
+                                                />
                                             );
                                         }
                                         return <BlogFallbackHero />;

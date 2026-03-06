@@ -1,0 +1,19 @@
+[
+    {
+        "origin": [
+            "https://noe-shiftica.web.app",
+            "https://noe-shiftica.firebaseapp.com"
+        ],
+        "method": [
+            "GET",
+            "HEAD"
+        ],
+        "responseHeader": [
+            "Content-Type",
+            "Content-Length",
+            "Date",
+            "Cache-Control"
+        ],
+        "maxAgeSeconds": 3600
+    }
+]

@@ -5,7 +5,8 @@ import {
   LinkFeature,
   BoldFeature,
   ItalicFeature,
-  ParagraphFeature
+  ParagraphFeature,
+  EXPERIMENTAL_TableFeature
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -36,6 +37,7 @@ const config = buildConfig({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       FixedToolbarFeature(),
+      EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
     ],
   }),

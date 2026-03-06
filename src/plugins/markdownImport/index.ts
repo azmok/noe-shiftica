@@ -1,7 +1,7 @@
 import { Plugin } from 'payload'
 import { convertMarkdownToLexical } from '@payloadcms/richtext-lexical'
 import matter from 'gray-matter'
-import { defaultEditorConfig, sanitizeServerEditorConfig } from '@payloadcms/richtext-lexical'
+import { sanitizeServerEditorConfig } from '@payloadcms/richtext-lexical'
 import { translateToSlug } from '../../lib/translateToSlug'
 
 export const markdownImportPlugin = (): Plugin => {
@@ -26,8 +26,13 @@ export const markdownImportPlugin = (): Plugin => {
                         const markdownBody = parsed.content || ''
                         const frontmatter = parsed.data || {}
 
-                        // Convert to Lexical
-                        const sanitizedEditorConfig = await sanitizeServerEditorConfig(defaultEditorConfig, req.payload.config as any)
+                        // Convert to Lexical using the actual editor config from Payload
+                        // (includes EXPERIMENTAL_TableFeature and all custom features)
+                        const editorConfig = req.payload.config.editor
+                        const sanitizedEditorConfig = await sanitizeServerEditorConfig(
+                            editorConfig as any,
+                            req.payload.config as any
+                        )
                         const lexicalData = convertMarkdownToLexical({
                             editorConfig: sanitizedEditorConfig,
                             markdown: markdownBody,
