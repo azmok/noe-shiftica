@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { slugField } from 'payload-plugin-slug'
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
@@ -23,6 +22,19 @@ export const Posts: CollectionConfig = {
         read: () => true,
     },
     hooks: {
+        beforeValidate: [
+            ({ data }) => {
+                if (data && !data.slug && data.title) {
+                    data.slug = data.title
+                        .toLowerCase()
+                        .trim()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/[\s_-]+/g, '-')
+                        .replace(/^-+|-+$/g, '');
+                }
+                return data;
+            }
+        ],
         afterChange: [
             async ({ doc, operation }) => {
                 if (operation === 'create' || operation === 'update') {
@@ -53,19 +65,17 @@ export const Posts: CollectionConfig = {
             type: 'text',
             required: true,
         },
-        ...slugField('title', {
-            slugOverrides: {
-                admin: {
-                    position: 'sidebar',
-                    hidden: true,
-                },
+        {
+            name: 'slug',
+            type: 'text',
+            required: true,
+            unique: true,
+            index: true,
+            admin: {
+                position: 'sidebar',
+                description: 'URLに使用される識別子です（タイトルから自動生成されます）',
             },
-            checkboxOverrides: {
-                admin: {
-                    hidden: true,
-                },
-            },
-        }),
+        },
         {
             name: 'author',
             type: 'relationship',
@@ -103,15 +113,14 @@ export const Posts: CollectionConfig = {
             type: 'upload',
             relationTo: 'media',
         },
-        // src/collections/Posts.ts の fields 配列の中に追加するコード
         {
-            name: 'heroImage', // APIで取得する時の名前や
+            name: 'heroImage',
             type: 'upload',
-            relationTo: 'media', // 画像を管理してるコレクション名（デフォルトは'media'が多い）
+            relationTo: 'media',
             label: 'Hero Image',
-            required: false, // 必須にするなら true
+            required: false,
             admin: {
-                position: 'sidebar', // 右側のサイドバーに配置すると管理画面がスッキリするで！
+                position: 'sidebar',
             },
         }
     ],

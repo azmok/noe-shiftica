@@ -1,0 +1,45 @@
+{
+  "status": "success",
+  "result": [
+    {
+      "name": "projects/noe-shiftica/locations/asia-east1/backends/noe-shiftica-backend",
+      "createTime": "2026-02-24T21:30:44.436510505Z",
+      "updateTime": "2026-03-06T17:23:53.420394Z",
+      "labels": {
+        "deployment-tool": "cli-firebase"
+      },
+      "uri": "noe-shiftica-backend--noe-shiftica.asia-east1.hosted.app",
+      "managedResources": [
+        {
+          "runService": {
+            "service": "projects/566328988333/locations/asia-east1/services/noe-shiftica-backend"
+          }
+        }
+      ],
+      "codebase": {
+        "repository": "projects/noe-shiftica/locations/asia-east1/connections/apphosting-github-conn-worxp5l/gitRepositoryLinks/azmok-noe-shiftica",
+        "rootDirectory": "/"
+      },
+      "uid": "45e74f91-9605-4731-9bcc-24786c9ae5af",
+      "etag": "kZ6YdxAgSfeiI748jZF7HNfNnRuu1JwOvxaa0fBtyRE",
+      "reconciling": false,
+      "servingLocality": "GLOBAL_ACCESS",
+      "serviceAccount": "firebase-app-hosting-compute@noe-shiftica.iam.gserviceaccount.com",
+      "appId": "1:566328988333:web:2bc71bfb29b74da59fac24",
+      "overrideEnv": [
+        {
+          "variable": "RESEND_API_KEY",
+          "value": "re_FYP5uEmc_KfkMqmspvGHNaehCycYvuG6Q"
+        },
+        {
+          "variable": "PAYLOAD_SECRET",
+          "value": ">&:i1#%sV^}O&R*R"
+        },
+        {
+          "variable": "DATABASE_URL",
+          "value": "postgresql://neondb_owner:npg_l0sYIoZAad2u@ep-shy-silence-a1mbjeqg-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+        }
+      ]
+    }
+  ]
+}

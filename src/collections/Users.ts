@@ -9,5 +9,15 @@ export const Users: CollectionConfig = {
   fields: [
     // Email added by default
     // Add more fields as needed
+    {
+      name: 'logoutButton',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: 'app/(frontend)/components/admin/LogoutButton#LogoutButton',
+        },
+      },
+    },
   ],
 }

@@ -179,6 +179,9 @@ export interface Category {
 export interface Post {
   id: number;
   title: string;
+  /**
+   * URLに使用される識別子です（タイトルから自動生成されます）
+   */
   slug: string;
   author?: (number | null) | User;
   publishedAt?: string | null;
@@ -202,6 +205,7 @@ export interface Post {
   heroImage?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -349,6 +353,7 @@ export interface PostsSelect<T extends boolean = true> {
   heroImage?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

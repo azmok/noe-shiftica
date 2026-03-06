@@ -1,14 +1,17 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
-import { useForm } from '@payloadcms/ui'
+import React, { useRef, useState, useCallback } from 'react'
+import { useForm, useField } from '@payloadcms/ui'
 
 export const ImportButton: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isImporting, setIsImporting] = useState(false)
     const { dispatchFields } = useForm()
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // useField gives us a proper setValue that syncs Lexical's internal state
+    const { setValue: setContent } = useField<Record<string, unknown>>({ path: 'content' })
+
+    const handleFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (!file) return
 
@@ -54,15 +57,10 @@ export const ImportButton: React.FC = () => {
             }
 
             // Populate Content (RichText Lexical)
+            // Use setContent from useField to properly sync the Lexical editor's internal state
             if (lexical) {
-                dispatchFields({
-                    type: 'UPDATE',
-                    path: 'content',
-                    value: lexical,
-                })
+                setContent(lexical)
             }
-
-            // Optionally, handle categories or other fields if present in frontmatter
 
             // Clear the input so the same file could be selected again if needed
             if (fileInputRef.current) {
@@ -74,7 +72,7 @@ export const ImportButton: React.FC = () => {
         } finally {
             setIsImporting(false)
         }
-    }
+    }, [dispatchFields, setContent])
 
     const handleImportClick = (e: React.MouseEvent) => {
         e.preventDefault()
