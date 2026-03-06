@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { translateToSlug } from '../lib/translateToSlug'
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
@@ -23,14 +24,11 @@ export const Posts: CollectionConfig = {
     },
     hooks: {
         beforeValidate: [
-            ({ data }) => {
+            async ({ data }) => {
+                // Auto-generate slug from title only when slug is empty
+                // Supports Japanese/CJK titles via translation
                 if (data && !data.slug && data.title) {
-                    data.slug = data.title
-                        .toLowerCase()
-                        .trim()
-                        .replace(/[^\w\s-]/g, '')
-                        .replace(/[\s_-]+/g, '-')
-                        .replace(/^-+|-+$/g, '');
+                    data.slug = await translateToSlug(data.title)
                 }
                 return data;
             }

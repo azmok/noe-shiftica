@@ -8,8 +8,9 @@ export const ImportButton: React.FC = () => {
     const [isImporting, setIsImporting] = useState(false)
     const { dispatchFields } = useForm()
 
-    // useField gives us a proper setValue that syncs Lexical's internal state
+    // useField gives us proper setValue that syncs Lexical's internal state
     const { setValue: setContent } = useField<Record<string, unknown>>({ path: 'content' })
+    const { setValue: setSlug } = useField<string>({ path: 'slug' })
 
     const handleFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
@@ -56,6 +57,24 @@ export const ImportButton: React.FC = () => {
                 }
             }
 
+            // Auto-generate slug from title (handles Japanese → English translation)
+            if (frontmatter.title) {
+                try {
+                    const slugRes = await fetch(
+                        `/api/translate-slug?title=${encodeURIComponent(frontmatter.title)}`
+                    )
+                    if (slugRes.ok) {
+                        const { slug } = await slugRes.json()
+                        if (slug) {
+                            setSlug(slug)
+                        }
+                    }
+                } catch {
+                    // Non-critical — slug can be filled manually
+                    console.warn('[ImportButton] Failed to auto-generate slug')
+                }
+            }
+
             // Populate Content (RichText Lexical)
             // Use setContent from useField to properly sync the Lexical editor's internal state
             if (lexical) {
@@ -72,7 +91,7 @@ export const ImportButton: React.FC = () => {
         } finally {
             setIsImporting(false)
         }
-    }, [dispatchFields, setContent])
+    }, [dispatchFields, setContent, setSlug])
 
     const handleImportClick = (e: React.MouseEvent) => {
         e.preventDefault()

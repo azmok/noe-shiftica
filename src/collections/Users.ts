@@ -15,7 +15,7 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         components: {
-          Field: 'app/(frontend)/components/admin/LogoutButton#LogoutButton',
+          Field: '@/app/(frontend)/components/admin/LogoutButton#LogoutButton',
         },
       },
     },
