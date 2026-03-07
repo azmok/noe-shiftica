@@ -10,6 +10,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@lexical/headless": "0.41.0",
+    "@lexical/html": "0.41.0",
+    "@lexical/markdown": "0.41.0",
+    "@lexical/react": "0.41.0",
     "@payloadcms/db-postgres": "3.79.0",
     "@payloadcms/next": "3.79.0",
     "@payloadcms/plugin-cloud-storage": "3.79.0",
@@ -23,6 +27,7 @@
     "framer-motion": "^12.34.3",
     "graphql": "^16.12.0",
     "gray-matter": "^4.0.3",
+    "lexical": "0.41.0",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "payload": "3.79.0",
@@ -37,6 +42,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
