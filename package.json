@@ -7,7 +7,11 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "payload": "payload",
+    "db:create-migration": "payload migrate:create",
+    "db:migrate": "payload migrate",
+    "db:migrate:status": "payload migrate:status"
   },
   "dependencies": {
     "@lexical/headless": "0.41.0",
@@ -25,6 +29,7 @@
     "@react-three/fiber": "^9.5.0",
     "@types/three": "^0.183.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
     "framer-motion": "^12.34.3",
     "graphql": "^16.12.0",
     "gray-matter": "^4.0.3",
@@ -50,6 +55,7 @@
     "eslint-config-next": "16.1.6",
     "neonctl": "^2.21.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
