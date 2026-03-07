@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
@@ -17,12 +17,12 @@ export default function HomePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fade In variants
-  const fadeIn: any = {
+  const fadeIn: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number = 1) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+      transition: { delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
     }),
   };
 

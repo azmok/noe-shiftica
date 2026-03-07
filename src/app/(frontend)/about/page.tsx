@@ -1,19 +1,19 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Button } from "../components/ui/Button";
 import Head from "next/head";
 
 export default function AboutPage() {
-  const fadeIn: any = {
+  const fadeIn: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number = 1) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+      transition: { delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
     }),
   };
 
