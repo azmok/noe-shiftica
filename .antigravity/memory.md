@@ -30,8 +30,17 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - For complex variant structures in TypeScript, use `as const` or, as a last resort, `ease: [...] as any` to bypass complex union type resolution failures in the `Transition` interface.
 
 ## Database & Deployment Lessons
-- **Neon Database Synchronization**:
-    - Use direct SQL execution via Node.js/`pg` driver for complex DDL migrations in local dev to bypass potential HTTP API timeout/limitations in the Windows environment.
+- **Neon Database Synchronization (2026-03-08)**:
+    - **Schema Sync**: Use `payload migrate` to sync schema. If "already exists" errors occur, make the migration idempotent with `IF NOT EXISTS` and `DO` blocks.
+    - **Data Sync**: Since `pg_dump` may be unavailable and Neon restricts `session_replication_role`, use a custom Node.js script with `pg` to sync tables in dependency order (parents first, then children) while clearing in reverse order.
+
+- **Premium Typography & Readability (2026-03-08)**:
+    - **Hierarchy**: Use 46px (2.875rem) for main titles (H1) with a tight `line-height` (1.13) to create "visual weight".
+    - **Body Text**: Opt for 18px (1.125rem) base size with a generous `line-height` (1.55) and a soft black color (e.g., `#222222`) to reduce eye strain and feel premium.
+    - **Content Width**: Restrict the main reading area to ~872px (`max-w-4xl`) to prevent long line lengths that disrupt scanning patterns.
+    - **Whitespace**: Use "luxury" spacing (e.g., 80px+ horizontal padding on desktop, 48px-120px vertical gaps) to separate distinct information blocks.
+    - **Media Polish**: Apply 12px-16px border radius to all images and use neutral background containers (e.g., `bg-slate-100`) to frame media.
+
 - **Security & Version Pinning**:
     - **Next.js**: Keep version at `15.1.9` or higher to mitigate CVE-2025-66478.
     - **Payload**: Pinned at `3.79.0` for maximum compatibility with Current Next.js / Firebase App Hosting stack.
