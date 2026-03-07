@@ -16,6 +16,8 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Neon Database Synchronization**:
     - When performing schema migrations in restricted or custom environments (like Windows/WSL vs. Neon API limits), direct SQL execution via a Node.js script and the `pg` driver is more robust than relying on the Neon HTTP API for complex DDL.
     - **Next.js Compatibility**: Ensure `next` and `eslint-config-next` versions are aligned with Payload's current stable requirements (currently `15.1.9` for Payload `3.79.0`).
+- **Lockfile Synchronization (npm ci)**:
+    - Firebase App Hosting uses `npm ci` for builds, which fails if `package.json` and `package-lock.json` are not perfectly synchronized. Always run `npm install` after manual `package.json` edits to update the lockfile before pushing to production.
 - **Security Vulnerability Management (CVE-2025-66478)**:
     - Critical RCE vulnerabilities in Next.js (like CVE-2025-66478) can lead to silent deployment blockages on platforms like Firebase App Hosting. Always check for security-related patches (e.g., upgrading to `15.1.9` or higher) even if the local build is passing.
 
