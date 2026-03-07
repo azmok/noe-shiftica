@@ -15,9 +15,8 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - If `as const` fails to narrow the type correctly for the `Transition` interface, use `as any` specifically for the `ease` property as a last resort to bypass the complex union type resolution failure, especially in deep variant structures.
 - **Neon Database Synchronization**:
     - When performing schema migrations in restricted or custom environments (like Windows/WSL vs. Neon API limits), direct SQL execution via a Node.js script and the `pg` driver is more robust than relying on the Neon HTTP API for complex DDL.
-- **Payload CMS Dependency Management**:
-    - **Exact Version Locking**: To prevent "Attempted import error" (e.g., `formatAdminURL` not found), lock all `@payloadcms/*` packages to exact identical versions (e.g., `3.79.0`) in `package.json`. Avoid `^` ranges during active development of major releases to prevent partial auto-upgrades.
-    - **Plugin Conflicts**: Be cautious with legacy plugins (e.g., `payload-plugin-slug`). They can pull in ancient beta versions of core UI libraries, causing silent but fatal import mismatches in modern builds. Prefer custom hooks for simple functionality like slug generation to maintain dependency leaness.
-    - **Next.js Compatibility**: Ensure `next` and `eslint-config-next` versions are aligned with Payload's current stable requirements (currently `15.1.7` for Payload `3.79.0`).
+    - **Next.js Compatibility**: Ensure `next` and `eslint-config-next` versions are aligned with Payload's current stable requirements (currently `15.1.9` for Payload `3.79.0`).
+- **Security Vulnerability Management (CVE-2025-66478)**:
+    - Critical RCE vulnerabilities in Next.js (like CVE-2025-66478) can lead to silent deployment blockages on platforms like Firebase App Hosting. Always check for security-related patches (e.g., upgrading to `15.1.9` or higher) even if the local build is passing.
 
 
