@@ -39,6 +39,13 @@ export function GcsImage({
     className = '',
     quality = 85,
 }: GcsImageProps) {
+    if (!src) return null;
+
+    // Fix for Firebase App Hosting loopback deadlocks:
+    // Next.js image optimization attempting to fetch from Payload's local media route
+    // causes server hangs. We bypass next/image processing for these routes.
+    const isLocalPayload = src.startsWith('/api/');
+
     return (
         <Image
             src={src}
@@ -48,6 +55,7 @@ export function GcsImage({
             quality={quality}
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
+            unoptimized={isLocalPayload}
             style={{ objectFit: 'cover', objectPosition: 'center' }}
             className={`transition-transform duration-700 ${className}`}
         />

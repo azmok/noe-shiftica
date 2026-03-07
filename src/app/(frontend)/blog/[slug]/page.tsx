@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { LivePreview } from "./LivePreview";
+import { PostArticle } from "./PostArticle";
 
 // 事前ビルド（SSG）するslugのリストを返す関数
 export async function generateStaticParams() {
@@ -115,7 +116,11 @@ export default async function BlogPostPage({
 
             <Header />
 
-            <LivePreview initialPost={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
+            {isPreview ? (
+                <LivePreview initialPost={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
+            ) : (
+                <PostArticle post={post} prevPost={prevPost} nextPost={nextPost} />
+            )}
 
             <Footer variant="blog" />
         </div>
