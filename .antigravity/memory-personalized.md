@@ -44,3 +44,9 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Security & Version Pinning**:
     - **Next.js**: Keep version at `15.1.9` or higher to mitigate CVE-2025-66478.
     - **Payload**: Pinned at `3.79.0` for maximum compatibility with Current Next.js / Firebase App Hosting stack.
+
+### [2026-03-08 04:40] Session Summary
+- **Learned/Decided**: 
+  1. Firebase App Hosting hangs when Next.js `Image` attempts to optimize images hosted on local API routes (e.g., Payload's `/api/media/file/*`). This loopback deadlock causes infinite loading in production. **Fix:** Use `unoptimized={true}` for local Payload media routes in `next/image`. Payload already generates responsive sizes via Sharp, preventing performance loss.
+  2. Avoid executing Payload's `useLivePreview` unconditionally inside a component rendered for regular users. If `NEXT_PUBLIC_SERVER_URL` is omitted, it defaults to polling `localhost:3000`, causing hydration blockages and infinite loading. **Fix:** Extracted live preview logic into a wrapper and strictly render it only when `isPreview` is true.
+- **Plan Impact**: Future implementations involving Payload CMS media and Next.js `Image` on Firebase App Hosting MUST bypass `next/image` optimization for local media routes. Future live preview implementations MUST conditionally render the `useLivePreview` wrapper.
