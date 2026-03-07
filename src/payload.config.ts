@@ -21,6 +21,7 @@ import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
+import { HtmlSourceFeature } from './features/htmlSource/feature.server'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -39,6 +40,7 @@ const config = buildConfig({
       FixedToolbarFeature(),
       EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
+      HtmlSourceFeature(),
     ],
   }),
   secret: process.env.PAYLOAD_SECRET || 'dummy-secret-key-for-build-bypass-only-xxx',
