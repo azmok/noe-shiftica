@@ -3,7 +3,7 @@ import { default as default_3464b17696a67b200eb846834620ef54 } from '../../../pl
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
-import { HtmlSourceFeatureClient as HtmlSourceFeatureClient_1866d528045e89ed7c25fd8164ec61b2 } from '../../../features/htmlSource/feature.client'
+import { HtmlSourceFeatureClient as HtmlSourceFeatureClient_1866d528045e89ed7c25fd8164ec61b2 } from '../../features/htmlSource/feature.client'
 import { MarkdownPasteClientFeature as MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226 } from '@/features/markdownPaste/client'
 import { TableFeatureClient as TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'

@@ -1,0 +1,12 @@
+# Long-Term Memory & Project Context
+
+## Overview
+This file tracks unique project learnings, specifically patterns and troubleshooting steps discovered during execution that are not already defined in the core project rules (GEMINI.md).
+
+## Induction & Troubleshooting Lessons
+- **HTML Source Editor (Lexical Payload v3)**: 
+    - When registering custom Lexical toolbar items in Payload v3, use the `Component` property instead of `ChildComponent`. Using `ChildComponent` causes Payload to wrap the custom element in a standard `<button>`, leading to invalid nested buttons that React refuses to render.
+    - **Controlled Component Pattern**: For Lexical plugins that involve external triggers (like a separate toolbar component), use a controlled pattern where the parent plugin manages the state.
+    - **State Synchronization**: Use custom window events (e.g., `htmlsource:sync`) to synchronize state between the Lexical toolbar items and the editor overlay/plugin components, ensuring consistency across the UI.
+    - **Payload Managed Imports**: `src/app/(payload)/admin/importMap.js` can sometimes generate incorrect relative paths in specific environments like WSL. Manually verifying and correcting these paths (e.g., ensuring the right number of `../` levels) is often necessary to resolve persistent "Module Not Found" build errors in Turbopack.
+    - **Bidirectional Sync**: When updating the Lexical editor state from HTML source, wrap the conversion logic (e.g., `$generateNodesFromDOM`) strictly inside an `editor.update()` block to ensure the internal state and DOM remain in sync.
