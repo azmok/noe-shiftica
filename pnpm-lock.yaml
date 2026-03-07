@@ -8,6 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@lexical/headless':
+        specifier: 0.41.0
+        version: 0.41.0
+      '@lexical/html':
+        specifier: 0.41.0
+        version: 0.41.0
+      '@lexical/markdown':
+        specifier: 0.41.0
+        version: 0.41.0
+      '@lexical/react':
+        specifier: 0.41.0
+        version: 0.41.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(yjs@13.6.29)
       '@payloadcms/db-postgres':
         specifier: 3.79.0
         version: 3.79.0(payload@3.79.0(graphql@16.13.1)(typescript@5.9.3))
@@ -47,6 +59,9 @@ importers:
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
+      lexical:
+        specifier: 0.41.0
+        version: 0.41.0
       lucide-react:
         specifier: ^0.575.0
         version: 0.575.0(react@19.2.3)
@@ -84,6 +99,9 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.19.37
+      '@types/pg':
+        specifier: ^8.18.0
+        version: 8.18.0
       '@types/react':
         specifier: ^19
         version: 19.2.14
@@ -1449,6 +1467,9 @@ packages:
 
   '@types/pg@8.10.2':
     resolution: {integrity: sha512-MKFs9P6nJ+LAeHLU3V0cODEOgyThJ3OAnmOlsZsxux6sfQs3HRXR5bBn7xG5DjckEFhTAxsXi7k7cd0pCMxpJw==}
+
+  '@types/pg@8.18.0':
+    resolution: {integrity: sha512-gT+oueVQkqnj6ajGJXblFR4iavIXWsGAFCk3dP4Kki5+a9R4NMt0JARdk6s8cUKcfUoqP5dAtDSLU8xYUTFV+Q==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -5715,6 +5736,12 @@ snapshots:
       '@types/node': 20.19.37
       pg-protocol: 1.13.0
       pg-types: 4.1.0
+
+  '@types/pg@8.18.0':
+    dependencies:
+      '@types/node': 20.19.37
+      pg-protocol: 1.13.0
+      pg-types: 2.2.0
 
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
