@@ -19,6 +19,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   // URLが変わったタイミングで表示状態やスクロール位置をリセットする
   useEffect(() => {
@@ -27,17 +28,18 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
     // setTimeout なしだと前ページのスクロール位置が評価される場合があるため、遅延して現在のスクロール位置を反映
     const timer = setTimeout(() => {
       const initialScrollY = window.scrollY;
-      setIsScrolled(initialScrollY > 50);
+      const threshold = isHomePage ? 50 : 20;
+      setIsScrolled(initialScrollY > threshold);
       setLastScrollY(initialScrollY);
 
-      if (hideTopThreshold > 0 && initialScrollY < hideTopThreshold) {
+      if (isHomePage && hideTopThreshold > 0 && initialScrollY < hideTopThreshold) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
       }
     }, 50);
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, isHomePage, hideTopThreshold]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,13 +50,16 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
       }
 
       const currentScrollY = window.scrollY;
-      const threshold = window.innerHeight - 80; // Trigger slightly before the second section
+      // LP: Trigger slightly before the second section
+      // Subpages: Trigger almost immediately (fixed small threshold)
+      const hideThreshold = isHomePage ? window.innerHeight - 80 : 50;
+      const scrolledTrigger = isHomePage ? 50 : 20;
 
       // Hide on scroll down, show on scroll up (after a small threshold for visibility toggling)
       let shouldBeVisible = true;
 
-      if (currentScrollY > 50) {
-        if (currentScrollY > lastScrollY && currentScrollY > threshold) {
+      if (currentScrollY > scrolledTrigger) {
+        if (currentScrollY > lastScrollY && currentScrollY > hideThreshold) {
           shouldBeVisible = false;
         } else {
           shouldBeVisible = true;
@@ -63,18 +68,18 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
         shouldBeVisible = true;
       }
 
-      if (hideTopThreshold > 0 && currentScrollY < hideTopThreshold) {
+      if (isHomePage && hideTopThreshold > 0 && currentScrollY < hideTopThreshold) {
         shouldBeVisible = false;
       }
 
       setIsVisible(shouldBeVisible);
-      setIsScrolled(currentScrollY > 50);
+      setIsScrolled(currentScrollY > scrolledTrigger);
       setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, isMobileMenuOpen]);
+  }, [lastScrollY, isMobileMenuOpen, isHomePage, hideTopThreshold]);
 
   const navLinks = [
     { name: "Concept", href: "/#concept" },
@@ -89,9 +94,9 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${hasBackdrop ? "bg-black/0 backdrop-blur-[8px] shadow-[0_0px_12px_rgba(200,200,200,0.05)] border-b border-white/5" : "bg-transparent"}`}
+        } ${hasBackdrop ? "bg-black/0 backdrop-blur-sm shadow-[0_0px_12px_rgba(200,200,200,0.05)] border-b border-white/5" : "bg-transparent"}`}
     >
-      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 transition-all duration-500 relative z-[120] ${hasBackdrop ? "" : "bg-transparent"}`}>
+      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-end md:gap-x-12 transition-all duration-500 relative z-120 ${hasBackdrop ? "" : "bg-transparent"}`}>
 
 
         {/* Desktop Nav */}
@@ -108,7 +113,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
         </nav>
 
         {/* Logo (Hidden on mobile) */}
-        <Link href="/" className="hidden md:flex items-center gap-2 relative z-[110]">
+        <Link href="/" className="hidden md:flex items-center gap-2 relative z-110">
           <Image
             src="/assets/NS_logo_White.jpg"
             alt="Noe Shiftica"
@@ -121,7 +126,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
 
         {/* Mobile Nav Toggle */}
         <button
-          className="md:hidden relative z-[130] text-white p-2 flex items-center gap-2"
+          className="md:hidden relative z-130 text-white p-2 flex items-center gap-2"
           onClick={() => {
             const nextState = !isMobileMenuOpen;
             setIsMobileMenuOpen(nextState);
@@ -146,7 +151,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="isolate　fixed inset-0 h-[100dvh] w-screen bg-transparent z-[110] flex flex-col items-center justify-center"
+            className="isolate fixed inset-0 h-dvh w-screen bg-transparent z-110 flex flex-col items-center justify-center"
           >
             {/* 背景ボカシ専用のレイヤー */}
             <div

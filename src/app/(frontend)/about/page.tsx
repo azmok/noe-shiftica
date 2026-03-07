@@ -18,8 +18,8 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen text-white relative selection:bg-[#FFFFFF] selection:text-[#050505]">
-      <Header alwaysBackdrop={true} hideTopThreshold={400} />
+    <div className="min-h-screen text-white relative selection:bg-[#FFFFFF] selection:text-background-void">
+      <Header />
 
       {/* 1. Hero Section */}
       <section className="pt-48 pb-20 px-6">
@@ -197,7 +197,7 @@ export default function AboutPage() {
       </section>
 
       {/* 3. CTA Section */}
-      <section className="py-24 px-6 relative z-10 border-t border-white/10 bg-gradient-to-b from-transparent to-[#050505]">
+      <section className="py-24 px-6 relative z-10 border-t border-white/10 bg-linear-to-b from-transparent to-background-void">
         <div className="container mx-auto max-w-4xl text-center">
           <motion.div
             initial="hidden"

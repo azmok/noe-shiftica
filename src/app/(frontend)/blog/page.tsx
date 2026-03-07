@@ -31,7 +31,7 @@ export default async function BlogPage() {
       */}
       <div className="absolute top-0 left-0 w-full h-[120px] bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none z-40"></div>
 
-      <Header alwaysBackdrop={true} />
+      <Header />
 
       <main className="flex-grow px-6 lg:px-40 py-24 md:py-32 relative z-10">
         <div className="max-w-[960px] mx-auto flex flex-col gap-10 mt-8">

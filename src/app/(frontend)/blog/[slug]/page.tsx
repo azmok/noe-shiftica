@@ -113,7 +113,7 @@ export default async function BlogPostPage({
             {/* Header contrast background */}
             <div className="absolute top-0 left-0 w-full h-[120px] bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none z-40"></div>
 
-            <Header alwaysBackdrop={true} />
+            <Header />
 
             <LivePreview initialPost={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
 

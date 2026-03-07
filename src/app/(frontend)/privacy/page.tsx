@@ -11,7 +11,7 @@ export const metadata = {
 export default function PrivacyPolicyPage() {
     return (
         <div className="min-h-screen bg-white text-slate-800 font-sans">
-            <Header alwaysBackdrop={true} />
+            <Header />
 
             <main className="container mx-auto max-w-4xl pt-32 pb-20 px-6">
                 <div className="neu-flat rounded-3xl p-8 md:p-12 mb-12">
@@ -19,9 +19,9 @@ export default function PrivacyPolicyPage() {
                         プライバシーポリシー
                     </h1>
 
-                    <div className="space-y-12 text-[15px] font-[200] leading-relaxed text-slate-600">
+                    <div className="space-y-12 text-[15px] font-light leading-relaxed text-slate-600">
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
                                 1. はじめに
                             </h2>
                             <p>
@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
                                 2. 収集する情報
                             </h2>
                             <p>
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
                                 3. 利用目的
                             </h2>
                             <p>
@@ -61,7 +61,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
                                 4. 情報の管理と保護
                             </h2>
                             <p>
@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
                                 5. クッキー（Cookie）の使用
                             </h2>
                             <p>
@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-[#CCDD00] pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
                                 6. お問い合わせ窓口
                             </h2>
                             <p>
