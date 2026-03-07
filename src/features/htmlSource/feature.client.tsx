@@ -3,52 +3,54 @@
  *
  * PayloadCMS v3 クライアント側 Feature 定義。
  * ツールバーボタンの登録と、Plugin の差し込みを行う。
- *
- * "use client" ディレクティブが必要。
  */
 
 'use client'
 
 import { createClientFeature } from '@payloadcms/richtext-lexical/client'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 
 import { HtmlSourcePlugin, HtmlSourceToolbarButton } from './HtmlSourcePlugin'
 import { htmlToLexical, lexicalToHtml } from './conversion'
 
 // ----------------------------------------------------------------
 // ツールバーボタンのラッパー
-// (Payload の ToolbarGroup に登録できる形式に合わせる)
 // ----------------------------------------------------------------
 
-/**
- * Payload v3 の toolbar item コンポーネント。
- * `ClientFeature` の `toolbarFixed` または `toolbarInline` に渡す。
- */
 function HtmlSourceToolbarItem() {
   const [editor] = useLexicalComposerContext()
   const [isSourceMode, setIsSourceMode] = useState(false)
 
+  // 同期用イベントリスナー (OverlayPlugin からのトグル同期)
+  useEffect(() => {
+    const handleSync = (e: Event) => {
+      const { active } = (e as CustomEvent).detail
+      setIsSourceMode(active)
+    }
+    window.addEventListener('htmlsource:sync', handleSync)
+    return () => window.removeEventListener('htmlsource:sync', handleSync)
+  }, [])
+
   const handleToggle = useCallback(() => {
-    if (!isSourceMode) {
+    const nextMode = !isSourceMode
+    if (nextMode) {
       // Rich → Source
       console.group('[HtmlSource] ══ Toolbar toggle → SOURCE ══')
       const html = lexicalToHtml(editor)
-      // カスタムイベントで Plugin へ通知
       window.dispatchEvent(
         new CustomEvent('htmlsource:enter', { detail: { html } }),
       )
       console.log('[HtmlSource] dispatched htmlsource:enter')
       console.groupEnd()
-      setIsSourceMode(true)
     } else {
       // Source → Rich
       console.group('[HtmlSource] ══ Toolbar toggle → RICH TEXT ══')
       window.dispatchEvent(new CustomEvent('htmlsource:exit'))
       console.log('[HtmlSource] dispatched htmlsource:exit')
       console.groupEnd()
-      setIsSourceMode(false)
     }
+    setIsSourceMode(nextMode)
   }, [editor, isSourceMode])
 
   return (
@@ -60,23 +62,20 @@ function HtmlSourceToolbarItem() {
 // Feature-local Plugin (エディタ DOM に overlay する)
 // ----------------------------------------------------------------
 
-/**
- * エディタ本体の上に重なる Textarea オーバーレイ。
- * CustomEvent で enter/exit を受け取り表示を切り替える。
- */
 function HtmlSourceOverlayPlugin() {
   const [editor] = useLexicalComposerContext()
   const [isSourceMode, setIsSourceMode] = useState(false)
   const [htmlValue, setHtmlValue] = useState('')
   const [parseError, setParseError] = useState<string | null>(null)
 
-  // カスタムイベントのリスナー登録
-  useState(() => {
+  useEffect(() => {
     function onEnter(e: Event) {
       const { html } = (e as CustomEvent<{ html: string }>).detail
       setHtmlValue(html)
       setParseError(null)
       setIsSourceMode(true)
+      // ツールバーボタンと状態を同期
+      window.dispatchEvent(new CustomEvent('htmlsource:sync', { detail: { active: true } }))
     }
 
     function onExit() {
@@ -87,6 +86,7 @@ function HtmlSourceOverlayPlugin() {
           htmlToLexical(editor, htmlValue)
         })
         setIsSourceMode(false)
+        window.dispatchEvent(new CustomEvent('htmlsource:sync', { detail: { active: false } }))
         console.log('[HtmlSource] editor state replaced successfully')
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
@@ -96,21 +96,20 @@ function HtmlSourceOverlayPlugin() {
       console.groupEnd()
     }
 
-    window.addEventListener('htmlsource:enter', onEnter)
+    window.addEventListener('htmlsource:enter', onEnter as EventListener)
     window.addEventListener('htmlsource:exit', onExit)
     return () => {
-      window.removeEventListener('htmlsource:enter', onEnter)
+      window.removeEventListener('htmlsource:enter', onEnter as EventListener)
       window.removeEventListener('htmlsource:exit', onExit)
     }
-  })
-
-  if (!isSourceMode) return null
+  }, [editor, htmlValue])
 
   return (
     <HtmlSourcePlugin
-      onModeChange={(active) => {
-        if (!active) setIsSourceMode(false)
-      }}
+      isSourceMode={isSourceMode}
+      htmlValue={htmlValue}
+      onHtmlChange={setHtmlValue}
+      parseError={parseError}
     />
   )
 }
@@ -122,9 +121,8 @@ function HtmlSourceOverlayPlugin() {
 export const HtmlSourceFeatureClient = createClientFeature({
   plugins: [
     {
-      // Lexical プラグインとして挿入
       Component: HtmlSourceOverlayPlugin,
-      position: 'bottom', // エディタ内コンテンツの下側に追加
+      position: 'bottom',
     },
   ],
 
@@ -133,10 +131,8 @@ export const HtmlSourceFeatureClient = createClientFeature({
       {
         key: 'htmlSourceGroup',
         type: 'buttons',
-        // ツールバー右端グループ
         items: [
           {
-            // ToolbarItem Component complete replacement
             Component: HtmlSourceToolbarItem,
             key: 'htmlSourceButton',
           },

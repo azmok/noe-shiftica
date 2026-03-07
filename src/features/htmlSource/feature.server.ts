@@ -18,8 +18,7 @@ import { createServerFeature } from '@payloadcms/richtext-lexical'
 export const HtmlSourceFeature = createServerFeature({
     feature: {
         // クライアントバンドルへ渡す Feature 設定
-        ClientFeature:
-            '@/features/htmlSource/feature.client#HtmlSourceFeatureClient',
+        ClientFeature: './feature.client#HtmlSourceFeatureClient',
 
         // このFeatureが追加するノード型は無い（変換のみ）
         nodes: [],
