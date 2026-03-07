@@ -8,7 +8,7 @@ import { RichText } from '@payloadcms/richtext-lexical/react';
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { LivePreviewPost } from "./LivePreviewPost";
+import { LivePreview } from "./LivePreview";
 
 // 事前ビルド（SSG）するslugのリストを返す関数
 export async function generateStaticParams() {
@@ -115,7 +115,7 @@ export default async function BlogPostPage({
 
             <Header alwaysBackdrop={true} />
 
-            <LivePreviewPost initialPost={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
+            <LivePreview initialPost={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
 
             <Footer variant="blog" />
         </div>
