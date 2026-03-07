@@ -136,7 +136,8 @@ export const HtmlSourceFeatureClient = createClientFeature({
         // ツールバー右端グループ
         items: [
           {
-            ChildComponent: HtmlSourceToolbarItem,
+            // ToolbarItem Component complete replacement
+            Component: HtmlSourceToolbarItem,
             key: 'htmlSourceButton',
           },
         ],
