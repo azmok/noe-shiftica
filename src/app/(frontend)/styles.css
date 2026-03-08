@@ -204,49 +204,52 @@ h6 {
   margin-bottom: 2rem;
 }
 
-/* --- Premium Dark Table Design --- */
+/* --- Premium Light Table Design (Match Blog Proactive Style) --- */
 .post-main .prose table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
   margin: 2.5rem 0;
-  background-color: #050505;
-  color: #a1a1aa; /* text-zinc-400 */
+  background-color: #ffffff;
+  color: #475569; /* slate-600 */
 }
 
 .post-main .prose thead {
-  background-color: #111111;
+  background-color: #f8fafc;
 }
 
 .post-main .prose th {
   padding: 1rem 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #1e293b; /* slate-800 */
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
 }
 
 .post-main .prose td {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #f1f5f9;
   transition: all 0.2s ease;
 }
 
 .post-main .prose tr:hover td {
-  background-color: rgba(204, 221, 0, 0.03); /* Subtle Lime Glow */
-  color: #ffffff;
+  background-color: #f8fafc;
+  color: #CCDD00; /* Lime accent on hover */
 }
 
 .post-main .prose tr:last-child td {
   border-bottom: none;
 }
-/* Summary row style if standard is followed */
+
 .post-main .prose tr:last-child {
   font-weight: 600;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 h1 {
