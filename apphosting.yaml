@@ -1,5 +1,6 @@
 kind: "AppHostingYaml"
 apiVersion: "v1"
+runtime: "nodejs20"
 
 # Cloud Run の設定（現状のまま）
 runConfig:
