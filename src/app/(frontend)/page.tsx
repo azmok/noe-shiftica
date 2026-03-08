@@ -82,7 +82,7 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             variants={fadeIn}
-            className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
           >
             AIと最新技術を武器に、あなたのビジネスに必要な「見た目」と「体験」を設計します。
             <br className="hidden md:block" />
@@ -124,16 +124,16 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeIn}
-            className="mb-20 text-center md:text-left max-w-3xl"
+            className="mb-20 text-center max-w-3xl mx-auto"
           >
             <h2 className="text-4xl md:text-[5.5rem] font-serif font-light mb-6 heading-2 oxanium-heading">
               AI × Design.
               <br />
-              <span className="text-xl md:text-2xl font-sans text-[#FFFFFF] block mt-4 font-normal">
+              <span className="text-area-1 text-xl md:text-2xl font-sans text-[#FFFFFF] block mt-4 font-normal">
                 制作コストを削減して、その分を「質」に全振りする。
               </span>
             </h2>
-            <p className="text-lg text-white/70 leading-relaxed">
+            <p className="text-area-2 text-lg text-white/70 leading-relaxed">
               従来のWeb制作は、品質を上げれば費用がかかり、費用を抑えればテンプレートになる。
               <br />
               Noe
@@ -168,7 +168,7 @@ export default function HomePage() {
                 <div className="text-4xl font-serif text-[#FFFFFF] mb-6 opacity-50 group-hover:opacity-100 transition-opacity">
                   0{idx + 1}
                 </div>
-                <h3 className="text-xl font-bold mb-4">{pillar.title}</h3>
+                <h3 className="text-xl font-extrabold mb-4">{pillar.title}</h3>
                 <p className="text-white/70 text-xs leading-relaxed">
                   {pillar.desc}
                 </p>
@@ -310,7 +310,7 @@ export default function HomePage() {
                 className={clsx(
                   "p-8 rounded-3xl border relative flex flex-col h-full",
                   plan.popular
-                    ? "bg-[#111111]/80 border-[#FFFFFF] shadow-[0_0_30px_rgba(204,221,0,0.15)]"
+                    ? "bg-[#111111]/80 border-[#FFFFFF]"
                     : "bg-[#111111]/30 border-white/10",
                 )}
               >
@@ -380,7 +380,7 @@ export default function HomePage() {
               Let's Work Together.
             </h2>
             <p className="text-xl text-[#FFFFFF] mb-6">まず話しましょう。</p>
-            <p className="text-white/70 max-w-2xl mx-auto">
+            <p className="text-white/70 test-center">
               「うちに合うのかな？」と思ったら、そのまま相談してください。
               <br />
               現状のヒアリングと方向性の確認だけでも大歓迎です。
