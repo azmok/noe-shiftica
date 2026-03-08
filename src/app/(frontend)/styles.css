@@ -224,7 +224,7 @@ h6 {
 .post-main .prose th {
   padding: 1rem 1.5rem;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
   color: #ffffff;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
