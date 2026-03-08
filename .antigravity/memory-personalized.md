@@ -45,6 +45,11 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - **Whitespace**: Use "luxury" spacing (e.g., 80px+ horizontal padding on desktop, 48px-120px vertical gaps) to separate distinct information blocks.
     - **Media Polish**: Apply 12px-16px border radius to all images and use neutral background containers (e.g., `bg-slate-100`) to frame media.
 
+## Design References & Inspiration
+- **Airbnb News (https://news.airbnb.com/ja/)**: 
+    - **Characteristics**: Clean typography (Japanese), spacious layouts, subtle borders, high-quality imagery, and a refined grid system. 
+    - **Application**: Use as a primary reference for "Premium Minimalist" UI, specifically for Japanese text hierarchy and footer structures.
+
 - **Security & Version Pinning**:
     - **Next.js**: Keep version at `15.1.9` or higher to mitigate CVE-2025-66478.
     - **Payload**: Pinned at `3.79.0` for maximum compatibility with Current Next.js / Firebase App Hosting stack.

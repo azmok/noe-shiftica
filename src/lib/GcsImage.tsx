@@ -43,8 +43,14 @@ export function GcsImage({
 
     // Fix for Firebase App Hosting loopback deadlocks:
     // Next.js image optimization attempting to fetch from Payload's local media route
-    // causes server hangs. We bypass next/image processing for these routes.
+    // causes server hangs. We bypass next/image processing for these routes in production.
     const isLocalPayload = src.startsWith('/api/');
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isFirebase = !!process.env.FIREBASE_CONFIG;
+
+    // In local development, we prefer to keep optimization ON for a better experience,
+    // as loopback usually works fine or isn't as critical for build stability.
+    const shouldDisableOptimization = isLocalPayload && (isProduction || isFirebase);
 
     return (
         <Image
@@ -55,7 +61,7 @@ export function GcsImage({
             quality={quality}
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
-            unoptimized={isLocalPayload}
+            unoptimized={shouldDisableOptimization}
             style={{ objectFit: 'cover', objectPosition: 'center' }}
             className={`transition-transform duration-700 ${className}`}
         />
