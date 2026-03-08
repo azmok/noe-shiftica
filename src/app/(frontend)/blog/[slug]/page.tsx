@@ -110,10 +110,7 @@ export default async function BlogPostPage({
     }
 
     return (
-        <div className="bg-[var(--color-neu-bg-light)] text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-[var(--color-neu-primary)] selection:text-white overflow-x-hidden">
-            {/* Header contrast background */}
-            <div className="absolute top-0 left-0 w-full h-[120px] bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none z-40"></div>
-
+        <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary) selection:text-white overflow-x-hidden">
             <Header />
 
             {isPreview ? (

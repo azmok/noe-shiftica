@@ -24,16 +24,10 @@ export default async function BlogPage() {
   const recentPosts = posts.slice(1);
 
   return (
-    <div className="bg-[var(--color-neu-bg-light)] text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-[var(--color-neu-primary)] selection:text-white">
-      {/* 
-        This absolute div sits behind the Header to provide contrast 
-        since the background is now light but the Header text is white/transparent 
-      */}
-      <div className="absolute top-0 left-0 w-full h-[120px] bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none z-40"></div>
-
+    <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary) selection:text-white">
       <Header />
 
-      <main className="flex-grow px-6 lg:px-40 py-24 md:py-32 relative z-10">
+      <main className="grow px-4 sm:px-6 lg:px-40 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10">
         <div className="max-w-[960px] mx-auto flex flex-col gap-10 mt-8">
 
           {posts.length === 0 ? (
@@ -56,15 +50,15 @@ export default async function BlogPage() {
               {/* Featured Post Hero */}
               {featuredPost && (
                 <section>
-                  <Link href={`/blog/${featuredPost.slug}`} className="block posts featured">
-                    <div className="neu-flat p-6 rounded-[2rem] flex flex-col lg:flex-row gap-8 items-center group cursor-pointer transition-transform hover:-translate-y-1">
+                  <Link href={`/blog/${featuredPost.slug}`} className="block posts featured group">
+                    <div className="bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] border border-slate-100">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
                           const imgUrl = (featuredPost.heroUrl || featuredPost.coverUrl);
                           if (imgUrl) {
                             return (
                               <>
-                                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-neu-primary)]/20 to-transparent mix-blend-overlay z-10 pointer-events-none" />
+                                <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none" />
                                 <GcsImage
                                   src={imgUrl}
                                   alt={featuredPost.title}
@@ -78,8 +72,8 @@ export default async function BlogPage() {
                         })()}
                       </div>
                       <div className="flex flex-col gap-5 w-full lg:w-1/2 lg:pr-6">
-                        <div className="flex items-center gap-2">
-                          <span className="px-3 py-1 rounded-full neu-pressed text-xs font-bold text-[var(--color-neu-primary)] uppercase tracking-wider">Featured</span>
+                        <div className="flex items-center gap-3">
+                          <span className="px-3 py-1 rounded-full bg-(--color-neu-primary)/10 text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Featured</span>
                           {featuredPost.publishedAt && (
                             <span className="text-slate-400 text-sm font-medium">
                               {new Date(featuredPost.publishedAt).toLocaleDateString('ja-JP')}
@@ -93,9 +87,9 @@ export default async function BlogPage() {
                           {"最新の記事をお届けします。クリックして本文をお読みください。"}
                         </p>
                         <div className="pt-2">
-                          <div className="neu-btn-primary h-12 px-8 rounded-xl inline-flex items-center justify-center gap-2 text-white font-bold transition-all hover:shadow-blue-500/40">
+                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-slate-900 text-white text-sm font-bold transition-all hover:bg-slate-800">
                             Read Article
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
                           </div>
                         </div>
                       </div>

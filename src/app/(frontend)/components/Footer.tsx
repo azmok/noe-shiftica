@@ -13,18 +13,18 @@ export function Footer({ variant = "landing" }: FooterProps) {
   return (
     <footer
       className={`w-full pt-16 pb-8 px-6 mt-32 relative z-10 transition-colors duration-300 border-t ${isBlog
-        ? "bg-[#F7F7F7] border-[#DDDDDD] text-[#222222]"
-        : "bg-[#050505] text-white border-white/10"
+        ? "bg-background-void border-white/10 text-[#222222]"
+        : "bg-background-void text-white border-white/10"
         }`}
     >
       <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-12 mb-16">
-          <div className="lg:col-span-5 space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 px-4">
+          <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="inline-block">
-              <span className="text-xl font-black tracking-tighter">Noe Shiftica</span>
+              <span className="text-lg font-bold tracking-tighter opacity-90">Noe Shiftica</span>
             </Link>
             <p
-              className={`text-sm max-w-sm leading-relaxed ${isBlog ? "text-slate-500" : "text-white/60"
+              className={`text-[13px] max-w-xs leading-relaxed font-light ${isBlog ? "text-slate-500" : "text-white/40"
                 }`}
             >
               Design the Shift.
@@ -33,9 +33,9 @@ export function Footer({ variant = "landing" }: FooterProps) {
             </p>
           </div>
 
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <h3
-              className={`text-sm font-bold uppercase tracking-wider mb-6 ${isBlog ? "text-slate-900" : "text-white"
+              className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-4 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
               Navigation
@@ -50,9 +50,9 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-sm transition-colors ${isBlog
-                      ? "text-[#222222] hover:text-[var(--color-neu-primary)]"
-                      : "text-white/80 hover:text-white"
+                    className={`text-[14px] leading-[18px] transition-colors font-light ${isBlog
+                      ? "text-[#222222] hover:text-(--color-neu-primary)"
+                      : "text-white/60 hover:text-white"
                       }`}
                   >
                     {link.name}
@@ -62,12 +62,39 @@ export function Footer({ variant = "landing" }: FooterProps) {
             </ul>
           </div>
 
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-2">
             <h3
-              className={`text-sm font-bold uppercase tracking-wider mb-6 ${isBlog ? "text-slate-900" : "text-white"
+              className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-6 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
-              Connect
+              Support
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { name: "Privacy Policy", href: "/privacy" },
+                { name: "Terms of Service", href: "/terms" },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className={`text-[13px] transition-colors font-light ${isBlog
+                      ? "text-[#222222] hover:text-(--color-neu-primary)"
+                      : "text-white/60 hover:text-white"
+                      }`}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-4 sm:col-span-2">
+            <h3
+              className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-4 ${isBlog ? "text-slate-400" : "text-white/30"
+                }`}
+            >
+              Stay Connected
             </h3>
             <div className="flex flex-wrap gap-4 mb-6">
               {[
@@ -81,51 +108,34 @@ export function Footer({ variant = "landing" }: FooterProps) {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`size-10 rounded-full flex items-center justify-center transition-all ${isBlog
-                    ? "bg-white shadow-sm border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900"
-                    : "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+                  className={`size-9 rounded-full flex items-center justify-center transition-all ${isBlog
+                    ? "bg-(--color-neu-primary) text-white hover:opacity-90"
+                    : "bg-white/5 hover:bg-white/10 text-white/40 hover:text-white"
                     }`}
                 >
-                  <social.icon size={18} />
+                  <social.icon size={16} />
                 </a>
               ))}
             </div>
-            <p className={`text-sm ${isBlog ? "text-slate-500" : "text-white/60"}`}>
+            <p className={`text-[13px] font-light ${isBlog ? "text-slate-400" : "text-white/40"}`}>
               info@noe-shiftica.com
             </p>
           </div>
         </div>
 
         <div
-          className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-6 ${isBlog ? "border-slate-200" : "border-white/10"
+          className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-6 px-4 ${isBlog ? "border-slate-100" : "border-white/5"
             }`}
         >
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 order-2 md:order-1">
-            <p className={`text-sm ${isBlog ? "text-slate-500" : "text-white/50"}`}>
+            <p className={`text-[11px] tracking-wider font-light ${isBlog ? "text-slate-400" : "text-white/30"}`}>
               &copy; {currentYear} Noe Shiftica
             </p>
-            <span className={`hidden md:inline ${isBlog ? "text-slate-300" : "text-white/10"}`}>|</span>
-            <div className="flex gap-6">
-              <Link
-                href="/privacy"
-                className={`text-sm ${isBlog ? "text-slate-500 hover:text-slate-900" : "text-white/50 hover:text-white"
-                  }`}
-              >
-                プライバシーポリシー
-              </Link>
-              <Link
-                href="/terms"
-                className={`text-sm ${isBlog ? "text-slate-500 hover:text-slate-900" : "text-white/50 hover:text-white"
-                  }`}
-              >
-                利用規約
-              </Link>
-            </div>
           </div>
 
           <div className="order-1 md:order-2 flex items-center gap-4">
-            <span className={`text-sm font-medium ${isBlog ? "text-slate-900" : "text-white"}`}>JP</span>
-            <span className={`text-xs ${isBlog ? "text-slate-300" : "text-white/20"}`}>English coming soon</span>
+            <span className={`text-[11px] font-bold tracking-widest ${isBlog ? "text-slate-900" : "text-white/90"}`}>JP</span>
+            <span className={`text-[10px] uppercase tracking-widest ${isBlog ? "text-slate-300" : "text-white/10"}`}>English coming soon</span>
           </div>
         </div>
       </div>

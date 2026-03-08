@@ -127,10 +127,6 @@ h4,
 h5,
 h6 {
   font-family: var(--font-sans);
-  font-weight: 800;
-  /* Extra Bold / Black に近いウェイトでインパクトを出す */
-  letter-spacing: -0.02em;
-  /* タイトルを少し詰めて塊感を出す */
 }
 
 
@@ -401,4 +397,7 @@ header {
 }
 footer{
   color: var(--color-text-sub2);
+}
+#concept .text-area-2{
+  font-weight: 200;
 }

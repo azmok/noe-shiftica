@@ -12,7 +12,7 @@ export const PostArticle: React.FC<{
     nextPost?: Post | null
 }> = ({ post, isPreview, prevPost, nextPost }) => {
     return (
-        <main className="post-main grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
+        <main className="post-main grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 md:pt-24 md:pb-32 relative z-10">
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat">
                     <p className="font-bold">Preview Mode</p>
@@ -34,12 +34,12 @@ export const PostArticle: React.FC<{
                     </div>
 
                     {/* Main Article Card */}
-                    <div className="neu-flat p-6 md:p-12 lg:p-16 relative overflow-hidden rounded-4xl">
+                    <div className="bg-white border border-slate-100 p-6 md:p-12 lg:p-16 relative overflow-hidden rounded-3xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)]">
 
                         {/* Title Section */}
                         <div className="mb-10">
                             <div className="flex items-center gap-4 mb-8">
-                                <span className="neu-pressed px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-(--color-neu-primary)">
+                                <span className="bg-(--color-neu-primary)/10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-(--color-neu-primary)">
                                     Journal
                                 </span>
                                 {post.publishedAt && (
@@ -96,38 +96,38 @@ export const PostArticle: React.FC<{
                     {/* Post Navigation */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-4 mb-8">
                         {prevPost ? (
-                            <Link href={`/blog/${prevPost.slug}`} className="neu-btn p-8 rounded-3xl group flex flex-col items-start transition-all hover:scale-[1.02]">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                            <Link href={`/blog/${prevPost.slug}`} className="bg-white border border-slate-100 p-8 rounded-2xl group flex flex-col items-start transition-all hover:shadow-lg hover:-translate-y-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                                     Previous
                                 </span>
-                                <h4 className="text-lg font-bold text-slate-700 leading-snug line-clamp-2 text-left group-hover:text-slate-900 transition-colors">{prevPost.title}</h4>
+                                <h4 className="text-lg font-bold text-slate-800 leading-snug line-clamp-2 text-left group-hover:text-(--color-neu-primary) transition-colors">{prevPost.title}</h4>
                             </Link>
                         ) : (
-                            <Link href="/blog" className="neu-btn p-8 rounded-3xl group flex flex-col items-start transition-all hover:scale-[1.02]">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                            <Link href="/blog" className="bg-white border border-slate-100 p-8 rounded-2xl group flex flex-col items-start transition-all hover:shadow-lg hover:-translate-y-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                                     Back to Journal
                                 </span>
-                                <h4 className="text-lg font-bold text-slate-700 leading-snug text-left group-hover:text-slate-900 transition-colors">一覧をチェック</h4>
+                                <h4 className="text-lg font-bold text-slate-800 leading-snug text-left group-hover:text-(--color-neu-primary) transition-colors">一覧をチェック</h4>
                             </Link>
                         )}
 
                         {nextPost ? (
-                            <Link href={`/blog/${nextPost.slug}`} className="neu-btn p-8 rounded-3xl group flex flex-col items-end transition-all hover:scale-[1.02]">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                            <Link href={`/blog/${nextPost.slug}`} className="bg-white border border-slate-100 p-8 rounded-2xl group flex flex-col items-end transition-all hover:shadow-lg hover:-translate-y-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     Next
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                                 </span>
-                                <h4 className="text-lg font-bold text-slate-700 leading-snug line-clamp-2 text-right group-hover:text-slate-900 transition-colors">{nextPost.title}</h4>
+                                <h4 className="text-lg font-bold text-slate-800 leading-snug line-clamp-2 text-right group-hover:text-(--color-neu-primary) transition-colors">{nextPost.title}</h4>
                             </Link>
                         ) : (
-                            <Link href="/blog" className="neu-btn p-8 rounded-3xl group flex flex-col items-end transition-all hover:scale-[1.02]">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                            <Link href="/blog" className="bg-white border border-slate-100 p-8 rounded-2xl group flex flex-col items-end transition-all hover:shadow-lg hover:-translate-y-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     Back to Journal
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                                 </span>
-                                <h4 className="text-lg font-bold text-slate-700 leading-snug text-right group-hover:text-slate-900 transition-colors">一覧をチェック</h4>
+                                <h4 className="text-lg font-bold text-slate-800 leading-snug text-right group-hover:text-(--color-neu-primary) transition-colors">一覧をチェック</h4>
                             </Link>
                         )}
                     </div>
