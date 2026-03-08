@@ -204,17 +204,18 @@ h6 {
   margin-bottom: 2rem;
 }
 
-/* --- Premium Light Table Design (Match Blog Proactive Style) --- */
+/* --- Premium Light Table Design (Enhanced Padding & Hover) --- */
 .post-main .prose table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 16px; /* Slightly smoother corners */
   overflow: hidden;
-  margin: 2.5rem 0;
+  margin: 3rem 0; /* More vertical breathability */
   background-color: #ffffff;
   color: #475569; /* slate-600 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 .post-main .prose thead {
@@ -222,25 +223,25 @@ h6 {
 }
 
 .post-main .prose th {
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 2rem; /* Increased padding */
   font-weight: 700;
   text-align: center;
   color: #1e293b; /* slate-800 */
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 2px solid #f1f5f9; /* Stronger header separation */
   text-transform: uppercase;
   font-size: 0.75rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
 }
 
 .post-main .prose td {
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 2rem; /* Consistent generous padding */
   border-bottom: 1px solid #f1f5f9;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .post-main .prose tr:hover td {
-  background-color: #f8fafc;
-  color: #CCDD00; /* Lime accent on hover */
+  background-color: rgba(107, 45, 160, 0.04); /* Subtle --color-secondary glow */
+  color: var(--color-secondary);
 }
 
 .post-main .prose tr:last-child td {
