@@ -48,7 +48,9 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 ## Design References & Inspiration
 - **Airbnb News (https://news.airbnb.com/ja/)**: 
     - **Characteristics**: Clean typography (Japanese), spacious layouts, subtle borders, high-quality imagery, and a refined grid system. 
-    - **Application**: Use as a primary reference for "Premium Minimalist" UI, specifically for Japanese text hierarchy and footer structures.
+    - **Individual Content Style (https://news.airbnb.com/ja/2025-winter-trend/)**: 
+        - **Lists (`<ul>`)**: Minimalist bullet points or numbered lists with generous line-height, subtle markers, and high-contrast text.
+    - **Application**: Use as a primary reference for "Premium Minimalist" UI, specifically for Japanese text hierarchy, footer structures, and list styling.
 
 - **Security & Version Pinning**:
     - **Next.js**: Keep version at `15.1.9` or higher to mitigate CVE-2025-66478.
