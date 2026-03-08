@@ -291,7 +291,6 @@ export default function HomePage() {
                 price: "¥350,000〜",
                 desc: "コーポレートサイト\nCMS(ブログ等)導入",
                 time: "納期：約3〜4週間",
-                popular: true,
               },
               {
                 name: "Premium",
@@ -307,18 +306,8 @@ export default function HomePage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                className={clsx(
-                  "p-8 rounded-3xl border relative flex flex-col h-full",
-                  plan.popular
-                    ? "bg-[#111111]/80 border-[#FFFFFF]"
-                    : "bg-[#111111]/30 border-white/10",
-                )}
+                className="p-8 rounded-3xl border border-white/10 bg-[#111111]/30 relative flex flex-col h-full"
               >
-                {plan.popular && (
-                  <div className="absolute top-0 right-8 -translate-y-1/2 bg-[#FFFFFF] text-[#050505] text-xs font-bold px-3 py-1 rounded-full">
-                    RECOMMENDED
-                  </div>
-                )}
                 <h3 className="text-2xl !font-inconsolata font-bold mb-2">
                   {plan.name}
                 </h3>
@@ -334,7 +323,7 @@ export default function HomePage() {
                   <p className="text-xs text-white/60 mb-6">{plan.time}</p>
                   <Button
                     href="#contact"
-                    variant={plan.popular ? "primary" : "outline"}
+                    variant="outline"
                     className="w-full"
                   >
                     選択する
