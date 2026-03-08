@@ -263,7 +263,7 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeIn}
-            className="text-center mb-20"
+            className="text-center mb-20 max-w-3xl mx-auto"
           >
             <h2 className="text-4xl md:text-[5.5rem] font-serif font-bold mb-4 heading-2 oxanium-heading">
               Pricing
@@ -271,7 +271,7 @@ export default function HomePage() {
             <p className="text-xl text-[#FFFFFF] mb-6">
               明確な価格。隠れた費用なし。
             </p>
-            <p className="text-white/70 max-w-2xl mx-auto">
+            <p className="text-white/70">
               必要な費用は、何のために・誰に・いくらかかるかを必ず事前に説明します。
               <br />
               不要な管理費や意味不明な月額請求は一切ありません。
