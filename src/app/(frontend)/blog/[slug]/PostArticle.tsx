@@ -12,7 +12,7 @@ export const PostArticle: React.FC<{
     nextPost?: Post | null
 }> = ({ post, isPreview, prevPost, nextPost }) => {
     return (
-        <main className="post-main grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24 md:pt-24 md:pb-32 relative z-10">
+        <main className="post-main grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 md:pt-24 md:pb-32 relative z-10">
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat">
                     <p className="font-bold">Preview Mode</p>

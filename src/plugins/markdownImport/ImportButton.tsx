@@ -24,14 +24,34 @@ export const ImportButton: React.FC = () => {
 
     const handleFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
-        if (!file) return
+        if (!file) {
+            console.log('[DEBUG-IMPORT] No file selected.');
+            return
+        }
 
-        console.log(`[DEBUG] Import started for file: ${file.name}`);
+        console.group('[DEBUG-IMPORT] === START IMPORT ===');
+        console.log(`[DEBUG-IMPORT] File name: ${file.name}`);
+        console.log(`[DEBUG-IMPORT] File size: ${file.size} bytes`);
         setIsImporting(true)
 
         try {
-            const text = await file.text()
-            console.log(`[DEBUG] File read successfully. Length: ${text.length}`);
+            // Use FileReader with explicit UTF-8 to avoid clipping/encoding issues
+            const readFile = () => new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target?.result as string);
+                reader.onerror = (e) => reject(new Error('FileReader failed'));
+                reader.readAsText(file, 'UTF-8');
+            });
+
+            let text = '';
+            try {
+                text = await readFile();
+                console.log(`[DEBUG-IMPORT] FileReader success. Length: ${text.length}`);
+            } catch (e) {
+                console.warn('[DEBUG-IMPORT] FileReader failed, falling back to file.text()');
+                text = await file.text();
+                console.log(`[DEBUG-IMPORT] file.text() fallback. Length: ${text.length}`);
+            }
 
             const response = await fetch('/api/convert-markdown', {
                 method: 'POST',
@@ -42,33 +62,41 @@ export const ImportButton: React.FC = () => {
             })
 
             if (!response.ok) {
+                console.error(`[DEBUG-IMPORT] API error: ${response.status} ${response.statusText}`);
                 throw new Error(`Failed to convert markdown: ${response.statusText}`)
             }
 
             const { frontmatter, lexical } = await response.json()
-            console.log('[DEBUG] API Response received:', {
+            console.log('[DEBUG-IMPORT] API Response received:', {
                 hasFrontmatter: !!frontmatter,
                 hasLexical: !!lexical,
-                title: frontmatter?.title
+                frontmatterData: frontmatter,
+                lexicalRootType: lexical?.root?.type
             });
 
-            // 1. CLEAR EXISTING CONTENT (Requirement: cleared once before importing)
-            console.log('[DEBUG] Clearing existing content...');
+            // 1. CLEAR EXISTING CONTENT (Requirement: clear EVERYTHING first)
+            console.log('[DEBUG-IMPORT] Step 1: Clearing all existing fields...');
             if (setTitle) setTitle('')
             if (setSlug) setSlug('')
             if (setPublishedAt) setPublishedAt(null as any)
             if (setContent) setContent(null)
 
-            // Small delay to ensure state clears before setting new ones
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Log the current field states immediately after calling clear
+            console.log('[DEBUG-IMPORT] Clear commands sent. Current state should be empty.');
+
+            // Small delay to ensure state clears before setting new ones (critical for UI stability)
+            console.log('[DEBUG-IMPORT] Waiting 200ms for clear-out to propagate...');
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             // 2. SET NEW CONTENT
-            console.log('[DEBUG] Setting new content...');
+            console.log('[DEBUG-IMPORT] Step 2: Setting new content from Markdown...');
 
             // Populate Title
             if (frontmatter.title && setTitle) {
-                console.log(`[DEBUG] Setting Title: ${frontmatter.title}`);
+                console.log(`[DEBUG-IMPORT] Setting TITLE: "${frontmatter.title}"`);
                 setTitle(frontmatter.title)
+            } else {
+                console.warn('[DEBUG-IMPORT] Skipping Title (missing in frontmatter or setTitle missing)');
             }
 
             // Populate PublishedAt (from 'date' or 'publishedAt' in frontmatter)
@@ -76,35 +104,46 @@ export const ImportButton: React.FC = () => {
             if (dateStr && setPublishedAt) {
                 const parsedDate = new Date(dateStr)
                 if (!isNaN(parsedDate.getTime())) {
-                    console.log(`[DEBUG] Setting PublishedAt: ${parsedDate.toISOString()}`);
-                    setPublishedAt(parsedDate.toISOString())
+                    const isoDate = parsedDate.toISOString();
+                    console.log(`[DEBUG-IMPORT] Setting PUBLISHED_AT: ${isoDate}`);
+                    setPublishedAt(isoDate)
+                } else {
+                    console.error(`[DEBUG-IMPORT] Invalid date format: ${dateStr}`);
                 }
             }
 
             // Auto-generate slug from title (handles Japanese → English translation)
             if (frontmatter.title) {
                 try {
-                    console.log('[DEBUG] Generating slug from title...');
+                    console.log('[DEBUG-IMPORT] Requesting SLUG translation...');
                     const slugRes = await fetch(
                         `/api/translate-slug?title=${encodeURIComponent(frontmatter.title)}`
                     )
                     if (slugRes.ok) {
                         const { slug } = await slugRes.json()
                         if (slug && setSlug) {
-                            console.log(`[DEBUG] Setting Slug: ${slug}`);
+                            console.log(`[DEBUG-IMPORT] Setting SLUG: "${slug}"`);
                             setSlug(slug)
+                        } else {
+                            console.warn('[DEBUG-IMPORT] Slug API returned empty slug');
                         }
+                    } else {
+                        console.error('[DEBUG-IMPORT] Slug translation API failed');
                     }
-                } catch {
-                    console.warn('[ImportButton] Failed to auto-generate slug')
+                } catch (e) {
+                    console.error('[DEBUG-IMPORT] Exception during slug generation:', e);
                 }
             }
 
             // Populate Content (RichText Lexical)
             if (lexical && setContent) {
-                console.log('[DEBUG] Setting Lexical Content. State structure:', JSON.stringify(lexical).substring(0, 100) + '...');
-                setContent(lexical)
-                console.log('[DEBUG] setContent called successfully');
+                console.log('[DEBUG-IMPORT] Setting LEXICAL content state. root nodes:', lexical.root?.children?.length);
+                // Ensure lexical is an object
+                const contentToSet = typeof lexical === 'string' ? JSON.parse(lexical) : lexical;
+                setContent(contentToSet)
+                console.log('[DEBUG-IMPORT] setContent call completed.');
+            } else {
+                console.warn('[DEBUG-IMPORT] Skipping Content (missing in response or setContent missing)');
             }
 
             // Clear the input so the same file could be selected again if needed
@@ -112,25 +151,28 @@ export const ImportButton: React.FC = () => {
                 fileInputRef.current.value = ''
             }
 
-            console.log('[DEBUG] Import process finished successfully');
+            console.log('[DEBUG-IMPORT] === IMPORT SUCCESSFUL ===');
+            console.groupEnd();
         } catch (error) {
-            console.error('[DEBUG] Error importing markdown:', error)
-            alert('Error importing markdown file.')
+            console.error('[DEBUG-IMPORT] !!! IMPORT FAILED !!!', error)
+            console.groupEnd();
+            alert('Error importing markdown file. Check console for details.')
         } finally {
             setIsImporting(false)
         }
     }, [setTitle, setPublishedAt, setSlug, setContent])
 
-    // Debugging Effect: Monitor field values
+    // Debugging Effect: Monitor field values in real-time
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
-            console.log('[DEBUG] Monitoring Field Values:', {
+            console.log('[DEBUG-IMPORT-UI] Field Values Changed:', {
                 title: fieldTitle?.value,
                 slug: fieldSlug?.value,
+                publishedAt: fieldPublishedAt?.value,
                 hasContent: !!fieldContent?.value,
             });
         }
-    }, [fieldTitle?.value, fieldSlug?.value, fieldContent?.value]);
+    }, [fieldTitle?.value, fieldSlug?.value, fieldPublishedAt?.value, fieldContent?.value]);
 
     const handleImportClick = (e: React.MouseEvent) => {
         e.preventDefault()

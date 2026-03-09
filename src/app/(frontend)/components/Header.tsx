@@ -92,92 +92,112 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   const hasBackdrop = alwaysBackdrop || isScrolled;
 
   return (
-    <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${hasBackdrop ? "md:bg-black/0 md:backdrop-blur-sm md:shadow-[0_0px_12px_rgba(200,200,200,0.05)] md:border-b md:border-white/5 bg-transparent border-none shadow-none" : "bg-transparent border-none shadow-none"}`}
-    >
-      <div className={`w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-between md:justify-end md:gap-x-12 transition-all duration-500 relative z-120 ${hasBackdrop ? "" : "bg-transparent"}`}>
+    <>
+      <header
+        className={`fixed bottom-0 md:top-0 left-0 w-full z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-full md:-translate-y-full"
+          } ${hasBackdrop ? "md:bg-black/0 md:backdrop-blur-sm md:shadow-[0_0px_12px_rgba(200,200,200,0.05)] md:border-b md:border-white/5 bg-transparent border-none shadow-none" : "bg-transparent border-none shadow-none"}`}
+      >
+        <div className="w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-between md:justify-end md:gap-x-12 relative z-120">
 
-        {/* Logo (Hidden on mobile) */}
-        <Link href="/" className="hidden md:flex items-center gap-2 relative z-110">
-          <Image
-            src="/assets/NS_logo_White.jpg"
-            alt="Noe Shiftica"
-            width={180}
-            height={40}
-            className="h-7 md:h-8 w-auto opacity-90"
-            priority
-          />
-        </Link>
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-xs rounded-full px-5 py-[11px]"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
 
+          {/* Logo (Hidden on mobile) */}
+          <Link href="/" className="hidden md:flex items-center gap-2 relative z-110">
+            <Image
+              src="/assets/NS_logo_White.jpg"
+              alt="Noe Shiftica"
+              width={180}
+              height={40}
+              className="h-7 md:h-8 w-auto opacity-90"
+              priority
+            />
+          </Link>
+        </div>
+      </header>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="text-xs rounded-full px-5 py-[11px]"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
+      {/* Mobile Nav Toggle - Moved outside header to fix mix-blend-mode stacking context */}
+      <div
+        className={`md:hidden fixed bottom-5 left-6 z-130 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-24"
+          } mix-blend-difference`}
+      >
+        <button
+          className="w-12 h-12 flex items-center justify-center border border-white rounded-full bg-white"
+          onClick={() => {
+            const nextState = !isMobileMenuOpen;
+            setIsMobileMenuOpen(nextState);
+            if (nextState) setIsVisible(true);
+          }}
+        >
+          {isMobileMenuOpen ? (
+            <X size={26} className="text-black" strokeWidth={2.5} />
+          ) : (
+            <Menu size={26} className="text-black" strokeWidth={2.5} />
+          )}
+        </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay & Content */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="isolate fixed inset-0 h-dvh w-screen bg-transparent z-110 flex flex-col items-center justify-center"
-          >
-            {/* 背景ボカシ専用のレイヤー */}
-            <div
+          <div className="fixed inset-0 z-[10000]">
+            {/* Backdrop: Forced GPU acceleration for reliable filters */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: "linear" }}
               className="absolute inset-0"
               style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                backdropFilter: 'blur(4px)',
-                WebkitBackdropFilter: 'blur(4px)',
-                zIndex: 0,
+                backgroundColor: 'rgba(5, 5, 5, 0.75)',
+                backdropFilter: 'blur(20px) saturate(180%) brightness(1.1) contrast(1.1)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%) brightness(1.1) contrast(1.1)',
+                transform: 'translateZ(0)',
+                WebkitTransform: 'translateZ(0)',
               }}
+              onClick={() => setIsMobileMenuOpen(false)}
             />
-            <div className="relative z-10 p-10 rounded-3xl flex flex-col items-center space-y-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-2xl font-serif text-white rounded-full transition-colors hover:text-primary"
-                  style={{ padding: '0.2em 0.5em' }}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-          </motion.div>
+
+            {/* Content Layer: Staggered entry for premium feel */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 flex flex-col items-center justify-center p-6 pointer-events-none"
+            >
+              <div className="w-full max-w-sm flex flex-col items-center space-y-8 pointer-events-auto">
+                {navLinks.map((link, i) => (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 + 0.1 }}
+                  >
+                    <Link
+                      href={link.href}
+                      className="text-3xl font-serif text-white! font-medium tracking-tight transition-all hover:opacity-80 active:scale-95"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
-      {/* Floating Mobile Nav Toggle (Bottom Left, Fixed) - Moved outside header for correct coordinate system */}
-      <button
-        className={`md:hidden fixed bottom-8 left-8 z-130 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl ${isMobileMenuOpen
-            ? "bg-white text-black scale-100 rotate-0"
-            : `bg-black/80 backdrop-blur-md text-white border border-white/10 ${isScrolled ? "translate-y-0 opacity-100 scale-100" : "translate-y-20 opacity-0 scale-90"}`
-          }`}
-        onClick={() => {
-          const nextState = !isMobileMenuOpen;
-          setIsMobileMenuOpen(nextState);
-        }}
-      >
-        {isMobileMenuOpen ? (
-          <X size={26} />
-        ) : (
-          <Menu size={26} />
-        )}
-      </button>
-    </header>
+    </>
   );
 }
