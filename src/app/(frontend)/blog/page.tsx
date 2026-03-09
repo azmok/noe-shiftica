@@ -27,8 +27,8 @@ export default async function BlogPage() {
     <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary) selection:text-white">
       <Header />
 
-      <main className="grow px-4 sm:px-6 lg:px-40 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10">
-        <div className="max-w-[960px] mx-auto flex flex-col gap-10 mt-8">
+      <main className="grow px-4 sm:px-6 lg:px-40 pt-14 pb-16 md:pt-28 md:pb-32 relative z-10">
+        <div className="max-w-[960px] mx-auto flex flex-col gap-10 mt-2 md:mt-8">
 
           {posts.length === 0 ? (
             <div className="text-center p-12 neu-flat rounded-2xl w-full">

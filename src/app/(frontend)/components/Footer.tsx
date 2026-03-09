@@ -12,7 +12,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
 
   return (
     <footer
-      className={`w-full pt-16 pb-8 px-6 mt-32 relative z-10 transition-colors duration-300 border-t ${isBlog
+      className={`w-full pt-16 pb-8 px-6 mt-0 md:mt-0 relative z-10 transition-colors duration-300 border-t ${isBlog
         ? "bg-background-void border-white/10 text-[#222222]"
         : "bg-background-void text-white border-white/10"
         }`}
@@ -20,7 +20,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 px-4">
           <div className="lg:col-span-4 space-y-6">
-            <Link href="/" className="inline-block">
+            <Link href="/" className="inline-block text-xs rounded-full px-5 py-[11px]">
               <span className="text-lg font-bold tracking-tighter opacity-90">Noe Shiftica</span>
             </Link>
             <p
@@ -35,12 +35,12 @@ export function Footer({ variant = "landing" }: FooterProps) {
 
           <div className="lg:col-span-2">
             <h3
-              className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-4 ${isBlog ? "text-slate-400" : "text-white/30"
+              className={`text-[12px] font-bold uppercase tracking-[0.2em] mb-2 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
               Navigation
             </h3>
-            <ul className="space-y-4">
+            <ul className="space-y-1.5 pl-0">
               {[
                 { name: "About", href: "/about" },
                 { name: "Services", href: "/#services" },
@@ -50,7 +50,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[14px] leading-[18px] transition-colors font-light ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full py-[6px] ${isBlog
                       ? "text-[#222222] hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -64,12 +64,12 @@ export function Footer({ variant = "landing" }: FooterProps) {
 
           <div className="lg:col-span-2">
             <h3
-              className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-6 ${isBlog ? "text-slate-400" : "text-white/30"
+              className={`text-[12px] font-bold uppercase tracking-[0.2em] mb-3 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
               Support
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-1 pl-0">
               {[
                 { name: "Privacy Policy", href: "/privacy" },
                 { name: "Terms of Service", href: "/terms" },
@@ -77,7 +77,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[13px] transition-colors font-light ${isBlog
+                    className={`text-[12px] transition-colors font-light rounded-full py-[6px] ${isBlog
                       ? "text-[#222222] hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -139,6 +139,6 @@ export function Footer({ variant = "landing" }: FooterProps) {
           </div>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 }

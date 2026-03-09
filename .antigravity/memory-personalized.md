@@ -62,3 +62,14 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   2. The `clsx` error in `page.tsx` was likely a side effect of environment mismatch during type checking. Standardizing the environment resolved it.
   3. Strict TypeScript enforcement in Framer Motion requires `as const` for bezier arrays to match `Transition` easing types.
 - **Plan Impact**: All future changes requiring a pnpm update MUST be mirrored in `package.json` and `apphosting.yaml` to prevent deployment regression.
+### [2026-03-10 06:45] Session Summary
+- **Learned/Decided**: 
+  1. **Footer Alignment**: Removed px-5 from navigation/support links in Footer.tsx to align first letters with section titles.
+  2. **Persistence Rule**: The user explicitly requested that this alignment must be maintained across all future edits. Do NOT add horizontal padding back to these list items unless specifically instructed.
+- **Preferences**: Left-aligned text hierarchy for footer navigation is preferred over 'pill-style' centered padding.
+- **Plan Impact**: All future global UI refactors MUST preserve this specific alignment in Footer.tsx.
+
+### [2026-03-10 06:50] Session Summary
+- **Learned/Decided**: 
+  1. **Footer Mobile Optimization**: Increased section title size (12px), decreased item text size (12px), and tightened vertical spacing (space-y-1.5/1) for better mobile legibility and compact design.
+- **Preferences**: Footer link items should feel distinctly smaller and more compact than their section headers on mobile devices.

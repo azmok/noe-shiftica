@@ -6,7 +6,8 @@ import {
   BoldFeature,
   ItalicFeature,
   ParagraphFeature,
-  EXPERIMENTAL_TableFeature
+  EXPERIMENTAL_TableFeature,
+  HorizontalRuleFeature
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -41,6 +42,7 @@ const config = buildConfig({
       EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
       HtmlSourceFeature(),
+      HorizontalRuleFeature(),
     ],
   }),
   secret: process.env.PAYLOAD_SECRET || 'dummy-secret-key-for-build-bypass-only-xxx',
