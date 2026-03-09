@@ -90,3 +90,4 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   2. **Resolution**: Added `md:bottom-auto` and `md:h-12` to the base `className` of the header, ensuring it maintains a fixed 48px height at all scroll positions on desktop.
 - **Preferences**: Clean, visually stable transitions without layout shifts or unexpected overlay stretching.
 - **Plan Impact**: When styling cross-device fixed elements (like headers/footers) in Tailwind, always ensure explicit height or opposite-edge `auto` properties (e.g., `md:bottom-auto`) are set for the desktop breakpoints to avoid unintended 100% stretching from mobile classes.
+
