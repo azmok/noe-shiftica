@@ -20,11 +20,19 @@ export const markdownImportPlugin = (): Plugin => {
                     try {
                         const rawBody = await (req as unknown as Request).text()
 
-                        // Parse frontmatter
-                        const parsed = matter(rawBody)
+                        // Debug: Inspect the first few characters for BOM or weirdness
+                        console.log('[DEBUG-API] Received raw body length:', rawBody.length);
+                        console.log('[DEBUG-API] First 100 characters:', JSON.stringify(rawBody.substring(0, 100)));
+
+                        // Parse frontmatter - ensure clean start for gray-matter
+                        const cleanBody = rawBody.trimStart();
+                        const parsed = matter(cleanBody)
 
                         const markdownBody = parsed.content || ''
                         const frontmatter = parsed.data || {}
+
+                        console.log('[DEBUG-API] Parsed Frontmatter:', JSON.stringify(frontmatter));
+                        console.log('[DEBUG-API] Body content start:', JSON.stringify(markdownBody.substring(0, 100)));
 
                         // Convert to Lexical using the actual editor config from Payload
                         // (includes EXPERIMENTAL_TableFeature and all custom features)
