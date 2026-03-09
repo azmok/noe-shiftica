@@ -22,6 +22,7 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **HTML Source Editor (Lexical Payload v3)**:
     - **Component Property**: Use the `Component` property instead of `ChildComponent` when registering custom toolbar items to prevent invalid nested `<button>` elements.
     - **State Synchronization**: Use custom window events (e.g., `htmlsource:sync`) to bridge Lexical toolbar items and the editor overlay.
+    - **Lexical Programmatic Updates**: When writing custom Payload components that programmatically update a Lexical RichText field, `setValue` from `useField` updates the form state, but Lexical may not immediately reflect it visually. To force a re-render, use `form.dispatchFields({ type: 'UPDATE', path: 'target_field', value: data, initialValue: data })`. Setting `initialValue` compels Lexical to re-initialize internally.
     - **Lexical Dependencies (2026-03-08)**: Matches `@payloadcms/richtext-lexical@3.79.0` with `lexical@0.41.0`. Installed `lexical`, `@lexical/markdown`, `@lexical/headless`, `@lexical/html`, and `@lexical/react` at version `0.41.0`.
     - **TypeScript Types**: Added `@types/pg` explicitly to resolve `Module not found` errors during `next build` involving database connection logic.
     - **Payload v3 Pathing**: In Windows Native, verify `src/app/(payload)/admin/importMap.js` relative paths. Avoid WSL-style `/mnt/c/` pathing in configuration files.
@@ -73,3 +74,19 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: 
   1. **Footer Mobile Optimization**: Increased section title size (12px), decreased item text size (12px), and tightened vertical spacing (space-y-1.5/1) for better mobile legibility and compact design.
 - **Preferences**: Footer link items should feel distinctly smaller and more compact than their section headers on mobile devices.
+
+### [2026-03-10 08:00] Session Summary (CRITICAL: Markdown Import Post-Mortem)
+- **Learned/Decided**: 
+  1. **Markdown Import Failure Cause**: Early truncations and missing frontmatter often occur when using the standard `file.text()` due to encoding conflicts. More importantly, the imported content failed to render immediately in the PayloadCMS UI because the Lexical RichText editor does NOT automatically re-initialize when its form `value` is updated via standard `useField().setValue()` hooks. This creates a desync where the form holds the data but the editor remains blank until a "Save Draft" reloads the component.
+  2. **Resolution & Core Pattern**: 
+     - Replaced `file.text()` with `FileReader` specifically bound to `UTF-8` encoding to guarantee 100% accurate file reading.
+     - Resolved the Lexical UI rendering issue by utilizing `form.dispatchFields({ type: 'UPDATE', path: 'target', value: data, initialValue: data })`. **Setting `initialValue` simultaneously with `value` is the critical trigger** that forcefully remounts Lexical's internal React components, making the new content appear instantly.
+  3. **Persistence Rule**: The markdown import feature (`ImportButton.tsx` and `/api/convert-markdown`) is now considered perfectly tuned and stable. The user has explicitly instructed to **NEVER** modify this logic again unless absolutely commanded to.
+- **Plan Impact**: Do not touch the Markdown Import components. If programmatic updates to any Lexical field are required in the future for a different feature, strictly adhere to the `dispatchFields({ initialValue })` pattern.
+
+### [2026-03-10 08:15] Session Summary
+- **Learned/Decided**: 
+  1. **Header PC Blur Issue**: When `bottom-0` (mobile) and `md:top-0` (desktop) are both applied to a fixed element without an explicit height constraint, it stretches to 100vh on desktop. This caused the header to expand fully when scrolling back to the top (removing `md:h-12` conditionally), creating a full-screen blur.
+  2. **Resolution**: Added `md:bottom-auto` and `md:h-12` to the base `className` of the header, ensuring it maintains a fixed 48px height at all scroll positions on desktop.
+- **Preferences**: Clean, visually stable transitions without layout shifts or unexpected overlay stretching.
+- **Plan Impact**: When styling cross-device fixed elements (like headers/footers) in Tailwind, always ensure explicit height or opposite-edge `auto` properties (e.g., `md:bottom-auto`) are set for the desktop breakpoints to avoid unintended 100% stretching from mobile classes.
