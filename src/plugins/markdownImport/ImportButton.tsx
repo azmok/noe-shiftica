@@ -76,37 +76,39 @@ export const ImportButton: React.FC = () => {
 
             // 1. CLEAR EXISTING CONTENT (Requirement: clear EVERYTHING first)
             console.log('[DEBUG-IMPORT] Step 1: Clearing all existing fields...');
-            if (setTitle) setTitle('')
-            if (setSlug) setSlug('')
-            if (setPublishedAt) setPublishedAt(null as any)
-            if (setContent) setContent(null)
+            if (dispatchFields) {
+                dispatchFields({ type: 'UPDATE', path: 'title', value: '' })
+                dispatchFields({ type: 'UPDATE', path: 'slug', value: '' })
+                dispatchFields({ type: 'UPDATE', path: 'publishedAt', value: null })
+                dispatchFields({ type: 'UPDATE', path: 'content', value: null, initialValue: null })
+            }
 
             // Log the current field states immediately after calling clear
             console.log('[DEBUG-IMPORT] Clear commands sent. Current state should be empty.');
 
             // Small delay to ensure state clears before setting new ones (critical for UI stability)
-            console.log('[DEBUG-IMPORT] Waiting 200ms for clear-out to propagate...');
-            await new Promise(resolve => setTimeout(resolve, 200));
+            console.log('[DEBUG-IMPORT] Waiting 150ms for clear-out to propagate...');
+            await new Promise(resolve => setTimeout(resolve, 150));
 
             // 2. SET NEW CONTENT
             console.log('[DEBUG-IMPORT] Step 2: Setting new content from Markdown...');
 
             // Populate Title
-            if (frontmatter.title && setTitle) {
+            if (frontmatter.title && dispatchFields) {
                 console.log(`[DEBUG-IMPORT] Setting TITLE: "${frontmatter.title}"`);
-                setTitle(frontmatter.title)
+                dispatchFields({ type: 'UPDATE', path: 'title', value: frontmatter.title })
             } else {
-                console.warn('[DEBUG-IMPORT] Skipping Title (missing in frontmatter or setTitle missing)');
+                console.warn('[DEBUG-IMPORT] Skipping Title (missing in frontmatter or dispatchFields missing)');
             }
 
             // Populate PublishedAt (from 'date' or 'publishedAt' in frontmatter)
             const dateStr = frontmatter.date || frontmatter.publishedAt
-            if (dateStr && setPublishedAt) {
+            if (dateStr && dispatchFields) {
                 const parsedDate = new Date(dateStr)
                 if (!isNaN(parsedDate.getTime())) {
                     const isoDate = parsedDate.toISOString();
                     console.log(`[DEBUG-IMPORT] Setting PUBLISHED_AT: ${isoDate}`);
-                    setPublishedAt(isoDate)
+                    dispatchFields({ type: 'UPDATE', path: 'publishedAt', value: isoDate })
                 } else {
                     console.error(`[DEBUG-IMPORT] Invalid date format: ${dateStr}`);
                 }
@@ -121,9 +123,9 @@ export const ImportButton: React.FC = () => {
                     )
                     if (slugRes.ok) {
                         const { slug } = await slugRes.json()
-                        if (slug && setSlug) {
+                        if (slug && dispatchFields) {
                             console.log(`[DEBUG-IMPORT] Setting SLUG: "${slug}"`);
-                            setSlug(slug)
+                            dispatchFields({ type: 'UPDATE', path: 'slug', value: slug })
                         } else {
                             console.warn('[DEBUG-IMPORT] Slug API returned empty slug');
                         }
@@ -136,14 +138,19 @@ export const ImportButton: React.FC = () => {
             }
 
             // Populate Content (RichText Lexical)
-            if (lexical && setContent) {
+            if (lexical && dispatchFields) {
                 console.log('[DEBUG-IMPORT] Setting LEXICAL content state. root nodes:', lexical.root?.children?.length);
                 // Ensure lexical is an object
                 const contentToSet = typeof lexical === 'string' ? JSON.parse(lexical) : lexical;
-                setContent(contentToSet)
-                console.log('[DEBUG-IMPORT] setContent call completed.');
+                dispatchFields({
+                    type: 'UPDATE',
+                    path: 'content',
+                    value: contentToSet,
+                    initialValue: contentToSet // Forcing initialValue triggers Lexical to re-initialize
+                })
+                console.log('[DEBUG-IMPORT] dispatchFields UPDATE for content completed.');
             } else {
-                console.warn('[DEBUG-IMPORT] Skipping Content (missing in response or setContent missing)');
+                console.warn('[DEBUG-IMPORT] Skipping Content (missing in response or dispatchFields missing)');
             }
 
             // Clear the input so the same file could be selected again if needed
