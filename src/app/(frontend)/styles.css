@@ -135,7 +135,7 @@ h6 {
   --blog-content-width: 872px;
   --blog-font-size-base: 18px;
   --blog-line-height-base: 1.55;
-  --blog-text-color: #222222;
+  --blog-text-color: #2c3e50; /* More legible, slightly bluish color */
   --blog-heading-color: #222222;
 }
 
@@ -180,7 +180,7 @@ h6 {
 }
 
 .post-main .prose li::marker {
-  color: var(--color-neu-primary); /* Use brand color for markers like Airbnb sometimes does */
+  color: var(--blog-text-color); /* Match text color as requested */
 }
 
 .post-main .prose h2 {

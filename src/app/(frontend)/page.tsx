@@ -94,12 +94,12 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             variants={fadeIn}
-            className="flex flex-col sm:flex-row gap-4 items-center"
+            className="flex flex-col sm:flex-row gap-5 sm:gap-6 w-full sm:w-auto items-center mt-2 mb-4"
           >
-            <Button href="#contact" variant="primary" size="lg">
+            <Button href="#contact" variant="primary" size="lg" className="w-full sm:w-auto">
               無料相談を予約する
             </Button>
-            <Button href="#works" variant="outline" size="lg">
+            <Button href="#works" variant="outline" size="lg" className="w-full sm:w-auto">
               実績を見る ↓
             </Button>
           </motion.div>
@@ -319,12 +319,12 @@ export default function HomePage() {
                 <p className="text-white/80 whitespace-pre-line mb-6 flex-grow">
                   {plan.desc}
                 </p>
-                <div className="mt-auto pt-6">
-                  <p className="text-xs text-white/60 mb-6">{plan.time}</p>
+                <div className="mt-auto pt-10">
+                  <p className="text-xs text-white/60">{plan.time}</p>
                   <Button
                     href="#contact"
                     variant="outline"
-                    className="w-full"
+                    className="w-full mt-2"
                   >
                     選択する
                   </Button>
@@ -492,8 +492,8 @@ export default function HomePage() {
                   />
                 </div>
               </div>
-              <div className="pt-6 text-center">
-                <div className={isSubmitting ? "opacity-50 pointer-events-none" : ""}>
+              <div className="pt-12 md:pt-14 text-center">
+                <div className={isSubmitting ? "opacity-50 pointer-events-none mb-8" : "mb-8"}>
                   <Button
                     type="submit"
                     variant="primary"
@@ -503,7 +503,7 @@ export default function HomePage() {
                     {isSubmitting ? '送信中...' : '送信する'}
                   </Button>
                 </div>
-                <p className="text-xs text-white/40 mt-6">
+                <p className="text-xs text-white/40 mt-8">
                   対応時間：11:00〜19:00 ｜ 返信は原則24時間以内
                 </p>
               </div>
