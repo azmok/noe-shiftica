@@ -94,8 +94,8 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   return (
     <>
       <header
-        className={`fixed bottom-0 md:top-0 left-0 w-full z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-full md:-translate-y-full"
-          } ${hasBackdrop ? "md:bg-black/0 md:backdrop-blur-sm md:shadow-[0_0px_12px_rgba(200,200,200,0.05)] md:border-b md:border-white/5 bg-transparent border-none shadow-none" : "bg-transparent border-none shadow-none"}`}
+        className={`fixed bottom-0 md:bottom-auto md:top-0 left-0 w-full md:h-12 z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-full md:-translate-y-full"
+          } ${hasBackdrop ? "md:bg-black/0 md:backdrop-blur-sm md:shadow-[0_0px_12px_rgba(200,200,200,0.05)] md:border-b md:border-white/5 bg-transparent border-none shadow-none md:fixed md:top-0 md:left-0 md:w-full md:h-12 bg-transparent" : "bg-transparent border-none shadow-none"}`}
       >
         <div className="w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-between md:justify-end md:gap-x-12 relative z-120">
 
