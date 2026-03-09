@@ -71,7 +71,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                         {post.title}
                                     </h3>
                                     <p className="text-slate-500 text-sm line-clamp-2 mb-4">
-                                        {post.description || "記事の詳細を読むにはここをクリックしてください。"}
+                                        {post.description || ""}
                                     </p>
                                     <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-50">
                                         <span className="text-[11px] text-slate-400 font-medium">
