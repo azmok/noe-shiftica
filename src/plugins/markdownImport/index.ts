@@ -77,7 +77,7 @@ export const markdownImportPlugin = (): Plugin => {
             },
             // AI Content Enrichment (Actual Integration)
             {
-                path: '/posts/ai-enrich',
+                path: '/ai-enrich-post',
                 method: 'post',
                 handler: async (req) => {
                     try {
