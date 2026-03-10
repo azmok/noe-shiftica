@@ -1,5 +1,6 @@
 import { LogoutButton as LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01 } from '@/app/(frontend)/components/admin/LogoutButton'
 import { default as default_3464b17696a67b200eb846834620ef54 } from '../../../plugins/markdownImport/ImportButton.tsx'
+import { default as MdImporter_77e7bcefc0fd3b } from '../../../plugins/markdownImport/MdImporter.tsx'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -33,6 +34,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 export const importMap = {
   "@/app/(frontend)/components/admin/LogoutButton#LogoutButton": LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01,
   "/plugins/markdownImport/ImportButton.tsx#default": default_3464b17696a67b200eb846834620ef54,
+  "/plugins/markdownImport/MdImporter.tsx#default": MdImporter_77e7bcefc0fd3b,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

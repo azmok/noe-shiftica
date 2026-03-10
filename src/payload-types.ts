@@ -232,6 +232,18 @@ export interface Post {
   };
   coverImage?: (number | null) | Media;
   heroImage?: (number | null) | Media;
+  /**
+   * MarkdownのFrontmatterに含まれる未知のメタデータがここに格納されます
+   */
+  customMetaData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -414,6 +426,7 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   coverImage?: T;
   heroImage?: T;
+  customMetaData?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
