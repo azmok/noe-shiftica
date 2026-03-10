@@ -7,7 +7,7 @@ export interface EnrichedContent {
     slug?: string
     description: string
     author?: string
-    categories?: string[]
+    categories?: any[]
     tags?: string[]
     seo_title: string
     seo_description: string

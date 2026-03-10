@@ -87,6 +87,36 @@ export const markdownImportPlugin = (): Plugin => {
                         // Call Gemini API
                         const result = await enrichPostContent(title, JSON.stringify(content))
 
+                        // Resolve Categories (Convert names to IDs, creating if necessary)
+                        if (result.categories && Array.isArray(result.categories)) {
+                            console.log('[AI-ENRICH] Resolving categories:', result.categories)
+                            const categoryIds = []
+
+                            for (const catName of result.categories) {
+                                // 1. Try to find existing category
+                                const existing = await req.payload.find({
+                                    collection: 'categories',
+                                    where: {
+                                        name: { equals: catName }
+                                    },
+                                    limit: 1,
+                                })
+
+                                if (existing.docs.length > 0) {
+                                    categoryIds.push(existing.docs[0].id)
+                                } else {
+                                    // 2. Create new category if not found
+                                    console.log(`[AI-ENRICH] Creating new category: ${catName}`)
+                                    const newCat = await req.payload.create({
+                                        collection: 'categories',
+                                        data: { name: catName },
+                                    })
+                                    categoryIds.push(newCat.id)
+                                }
+                            }
+                            result.categories = categoryIds
+                        }
+
                         console.log('[AI-ENRICH] AI analysis complete')
                         console.groupEnd()
 
