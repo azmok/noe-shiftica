@@ -3,6 +3,7 @@ import { convertMarkdownToLexical } from '@payloadcms/richtext-lexical'
 import matter from 'gray-matter'
 import { sanitizeServerEditorConfig } from '@payloadcms/richtext-lexical'
 import { translateToSlug } from '../../lib/translateToSlug'
+import { enrichPostContent } from '../../lib/gemini'
 
 export const markdownImportPlugin = (): Plugin => {
     return (config) => {
@@ -13,7 +14,6 @@ export const markdownImportPlugin = (): Plugin => {
             ...existingEndpoints,
             // Markdown → Lexical conversion
             {
-
                 path: '/convert-markdown',
                 method: 'post',
                 handler: async (req) => {
@@ -75,7 +75,7 @@ export const markdownImportPlugin = (): Plugin => {
                     }
                 },
             },
-            // AI Content Enrichment (Stub)
+            // AI Content Enrichment (Actual Integration)
             {
                 path: '/posts/ai-enrich',
                 method: 'post',
@@ -84,25 +84,13 @@ export const markdownImportPlugin = (): Plugin => {
                         const { title, content } = await (req as unknown as Request).json()
                         console.group('[AI-ENRICH] Request for:', title)
 
-                        // TODO: Integrate Gemini API here
-                        // For now, return a deterministic stub response
-                        const mockDescription = `This is an AI-generated description for "${title}". It analyzes the content which has ${content?.length || 0} characters.`
+                        // Call Gemini API
+                        const result = await enrichPostContent(title, JSON.stringify(content))
 
-                        const mockCustomMetaData = {
-                            seo_title: `${title} | Noe Shiftica`,
-                            seo_description: mockDescription,
-                            og_title: title,
-                            og_description: mockDescription,
-                            keywords: ['AI', 'Generated', 'Blog'],
-                        }
-
-                        console.log('[AI-ENRICH] returning mock data')
+                        console.log('[AI-ENRICH] AI analysis complete')
                         console.groupEnd()
 
-                        return Response.json({
-                            description: mockDescription,
-                            customMetaData: mockCustomMetaData,
-                        })
+                        return Response.json(result)
                     } catch (error) {
                         console.error('Error in AI enrichment:', error)
                         return Response.json({ error: 'Failed to enrich content' }, { status: 500 })
@@ -121,7 +109,7 @@ export const markdownImportPlugin = (): Plugin => {
                         admin: {
                             position: 'sidebar',
                             components: {
-                                Field: '/plugins/markdownImport/ImportButton.tsx',
+                                Field: '/plugins/markdownImport/BlogContentActions.tsx',
                             },
                         },
                     },

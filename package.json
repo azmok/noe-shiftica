@@ -19,6 +19,7 @@
     "db:migrate:status": "payload migrate:status"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@lexical/headless": "0.41.0",
     "@lexical/html": "0.41.0",
     "@lexical/markdown": "0.41.0",
@@ -61,6 +62,6 @@
     "neonctl": "^2.21.2",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
