@@ -140,7 +140,7 @@ export const BlogContentActions: React.FC = () => {
         console.group('[BLOG-ACTIONS] AI Optimizing...')
 
         try {
-            const response = await fetch('/api/posts/ai-enrich', {
+            const response = await fetch('/api/ai-enrich-post', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, content }),

@@ -100,3 +100,17 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   4. **Plugin Architecture**: Manually registered the new component in `Posts.ts` and `importMap.js` (Payload v3) to ensure client-side availability.
 - **Preferences**: Front-end driven synchronization for better UX (immediate feedback before saving). 
 - **Plan Impact**: The `MdImporter` is now the standard for Markdown ingestion in the `posts` collection.
+
+### [2026-03-11 01:30] Session Summary (Markdown Importer & Gemini AI)
+- **Learned/Decided**: 
+  1. **Gemini 2.0 Flash Integration**: Successfully integrated @google/generative-ai to provide real-time SEO and content enrichment. 
+  2. **Consolidated Plugin Component**: Merged ImportButton.tsx and BlogContentActions.tsx into a single high-performance component. 
+  3. **Payload v3 importMap management**: Removing a component file manually requires updating importMap.js. 
+  4. **Field Clearing Requirement**: Re-implemented the "clear-before-import" logic. 
+- **Preferences**: Modular plugin design with AI-driven automation. 
+- **Plan Impact**: The Markdown Importer plugin is now fully feature-complete.
+
+### [2026-03-11 01:35] Hotfix (AI Enrich 404)
+- **Learned/Decided**: 
+  1. **Endpoint Collision**: Global endpoints starting with a collection slug (e.g., /api/posts/...) collide with Payload's built-in collection routes. 
+  2. **Resolution**: Renamed global AI endpoint to /api/ai-enrich-post to bypass the collision. Always prefix global endpoints with something unique or avoid collection names at the root.
