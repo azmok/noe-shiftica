@@ -37,7 +37,7 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 ## Database & Deployment Lessons
 - **Neon Database Synchronization (2026-03-08)**:
     - **Schema Sync**: Use `payload migrate` to sync schema. If "already exists" errors occur, make the migration idempotent with `IF NOT EXISTS` and `DO` blocks.
-    - **Data Sync**: Since `pg_dump` may be unavailable and Neon restricts `session_replication_role`, use a custom Node.js script with `pg` to sync tables in dependency order (parents first, then children) while clearing in reverse order.
+    - **Data Sync**: Since `pg_dump` acknowledging is unavailable and Neon restricts `session_replication_role`, use a custom Node.js script with `pg` to sync tables in dependency order (parents first, then children) while clearing in reverse order.
 
 - **Premium Typography & Readability (2026-03-08)**:
     - **Hierarchy**: Use 46px (2.875rem) for main titles (H1) with a tight `line-height` (1.13) to create "visual weight".
@@ -63,6 +63,7 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   2. The `clsx` error in `page.tsx` was likely a side effect of environment mismatch during type checking. Standardizing the environment resolved it.
   3. Strict TypeScript enforcement in Framer Motion requires `as const` for bezier arrays to match `Transition` easing types.
 - **Plan Impact**: All future changes requiring a pnpm update MUST be mirrored in `package.json` and `apphosting.yaml` to prevent deployment regression.
+
 ### [2026-03-10 06:45] Session Summary
 - **Learned/Decided**: 
   1. **Footer Alignment**: Removed px-5 from navigation/support links in Footer.tsx to align first letters with section titles.
@@ -114,3 +115,18 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: 
   1. **Endpoint Collision**: Global endpoints starting with a collection slug (e.g., /api/posts/...) collide with Payload's built-in collection routes. 
   2. **Resolution**: Renamed global AI endpoint to /api/ai-enrich-post to bypass the collision. Always prefix global endpoints with something unique or avoid collection names at the root.
+
+### [2026-03-11 02:12] UI Refinement (Dynamic MetaData)
+- **Learned/Decided**: 
+  1. **Dynamic Rendering**: Used Object.entries() for customMetaData. 
+  2. **Reactivity**: Verified useField reactivity. 
+  3. **Neon Auth**: Confirmed external CLI tools are the likely cause.
+
+### [2026-03-11 03:55] Session Summary (AI Optimizer & Form State)
+- **Learned/Decided**: 
+  1. **Smart Field Mapping**: Implemented a dynamic sorting loop to route AI results to either standard Payload fields or the `customMetaData` JSON bucket.
+  2. **Relationship Field Protection**: Excluded `author` and `categories` from direct programmatic updates because the AI returns names/strings while Payload expects IDs. Routing them to `customMetaData` as suggestions prevents 500 database errors.
+  3. **Form Dirty State (Payload v3)**: Discovered that `form.dispatchFields` does not always trigger the "dirty" state needed to enable the **Publish** button in the Admin UI. 
+  4. **Resolution**: Added `form.setModified(true)` after field updates to manually trigger the modified state, ensuring the Publish button is immediately functional.
+- **Preferences**: Modular sorting logic and explicit form state management for a smoother Admin UI experience.
+- **Plan Impact**: Use `form.setModified(true)` for all future custom Admin UI components that perform programmatic multi-field updates.
