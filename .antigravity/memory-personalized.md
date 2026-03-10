@@ -91,3 +91,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Preferences**: Clean, visually stable transitions without layout shifts or unexpected overlay stretching.
 - **Plan Impact**: When styling cross-device fixed elements (like headers/footers) in Tailwind, always ensure explicit height or opposite-edge `auto` properties (e.g., `md:bottom-auto`) are set for the desktop breakpoints to avoid unintended 100% stretching from mobile classes.
 
+
+### [2026-03-10 23:55] Session Summary (Markdown Instant Importer)
+- **Learned/Decided**: 
+  1. **Instant Field Sync**: Successfully implemented `MdImporter.tsx` which uses `useForm` / `dispatchFields` to instantly populate multiple fields (`title`, `slug`, `publishedAt`, `content`, `customMetaData`) from an uploaded `.md` file.
+  2. **Lexical Re-initialization**: Re-confirmed that setting `initialValue` alongside `value` in `dispatchFields` is the only way to force Lexical to re-render programmatically updated content immediately in the Admin UI.
+  3. **Custom Metadata Handling**: Added a dedicated `customMetaData` JSON field to the `Posts` collection to capture non-standard Frontmatter keys, ensuring no data loss from imported Markdown files.
+  4. **Plugin Architecture**: Manually registered the new component in `Posts.ts` and `importMap.js` (Payload v3) to ensure client-side availability.
+- **Preferences**: Front-end driven synchronization for better UX (immediate feedback before saving). 
+- **Plan Impact**: The `MdImporter` is now the standard for Markdown ingestion in the `posts` collection.

@@ -64,6 +64,16 @@ export const Posts: CollectionConfig = {
             required: true,
         },
         {
+            name: 'mdImporter',
+            type: 'ui',
+            admin: {
+                position: 'sidebar',
+                components: {
+                    Field: '/plugins/markdownImport/MdImporter.tsx',
+                },
+            },
+        },
+        {
             name: 'slug',
             type: 'text',
             required: true,
@@ -119,6 +129,14 @@ export const Posts: CollectionConfig = {
             required: false,
             admin: {
                 position: 'sidebar',
+            },
+        },
+        {
+            name: 'customMetaData',
+            type: 'json',
+            admin: {
+                position: 'sidebar',
+                description: 'MarkdownのFrontmatterに含まれる未知のメタデータがここに格納されます',
             },
         }
     ],
