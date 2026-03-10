@@ -160,9 +160,9 @@ export const BlogContentActions: React.FC = () => {
             console.log('[BLOG-ACTIONS] AI Result received:', aiResult)
 
             if (dispatchFields) {
-                // Relationship fields (author, categories) are excluded here because AI returns names/strings 
-                // but Payload expects IDs. They will be routed to customMetaData as suggestions.
-                const standardFields = ['title', 'slug', 'description', 'publishedAt', 'content', 'coverImage', 'heroImage']
+                // Relationship fields (author) are excluded here because AI returns names/strings 
+                // but Payload expects IDs. categories are now resolved to IDs on the backend.
+                const standardFields = ['title', 'slug', 'description', 'categories', 'publishedAt', 'content', 'coverImage', 'heroImage']
                 const nextCustomMeta = { ...currentMeta }
 
                 Object.entries(aiResult).forEach(([key, value]) => {
