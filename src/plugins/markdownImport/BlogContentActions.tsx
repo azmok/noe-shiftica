@@ -17,6 +17,9 @@ export const BlogContentActions: React.FC = () => {
     // Field handles
     const fieldTitle = useField<string>({ path: 'title' })
     const fieldContent = useField<any>({ path: 'content' })
+    const fieldCustomMetaData = useField<Record<string, any>>({ path: 'customMetaData' })
+
+    const metaData = fieldCustomMetaData?.value || {}
 
     const contentToSlug = useCallback(async (title: string) => {
         try {
@@ -114,6 +117,10 @@ export const BlogContentActions: React.FC = () => {
                         initialValue: lexical,
                     })
                 }
+                // Mark form as modified to enable Save/Publish buttons
+                if (form?.setModified) {
+                    form.setModified(true)
+                }
             }
             console.log('[BLOG-ACTIONS] Markdown import complete.')
         } catch (error) {
@@ -130,6 +137,7 @@ export const BlogContentActions: React.FC = () => {
     const handleAiOptimize = useCallback(async () => {
         const title = fieldTitle?.value
         const content = fieldContent?.value
+        const currentMeta = fieldCustomMetaData?.value || {}
 
         if (!title) {
             alert('Please enter a title first.')
@@ -148,14 +156,41 @@ export const BlogContentActions: React.FC = () => {
 
             if (!response.ok) throw new Error('AI Enrichment failed')
 
-            const { description, customMetaData } = await response.json()
+            const aiResult = await response.json()
+            console.log('[BLOG-ACTIONS] AI Result received:', aiResult)
 
             if (dispatchFields) {
-                if (description) {
-                    dispatchFields({ type: 'UPDATE', path: 'description', value: description })
-                }
-                if (customMetaData) {
-                    dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: customMetaData })
+                // Relationship fields (author, categories) are excluded here because AI returns names/strings 
+                // but Payload expects IDs. They will be routed to customMetaData as suggestions.
+                const standardFields = ['title', 'slug', 'description', 'publishedAt', 'content', 'coverImage', 'heroImage']
+                const nextCustomMeta = { ...currentMeta }
+
+                Object.entries(aiResult).forEach(([key, value]) => {
+                    if (key === 'updatedAt') {
+                        console.log(`[BLOG-ACTIONS] Skipping manual updatedAt: ${value}`)
+                        return
+                    }
+
+                    if (standardFields.includes(key)) {
+                        console.log(`[BLOG-ACTIONS] Mapping "${key}" to standard Field. value:`, value)
+                        dispatchFields({ type: 'UPDATE', path: key, value })
+                    } else {
+                        console.log(`[BLOG-ACTIONS] Mapping "${key}" to customMetaData bucket. value:`, value)
+                        nextCustomMeta[key] = value
+                    }
+                })
+
+                console.log('[BLOG-ACTIONS] Merged customMetaData:', nextCustomMeta)
+
+                // Update Custom Meta Data with merged values
+                dispatchFields({
+                    type: 'UPDATE',
+                    path: 'customMetaData',
+                    value: nextCustomMeta
+                })
+                // Mark form as modified to enable Save/Publish buttons
+                if (form?.setModified) {
+                    form.setModified(true)
                 }
             }
             console.log('[BLOG-ACTIONS] AI optimization complete.')
@@ -166,7 +201,7 @@ export const BlogContentActions: React.FC = () => {
             setIsOptimizing(false)
             console.groupEnd()
         }
-    }, [fieldTitle?.value, fieldContent?.value, dispatchFields])
+    }, [fieldTitle?.value, fieldContent?.value, fieldCustomMetaData?.value, dispatchFields])
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0 0.5rem 1rem' }}>
@@ -203,6 +238,54 @@ export const BlogContentActions: React.FC = () => {
             <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.25rem' }}>
                 Import first, then optimize. Remember to check AI suggestions before publishing.
             </p>
+
+            {/* Metadata Preview Section */}
+            <div style={{
+                marginTop: '1rem',
+                borderTop: '1px solid #eee',
+                paddingTop: '1rem',
+                backgroundColor: '#f9fafb',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb'
+            }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span role="img" aria-label="meta">🏷️</span> Metadata Preview
+                </h4>
+                {Object.entries(metaData).length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                        {Object.entries(metaData).map(([key, value]) => (
+                            <div key={key} style={{ fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                                <span style={{ fontWeight: '600', color: '#4b5563', textTransform: 'capitalize' }}>{key}:</span>
+                                <div style={{
+                                    paddingLeft: '0.5rem',
+                                    borderLeft: '2px solid #d1d5db',
+                                    color: '#1f2937',
+                                    wordBreak: 'break-word',
+                                    lineHeight: '1.4'
+                                }}>
+                                    {Array.isArray(value) ? (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                            {value.map((v, i) => (
+                                                <span key={i} style={{
+                                                    backgroundColor: '#e5e7eb',
+                                                    padding: '1px 6px',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.7rem'
+                                                }}>{String(v)}</span>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        String(value)
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p style={{ fontSize: '0.75rem', color: '#9ba3af', fontStyle: 'italic' }}>No custom metadata found.</p>
+                )}
+            </div>
         </div>
     )
 }

@@ -3,68 +3,97 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export interface EnrichedContent {
+    title?: string
+    slug?: string
     description: string
-    customMetaData: {
-        seo_title: string
-        seo_description: string
-        og_title: string
-        og_description: string
-        keywords: string[]
-    }
+    author?: string
+    categories?: string[]
+    tags?: string[]
+    seo_title: string
+    seo_description: string
+    canonical?: string
+    noindex: boolean
+    og_title: string
+    og_image?: string
+    updatedAt: string
+    [key: string]: any // Support for unknown fields
 }
 
 export async function enrichPostContent(title: string, content: string): Promise<EnrichedContent> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    console.log(`[AI-ENRICH] Starting enrichment for: "${title}"`)
+    // Switching to 2.5 as 2.0 returned "no longer available to new users" 404
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
     const prompt = `
     You are an expert SEO and content strategist. 
-    Based on the following blog post title and content, generate SEO metadata.
+    Based on the following blog post title and content, generate structured metadata.
     
     TITLE: ${title}
     CONTENT: ${content}
     
     Please provide the following in JSON format:
-    1. A concise summary/description for the blog post (approx 150 characters).
-    2. SEO Title (max 60 characters).
-    3. SEO Description (max 160 characters).
-    4. OpenGraph Title.
-    5. OpenGraph Description.
-    6. A list of 5-10 relevant keywords.
+    1. description: A concise summary/description for the blog post (approx 150 characters).
+    2. seo_title: SEO Title (max 60 characters).
+    3. seo_description: SEO Description (max 160 characters).
+    4. og_title: OpenGraph Title.
+    5. og_image: A suggested image description or URL-ready keyword for the OG image.
+    6. tags: A list of 5-10 relevant tags.
+    7. categories: A list of 1-3 relevant internal categories (e.g. Technology, Design, Business).
+    8. canonical: A suggested canonical URL suffix (the slug).
+    9. noindex: Boolean, set to false unless the content is low quality or duplicate.
+    10. slug: An English URL-friendly slug based on the title.
     
     The response must be a valid JSON object with the following structure:
     {
+      "title": "${title}",
+      "slug": "...",
       "description": "...",
       "seo_title": "...",
       "seo_description": "...",
       "og_title": "...",
-      "og_description": "...",
-      "keywords": ["...", "..."]
+      "og_image": "...",
+      "tags": ["...", "..."],
+      "categories": ["...", "..."],
+      "canonical": "...",
+      "noindex": false
     }
     
     Response MUST be valid JSON only, no markdown formatting.
   `
 
     try {
+        console.log('[AI-ENRICH] Sending prompt to Gemini (gemini-2.5-flash)...')
+        console.log('[AI-ENRICH] Prompt Context Length:', prompt.length)
         const result = await model.generateContent(prompt)
         const response = await result.response
         const text = response.text()
+        console.log('[AI-ENRICH] Raw response received from Gemini.')
 
         // Attempt to parse JSON, cleaning up any potential markdown code blocks
         const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim()
-        const parsed = JSON.parse(cleanJson)
+        console.log('[AI-ENRICH] Cleaned JSON for parsing:', cleanJson)
 
-        return {
+        const parsed = JSON.parse(cleanJson)
+        console.log('[AI-ENRICH] JSON parsed successfully.')
+
+        const enrichedByAi = {
+            ...parsed,
             description: parsed.description || '',
-            customMetaData: {
-                seo_title: parsed.seo_title || title,
-                seo_description: parsed.seo_description || parsed.description || '',
-                og_title: parsed.og_title || parsed.seo_title || title,
-                og_description: parsed.og_description || parsed.seo_description || '',
-                keywords: parsed.keywords || [],
-            },
+            seo_title: parsed.seo_title || title,
+            seo_description: parsed.seo_description || parsed.description || '',
+            og_title: parsed.og_title || parsed.seo_title || title,
+            noindex: parsed.noindex ?? false,
+            updatedAt: new Date().toISOString(),
         }
+
+        console.log('[AI-ENRICH] Enrichment complete:', {
+            title: enrichedByAi.title,
+            keys: Object.keys(enrichedByAi)
+        })
+
+        return enrichedByAi
     } catch (error) {
-        console.error('Error calling Gemini API:', error)
+        console.error('[AI-ENRICH] Error in enrichPostContent:', error)
         throw new Error('Failed to enrich content with AI')
     }
 }
