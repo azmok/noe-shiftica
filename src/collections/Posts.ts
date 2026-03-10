@@ -69,8 +69,15 @@ export const Posts: CollectionConfig = {
             admin: {
                 position: 'sidebar',
                 components: {
-                    Field: '/plugins/markdownImport/MdImporter.tsx',
+                    Field: '/plugins/markdownImport/BlogContentActions.tsx',
                 },
+            },
+        },
+        {
+            name: 'description',
+            type: 'textarea',
+            admin: {
+                description: '記事の概要文。AIによって自動生成することも可能です。',
             },
         },
         {
