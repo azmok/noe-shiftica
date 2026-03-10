@@ -75,6 +75,40 @@ export const markdownImportPlugin = (): Plugin => {
                     }
                 },
             },
+            // AI Content Enrichment (Stub)
+            {
+                path: '/posts/ai-enrich',
+                method: 'post',
+                handler: async (req) => {
+                    try {
+                        const { title, content } = await (req as unknown as Request).json()
+                        console.group('[AI-ENRICH] Request for:', title)
+
+                        // TODO: Integrate Gemini API here
+                        // For now, return a deterministic stub response
+                        const mockDescription = `This is an AI-generated description for "${title}". It analyzes the content which has ${content?.length || 0} characters.`
+
+                        const mockCustomMetaData = {
+                            seo_title: `${title} | Noe Shiftica`,
+                            seo_description: mockDescription,
+                            og_title: title,
+                            og_description: mockDescription,
+                            keywords: ['AI', 'Generated', 'Blog'],
+                        }
+
+                        console.log('[AI-ENRICH] returning mock data')
+                        console.groupEnd()
+
+                        return Response.json({
+                            description: mockDescription,
+                            customMetaData: mockCustomMetaData,
+                        })
+                    } catch (error) {
+                        console.error('Error in AI enrichment:', error)
+                        return Response.json({ error: 'Failed to enrich content' }, { status: 500 })
+                    }
+                },
+            },
         ]
 
         // 2. Inject UI component into Posts collection

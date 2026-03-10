@@ -209,6 +209,10 @@ export interface Post {
   id: number;
   title: string;
   /**
+   * 記事の概要文。AIによって自動生成することも可能です。
+   */
+  description?: string | null;
+  /**
    * URLに使用される識別子です（タイトルから自動生成されます）
    */
   slug: string;
@@ -419,6 +423,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  description?: T;
   slug?: T;
   author?: T;
   publishedAt?: T;

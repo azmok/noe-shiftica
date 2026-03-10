@@ -3,18 +3,21 @@
 import React, { useRef, useState, useCallback } from 'react'
 import { useForm, useField } from '@payloadcms/ui'
 
-const KNOWN_FIELDS = ['title', 'slug', 'publishedAt', 'content']
+const KNOWN_FIELDS = ['title', 'slug', 'publishedAt', 'content', 'description']
 
-export const MdImporter: React.FC = () => {
+export const BlogContentActions: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isImporting, setIsImporting] = useState(false)
+    const [isOptimizing, setIsOptimizing] = useState(false)
 
     // Form mechanics
     const form = useForm()
     const dispatchFields = form?.dispatchFields
 
-    // Field handles for known fields
+    // Field handles
+    const fieldTitle = useField<string>({ path: 'title' })
     const fieldContent = useField<any>({ path: 'content' })
+
     const contentToSlug = useCallback(async (title: string) => {
         try {
             const res = await fetch(`/api/translate-slug?title=${encodeURIComponent(title)}`)
@@ -23,20 +26,20 @@ export const MdImporter: React.FC = () => {
                 return slug
             }
         } catch (e) {
-            console.error('[MD-IMPORTER] Slug translation failed', e)
+            console.error('[BLOG-ACTIONS] Slug translation failed', e)
         }
         return ''
     }, [])
 
+    // --- Action 1: Markdown Import ---
     const handleFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (!file) return
 
         setIsImporting(true)
-        console.group('[MD-IMPORTER] Parsing file:', file.name)
+        console.group('[BLOG-ACTIONS] Importing Markdown:', file.name)
 
         try {
-            // Read file as UTF-8
             const text = await new Promise<string>((resolve, reject) => {
                 const reader = new FileReader()
                 reader.onload = (e) => resolve(e.target?.result as string)
@@ -44,7 +47,6 @@ export const MdImporter: React.FC = () => {
                 reader.readAsText(file, 'UTF-8')
             })
 
-            // Convert via API
             const response = await fetch('/api/convert-markdown', {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain' },
@@ -55,7 +57,6 @@ export const MdImporter: React.FC = () => {
 
             const { frontmatter, lexical } = await response.json()
 
-            // 1. Separate known vs unknown metadata
             const customMetaData: Record<string, any> = {}
             Object.keys(frontmatter).forEach((key) => {
                 if (!KNOWN_FIELDS.includes(key) && key !== 'date') {
@@ -63,29 +64,14 @@ export const MdImporter: React.FC = () => {
                 }
             })
 
-            // 2. Prepare updates
             if (dispatchFields) {
-                // Clear state slightly to ensure fresh update
-                dispatchFields({ type: 'UPDATE', path: 'title', value: '' })
-                dispatchFields({ type: 'UPDATE', path: 'slug', value: '' })
-                dispatchFields({ type: 'UPDATE', path: 'publishedAt', value: null })
-                dispatchFields({ type: 'UPDATE', path: 'content', value: null, initialValue: null })
-                dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: null })
-
-                await new Promise((resolve) => setTimeout(resolve, 100))
-
-                // Title
+                // Clear and Update
+                dispatchFields({ type: 'UPDATE', path: 'title', value: frontmatter.title || '' })
                 if (frontmatter.title) {
-                    dispatchFields({ type: 'UPDATE', path: 'title', value: frontmatter.title })
-
-                    // Slug generation
                     const slug = await contentToSlug(frontmatter.title)
-                    if (slug) {
-                        dispatchFields({ type: 'UPDATE', path: 'slug', value: slug })
-                    }
+                    dispatchFields({ type: 'UPDATE', path: 'slug', value: slug })
                 }
 
-                // Date
                 const dateStr = frontmatter.date || frontmatter.publishedAt
                 if (dateStr) {
                     const parsedDate = new Date(dateStr)
@@ -94,10 +80,8 @@ export const MdImporter: React.FC = () => {
                     }
                 }
 
-                // Custom Metadata
                 dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: customMetaData })
 
-                // Content (Lexical) - Forcing initialValue triggers re-render
                 if (lexical) {
                     dispatchFields({
                         type: 'UPDATE',
@@ -107,26 +91,61 @@ export const MdImporter: React.FC = () => {
                     })
                 }
             }
-
-            console.log('[MD-IMPORTER] Instant synchronization complete.')
-            console.groupEnd()
+            console.log('[BLOG-ACTIONS] Markdown import complete.')
         } catch (error) {
-            console.error('[MD-IMPORTER] Import failed:', error)
-            alert('Failed to parse Markdown. See console for details.')
-            console.groupEnd()
+            console.error('[BLOG-ACTIONS] Import failed:', error)
+            alert('Failed to import Markdown.')
         } finally {
             setIsImporting(false)
+            console.groupEnd()
             if (fileInputRef.current) fileInputRef.current.value = ''
         }
     }, [dispatchFields, contentToSlug])
 
-    const handleButtonClick = (e: React.MouseEvent) => {
-        e.preventDefault()
-        fileInputRef.current?.click()
-    }
+    // --- Action 2: AI Optimization ---
+    const handleAiOptimize = useCallback(async () => {
+        const title = fieldTitle?.value
+        const content = fieldContent?.value
+
+        if (!title) {
+            alert('Please enter a title first.')
+            return
+        }
+
+        setIsOptimizing(true)
+        console.group('[BLOG-ACTIONS] AI Optimizing...')
+
+        try {
+            const response = await fetch('/api/posts/ai-enrich', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content }),
+            })
+
+            if (!response.ok) throw new Error('AI Enrichment failed')
+
+            const { description, customMetaData } = await response.json()
+
+            if (dispatchFields) {
+                if (description) {
+                    dispatchFields({ type: 'UPDATE', path: 'description', value: description })
+                }
+                if (customMetaData) {
+                    dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: customMetaData })
+                }
+            }
+            console.log('[BLOG-ACTIONS] AI optimization complete.')
+        } catch (error) {
+            console.error('[BLOG-ACTIONS] AI Optimization failed:', error)
+            alert('AI Optimization failed.')
+        } finally {
+            setIsOptimizing(false)
+            console.groupEnd()
+        }
+    }, [fieldTitle?.value, fieldContent?.value, dispatchFields])
 
     return (
-        <div style={{ padding: '0 0.5rem 1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0 0.5rem 1rem' }}>
             <input
                 type="file"
                 accept=".md"
@@ -134,17 +153,34 @@ export const MdImporter: React.FC = () => {
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
             />
+
+            {/* Button 1: Import */}
             <button
                 type="button"
-                onClick={handleButtonClick}
-                disabled={isImporting}
+                onClick={(e) => { e.preventDefault(); fileInputRef.current?.click(); }}
+                disabled={isImporting || isOptimizing}
                 className="btn btn--style-secondary btn--size-small"
-                style={{ width: '100%', cursor: isImporting ? 'not-allowed' : 'pointer' }}
+                style={{ width: '100%' }}
             >
-                {isImporting ? 'Parsing...' : '📄 Markdown Importer'}
+                {isImporting ? 'Importing...' : '📄 Markdown Importer'}
             </button>
+
+            {/* Button 2: AI Optimize */}
+            <button
+                type="button"
+                onClick={(e) => { e.preventDefault(); handleAiOptimize(); }}
+                disabled={isImporting || isOptimizing}
+                className="btn btn--style-primary btn--size-small"
+                style={{ width: '100%' }}
+            >
+                {isOptimizing ? 'Optimizing...' : '✨ AI Content Optimizer'}
+            </button>
+
+            <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.25rem' }}>
+                Import first, then optimize. Remember to check AI suggestions before publishing.
+            </p>
         </div>
     )
 }
 
-export default MdImporter
+export default BlogContentActions
