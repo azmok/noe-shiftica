@@ -57,6 +57,20 @@ export const BlogContentActions: React.FC = () => {
 
             const { frontmatter, lexical } = await response.json()
 
+            // 1. CLEAR EXISTING CONTENT (Requirement: clear EVERYTHING first)
+            console.log('[BLOG-ACTIONS] Clearing all existing fields...')
+            if (dispatchFields) {
+                dispatchFields({ type: 'UPDATE', path: 'title', value: '' })
+                dispatchFields({ type: 'UPDATE', path: 'slug', value: '' })
+                dispatchFields({ type: 'UPDATE', path: 'publishedAt', value: null })
+                dispatchFields({ type: 'UPDATE', path: 'description', value: '' })
+                dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: {} })
+                dispatchFields({ type: 'UPDATE', path: 'content', value: null, initialValue: null })
+            }
+
+            // Small delay to ensure state clears
+            await new Promise(resolve => setTimeout(resolve, 150));
+
             const customMetaData: Record<string, any> = {}
             Object.keys(frontmatter).forEach((key) => {
                 if (!KNOWN_FIELDS.includes(key) && key !== 'date') {
@@ -65,13 +79,16 @@ export const BlogContentActions: React.FC = () => {
             })
 
             if (dispatchFields) {
-                // Clear and Update
+                // Update Title
                 dispatchFields({ type: 'UPDATE', path: 'title', value: frontmatter.title || '' })
+
+                // Update Slug (Translate if title exists)
                 if (frontmatter.title) {
                     const slug = await contentToSlug(frontmatter.title)
                     dispatchFields({ type: 'UPDATE', path: 'slug', value: slug })
                 }
 
+                // Update PublishedAt
                 const dateStr = frontmatter.date || frontmatter.publishedAt
                 if (dateStr) {
                     const parsedDate = new Date(dateStr)
@@ -80,8 +97,15 @@ export const BlogContentActions: React.FC = () => {
                     }
                 }
 
+                // Update Description if it exists in frontmatter
+                if (frontmatter.description) {
+                    dispatchFields({ type: 'UPDATE', path: 'description', value: frontmatter.description })
+                }
+
+                // Update Custom Meta Data
                 dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: customMetaData })
 
+                // Update Content (Lexical)
                 if (lexical) {
                     dispatchFields({
                         type: 'UPDATE',

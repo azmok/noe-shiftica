@@ -64,16 +64,6 @@ export const Posts: CollectionConfig = {
             required: true,
         },
         {
-            name: 'mdImporter',
-            type: 'ui',
-            admin: {
-                position: 'sidebar',
-                components: {
-                    Field: '/plugins/markdownImport/BlogContentActions.tsx',
-                },
-            },
-        },
-        {
             name: 'description',
             type: 'textarea',
             admin: {
