@@ -55,35 +55,56 @@ export const BlogContentActions: React.FC = () => {
     }, [pathname])
 
     // 新規作成時のみ：ローカルキャッシュから復元する
+    // Next.jsの戻る/進む（bfcache）や、Payloadの非同期な INITIAL_STATE レセットに対応するため、
+    // マウント後しばらくの間、フォームが空になった瞬間にキャッシュを再注入する処理
     useEffect(() => {
-        if (id || hasRestored.current) return
+        if (id) return // すでに保存済みの記事なら何もしない
 
         const savedDraft = localStorage.getItem(DRAFT_KEY)
-        if (savedDraft && dispatchFields) {
-            hasRestored.current = true
-            try {
-                const draft = JSON.parse(savedDraft)
-                console.log('[BLOG-ACTIONS] Restoring local draft...')
+        if (!savedDraft || !dispatchFields) return
 
-                // Lexicalエディター等のマウントを待つため少し遅延させる
-                setTimeout(() => {
-                    Object.entries(draft).forEach(([key, value]) => {
-                        if (value !== undefined && value !== null) {
-                            dispatchFields({
-                                type: 'UPDATE',
-                                path: key,
-                                value: value
-                            })
-                        }
-                    })
-                    if (form?.setModified) {
-                        form.setModified(true)
-                    }
-                }, 800)
-            } catch (e) {
-                console.error('[BLOG-ACTIONS] Restore failed:', e)
-            }
+        let draft: any
+        try {
+            draft = JSON.parse(savedDraft)
+        } catch (e) {
+            return
         }
+
+        console.log('[BLOG-ACTIONS] Draft found, starting restoration watcher...')
+
+        let attempts = 0
+        const intervalId = setInterval(() => {
+            attempts++
+            const currentData = form?.getData() || {}
+
+            // Payload初期化後にタイトル等が空になったタイミングを検知
+            const isFormEmpty = !currentData.title && !currentData.description
+
+            // 下書きが存在し、かつフォームが空っぽの場合に注入
+            if (isFormEmpty && (draft.title || draft.content)) {
+                console.log(`[BLOG-ACTIONS] Form reset detected. Injecting draft (Attempt ${attempts})...`)
+                Object.entries(draft).forEach(([key, value]) => {
+                    if (value !== undefined && value !== null) {
+                        dispatchFields({
+                            type: 'UPDATE',
+                            path: key,
+                            value: value
+                        })
+                    }
+                })
+                if (form?.setModified) {
+                    form.setModified(true)
+                }
+            }
+
+            // フォームにタイトル等が入って安定したら（または2.5秒経過したら）監視終了
+            if ((currentData.title === draft.title) || attempts > 10) {
+                console.log('[BLOG-ACTIONS] Draft restoration complete and stable.')
+                clearInterval(intervalId)
+            }
+        }, 250)
+
+        return () => clearInterval(intervalId)
     }, [id, dispatchFields, form, pathname])
 
     // 保存やPublish時（idが新しく付与された時）にキャッシュを完全にクリア
