@@ -24,7 +24,7 @@ export default async function BlogPage() {
   const recentPosts = posts.slice(1);
 
   return (
-    <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary) selection:text-white">
+    <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative">
       <Header />
 
       <main className="grow px-4 sm:px-6 lg:px-40 pt-14 pb-16 md:pt-28 md:pb-32 relative z-10">
@@ -85,7 +85,7 @@ export default async function BlogPage() {
                         </h1>
 
                         <div className="pt-2">
-                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-secondary text-[#1d1a2e] text-sm font-bold transition-all">
+                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-secondary text-[#1d1a2e] text-sm font-bold transition-all hover:bg-slate">
                             Read Article
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
                           </div>
