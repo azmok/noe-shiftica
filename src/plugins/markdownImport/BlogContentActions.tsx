@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useCallback, useEffect } from 'react'
 import { useForm, useField, useDocumentInfo } from '@payloadcms/ui'
+import { usePathname } from 'next/navigation'
 
 const KNOWN_FIELDS = ['title', 'slug', 'publishedAt', 'content', 'description']
 
@@ -21,6 +22,7 @@ export const BlogContentActions: React.FC = () => {
 
     const metaData = fieldCustomMetaData?.value || {}
     const { id } = useDocumentInfo()
+    const pathname = usePathname()
 
     // --- Autosave Logic (LocalStorage) ---
     const DRAFT_KEY = 'payload-draft-post-new'
@@ -46,6 +48,11 @@ export const BlogContentActions: React.FC = () => {
     }, [id, form])
 
     const hasRestored = useRef(false)
+
+    // ページ遷移して戻ってきた時（クライアントサイドルーティング時）に復元フラグをリセット
+    useEffect(() => {
+        hasRestored.current = false
+    }, [pathname])
 
     // 新規作成時のみ：ローカルキャッシュから復元する
     useEffect(() => {
@@ -77,7 +84,7 @@ export const BlogContentActions: React.FC = () => {
                 console.error('[BLOG-ACTIONS] Restore failed:', e)
             }
         }
-    }, [id, dispatchFields, form])
+    }, [id, dispatchFields, form, pathname])
 
     // 保存やPublish時（idが新しく付与された時）にキャッシュを完全にクリア
     useEffect(() => {
