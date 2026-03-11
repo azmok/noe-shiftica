@@ -150,3 +150,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: PayloadCMS Collections with Versions enabled (Drafts) require intact _version table metadata. Raw Postgres injections bypass sequence updates causing cascading unique ID constraint errors on native local API version scaffolding. Next.JS evalidatePath imported dynamically in Payload Hooks throws Invariant: static generation if executed outside active Node/NextJS HTTP web servers.
 - **Preferences**: Zero collateral modifications of project components. Temporary diagnostic patches must use transient runtime API routes or ad-hoc scripts that delete themselves afterwards.
 - **Plan Impact**: Any future database imports bypassing Payload API MUST include manual Sequence updates (SELECT setval(...)) to maintain constraint synchronicity.
+
+### [2026-03-12 07:58] PayloadCMS Data Synchronization Protocol
+- **Protocol Description**: When syncing data between DB instances (e.g., branch to main), NEVER use raw SQL upserts as they bypass PayloadCMS versioning, relationship metadata (_posts_v, _posts_v_rels), and out-of-sync PostgreSQL sequences.
+- **Standard Procedure**: 
+  1. Create a script in src/scripts/sync-data.ts.
+  2. Use payload.update or payload.create via Payload Local API to trigger mandatory lifecycle hooks and auto-generate versions.
+  3. Handle Next.js cache invariants (e.g., evalidatePath) by either executing via a temporary API Router in the Next.js server context or using specific environment flags to skip hooks if safe.
+  4. Clean up all temporary sync scripts and routes immediately after execution.
+- **Future Adoption**: This application-layer-oriented process is the default strategy for all future data 'migration' or 'sync' tasks.
