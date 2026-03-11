@@ -16,30 +16,30 @@ export default async function TagPage({
     const decodedTag = typeof tag === 'string' ? decodeURIComponent(tag) : '';
     const payload = await getPayload({ config: configPromise });
 
-    // Fetch posts where customMetaData.tags contains the tag
-    // We use depth: 1 to get image data
+    // Fetch published posts and filter by tag in-memory 
+    // to avoid Payload/Postgres JSON path query compatibility issues
     const postsRes = await payload.find({
         collection: "posts",
         where: {
-            and: [
-                {
-                    _status: {
-                        equals: 'published',
-                    },
-                },
-                {
-                    'customMetaData.tags': {
-                        contains: decodedTag,
-                    },
-                },
-            ],
+            _status: {
+                equals: 'published',
+            },
         },
         sort: '-publishedAt',
-        limit: 100,
+        limit: 1000,
         depth: 1,
     });
 
-    const posts = postsRes.docs;
+    const posts = postsRes.docs.filter((post) => {
+        const meta = post.customMetaData as Record<string, any> | undefined;
+        if (meta && Array.isArray(meta.tags)) {
+            // Case-insensitive match for tags
+            return meta.tags.some((t: any) =>
+                String(t).toLowerCase() === decodedTag.toLowerCase()
+            );
+        }
+        return false;
+    });
 
     // Map Payload Post type to PostSummary-like shape for BlogRecentStoriesClient
     const mappedPosts = posts.map(post => {

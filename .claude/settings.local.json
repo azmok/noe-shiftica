@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /c/Users/genta/projects/noe-shiftica.dev/noe-shiftica*.json 2>/dev/null | head -5)",
+      "Bash(git ls-tree:*)"
+    ]
+  }
+}
