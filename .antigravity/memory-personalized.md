@@ -145,3 +145,8 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   3. **Duplicate Cleanup Pattern**: When synchronizing relationship tables (like `posts_rels`) where IDs might not collide naturally, logical duplicates can occur. The cleanup pattern is: `GROUP BY [logical_keys] HAVING COUNT(*) > 1`, then `array_agg(id)` to identify and keep the highest (newest) ID while deleting others.
 - **Preferences**: Automated data parity checks before and after synchronization to ensure 100% accuracy.
 - **Plan Impact**: The `sync_db.py` logic is now the reference for all future NeonDB branch-to-branch data migrations.
+
+### [2026-03-12 07:40] Session Summary
+- **Learned/Decided**: PayloadCMS Collections with Versions enabled (Drafts) require intact _version table metadata. Raw Postgres injections bypass sequence updates causing cascading unique ID constraint errors on native local API version scaffolding. Next.JS evalidatePath imported dynamically in Payload Hooks throws Invariant: static generation if executed outside active Node/NextJS HTTP web servers.
+- **Preferences**: Zero collateral modifications of project components. Temporary diagnostic patches must use transient runtime API routes or ad-hoc scripts that delete themselves afterwards.
+- **Plan Impact**: Any future database imports bypassing Payload API MUST include manual Sequence updates (SELECT setval(...)) to maintain constraint synchronicity.
