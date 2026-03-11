@@ -48,7 +48,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                 {recentPosts.map((post: any) => (
                     <Link href={`/blog/${post.slug}`} key={post.id} className="block group font-sans blog-posts">
                         {viewMode === "grid" ? (
-                            <article className="bg-white border border-slate-100 rounded-2xl p-4 flex flex-col gap-4 relative transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.13)] hover:-translate-y-1 h-full">
+                            <article className="border boder-solid border-slate-400 bg-white rounded-2xl p-4 flex flex-col gap-4 relative transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5 h-full">
                                 <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative bg-slate-50 border border-slate-100/50">
                                     {(() => {
                                         // Use medium-sized variant for grid cards if available, fall back to original
@@ -66,7 +66,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                     })()}
                                 </div>
                                 <div className="flex flex-col flex-1 px-1 pb-1">
-                                    <span className="text-[10px] font-bold text-(--color-neu-primary) mb-2 uppercase tracking-widest">Journal</span>
+                                    {/* <span className="text-[10px] font-bold text-(--color-neu-primary) mb-2 uppercase tracking-widest">Journal</span> */}
                                     <h3 className="text-lg font-bold text-slate-800 leading-snug mb-2 transition-colors">
                                         {post.title}
                                     </h3>

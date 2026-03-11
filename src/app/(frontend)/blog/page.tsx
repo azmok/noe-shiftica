@@ -51,7 +51,7 @@ export default async function BlogPage() {
               {featuredPost && (
                 <section>
                   <Link href={`/blog/${featuredPost.slug}`} className="block posts featured group">
-                    <div className="bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.13)] hover:-translate-y-1 border border-slate-100">
+                    <div className="border boder-solid border-slate-400 groupbg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
                           const imgUrl = (featuredPost.heroUrl || featuredPost.coverUrl);
@@ -83,11 +83,9 @@ export default async function BlogPage() {
                         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-800 leading-tight">
                           {featuredPost.title}
                         </h1>
-                        <p className="text-slate-500 leading-relaxed text-lg line-clamp-3">
-                          {"最新の記事をお届けします。クリックして本文をお読みください。"}
-                        </p>
+
                         <div className="pt-2">
-                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-slate-900 text-white text-sm font-bold transition-all hover:bg-slate-800">
+                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-secondary text-[#1d1a2e] text-sm font-bold transition-all">
                             Read Article
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
                           </div>
