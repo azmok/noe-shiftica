@@ -51,7 +51,7 @@ export default async function BlogPage() {
               {featuredPost && (
                 <section>
                   <Link href={`/blog/${featuredPost.slug}`} className="block posts featured group">
-                    <div className="bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] border border-slate-100">
+                    <div className="bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.13)] hover:-translate-y-1 border border-slate-100">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
                           const imgUrl = (featuredPost.heroUrl || featuredPost.coverUrl);
