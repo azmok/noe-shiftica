@@ -97,6 +97,21 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
         className={`fixed bottom-0 md:bottom-auto md:top-0 left-0 w-full md:h-12 z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-full md:-translate-y-full"
           } ${hasBackdrop ? "md:bg-black/0 md:backdrop-blur-sm md:shadow-[0_0px_12px_rgba(200,200,200,0.05)] md:border-b md:border-white/5 bg-transparent border-none shadow-none md:fixed md:top-0 md:left-0 md:w-full md:h-12 bg-transparent" : "bg-transparent border-none shadow-none"}`}
       >
+        {/* ブラーレイヤー 
+          - backdrop-blur で背景をぼかす
+          - mask-image で下方向に向けて透明にする
+        */}
+        <div
+          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
+            }`}
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            maskImage: 'linear-gradient(to bottom, black 0%, black 50%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 50%, transparent 100%)',
+          }}
+        />
         <div className="w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-between md:justify-end md:gap-x-12 relative z-120">
 
           {/* Desktop Nav */}
