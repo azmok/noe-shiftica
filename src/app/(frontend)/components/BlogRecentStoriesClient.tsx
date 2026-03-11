@@ -103,7 +103,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                 </div>
                                 <div className="flex flex-col justify-center flex-1 pr-6">
                                     <div className="flex items-center gap-4 mb-1">
-                                        <span className="text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Journal</span>
+                                        {/* <span className="text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Journal</span> */}
                                         <span className="text-[11px] text-slate-400">
                                             {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('ja-JP') : ''}
                                         </span>

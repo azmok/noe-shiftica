@@ -63,7 +63,7 @@ export default async function TagPage({
     });
 
     return (
-        <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary) selection:text-white">
+        <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative">
             <Header />
 
             <main className="grow px-4 sm:px-6 lg:px-40 pt-14 pb-16 md:pt-28 md:pb-32 relative z-10">
