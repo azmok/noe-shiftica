@@ -83,14 +83,22 @@ export const PostArticle: React.FC<{
                         </div>
 
                         {/* Tags / Bottom Border */}
-                        <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-slate-100">
-                            <span className="px-4 py-2 rounded-xl bg-(--color-neu-bg-light) neu-flat text-sm font-bold text-slate-400">
-                                #Journal
-                            </span>
-                            <span className="px-4 py-2 rounded-xl bg-(--color-neu-bg-light) neu-flat text-sm font-bold text-slate-400">
-                                #News
-                            </span>
-                        </div>
+                        {(() => {
+                            const cmd = (post.customMetaData as Record<string, any>) || {};
+                            const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
+
+                            if (tags.length === 0) return null;
+
+                            return (
+                                <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-slate-100">
+                                    {tags.map((tag, index) => (
+                                        <span key={index} className="px-4 py-2 rounded-xl bg-(--color-neu-bg-light) neu-flat text-sm font-bold text-slate-400">
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     {/* Post Navigation */}
