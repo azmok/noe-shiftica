@@ -94,34 +94,27 @@ export function PastelTopology() {
     useEffect(() => {
         if (!containerRef.current) return;
 
+        // 毎回のマウントごとに新しいシーンとレンダラーを作成する（コンテキスト喪失によるフリーズを防ぐため）
         const scene = new THREE.Scene();
-
-        // We adjust camera specifically for the component container instead of window
-        // to allow it to only span the section if we want it to, or fixed screen
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 4.5;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        containerRef.current.appendChild(renderer.domElement);
-
-        const geometry = new THREE.IcosahedronGeometry(2, 40); // 繊細な多面体ベース
+        const geometry = new THREE.IcosahedronGeometry(2, 40);
         const material = new THREE.ShaderMaterial({
             vertexShader,
             fragmentShader,
             uniforms: { uTime: { value: 0 } },
             wireframe: true,
             transparent: true,
-            blending: THREE.AdditiveBlending, // 加算合成で発光感を出す
+            blending: THREE.AdditiveBlending,
             depthTest: false
         });
 
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
 
-        // 中にぼんやりした光の核を追加
         const coreGeo = new THREE.SphereGeometry(1.2, 32, 32);
         const coreMat = new THREE.MeshBasicMaterial({
             color: 0x89cff0,
@@ -130,6 +123,14 @@ export function PastelTopology() {
         });
         const core = new THREE.Mesh(coreGeo, coreMat);
         scene.add(core);
+
+        // ウィンドウサイズに合わせる
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        containerRef.current.appendChild(renderer.domElement);
 
         let isMounted = true;
         let animationFrameId: number;
@@ -143,7 +144,6 @@ export function PastelTopology() {
             mesh.rotation.y = time * 0.2;
             mesh.rotation.x = time * 0.1;
 
-            // 呼吸するようなスケール変化
             const s = 1.0 + Math.sin(time * 2.0) * 0.05;
             mesh.scale.set(s, s, s);
 
@@ -160,36 +160,25 @@ export function PastelTopology() {
 
         window.addEventListener('resize', handleResize);
 
+        // クリーンアップ関数
         return () => {
             isMounted = false;
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationFrameId);
 
-            // シーン内のすべてのオブジェクトに対してメモリ解放を徹底的に行う
-            scene.traverse((object) => {
-                if (object instanceof THREE.Mesh) {
-                    if (object.geometry) {
-                        object.geometry.dispose();
-                    }
-                    if (object.material) {
-                        if (Array.isArray(object.material)) {
-                            object.material.forEach(material => material.dispose());
-                        } else {
-                            object.material.dispose();
-                        }
-                    }
-                }
-            });
-
-            renderer.dispose();
-
-            // forceContextLoss を呼ぶとブラウザのWebGLキャパシティやNext.jsの高速な再レンダリング時にコンテキスト復帰が間に合わず
-            // 背景が真っ白になる原因になるため削除
-            // renderer.forceContextLoss();
-
             if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
                 containerRef.current.removeChild(renderer.domElement);
             }
+
+            // メモリリークと、ナビゲーション時のWebGLコンテキスト上限エラー・フリーズを防ぐため
+            // 完全にリソースを破棄し、WebGLコンテキストを強制解放する
+            geometry.dispose();
+            material.dispose();
+            coreGeo.dispose();
+            coreMat.dispose();
+
+            renderer.dispose();
+            renderer.forceContextLoss(); // ブラウザに即座にコンテキストを解放させる
         };
     }, []);
 
