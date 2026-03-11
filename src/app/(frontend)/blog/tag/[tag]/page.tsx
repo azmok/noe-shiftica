@@ -92,7 +92,7 @@ export default async function TagPage({
                             </p>
                             <Link
                                 href="/blog"
-                                className="text-[var(--color-neu-primary)] font-bold hover:underline transition-colors"
+                                className="text-(--color-neu-primary) font-bold hover:underline transition-colors"
                             >
                                 全ての記事を見る
                             </Link>

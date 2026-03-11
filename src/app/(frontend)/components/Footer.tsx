@@ -50,7 +50,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full py-[6px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
                       ? "text-[#222222] hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -77,7 +77,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] transition-colors font-light rounded-full py-[6px] ${isBlog
+                    className={`text-[12px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
                       ? "text-[#222222] hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
