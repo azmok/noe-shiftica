@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Priority: AVIF > WebP > Original
+    formats: ["image/avif", "image/webp"],
     // Allow Next.js to optimize images served from Google Cloud Storage
     remotePatterns: [
       {
@@ -17,15 +19,15 @@ const nextConfig: NextConfig = {
         pathname: "/v0/b/noe-shiftica.firebasestorage.app/**",
       },
     ],
-    // Serve WebP/AVIF when browser supports it (Next.js default, explicit for clarity)
-    formats: ["image/avif", "image/webp"],
-    // Cache optimized images on the CDN for 1 year
+    // High-performance cache: 1 year (Firebase App Hosting CDN will honor this)
     minimumCacheTTL: 31536000,
-    // Common widths used in responsive blog layouts
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 400],
-    // Allow quality 85 which is used as default in GcsImage
-    qualities: [75, 85],
+    // Refined sizes to minimize wasted bandwidth. 
+    // Device sizes: trigger point for specific screen widths.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Image sizes: smaller increments for UI components.
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Quality 90 for premium visual fidelity on tech-focused designs
+    qualities: [75, 85, 90],
   },
 };
 
