@@ -64,7 +64,13 @@ export const PostArticle: React.FC<{
                                         return (
                                             <>
                                                 <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
-                                                <GcsImage src={img.url} alt={post.title} priority className="group-hover:scale-105" />
+                                                <GcsImage
+                                                    src={img.url}
+                                                    alt={post.title}
+                                                    priority
+                                                    sizes="(max-width: 1280px) 100vw, 1200px"
+                                                    className="group-hover:scale-105"
+                                                />
                                             </>
                                         );
                                     }
