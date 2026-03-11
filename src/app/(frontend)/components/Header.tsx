@@ -105,11 +105,11 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
             }`}
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            maskImage: 'linear-gradient(to bottom, black 0%, black 50%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 50%, transparent 100%)',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            maskImage: 'linear-gradient(to bottom, black 0%, black 20%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 20%, transparent 100%)',
           }}
         />
         <div className="w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-between md:justify-end md:gap-x-12 relative z-120">
