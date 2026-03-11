@@ -137,3 +137,11 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   2. **Zero Modification Rule**: You are FORBIDDEN from modifying, refactoring, reformatting, or touching the Footer component in any way unless explicitly and specifically instructed to do so by the user. "Global UI" or "Layout" changes do NOT include the Footer.
 - **Preferences**: The user wants full manual control over the Footer's visual styling and alignment.
 - **Plan Impact**: `Footer.tsx` is added to the "Protected Files" list in my internal operational logic for this project.
+
+### [2026-03-12 06:40] Session Summary (NeonDB Sync & JSONB Pattern)
+- **Learned/Decided**: 
+  1. **Upsert-based Data Sync**: Successfully synchronized `local` branch data to `production` using a Python script with an Upsert strategy (`INSERT ... ON CONFLICT (id) DO UPDATE`). This preserves data integrity without schema changes.
+  2. **JSONB Adaptation**: Psycopg2 requires explicit `json.dumps()` for dictionary/list values when performing batch updates or upserts to standard `jsonb` columns. Relying on default adapters can cause `can't adapt type 'dict'` errors.
+  3. **Duplicate Cleanup Pattern**: When synchronizing relationship tables (like `posts_rels`) where IDs might not collide naturally, logical duplicates can occur. The cleanup pattern is: `GROUP BY [logical_keys] HAVING COUNT(*) > 1`, then `array_agg(id)` to identify and keep the highest (newest) ID while deleting others.
+- **Preferences**: Automated data parity checks before and after synchronization to ensure 100% accuracy.
+- **Plan Impact**: The `sync_db.py` logic is now the reference for all future NeonDB branch-to-branch data migrations.
