@@ -92,9 +92,13 @@ export const PostArticle: React.FC<{
                             return (
                                 <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-slate-100">
                                     {tags.map((tag, index) => (
-                                        <span key={index} className="px-4 py-2 rounded-xl bg-(--color-neu-bg-light) neu-flat text-sm font-bold text-slate-400">
+                                        <Link
+                                            key={index}
+                                            href={`/blog/tag/${tag}`}
+                                            className="px-4 py-2 rounded-xl bg-(--color-neu-bg-light) neu-flat text-sm font-bold text-slate-400 hover:text-(--color-neu-primary) hover:scale-105 transition-all"
+                                        >
                                             #{tag}
-                                        </span>
+                                        </Link>
                                     ))}
                                 </div>
                             );
