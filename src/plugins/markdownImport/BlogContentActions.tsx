@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useRef, useState, useCallback } from 'react'
-import { useForm, useField } from '@payloadcms/ui'
+import React, { useRef, useState, useCallback, useEffect } from 'react'
+import { useForm, useField, useDocumentInfo } from '@payloadcms/ui'
 
 const KNOWN_FIELDS = ['title', 'slug', 'publishedAt', 'content', 'description']
 
@@ -20,6 +20,94 @@ export const BlogContentActions: React.FC = () => {
     const fieldCustomMetaData = useField<Record<string, any>>({ path: 'customMetaData' })
 
     const metaData = fieldCustomMetaData?.value || {}
+    const { id } = useDocumentInfo()
+
+    // --- Autosave Logic (LocalStorage) ---
+    const DRAFT_KEY = 'payload-draft-post-new'
+
+    const saveDraftToStorage = useCallback(() => {
+        if (id || !form) return // すでに保存済み(idあり)の場合はキャッシュしない
+
+        // form.getData() はフォーム全体の状態を取得
+        const data = form.getData()
+        const draft = {
+            title: data.title,
+            slug: data.slug,
+            description: data.description,
+            publishedAt: data.publishedAt,
+            customMetaData: data.customMetaData,
+            content: data.content,
+        }
+
+        // 何か入力があれば保存
+        if (draft.title || draft.content || draft.description) {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+        }
+    }, [id, form])
+
+    const hasRestored = useRef(false)
+
+    // 新規作成時のみ：ローカルキャッシュから復元する
+    useEffect(() => {
+        if (id || hasRestored.current) return
+
+        const savedDraft = localStorage.getItem(DRAFT_KEY)
+        if (savedDraft && dispatchFields) {
+            hasRestored.current = true
+            try {
+                const draft = JSON.parse(savedDraft)
+                console.log('[BLOG-ACTIONS] Restoring local draft...')
+
+                // Lexicalエディター等のマウントを待つため少し遅延させる
+                setTimeout(() => {
+                    Object.entries(draft).forEach(([key, value]) => {
+                        if (value !== undefined && value !== null) {
+                            dispatchFields({
+                                type: 'UPDATE',
+                                path: key,
+                                value: value
+                            })
+                        }
+                    })
+                    if (form?.setModified) {
+                        form.setModified(true)
+                    }
+                }, 800)
+            } catch (e) {
+                console.error('[BLOG-ACTIONS] Restore failed:', e)
+            }
+        }
+    }, [id, dispatchFields, form])
+
+    // 保存やPublish時（idが新しく付与された時）にキャッシュを完全にクリア
+    useEffect(() => {
+        if (id) {
+            const exists = localStorage.getItem(DRAFT_KEY)
+            if (exists) {
+                localStorage.removeItem(DRAFT_KEY)
+                console.log('[BLOG-ACTIONS] Local draft cleared (Post saved/published).')
+            }
+        }
+    }, [id])
+
+    // タイピング時の自動保存 (Keyup Event)
+    useEffect(() => {
+        if (id) return
+
+        let timer: NodeJS.Timeout
+        const handleKeyUp = () => {
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                saveDraftToStorage()
+            }, 1000)
+        }
+
+        window.addEventListener('keyup', handleKeyUp)
+        return () => {
+            window.removeEventListener('keyup', handleKeyUp)
+            clearTimeout(timer)
+        }
+    }, [id, saveDraftToStorage])
 
     const contentToSlug = useCallback(async (title: string) => {
         try {
@@ -123,6 +211,11 @@ export const BlogContentActions: React.FC = () => {
                 }
             }
             console.log('[BLOG-ACTIONS] Markdown import complete.')
+
+            // --- インポート直後にAutosave ---
+            setTimeout(() => {
+                saveDraftToStorage()
+            }, 500)
         } catch (error) {
             console.error('[BLOG-ACTIONS] Import failed:', error)
             alert('Failed to import Markdown.')
@@ -194,6 +287,11 @@ export const BlogContentActions: React.FC = () => {
                 }
             }
             console.log('[BLOG-ACTIONS] AI optimization complete.')
+
+            // --- AI最適化直後にAutosave ---
+            setTimeout(() => {
+                saveDraftToStorage()
+            }, 500)
         } catch (error) {
             console.error('[BLOG-ACTIONS] AI Optimization failed:', error)
             alert('AI Optimization failed.')
