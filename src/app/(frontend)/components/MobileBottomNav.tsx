@@ -29,6 +29,11 @@ export function MobileBottomNav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
   
+  // Hide nav on route change
+  useEffect(() => {
+    setIsVisible(false);
+  }, [pathname]);
+  
   // Allow rendering on LP, About, Privacy, Terms, and all Blog pages
   const isAllowed = 
     pathname === "/" || 
