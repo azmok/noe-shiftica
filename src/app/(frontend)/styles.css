@@ -282,6 +282,22 @@ p {
   }
 }
 
+@layer components {
+  /* Premium Studio-style link animation for blog content */
+  .post-content-body a {
+    position: relative;
+    background-image: linear-gradient(var(--color-neu-primary), var(--color-neu-primary));
+    background-position: 0% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    transition: background-size 0.3s ease;
+  }
+
+  .post-content-body a:hover {
+    background-size: 100% 1.5px;
+  }
+}
+
 a {
   color: currentColor;
   text-decoration: none;

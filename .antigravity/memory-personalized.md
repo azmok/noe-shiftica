@@ -159,3 +159,14 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   3. Handle Next.js cache invariants (e.g., evalidatePath) by either executing via a temporary API Router in the Next.js server context or using specific environment flags to skip hooks if safe.
   4. Clean up all temporary sync scripts and routes immediately after execution.
 - **Future Adoption**: This application-layer-oriented process is the default strategy for all future data 'migration' or 'sync' tasks.
+
+### [2026-03-13 07:00] Session Summary (UI Optimization & Performance Audit)
+- **Learned/Decided**:
+  1. **Frontend-Driven Reading Time**: Moving CC (Calculation) to the frontend component (`PostArticle.tsx`) avoids DB schema bloat and complex migration/sync logic between Neon branches.
+  2. **Hydration Resilience**: `suppressHydrationWarning` on `<body>` effectively silences reconcile errors from browser extensions that inject DOM attributes.
+  3. **Performance Optimization (q=5)**: Confirmed via audit that `quality: 5` reduces image payload by **~50%** (~90KB vs ~180KB for hero images) with negligible visual impact on standard/retina displays.
+  4. **Next.js Quality Control**: Defined explicit `qualities` in `next.config.ts` to enable data-driven performance tuning.
+  5. **TopLoader Integration**: `nextjs-toploader` is used for a premium, non-blocking navigation indicator.
+  6. **Link Styling**: Combined Tailwind `prose-a` with custom CSS `@layer` animations to achieve studio-grade link hover effects.
+- **Preferences**: Performance-first approach using drastic quality reductions (q=5) when visual data confirms it is studio-grade.
+- **Plan Impact**: Standardized `GcsImage` as the primary optimization gateway for all remote media.

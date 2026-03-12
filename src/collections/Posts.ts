@@ -37,10 +37,12 @@ export const Posts: CollectionConfig = {
             async ({ doc, operation }) => {
                 if (operation === 'create' || operation === 'update') {
                     // ブログ一覧ページと各記事ページのキャッシュを破棄し、次回アクセス時に静的生成(SSG)させる
-                    const { revalidatePath } = await import('next/cache');
-                    revalidatePath('/blog');
-                    if (doc.slug) {
-                        revalidatePath(`/blog/${doc.slug}`);
+                    if (process.env.PAYLOAD_SYNC_MODE !== 'true') {
+                        const { revalidatePath } = await import('next/cache');
+                        revalidatePath('/blog');
+                        if (doc.slug) {
+                            revalidatePath(`/blog/${doc.slug}`);
+                        }
                     }
                 }
                 return doc;
@@ -48,10 +50,12 @@ export const Posts: CollectionConfig = {
         ],
         afterDelete: [
             async ({ doc }) => {
-                const { revalidatePath } = await import('next/cache');
-                revalidatePath('/blog');
-                if (doc.slug) {
-                    revalidatePath(`/blog/${doc.slug}`);
+                if (process.env.PAYLOAD_SYNC_MODE !== 'true') {
+                    const { revalidatePath } = await import('next/cache');
+                    revalidatePath('/blog');
+                    if (doc.slug) {
+                        revalidatePath(`/blog/${doc.slug}`);
+                    }
                 }
                 return doc;
             }

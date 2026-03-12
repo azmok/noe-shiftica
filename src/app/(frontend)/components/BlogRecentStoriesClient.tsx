@@ -51,13 +51,16 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                             <article className="border boder-solid border-slate-400 bg-white rounded-2xl p-4 flex flex-col gap-4 relative transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5 h-full">
                                 <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative bg-slate-50 border border-slate-100/50">
                                     {(() => {
-                                        // Use medium-sized variant for grid cards if available, fall back to original
-                                        const img = (post.heroMediumUrl || post.heroUrl || post.coverMediumUrl || post.coverUrl);
+                                        // Prefer Payload pre-generated thumbnail (400x300) to skip /_next/image proxy
+                                        const preGenUrl = post.heroThumbnailUrl || post.coverThumbnailUrl;
+                                        const img = preGenUrl || post.heroMediumUrl || post.heroUrl || post.coverMediumUrl || post.coverUrl;
                                         if (img) {
                                             return (
                                                 <GcsImage
                                                     src={img}
                                                     alt={post.title}
+                                                    preOptimized={!!preGenUrl}
+                                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
                                                     className="group-hover:scale-110"
                                                 />
                                             );
@@ -87,13 +90,16 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                             <article className="bg-white border border-slate-100 rounded-2xl p-4 flex gap-6 relative transition-all duration-300 hover:shadow-md hover:translate-x-1">
                                 <div className="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden relative bg-slate-50 border border-slate-100/50">
                                     {(() => {
-                                        // Use thumbnail variant for list view small images
-                                        const img = (post.heroThumbnailUrl || post.heroUrl || post.coverThumbnailUrl || post.coverUrl);
+                                        // Thumbnail (400x300) is already the right size, serve directly from GCS CDN
+                                        const preGenUrl = post.heroThumbnailUrl || post.coverThumbnailUrl;
+                                        const img = preGenUrl || post.heroUrl || post.coverUrl;
                                         if (img) {
                                             return (
                                                 <GcsImage
                                                     src={img}
                                                     alt={post.title}
+                                                    preOptimized={!!preGenUrl}
+                                                    sizes="96px"
                                                     className="group-hover:scale-110"
                                                 />
                                             );
