@@ -178,7 +178,6 @@ export function PastelTopology() {
             coreMat.dispose();
 
             renderer.dispose();
-            renderer.forceContextLoss(); // ブラウザに即座にコンテキストを解放させる
         };
     }, []);
 
