@@ -8,11 +8,15 @@ import { Home, FileText, User } from "lucide-react";
 export function MobileBottomNav() {
   const pathname = usePathname();
   
-  // Only show on blog or related pages for now, or as requested
-  // The user specifically requested this for the blog redesign
-  const isBlog = pathname?.startsWith("/blog");
+  // Allow rendering on LP, About, Privacy, Terms, and all Blog pages
+  const isAllowed = 
+    pathname === "/" || 
+    pathname === "/about" || 
+    pathname === "/privacy" || 
+    pathname === "/terms" || 
+    pathname?.startsWith("/blog");
   
-  if (!isBlog) return null;
+  if (!isAllowed) return null;
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-100 bg-(--mobile-bg) border-t border-black/5 flex items-center justify-around px-4 pb-8 pt-3 pb-safe">
