@@ -44,7 +44,7 @@ export function MobileBottomNav() {
   
   if (!isAllowed) return null;
 
-  const isDarkTheme = pathname === "/";
+  const isDarkTheme = pathname === "/" || pathname === "/about";
 
   return (
     <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-[100] border-t flex items-center justify-around px-4 pb-8 pt-3 pb-safe transition-transform duration-300 ease-in-out ${
