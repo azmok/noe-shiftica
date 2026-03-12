@@ -4,6 +4,7 @@ import { RichText } from "@payloadcms/richtext-lexical/react"
 import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
+import { calculateReadingTime } from "@/lib/calculateReadingTime"
 
 export const PostArticle: React.FC<{
     post: Post
@@ -11,6 +12,8 @@ export const PostArticle: React.FC<{
     prevPost?: Post | null
     nextPost?: Post | null
 }> = ({ post, isPreview, prevPost, nextPost }) => {
+    const readingTime = (post as any).readingTime || calculateReadingTime(post.content);
+
     return (
         <main className="post-main grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 md:pt-24 md:pb-32 relative z-10">
             {isPreview && (
@@ -43,10 +46,21 @@ export const PostArticle: React.FC<{
                                     Journal
                                 </span>
                                 {post.publishedAt && (
-                                    <span className="text-slate-400 text-sm font-medium flex items-center gap-1.5">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                        {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-slate-400 text-sm font-medium flex items-center gap-1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                            {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </span>
+                                        {readingTime > 0 && (
+                                            <>
+                                                <span className="text-slate-200">|</span>
+                                                <span className="text-slate-400 text-sm font-medium flex items-center gap-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z" /></svg>
+                                                    読了目安: {readingTime}分
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
                                 )}
                             </div>
 
@@ -61,14 +75,16 @@ export const PostArticle: React.FC<{
                                 {(() => {
                                     const img = (post.heroImage || post.coverImage);
                                     if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                        const largeUrl = img.sizes?.large?.url;
+                                        const finalUrl = largeUrl || img.url;
                                         return (
                                             <>
                                                 <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
                                                 <GcsImage
-                                                    src={img.url}
+                                                    src={finalUrl}
                                                     alt={post.title}
                                                     priority
-                                                    sizes="(max-width: 1280px) 100vw, 1200px"
+                                                    preOptimized={!!largeUrl}
                                                     className="group-hover:scale-105"
                                                 />
                                             </>
@@ -80,7 +96,24 @@ export const PostArticle: React.FC<{
                         </div>
 
                         {/* Content Body */}
-                        <div className="prose prose-lg post-content-body max-w-none font-sans leading-relaxed marker:text-(--color-neu-primary) prose-a:text-(--color-neu-primary) prose-a:no-underline hover:prose-a:underline prose-headings:text-slate-800 prose-strong:text-slate-900 prose-blockquote:border-l-(--color-neu-primary) prose-blockquote:bg-slate-50/50 prose-blockquote:neu-pressed prose-blockquote:rounded-xl prose-blockquote:p-6 prose-blockquote:not-italic prose-blockquote:text-slate-600 prose-code:text-(--color-neu-primary) prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-[''] prose-code:after:content-['']">
+                        <div className="prose prose-lg post-content-body max-w-none font-sans leading-relaxed 
+                            marker:text-(--color-neu-primary) 
+                            prose-headings:text-slate-800 
+                            prose-strong:text-slate-900 
+                            prose-blockquote:border-l-4 prose-blockquote:border-(--color-neu-primary) 
+                            prose-blockquote:bg-slate-50/50 prose-blockquote:neu-pressed 
+                            prose-blockquote:rounded-xl prose-blockquote:p-6 prose-blockquote:not-italic 
+                            prose-blockquote:text-slate-600 
+                            prose-code:text-(--color-neu-primary) prose-code:bg-slate-100 
+                            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md 
+                            prose-code:before:content-[''] prose-code:after:content-['']
+                            prose-a:text-(--color-neu-primary) 
+                            prose-a:no-underline 
+                            prose-a:font-bold
+                            prose-a:relative 
+                            prose-a:transition-all
+                            hover:prose-a:text-(--color-neu-primary)/80
+                        ">
                             {post.content && typeof post.content === 'object' && 'root' in post.content ? (
                                 <RichText data={post.content as any} />
                             ) : (
