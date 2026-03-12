@@ -211,7 +211,7 @@ export default function HomePage() {
               {
                 step: "03",
                 phase: "Build",
-                desc: "Next.js × Payload CMS × Neonで実装。表示速度・SEO・運用性をすべて両立した構成で構築します。",
+                desc: "Next.js × Payload CMS × Postgresで実装。表示速度・SEO・運用性をすべて両立した構成で構築します。",
               },
               {
                 step: "04",
