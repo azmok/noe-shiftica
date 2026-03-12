@@ -18,7 +18,7 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen text-white relative selection:bg-[#FFFFFF] selection:text-background-void">
+    <div className="min-h-screen text-white bg-background-void relative selection:bg-[#FFFFFF] selection:text-background-void">
       <Header />
 
       {/* 1. Hero Section */}
