@@ -1,12 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, FileText, User } from "lucide-react";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        // Scrolling down (and past initial top padding threshold)
+        setIsVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
   
   // Allow rendering on LP, About, Privacy, Terms, and all Blog pages
   const isAllowed = 
@@ -19,7 +40,9 @@ export function MobileBottomNav() {
   if (!isAllowed) return null;
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-100 bg-(--mobile-bg) border-t border-black/5 flex items-center justify-around px-4 pb-8 pt-3 pb-safe">
+    <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-(--mobile-bg) border-t border-black/5 flex items-center justify-around px-4 pb-8 pt-3 pb-safe transition-transform duration-300 ease-in-out ${
+      isVisible ? "translate-y-0" : "translate-y-full"
+    }`}>
       <Link href="/" className="flex flex-col items-center gap-1 group">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
           pathname === "/" ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA]" : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF]"
