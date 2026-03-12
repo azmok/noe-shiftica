@@ -15,18 +15,133 @@ export const PostArticle: React.FC<{
     const readingTime = (post as any).readingTime || calculateReadingTime(post.content);
 
     return (
-        <main className="post-main grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 md:pt-24 md:pb-32 relative z-10">
+        <main className="grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
             {isPreview && (
-                <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat">
+                <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
                     <p className="font-bold">Preview Mode</p>
                     <p className="text-sm">You are viewing a draft version of this post with live updates enabled.</p>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 mt-2 md:mt-8">
-                {/* Article Column */}
-                <article className="lg:col-span-10 lg:col-start-2 xl:col-span-8 xl:col-start-3 flex flex-col gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+                
+                {/* Mobile Article View */}
+                <article className="md:hidden flex flex-col pt-0">
+                    {/* Immersive Hero */}
+                    <div className="relative w-full aspect-square sm:aspect-video rounded-b-[40px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
+                        {(() => {
+                            const img = (post.heroImage || post.coverImage);
+                            if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                return (
+                                    <GcsImage
+                                        src={img.url}
+                                        alt={post.title}
+                                        priority
+                                        className="w-full h-full object-cover"
+                                    />
+                                );
+                            }
+                            return <BlogFallbackHero />;
+                        })()}
+                        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-transparent to-black/90" />
+                        
+                        <div className="absolute top-16 left-6 right-6">
+                            <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2 px-1">
+                                <span className="bg-(--color-neu-primary) text-black px-2 py-0.5 rounded-sm">Journal</span>
+                                <span>•</span>
+                                <span>{readingTime} min read</span>
+                            </div>
+                        </div>
 
+                        <div className="absolute bottom-10 left-6 right-6">
+                            <h1 className="text-3xl font-serif text-white leading-tight mb-4 drop-shadow-lg">
+                                {post.title}
+                            </h1>
+                            <div className="flex items-center gap-3 text-white/60 text-xs">
+                                <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('ja-JP') : ''}</span>
+                                <span className="w-1 h-1 rounded-full bg-white/40" />
+                                <span>Noe Shiftica Editorial</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="px-6 py-10 space-y-10">
+                        {/* Key Points / Intro Card */}
+                        <div className="p-6 rounded-(--mobile-radius) bg-(--mobile-surface) shadow-(--mobile-shadow-inset) border border-white/5">
+                            <h2 className="text-sm font-bold text-(--color-neu-primary) uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-(--color-neu-primary) animate-pulse" />
+                                Key Insights
+                            </h2>
+                            <p className="text-sm text-(--mobile-text-secondary) leading-relaxed italic">
+                                {post.description || "この記事の主要なポイントをまとめました。詳細については以下の本文をご覧ください。"}
+                            </p>
+                        </div>
+
+                        {/* Content Body */}
+                        <div className="prose prose-sm prose-invert post-content-body max-w-none font-sans leading-relaxed 
+                            prose-headings:font-serif
+                            prose-headings:text-(--mobile-text-primary)
+                            prose-p:text-(--mobile-text-secondary)
+                            prose-p:text-base
+                            prose-a:text-(--color-neu-primary)
+                            prose-strong:text-(--mobile-text-primary)
+                            prose-blockquote:border-l-3
+                            prose-blockquote:border-(--color-neu-primary)
+                            prose-blockquote:bg-white/5
+                            prose-blockquote:rounded-lg
+                            prose-blockquote:px-4
+                            prose-blockquote:py-2
+                            prose-img:rounded-(--mobile-radius-sm)
+                            prose-img:shadow-lg
+                        ">
+                            {post.content && typeof post.content === 'object' && 'root' in post.content ? (
+                                <RichText data={post.content as any} />
+                            ) : (
+                                <div dangerouslySetInnerHTML={{ __html: post.content as any }} />
+                            )}
+                        </div>
+
+                        {/* Mobile Tags */}
+                        {(() => {
+                            const cmd = (post.customMetaData as Record<string, any>) || {};
+                            const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
+                            if (tags.length === 0) return null;
+                            return (
+                                <div className="flex flex-wrap gap-2 pt-8 border-t border-white/10">
+                                    {tags.map((tag, index) => (
+                                        <span key={index} className="px-4 py-1.5 rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-[10px] font-bold text-(--mobile-text-muted)">
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            );
+                        })()}
+
+                        {/* Mobile Navigation Cards */}
+                        <div className="space-y-4 pt-4">
+                            <h4 className="text-xs font-bold text-(--mobile-text-muted) uppercase tracking-widest text-center mb-6">Continue Reading</h4>
+                            {nextPost && (
+                                <Link href={`/blog/${nextPost.slug}`} className="block">
+                                    <div className="p-5 rounded-(--mobile-radius) bg-(--mobile-surface) shadow-(--mobile-shadow-soft) flex flex-col gap-2">
+                                        <span className="text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Up Next</span>
+                                        <h5 className="text-sm font-bold text-(--mobile-text-primary) line-clamp-1">{nextPost.title}</h5>
+                                    </div>
+                                </Link>
+                            )}
+                            {prevPost && (
+                                <Link href={`/blog/${prevPost.slug}`} className="block">
+                                    <div className="p-5 rounded-(--mobile-radius) bg-(--mobile-surface) shadow-(--mobile-shadow-soft) opacity-80 flex flex-col gap-2 border border-black/5">
+                                        <span className="text-[10px] font-bold text-(--mobile-text-muted) uppercase tracking-widest">Previous</span>
+                                        <h5 className="text-sm font-bold text-(--mobile-text-secondary) line-clamp-1">{prevPost.title}</h5>
+                                    </div>
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                </article>
+
+                {/* Desktop Article Column */}
+                <article className="hidden md:flex lg:col-span-12 xl:col-span-10 xl:col-start-2 flex-col gap-12 mt-8">
                     {/* Breadcrumbs */}
                     <div className="flex items-center gap-2 text-sm font-medium pl-2">
                         <Link className="text-slate-500 hover:text-(--color-neu-primary) transition-colors" href="/">Home</Link>
@@ -69,14 +184,13 @@ export const PostArticle: React.FC<{
                             </h1>
                         </div>
 
-                        {/* Hero Image / Header visual gap */}
+                        {/* Hero Image */}
                         <div className="w-full aspect-video rounded-2xl overflow-hidden mb-12 shadow-inner p-2 bg-slate-100">
                             <div className="w-full h-full rounded-xl overflow-hidden relative group">
                                 {(() => {
                                     const img = (post.heroImage || post.coverImage);
                                     if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                        const largeUrl = img.sizes?.large?.url;
-                                        const finalUrl = largeUrl || img.url;
+                                        const finalUrl = img.sizes?.large?.url || img.url;
                                         return (
                                             <>
                                                 <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
@@ -84,7 +198,7 @@ export const PostArticle: React.FC<{
                                                     src={finalUrl}
                                                     alt={post.title}
                                                     priority
-                                                    preOptimized={!!largeUrl}
+                                                    preOptimized={!!img.sizes?.large}
                                                     className="group-hover:scale-105"
                                                 />
                                             </>
@@ -121,13 +235,11 @@ export const PostArticle: React.FC<{
                             )}
                         </div>
 
-                        {/* Tags / Bottom Border */}
+                        {/* Tags */}
                         {(() => {
                             const cmd = (post.customMetaData as Record<string, any>) || {};
                             const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
-
                             if (tags.length === 0) return null;
-
                             return (
                                 <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-slate-100">
                                     {tags.map((tag, index) => (
@@ -144,8 +256,8 @@ export const PostArticle: React.FC<{
                         })()}
                     </div>
 
-                    {/* Post Navigation */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-4 mb-8">
+                    {/* Navigation */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
                         {prevPost ? (
                             <Link href={`/blog/${prevPost.slug}`} className="bg-white border border-slate-100 p-8 rounded-2xl group flex flex-col items-start transition-all hover:shadow-lg hover:-translate-y-1">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">

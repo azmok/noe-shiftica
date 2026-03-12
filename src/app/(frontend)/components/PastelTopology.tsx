@@ -182,5 +182,5 @@ export function PastelTopology() {
         };
     }, []);
 
-    return <div ref={containerRef} className="absolute inset-0 -z-10 pointer-events-none overflow-hidden" />;
+    return <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none overflow-hidden" />;
 }

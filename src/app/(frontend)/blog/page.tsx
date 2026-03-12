@@ -24,18 +24,18 @@ export default async function BlogPage() {
   const recentPosts = posts.slice(1);
 
   return (
-    <div className="bg-(--color-neu-bg-light) text-slate-900 min-h-screen flex flex-col font-sans antialiased relative">
+    <div className="md:bg-(--color-neu-bg-light) bg-(--mobile-bg) md:text-slate-900 text-(--mobile-text-primary) min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary)/30">
       <Header />
 
-      <main className="grow px-4 sm:px-6 lg:px-40 pt-14 pb-16 md:pt-28 md:pb-32 relative z-10">
-        <div className="max-w-[960px] mx-auto flex flex-col gap-10 mt-2 md:mt-8">
+      <main className="grow px-4 sm:px-6 lg:px-40 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10 transition-colors duration-500">
+        <div className="max-w-[960px] mx-auto flex flex-col gap-8 md:gap-10 mt-2 md:mt-8">
 
           {posts.length === 0 ? (
             <div className="text-center p-12 neu-flat rounded-2xl w-full">
-              <h3 className="text-2xl font-bold mb-4 text-slate-800">
+              <h3 className="text-2xl font-bold mb-4 md:text-slate-800 text-(--mobile-text-primary)">
                 No articles yet
               </h3>
-              <p className="text-slate-500 mb-8 max-w-md mx-auto">
+              <p className="md:text-slate-500 text-(--mobile-text-secondary) mb-8 max-w-md mx-auto">
                 Payload CMSの「Posts」コレクションから記事が投稿されると、ここに表示されます。現在準備中です。
               </p>
               <Link
@@ -47,11 +47,11 @@ export default async function BlogPage() {
             </div>
           ) : (
             <>
-              {/* Featured Post Hero */}
+              {/* Desktop Featured Post Hero */}
               {featuredPost && (
-                <section>
+                <section className="hidden md:block">
                   <Link href={`/blog/${featuredPost.slug}`} className="block posts featured group">
-                    <div className="border boder-solid border-slate-400 groupbg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5">
+                    <div className="border border-solid border-slate-400 bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
                           const preGenUrl = featuredPost.heroLargeUrl || featuredPost.coverLargeUrl;
@@ -98,8 +98,60 @@ export default async function BlogPage() {
                 </section>
               )}
 
-              {/* Search Bar (Mobile/Tablet focus) */}
-              <div className="lg:hidden mt-4">
+              {/* Mobile Featured Post Section */}
+              {featuredPost && (
+                <section className="md:hidden">
+                  <Link href={`/blog/${featuredPost.slug}`} className="block">
+                    <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
+                      {(() => {
+                        const imgUrl = featuredPost.heroUrl || featuredPost.coverUrl;
+                        if (imgUrl) {
+                          return (
+                            <GcsImage
+                              src={imgUrl}
+                              alt={featuredPost.title}
+                              priority
+                              className="w-full h-full object-cover"
+                            />
+                          );
+                        }
+                        return <BlogFallbackHero />;
+                      })()}
+                      <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/80" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <span className="px-3 py-1 rounded-full bg-(--color-neu-primary) text-[10px] font-bold text-black uppercase tracking-widest mb-3 inline-block">
+                          Featured
+                        </span>
+                        <h2 className="text-2xl font-serif text-white leading-tight mb-2">
+                          {featuredPost.title}
+                        </h2>
+                        <div className="flex items-center gap-2 text-white/60 text-xs font-sans">
+                          <span>{featuredPost.publishedAt ? new Date(featuredPost.publishedAt).toLocaleDateString('ja-JP') : ''}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </section>
+              )}
+
+              {/* Mobile Tag Scroll */}
+              <div className="md:hidden -mx-4 overflow-x-auto flex items-center gap-3 px-4 no-scrollbar">
+                {["All", "Design", "AI", "Development", "Business"].map((tag, i) => (
+                  <button 
+                    key={tag}
+                    className={`px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all ${
+                      i === 0 
+                        ? "bg-(--mobile-surface) shadow-(--mobile-shadow-inset) text-(--mobile-text-primary)" 
+                        : "bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-secondary)"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Bar (Tablet focus) */}
+              <div className="hidden sm:block lg:hidden mt-4">
                 <div className="neu-pressed h-14 w-full rounded-2xl flex items-center px-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                   <input

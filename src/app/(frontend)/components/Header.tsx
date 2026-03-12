@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronLeft } from "lucide-react";
 import { Button } from "./ui/Button";
 
 interface HeaderProps {
@@ -20,6 +20,8 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   const [lastScrollY, setLastScrollY] = useState(0);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
+  const isBlogDetail = pathname?.startsWith("/blog/") && pathname !== "/blog";
+  const isBlogPage = pathname?.startsWith("/blog");
 
   // URLが変わったタイミングで表示状態やスクロール位置をリセットする
   useEffect(() => {
@@ -94,25 +96,44 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   return (
     <>
       <header
-        className={`fixed bottom-0 md:bottom-auto md:top-0 left-0 w-full md:h-12 z-50 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-full md:-translate-y-full"
-          } ${hasBackdrop ? "bg-transparent border-none shadow-none md:fixed md:top-0 md:left-0 md:w-full md:h-12" : "bg-transparent border-none shadow-none"}`}
+        className={`hidden md:block fixed transition-all duration-500 transform ${
+          isScrolled ? "translate-y-0" : "translate-y-0"
+        } ${
+          isBlogPage ? "top-0 left-0 w-full h-16 md:h-12 z-50" : "bottom-0 md:bottom-auto md:top-0 left-0 w-full md:h-12 z-50"
+        } ${isVisible ? "translate-y-0" : isBlogPage ? "-translate-y-full" : "translate-y-full md:-translate-y-full"} ${
+          hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
+        }`}
       >
-        {/* ブラーレイヤー 
-          - backdrop-blur で背景をぼかす
-          - mask-image で下方向に向けて透明にする
-        */}
-        <div
-          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
-            }`}
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.01)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
-          }}
-        />
-        <div className="w-full mx-auto pl-6 pr-6 md:pr-0 flex items-center justify-between md:justify-end md:gap-x-12 relative z-120">
+        {/* ブラーレイヤー (Hidden on mobile blog page for clean sample look) */}
+        {!isBlogPage && (
+          <div
+            className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
+              }`}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.01)',
+              backdropFilter: 'blur(40px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+              maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+            }}
+          />
+        )}
+        
+        <div className={`w-full h-full mx-auto px-6 flex items-center ${isBlogPage ? "justify-between" : "justify-between md:justify-end md:gap-x-12"} relative z-120`}>
+          
+          {/* Mobile Back Button (Detail Page only) */}
+          {isBlogPage && (
+            <div className="md:hidden flex-1">
+              {isBlogDetail && (
+                <Link 
+                  href="/blog" 
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-primary)"
+                >
+                  <ChevronLeft size={24} />
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
@@ -127,24 +148,32 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
             ))}
           </nav>
 
-          {/* Logo (Hidden on mobile) */}
-          <Link href="/" className="hidden md:flex items-center gap-2 relative z-110">
-            <Image
-              src="/assets/NS_logo_White.jpg"
-              alt="Noe Shiftica"
-              width={180}
-              height={40}
-              className="h-7 md:h-8 w-auto opacity-90"
-              priority
-            />
-          </Link>
+          {/* Logo */}
+          <div className={`flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-center`}>
+            <Link href="/" className="flex items-center gap-2 relative z-110">
+              <Image
+                src={isBlogPage ? "/assets/NS_logo_Black.jpg" : "/assets/NS_logo_White.jpg"}
+                alt="Noe Shiftica"
+                width={180}
+                height={40}
+                className={`${isBlogPage ? "h-6 md:h-8" : "hidden md:block h-8"} w-auto opacity-90`}
+                priority
+              />
+            </Link>
+          </div>
+
+          {/* Spacer for centering on mobile blog page if back button exists */}
+          {isBlogPage && <div className="md:hidden flex-1 flex justify-end">
+             {/* Future right side icons if any */}
+          </div>}
         </div>
       </header>
 
       {/* Mobile Nav Toggle - Moved outside header to fix mix-blend-mode stacking context */}
       <div
-        className={`md:hidden fixed bottom-5 left-6 z-130 transition-all duration-500 transform ${isVisible ? "translate-y-0" : "translate-y-24"
-          } mix-blend-difference`}
+        className={`hidden md:hidden fixed bottom-5 left-6 z-130 transition-all duration-500 transform ${
+          isVisible && !isBlogPage ? "translate-y-0" : "translate-y-24"
+        } mix-blend-difference`}
       >
         <button
           className="w-12 h-12 flex items-center justify-center border border-white rounded-full bg-white"
@@ -165,8 +194,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
       {/* Mobile Menu Overlay & Content */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-[10000]">
-            {/* Backdrop: Forced GPU acceleration for reliable filters */}
+          <div className="fixed inset-0 z-10000">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -183,7 +211,6 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
-            {/* Content Layer: Staggered entry for premium feel */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
