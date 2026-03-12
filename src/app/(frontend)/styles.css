@@ -70,6 +70,26 @@
   --color-neu-primary: #CCDD00;
   --color-neu-light: #ffffff;
   --color-neu-dark: #d1d9e6;
+
+  /* Mobile Design Tokens (from reference samples) */
+  --mobile-bg: #F5F4F1;
+  --mobile-surface: #EFEDE9;
+  --mobile-surface-raised: #F9F8F6;
+  --mobile-text-primary: #1A1917;
+  --mobile-text-secondary: #6B6760;
+  --mobile-text-muted: #9E9B96;
+  --mobile-tag-bg: #E8E5DF;
+  --mobile-shadow-out: 4px 4px 10px #D8D5CF, -4px -4px 10px #FFFFFF;
+  --mobile-shadow-soft: 2px 2px 6px #D8D5CF, -2px -2px 6px #FFFFFF;
+  --mobile-shadow-inset: inset 2px 2px 5px #D0CDC7, inset -2px -2px 5px #FDFCFA;
+  --mobile-radius: 16px;
+  --mobile-radius-sm: 10px;
+}
+
+@theme {
+  --font-dm-sans: var(--font-dm-sans);
+  --font-dm-serif: var(--font-dm-serif);
+  --font-shippori-mincho: var(--font-shippori-mincho);
 }
 
 * {
@@ -295,6 +315,14 @@ p {
 
   .post-content-body a:hover {
     background-size: 100% 1.5px;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

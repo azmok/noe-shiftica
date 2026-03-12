@@ -1,5 +1,4 @@
-import React from "react";
-import { Inconsolata } from "next/font/google";
+import { Inconsolata, DM_Sans, DM_Serif_Display, Shippori_Mincho } from "next/font/google";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
 import { ProgressBar } from "./components/ProgressBar";
@@ -8,6 +7,27 @@ const inconsolata = Inconsolata({
   subsets: ["latin"],
   variable: "--font-inconsolata",
   display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+  weight: ["300", "400", "500", "700"],
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  subsets: ["latin"],
+  variable: "--font-dm-serif",
+  display: "swap",
+  weight: ["400"],
+});
+
+const shipporiMincho = Shippori_Mincho({
+  subsets: ["latin"],
+  variable: "--font-shippori-mincho",
+  display: "swap",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata = {
@@ -47,11 +67,18 @@ export const metadata = {
   },
 };
 
+import { MobileBottomNav } from "./components/MobileBottomNav";
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <html lang="ja" className={inconsolata.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html 
+      lang="ja" 
+      className={`${inconsolata.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${shipporiMincho.variable}`} 
+      data-scroll-behavior="smooth" 
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -77,6 +104,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
           {children}
         </main>
+        <MobileBottomNav />
       </body>
     </html>
   );
