@@ -13,7 +13,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
   return (
     <footer
       className={`w-full pt-16 pb-8 px-6 mt-0 md:mt-0 relative z-10 transition-colors duration-300 border-t ${isBlog
-        ? "bg-background-void border-white/10 text-[#222222]"
+        ? "bg-background-void border-white/10 text-white/60"
         : "bg-background-void text-white border-white/10"
         }`}
     >
@@ -51,7 +51,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                   <Link
                     href={link.href}
                     className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
-                      ? "text-[#222222] hover:text-(--color-neu-primary)"
+                      ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
                   >
@@ -78,7 +78,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                   <Link
                     href={link.href}
                     className={`text-[12px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
-                      ? "text-[#222222] hover:text-(--color-neu-primary)"
+                      ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
                   >
@@ -134,8 +134,8 @@ export function Footer({ variant = "landing" }: FooterProps) {
           </div>
 
           <div className="order-1 md:order-2 flex items-center gap-4">
-            <span className={`text-[11px] font-bold tracking-widest ${isBlog ? "text-slate-900" : "text-white/90"}`}>JP</span>
-            <span className={`text-[10px] uppercase tracking-widest ${isBlog ? "text-slate-300" : "text-white/10"}`}>English coming soon</span>
+            <span className={`text-[11px] font-bold tracking-widest ${isBlog ? "text-white/90" : "text-white/90"}`}>JP</span>
+            <span className={`text-[10px] uppercase tracking-widest ${isBlog ? "text-white/20" : "text-white/10"}`}>English coming soon</span>
           </div>
         </div>
       </div>

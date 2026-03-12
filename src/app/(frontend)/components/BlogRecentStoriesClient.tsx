@@ -40,10 +40,52 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                 </div>
             </div>
 
+            <div className={`md:hidden flex flex-col gap-5 mt-4`}>
+                <h2 className="text-xl font-serif text-(--mobile-text-primary) mb-1 px-1">Recent Stories</h2>
+                <div className="flex flex-col gap-4">
+                    {recentPosts.map((post: any) => (
+                        <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
+                            <article className="bg-(--mobile-surface) shadow-(--mobile-shadow-soft) rounded-(--mobile-radius) p-3 flex gap-4 transition-all active:scale-[0.98]">
+                                <div className="w-20 h-20 flex-shrink-0 rounded-(--mobile-radius-sm) overflow-hidden relative shadow-(--mobile-shadow-inset) bg-(--mobile-surface)">
+                                    {(() => {
+                                        const img = post.heroThumbnailUrl || post.coverThumbnailUrl || post.heroUrl || post.coverUrl;
+                                        if (img) {
+                                            return (
+                                                <GcsImage
+                                                    src={img}
+                                                    alt={post.title}
+                                                    preOptimized={true}
+                                                    sizes="80px"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            );
+                                        }
+                                        return <BlogFallbackHero />;
+                                    })()}
+                                </div>
+                                <div className="flex flex-col justify-between flex-1 py-0.5">
+                                    <h3 className="text-sm font-bold text-(--mobile-text-primary) line-clamp-2 leading-tight">
+                                        {post.title}
+                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] text-(--mobile-text-muted) font-sans">
+                                            {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('ja-JP') : ''}
+                                        </span>
+                                        <div className="w-7 h-7 rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) flex items-center justify-center text-(--mobile-text-muted)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
             <div className={
-                viewMode === "grid"
+                `hidden md:${viewMode === "grid"
                     ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                    : "flex flex-col gap-6"
+                    : "flex flex-col gap-6"}`
             }>
                 {recentPosts.map((post: any) => (
                     <Link href={`/blog/${post.slug}`} key={post.id} className="block group font-sans blog-posts">
