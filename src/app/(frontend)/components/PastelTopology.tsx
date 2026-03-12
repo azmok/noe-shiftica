@@ -88,6 +88,8 @@ const fragmentShader = `
     }
 `;
 
+let sharedRenderer: THREE.WebGLRenderer | null = null;
+
 export function PastelTopology() {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -99,7 +101,10 @@ export function PastelTopology() {
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 4.5;
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        if (!sharedRenderer) {
+            sharedRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        }
+        const renderer = sharedRenderer;
 
         const geometry = new THREE.IcosahedronGeometry(2, 40);
         const material = new THREE.ShaderMaterial({
@@ -170,14 +175,13 @@ export function PastelTopology() {
                 containerRef.current.removeChild(renderer.domElement);
             }
 
-            // メモリリークと、ナビゲーション時のWebGLコンテキスト上限エラー・フリーズを防ぐため
-            // 完全にリソースを破棄し、WebGLコンテキストを強制解放する
+            // メモリリークを防ぐため、オブジェクトのリソースは破棄する
             geometry.dispose();
             material.dispose();
             coreGeo.dispose();
             coreMat.dispose();
 
-            renderer.dispose();
+            // WebGLコンテキスト上限エラー・フリーズを防ぐため、レンダラーは破棄せず使い回す
         };
     }, []);
 
