@@ -39,18 +39,32 @@ export function MobileBottomNav() {
   
   if (!isAllowed) return null;
 
+  const isDarkTheme = pathname === "/";
+
   return (
-    <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-(--mobile-bg) border-t border-black/5 flex items-center justify-around px-4 pb-8 pt-3 pb-safe transition-transform duration-300 ease-in-out ${
+    <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-[100] border-t flex items-center justify-around px-4 pb-8 pt-3 pb-safe transition-transform duration-300 ease-in-out ${
       isVisible ? "translate-y-0" : "translate-y-full"
-    }`}>
+    } ${isDarkTheme ? "bg-background-void border-white/10" : "bg-(--mobile-bg) border-black/5"}`}>
       <Link href="/" className="flex flex-col items-center gap-1 group">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-          pathname === "/" ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA]" : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF]"
-        } bg-(--mobile-surface)`}>
-          <Home size={18} className={pathname === "/" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"} />
+          isDarkTheme
+            ? pathname === "/" 
+              ? "shadow-[inset_2px_2px_4px_#0a0a0a,inset_-2px_-2px_4px_#181818] bg-[#111111]" 
+              : "shadow-[2px_2px_5px_#0a0a0a,-2px_-2px_5px_#181818] bg-[#111111]"
+            : pathname === "/" 
+              ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA] bg-(--mobile-surface)" 
+              : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF] bg-(--mobile-surface)"
+        }`}>
+          <Home size={18} className={
+            isDarkTheme
+              ? pathname === "/" ? "text-[#FFFFFF]" : "text-white/40"
+              : pathname === "/" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
+          } />
         </div>
         <span className={`text-[10px] font-bold uppercase tracking-wider ${
-          pathname === "/" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
+          isDarkTheme
+            ? pathname === "/" ? "text-[#FFFFFF]" : "text-white/40"
+            : pathname === "/" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
         }`}>
           Home
         </span>
@@ -58,12 +72,24 @@ export function MobileBottomNav() {
 
       <Link href="/blog" className="flex flex-col items-center gap-1 group">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-          pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog") ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA]" : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF]"
-        } bg-(--mobile-surface)`}>
-          <FileText size={18} className={pathname?.startsWith("/blog") ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"} />
+          isDarkTheme
+            ? pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog")
+              ? "shadow-[inset_2px_2px_4px_#0a0a0a,inset_-2px_-2px_4px_#181818] bg-[#111111]" 
+              : "shadow-[2px_2px_5px_#0a0a0a,-2px_-2px_5px_#181818] bg-[#111111]"
+            : pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog")
+              ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA] bg-(--mobile-surface)" 
+              : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF] bg-(--mobile-surface)"
+        }`}>
+          <FileText size={18} className={
+            isDarkTheme
+              ? pathname?.startsWith("/blog") ? "text-[#FFFFFF]" : "text-white/40"
+              : pathname?.startsWith("/blog") ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
+          } />
         </div>
         <span className={`text-[10px] font-bold uppercase tracking-wider ${
-          pathname?.startsWith("/blog") ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
+          isDarkTheme
+            ? pathname?.startsWith("/blog") ? "text-[#FFFFFF]" : "text-white/40"
+            : pathname?.startsWith("/blog") ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
         }`}>
           Blog
         </span>
@@ -71,12 +97,24 @@ export function MobileBottomNav() {
 
       <Link href="/about" className="flex flex-col items-center gap-1 group">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-          pathname === "/about" ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA]" : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF]"
-        } bg-(--mobile-surface)`}>
-          <User size={18} className={pathname === "/about" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"} />
+          isDarkTheme
+            ? pathname === "/about" 
+              ? "shadow-[inset_2px_2px_4px_#0a0a0a,inset_-2px_-2px_4px_#181818] bg-[#111111]" 
+              : "shadow-[2px_2px_5px_#0a0a0a,-2px_-2px_5px_#181818] bg-[#111111]"
+            : pathname === "/about" 
+              ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA] bg-(--mobile-surface)" 
+              : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF] bg-(--mobile-surface)"
+        }`}>
+          <User size={18} className={
+            isDarkTheme
+              ? pathname === "/about" ? "text-[#FFFFFF]" : "text-white/40"
+              : pathname === "/about" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
+          } />
         </div>
         <span className={`text-[10px] font-bold uppercase tracking-wider ${
-          pathname === "/about" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
+          isDarkTheme
+            ? pathname === "/about" ? "text-[#FFFFFF]" : "text-white/40"
+            : pathname === "/about" ? "text-(--mobile-text-primary)" : "text-(--mobile-text-muted)"
         }`}>
           About
         </span>
