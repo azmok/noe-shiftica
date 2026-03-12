@@ -2,6 +2,7 @@ import React from "react";
 import { Inconsolata } from "next/font/google";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
+import { ProgressBar } from "./components/ProgressBar";
 
 const inconsolata = Inconsolata({
   subsets: ["latin"],
@@ -37,6 +38,13 @@ export const metadata = {
     title: "Noe Shiftica | Design the Shift.",
     description: "AIとデザインでビジネスの本質を設計するスタジオ。",
   },
+  icons: {
+    icon: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png" },
+      { url: "/apple-touch-icon-precomposed.png", rel: "apple-touch-icon-precomposed" },
+    ],
+  },
 };
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
@@ -63,7 +71,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
+        <ProgressBar />
         <CustomCursor />
         <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
           {children}

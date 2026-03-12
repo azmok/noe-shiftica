@@ -3,7 +3,8 @@
     "allow": [
       "Bash(ls -la /c/Users/genta/projects/noe-shiftica.dev/noe-shiftica*.json 2>/dev/null | head -5)",
       "Bash(git ls-tree:*)",
-      "Bash(grep -r \"TODO\\\\|FIXME\\\\|HACK\\\\|XXX\\\\|CRITICAL\\\\|SECURITY\" /c/Users/genta/projects/noe-shiftica.dev/src --include=\"*.ts\" --include=\"*.tsx\" 2>/dev/null | head -20)"
+      "Bash(grep -r \"TODO\\\\|FIXME\\\\|HACK\\\\|XXX\\\\|CRITICAL\\\\|SECURITY\" /c/Users/genta/projects/noe-shiftica.dev/src --include=\"*.ts\" --include=\"*.tsx\" 2>/dev/null | head -20)",
+      "Bash(node -e \"const sharp = require\\('sharp'\\); console.log\\('sharp available'\\);\" 2>&1 | head -5)"
     ]
   }
 }

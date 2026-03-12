@@ -24,10 +24,17 @@ interface GcsImageProps {
     priority?: boolean
     /** Extra Tailwind/CSS classes applied to the wrapping div */
     className?: string
-    /** Quality 1-100 (default: 90) */
+    /** Quality 1-100 (default: 75) */
     quality?: number
     /** Custom sizes attribute for fine-grained control */
     sizes?: string
+    /**
+     * Set true when src is a Payload pre-generated variant (thumbnail/medium/large).
+     * Bypasses the /_next/image proxy and serves directly from GCS CDN:
+     *   default: GCS → Next.js server → browser (2 hops, slow on cold cache)
+     *   preOptimized: GCS CDN → browser (1 hop, always fast)
+     */
+    preOptimized?: boolean
 }
 
 /**
@@ -61,8 +68,9 @@ export function GcsImage({
     alt,
     priority = false,
     className = '',
-    quality = 90,
+    quality = 5,
     sizes,
+    preOptimized = false,
 }: GcsImageProps) {
     if (!src) return null;
 
@@ -71,12 +79,14 @@ export function GcsImage({
     const isProduction = process.env.NODE_ENV === 'production';
     const isFirebase = !!process.env.FIREBASE_CONFIG;
 
-    const shouldDisableOptimization = isLocalPayload && (isProduction || isFirebase);
+    // preOptimized=true: Payload pre-generated variant → skip /_next/image proxy → GCS CDN direct
+    // isLocalPayload: /api/ paths on Firebase → skip to avoid loopback deadlock
+    const shouldDisableOptimization = preOptimized || (isLocalPayload && (isProduction || isFirebase));
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority
-        ? "(max-width: 1024px) 100vw, 1200px" // Hero images
-        : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"; // Card/Sidebar images
+        ? "(max-width: 1024px) 33vw, 724px" // Hero images
+        : "(max-width: 640px) 25vw, (max-width: 1024px) 25vw, 25vw"; // Card/Sidebar images
 
     return (
         <Image
@@ -91,8 +101,6 @@ export function GcsImage({
             unoptimized={shouldDisableOptimization}
             style={{ objectFit: 'cover', objectPosition: 'center' }}
             className={`transition-all duration-700 ease-in-out ${className}`}
-        // fetchPriority is part of standard Next.js Image through the priority prop, 
-        // but for modern browsers we can ensure the underlying img gets it
         />
     )
 }
