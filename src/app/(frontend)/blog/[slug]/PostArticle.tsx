@@ -68,7 +68,7 @@ export const PostArticle: React.FC<{
                                 {post.title}
                             </h1>
                             <div className="flex items-center gap-3 text-white/60 text-xs">
-                                <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('ja-JP') : ''}</span>
+                                <span>{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
                                 <span className="w-1 h-1 rounded-full bg-white/40" />
                                 <span>Noe Shiftica Editorial</span>
                             </div>

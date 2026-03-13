@@ -83,7 +83,7 @@ export default async function BlogPage() {
                           <span className="px-3 py-1 rounded-full bg-(--color-neu-primary)/10 text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Featured</span>
                           {featuredPost.publishedAt && (
                             <span className="text-slate-400 text-sm font-medium">
-                              {new Date(featuredPost.publishedAt).toLocaleDateString('ja-JP')}
+                              {featuredPost.publishedAt ? new Date(featuredPost.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}
                             </span>
                           )}
                         </div>
@@ -131,7 +131,7 @@ export default async function BlogPage() {
                           {featuredPost.title}
                         </h2>
                         <div className="flex items-center gap-2 text-white/60 text-xs font-sans">
-                          <span>{featuredPost.publishedAt ? new Date(featuredPost.publishedAt).toLocaleDateString('ja-JP') : ''}</span>
+                          <span>{featuredPost.publishedAt ? new Date(featuredPost.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
                         </div>
                       </div>
                     </div>
