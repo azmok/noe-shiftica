@@ -78,11 +78,11 @@ export function MobileBottomNav() {
       <Link href="/blog" className="flex flex-col items-center gap-1 group">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
           isDarkTheme
-            ? pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog")
-              ? "shadow-[inset_2px_2px_4px_#0a0a0a,inset_-2px_-2px_4px_#181818] bg-[#111111]" 
+            ? pathname?.startsWith("/blog")
+              ? "shadow-[inset_2px_2px_4px_#0a0a0a,inset_-2px_-2px_4px_#181818] bg-[#111111]"
               : "shadow-[2px_2px_5px_#0a0a0a,-2px_-2px_5px_#181818] bg-[#111111]"
-            : pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog")
-              ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA] bg-(--mobile-surface)" 
+            : pathname?.startsWith("/blog")
+              ? "shadow-[inset_2px_2px_4px_#D0CDC7,inset_-2px_-2px_4px_#FDFCFA] bg-(--mobile-surface)"
               : "shadow-[2px_2px_5px_#D8D5CF,-2px_-2px_5px_#FFFFFF] bg-(--mobile-surface)"
         }`}>
           <FileText size={18} className={
