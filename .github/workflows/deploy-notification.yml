@@ -11,9 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Email Notification
-        # We trigger on any check completion, but filter for Firebase App Hosting status
-        # This action catches the completion of the Firebase build/rollout
-        if: always()
+        # Trigger only when the specific Firebase App Hosting check completes
+        if: github.event.check_run.name == 'App Hosting - Rollout (noe-shiftica/asia-east1/noe-shiftica-backend)'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
