@@ -20,11 +20,11 @@ export function Footer({ variant = "landing" }: FooterProps) {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 px-4">
           <div className="lg:col-span-4 space-y-6">
-            <Link href="/" className="inline-block text-xs rounded-full px-5 py-[11px]">
+            <Link href="/" className="inline-block text-xs rounded-full px-0 py-[3px]">
               <span className="text-lg font-bold tracking-tighter opacity-90">Noe Shiftica</span>
             </Link>
             <p
-              className={`text-[13px] max-w-xs leading-relaxed font-light ${isBlog ? "text-slate-500" : "text-white/40"
+              className={`text-[8px] max-w-xs font-light ${isBlog ? "text-slate-500" : "text-white/40"
                 }`}
             >
               Design the Shift.
@@ -50,7 +50,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-0 py-[11px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -77,7 +77,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
+                    className={`text-[12px] transition-colors font-light rounded-full px-0 py-[11px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}

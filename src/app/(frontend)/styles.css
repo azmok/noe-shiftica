@@ -308,14 +308,15 @@ h6 {
     margin-bottom: 24px !important;
   }
 
+  /* Upgraded H2 to act as primary impact section header */
   .post-content-body h2 {
-    font-size: 18px !important;
+    font-size: 26px !important;
     font-weight: 500 !important;
-    line-height: 22px !important;
+    line-height: 30px !important;
     letter-spacing: normal !important;
     color: #222222 !important;
-    margin-top: 24px !important;
-    margin-bottom: 16px !important;
+    margin-top: 32px !important;
+    margin-bottom: 20px !important;
   }
 
   .post-content-body h3 {
@@ -331,9 +332,9 @@ h6 {
   .post-content-body h4, 
   .post-content-body h5, 
   .post-content-body h6 {
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    line-height: 18px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 24px !important;
     letter-spacing: normal !important;
     color: #222222 !important;
     margin-top: 20px !important;
