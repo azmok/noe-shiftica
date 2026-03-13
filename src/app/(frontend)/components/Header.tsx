@@ -143,7 +143,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           </nav>
 
           {/* Logo */}
-          <div className={`flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-end`}>
+          <div className={`hidden md:flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-end`}>
             <Link href="/" className="flex items-center gap-2 relative z-110">
               <Image
                 src={isBlogPage ? "/assets/NS_logo_Black.jpg" : "/assets/NS_logo_White.jpg"}
@@ -162,27 +162,6 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           </div>}
         </div>
       </header>
-
-      {/* Mobile Nav Toggle - Moved to top right */}
-      <div
-        className={`md:hidden fixed top-5 right-6 z-130 transition-all duration-500 transform ${isVisible && !isBlogPage ? "translate-y-0" : isBlogPage ? "-translate-y-24" : "translate-y-0"
-          } mix-blend-difference`}
-      >
-        <button
-          className="w-12 h-12 flex items-center justify-center border border-white rounded-full bg-white"
-          onClick={() => {
-            const nextState = !isMobileMenuOpen;
-            setIsMobileMenuOpen(nextState);
-            if (nextState) setIsVisible(true);
-          }}
-        >
-          {isMobileMenuOpen ? (
-            <X size={26} className="text-black" strokeWidth={2.5} />
-          ) : (
-            <Menu size={26} className="text-black" strokeWidth={2.5} />
-          )}
-        </button>
-      </div>
 
       {/* Mobile Menu Overlay & Content */}
       <AnimatePresence>
