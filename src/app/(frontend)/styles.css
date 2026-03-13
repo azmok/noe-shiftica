@@ -272,6 +272,91 @@ h6 {
   color: #0f172a;
 }
 
+/* === Mobile Typography Override for Blog Posts (Airbnb Inspired) === */
+@media (max-width: 768px) {
+  .post-content-body {
+    /* Base text color & sizing */
+    color: #222222 !important;
+  }
+
+  /* Container elements */
+  .post-content-body p,
+  .post-content-body div,
+  .post-content-body ul,
+  .post-content-body li {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 24px !important;
+    letter-spacing: normal !important;
+    color: #222222 !important;
+  }
+
+  /* Specific handling for lead paragraph (often the first p in the prose wrapper) */
+  .post-content-body > p:first-of-type {
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  /* Headings */
+  .post-content-body h1 {
+    font-size: 26px !important;
+    font-weight: 500 !important;
+    line-height: 30px !important;
+    letter-spacing: normal !important;
+    color: #222222 !important;
+    margin-bottom: 24px !important;
+  }
+
+  .post-content-body h2 {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    line-height: 22px !important;
+    letter-spacing: normal !important;
+    color: #222222 !important;
+    margin-top: 24px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .post-content-body h3 {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    line-height: 22px !important;
+    letter-spacing: normal !important;
+    color: #222222 !important;
+    margin-top: 24px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .post-content-body h4, 
+  .post-content-body h5, 
+  .post-content-body h6 {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 18px !important;
+    letter-spacing: normal !important;
+    color: #222222 !important;
+    margin-top: 20px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Links */
+  .post-content-body a {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 24px !important;
+    color: #222222 !important;
+    letter-spacing: normal !important;
+  }
+
+  /* Image spacing to match clean flow */
+  .post-content-body img {
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+}
+
+
 h1 {
   margin: 40px 0;
   font-size: 64px;
