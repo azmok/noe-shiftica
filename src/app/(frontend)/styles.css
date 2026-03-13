@@ -506,9 +506,6 @@ h2.text-4xl.md\:text-5xl.font-serif.font-bold.mb-6 {
   color: var(--color-primary);
 }
 
-img.h-7.md\:h-8.w-auto.opacity-90 {
-  width: 60px;
-}
 
 h2.hero-h2.heading-2 {
   margin-top: 0;
