@@ -117,9 +117,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 </a>
               ))}
             </div>
-            <p className={`text-[13px] font-light ${isBlog ? "text-slate-400" : "text-white/40"}`}>
-              info@noe-shiftica.com
-            </p>
+
           </div>
         </div>
 
@@ -131,11 +129,6 @@ export function Footer({ variant = "landing" }: FooterProps) {
             <p className={`text-[11px] tracking-wider font-light ${isBlog ? "text-slate-400" : "text-white/30"}`}>
               &copy; {currentYear} Noe Shiftica
             </p>
-          </div>
-
-          <div className="order-1 md:order-2 flex items-center gap-4">
-
-            <span className={`text-[10px] uppercase tracking-widest ${isBlog ? "text-white/20" : "text-white/10"}`}>English coming soon</span>
           </div>
         </div>
       </div>
