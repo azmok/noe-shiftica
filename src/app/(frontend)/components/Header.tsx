@@ -18,10 +18,22 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isBlogDetail = pathname?.startsWith("/blog/") && pathname !== "/blog";
   const isBlogPage = pathname?.startsWith("/blog");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Debug log for production visibility
+  useEffect(() => {
+    if (isMounted) {
+      console.log("[Header] isBlogPage:", isBlogPage, "pathname:", pathname);
+    }
+  }, [isMounted, isBlogPage, pathname]);
 
   // URLが変わったタイミングで表示状態やスクロール位置をリセットする
   useEffect(() => {
@@ -93,6 +105,9 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
 
   const hasBackdrop = alwaysBackdrop || isScrolled;
 
+  // Hydration safety: use a default src during SSR and switch after mount if needed
+  const logoSrc = isMounted && isBlogPage ? "/assets/NS_logo_Black.png" : "/assets/NS_logo_White.jpg";
+
   return (
     <>
       <header
@@ -146,12 +161,13 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           <div className={`hidden md:flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-end`}>
             <Link href="/" className="flex items-center gap-2 relative z-110">
               <Image
-                src={isBlogPage ? "/assets/NS_logo_Black.png" : "/assets/NS_logo_White.jpg"}
+                src={logoSrc}
                 alt="Noe Shiftica"
                 width={32}
                 height={32}
                 className={`${isBlogPage ? "h-6 md:h-8" : "block h-6 md:h-8"} w-auto max-h-full object-contain opacity-90`}
                 priority
+                style={{ height: '32px', width: 'auto' }}
               />
             </Link>
           </div>
