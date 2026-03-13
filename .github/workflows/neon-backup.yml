@@ -1,0 +1,58 @@
+name: Neon Pre-deploy Backup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Neon Branch Backup
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+          BRANCH_NAME: "backup/pre-deploy"
+        run: |
+          # 1. Get branches to check if backup exists
+          echo "Fetching branches for project $PROJECT_ID..."
+          RESPONSE=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches")
+          
+          # Check if the API call was successful
+          if echo "$RESPONSE" | jq -e '.branches' > /dev/null; then
+            BRANCH_ID=$(echo "$RESPONSE" | jq -r ".branches[] | select(.name==\"$BRANCH_NAME\") | .id")
+            
+            # 2. Delete existing backup if it exists
+            if [ ! -z "$BRANCH_ID" ] && [ "$BRANCH_ID" != "null" ]; then
+              echo "Deleting existing backup branch $BRANCH_NAME (ID: $BRANCH_ID)..."
+              curl -X DELETE -s -H "Authorization: Bearer $NEON_API_KEY" \
+                "https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches/$BRANCH_ID"
+              
+              # Wait for deletion to propagate
+              sleep 5
+            else
+              echo "Backup branch $BRANCH_NAME does not exist. Skipping deletion."
+            fi
+          else
+            echo "Failed to fetch branches or project ID is incorrect."
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+          
+          # 3. Create new backup from production
+          echo "Creating new backup branch $BRANCH_NAME from production..."
+          CREATE_RESPONSE=$(curl -X POST -s -H "Authorization: Bearer $NEON_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"branch\": {\"name\": \"$BRANCH_NAME\"}}" \
+            "https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches")
+            
+          if echo "$CREATE_RESPONSE" | jq -e '.branch' > /dev/null; then
+            NEW_BRANCH_ID=$(echo "$CREATE_RESPONSE" | jq -r '.branch.id')
+            echo "Successfully created backup branch: $NEW_BRANCH_ID"
+          else
+            echo "Failed to create backup branch."
+            echo "Response: $CREATE_RESPONSE"
+            exit 1
+          fi
