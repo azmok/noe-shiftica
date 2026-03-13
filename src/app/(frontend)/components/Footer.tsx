@@ -23,14 +23,14 @@ export function Footer({ variant = "landing" }: FooterProps) {
             <Link href="/" className="inline-block text-xs rounded-full px-0 py-[3px]">
               <span className="text-[2rem] font-bold tracking-tighter opacity-90">Noe Shiftica</span>
             </Link>
-            <p
+            <div
               className={`text-[8px] max-w-xs font-light ${isBlog ? "text-slate-500" : "text-white/40"
                 }`}
             >
               <p className="leading-4 text-[0.8rem] font-medium tracking-tighter opacity-90">Design the Shift.</p>
 
               <p className="leading-4">最新技術と本質の追求で、ビジネスの世界観を転換します。</p>
-            </p>
+            </div>
           </div>
 
           <div className="lg:col-span-2">
