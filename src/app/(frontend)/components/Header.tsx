@@ -100,22 +100,20 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           } ${isVisible ? "translate-y-0" : isBlogPage ? "-translate-y-full" : "-translate-y-full"} ${hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
           }`}
       >
-        {/* ブラーレイヤー (Hidden on mobile blog page for clean sample look) */}
-        {!isBlogPage && (
-          <div
-            className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
-              }`}
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.01)',
-              backdropFilter: 'blur(40px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-              maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
-            }}
-          />
-        )}
+        {/* ブラーレイヤー (Hidden on mobile blog page for clean sample look, shown on desktop for all pages) */}
+        <div
+          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
+            } ${isBlogPage ? 'hidden md:block' : ''}`}
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.01)',
+            backdropFilter: 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+          }}
+        />
 
-        <div className={`w-full h-full mx-auto flex items-center ${isBlogPage ? "justify-between" : "justify-between md:justify-end md:gap-x-12"} relative z-120`}>
+        <div className={`w-full h-full mx-auto flex items-center justify-between md:justify-end md:gap-x-12 relative z-120`}>
 
           {/* Mobile Back Button (Detail Page only) */}
           {isBlogPage && (
