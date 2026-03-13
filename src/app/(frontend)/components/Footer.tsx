@@ -19,17 +19,17 @@ export function Footer({ variant = "landing" }: FooterProps) {
     >
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 px-4">
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-0">
             <Link href="/" className="inline-block text-xs rounded-full px-0 py-[3px]">
-              <span className="text-lg font-bold tracking-tighter opacity-90">Noe Shiftica</span>
+              <span className="text-[2rem] font-bold tracking-tighter opacity-90">Noe Shiftica</span>
             </Link>
             <p
               className={`text-[8px] max-w-xs font-light ${isBlog ? "text-slate-500" : "text-white/40"
                 }`}
             >
-              Design the Shift.
-              <br />
-              最新技術と本質の追求で、ビジネスの世界観を転換します。
+              <p className="leading-4 text-[0.8rem] font-medium tracking-tighter opacity-90">Design the Shift.</p>
+
+              <p className="leading-4">最新技術と本質の追求で、ビジネスの世界観を転換します。</p>
             </p>
           </div>
 
@@ -134,7 +134,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
           </div>
 
           <div className="order-1 md:order-2 flex items-center gap-4">
-            <span className={`text-[11px] font-bold tracking-widest ${isBlog ? "text-white/90" : "text-white/90"}`}>JP</span>
+
             <span className={`text-[10px] uppercase tracking-widest ${isBlog ? "text-white/20" : "text-white/10"}`}>English coming soon</span>
           </div>
         </div>

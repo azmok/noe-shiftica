@@ -281,14 +281,29 @@ h6 {
 
   /* Container elements */
   .post-content-body p,
-  .post-content-body div,
-  .post-content-body ul,
+  .post-content-body div {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 24px !important;
+    letter-spacing: normal !important;
+    color: #222222 !important;
+    margin-bottom: 24px !important;
+  }
+
+  .post-content-body ul {
+    list-style-type: disc !important;
+    padding-left: 30px !important;
+    margin-top: 32px !important;
+    margin-bottom: 32px !important;
+  }
+
   .post-content-body li {
     font-size: 16px !important;
     font-weight: 400 !important;
     line-height: 24px !important;
     letter-spacing: normal !important;
     color: #222222 !important;
+    margin-bottom: 12px !important;
   }
 
   /* Specific handling for lead paragraph (often the first p in the prose wrapper) */
@@ -350,10 +365,11 @@ h6 {
     letter-spacing: normal !important;
   }
 
-  /* Image spacing to match clean flow */
+  /* Image spacing to match clean flow and adding Airbnb-style rounded corners */
   .post-content-body img {
-    margin-top: 24px !important;
-    margin-bottom: 24px !important;
+    margin-top: 32px !important;
+    margin-bottom: 32px !important;
+    border-radius: 16px !important;
   }
 }
 
