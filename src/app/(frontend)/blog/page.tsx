@@ -138,16 +138,17 @@ export default async function BlogPage() {
               {/* Mobile Tag Scroll */}
               <div className="md:hidden -mx-4 overflow-x-auto flex items-center gap-3 px-4 no-scrollbar">
                 {["All", "Design", "AI", "Development", "Business"].map((tag, i) => (
-                  <button 
+                  <Link
                     key={tag}
+                    href={i === 0 ? "/blog" : `/blog/tag/${tag}`}
                     className={`px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all ${
-                      i === 0 
-                        ? "bg-(--mobile-surface) shadow-(--mobile-shadow-inset) text-(--mobile-text-primary)" 
+                      i === 0
+                        ? "bg-(--mobile-surface) shadow-(--mobile-shadow-inset) text-(--mobile-text-primary)"
                         : "bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-secondary)"
                     }`}
                   >
                     {tag}
-                  </button>
+                  </Link>
                 ))}
               </div>
 
