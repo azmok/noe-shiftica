@@ -6,19 +6,3 @@
 - Environments: .env.local, .env
 
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 11.5s
-  Running TypeScript ...
-Failed to compile.
-
-./src/app/(frontend)/components/MobileBottomNav.tsx:81:15
-Type error: This comparison appears to be unintentional because the types '"/" | "/about"' and '"/blog"' have no overlap.
-
-  79 |         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-  80 |           isDarkTheme
-> 81 |             ? pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog")
-     |               ^
-  82 |               ? "shadow-[inset_2px_2px_4px_#0a0a0a,inset_-2px_-2px_4px_#181818] bg-[#111111]" 
-  83 |               : "shadow-[2px_2px_5px_#0a0a0a,-2px_-2px_5px_#181818] bg-[#111111]"
-  84 |             : pathname === "/blog" || (pathname?.startsWith("/blog") && pathname !== "/blog")
-Next.js build worker exited with code: 1 and signal: null
-ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
