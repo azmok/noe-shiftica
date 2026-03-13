@@ -24,7 +24,7 @@ export const PostArticle: React.FC<{
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-                
+
                 {/* Mobile Article View */}
                 <article className="md:hidden flex flex-col pt-0">
                     {/* Immersive Hero */}
@@ -44,12 +44,20 @@ export const PostArticle: React.FC<{
                             return <BlogFallbackHero />;
                         })()}
                         <div className="absolute inset-0 bg-linear-to-b from-black/40 via-transparent to-black/90" />
-                        
+
                         <div className="absolute top-16 left-6 right-6">
                             <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2 px-1">
                                 <span className="bg-(--color-neu-primary) text-black px-2 py-0.5 rounded-sm">Journal</span>
-                                <span>•</span>
-                                <span>{readingTime} min read</span>
+                                {/* <span>•</span> */}
+                                {readingTime > 0 && (
+                                    <>
+                                        <span className="text-slate-200">|</span>
+                                        <span className="text-slate-200 text-[0.75rem] font-extralight font-(--font-serif) tracking-[-1px] flex items-center gap-1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z" /></svg>
+                                            読了目安: {readingTime}分
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         </div>
 
