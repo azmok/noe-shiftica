@@ -96,7 +96,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   return (
     <>
       <header
-        className={`fixed transition-all duration-500 transform ${isBlogPage ? "top-0 left-0 w-full h-16 md:h-12 z-50" : "top-0 left-0 w-full md:h-12 z-50"
+        className={`fixed transition-all duration-500 transform ${isBlogPage ? "hidden md:block top-0 left-0 w-full h-16 md:h-12 z-50" : "top-0 left-0 w-full md:h-12 z-50"
           } ${isVisible ? "translate-y-0" : isBlogPage ? "-translate-y-full" : "-translate-y-full"} ${hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
           }`}
       >
