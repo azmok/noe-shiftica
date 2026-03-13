@@ -96,13 +96,9 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   return (
     <>
       <header
-        className={`hidden md:block fixed transition-all duration-500 transform ${
-          isScrolled ? "translate-y-0" : "translate-y-0"
-        } ${
-          isBlogPage ? "top-0 left-0 w-full h-16 md:h-12 z-50" : "bottom-0 md:bottom-auto md:top-0 left-0 w-full md:h-12 z-50"
-        } ${isVisible ? "translate-y-0" : isBlogPage ? "-translate-y-full" : "translate-y-full md:-translate-y-full"} ${
-          hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
-        }`}
+        className={`fixed transition-all duration-500 transform ${isBlogPage ? "top-0 left-0 w-full h-16 md:h-12 z-50" : "top-0 left-0 w-full md:h-12 z-50"
+          } ${isVisible ? "translate-y-0" : isBlogPage ? "-translate-y-full" : "-translate-y-full"} ${hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
+          }`}
       >
         {/* ブラーレイヤー (Hidden on mobile blog page for clean sample look) */}
         {!isBlogPage && (
@@ -118,15 +114,15 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
             }}
           />
         )}
-        
-        <div className={`w-full h-full mx-auto px-6 flex items-center ${isBlogPage ? "justify-between" : "justify-between md:justify-end md:gap-x-12"} relative z-120`}>
-          
+
+        <div className={`w-full h-full mx-auto flex items-center ${isBlogPage ? "justify-between" : "justify-between md:justify-end md:gap-x-12"} relative z-120`}>
+
           {/* Mobile Back Button (Detail Page only) */}
           {isBlogPage && (
             <div className="md:hidden flex-1">
               {isBlogDetail && (
-                <Link 
-                  href="/blog" 
+                <Link
+                  href="/blog"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-primary)"
                 >
                   <ChevronLeft size={24} />
@@ -149,31 +145,30 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           </nav>
 
           {/* Logo */}
-          <div className={`flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-center`}>
+          <div className={`flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-end`}>
             <Link href="/" className="flex items-center gap-2 relative z-110">
               <Image
                 src={isBlogPage ? "/assets/NS_logo_Black.jpg" : "/assets/NS_logo_White.jpg"}
                 alt="Noe Shiftica"
-                width={180}
-                height={40}
-                className={`${isBlogPage ? "h-6 md:h-8" : "hidden md:block h-8"} w-auto opacity-90`}
+                width={45}
+                height={26}
+                className={`${isBlogPage ? "h-6 md:h-8" : "block h-6 md:h-8"} w-auto opacity-90`}
                 priority
               />
             </Link>
           </div>
 
           {/* Spacer for centering on mobile blog page if back button exists */}
-          {isBlogPage && <div className="md:hidden flex-1 flex justify-end">
-             {/* Future right side icons if any */}
+          {isBlogPage && <div className="md:hidden flex-1 flex ml-auto justify-end">
+            {/* Future right side icons if any */}
           </div>}
         </div>
       </header>
 
-      {/* Mobile Nav Toggle - Moved outside header to fix mix-blend-mode stacking context */}
+      {/* Mobile Nav Toggle - Moved to top right */}
       <div
-        className={`hidden md:hidden fixed bottom-5 left-6 z-130 transition-all duration-500 transform ${
-          isVisible && !isBlogPage ? "translate-y-0" : "translate-y-24"
-        } mix-blend-difference`}
+        className={`md:hidden fixed top-5 right-6 z-130 transition-all duration-500 transform ${isVisible && !isBlogPage ? "translate-y-0" : isBlogPage ? "-translate-y-24" : "translate-y-0"
+          } mix-blend-difference`}
       >
         <button
           className="w-12 h-12 flex items-center justify-center border border-white rounded-full bg-white"
