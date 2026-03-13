@@ -146,10 +146,10 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           <div className={`hidden md:flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-end`}>
             <Link href="/" className="flex items-center gap-2 relative z-110">
               <Image
-                src={isBlogPage ? "/assets/NS_logo_Black.jpg" : "/assets/NS_logo_White.jpg"}
+                src={isBlogPage ? "/assets/NS_logo_Black.png" : "/assets/NS_logo_White.jpg"}
                 alt="Noe Shiftica"
-                width={45}
-                height={26}
+                width={32}
+                height={32}
                 className={`${isBlogPage ? "h-6 md:h-8" : "block h-6 md:h-8"} w-auto opacity-90`}
                 priority
               />
