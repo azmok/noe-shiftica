@@ -32,11 +32,13 @@ export const PostArticle: React.FC<{
                         {(() => {
                             const img = (post.heroImage || post.coverImage);
                             if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                const finalUrl = img.sizes?.large?.url || img.url;
                                 return (
                                     <GcsImage
-                                        src={img.url}
+                                        src={finalUrl}
                                         alt={post.title}
                                         priority
+                                        preOptimized={!!img.sizes?.large}
                                         className="w-full h-full object-cover"
                                     />
                                 );
