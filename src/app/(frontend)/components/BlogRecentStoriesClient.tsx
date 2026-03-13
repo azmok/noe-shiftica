@@ -83,9 +83,9 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
             </div>
 
             <div className={
-                `hidden md:${viewMode === "grid"
-                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                    : "flex flex-col gap-6"}`
+                `hidden ${viewMode === "grid"
+                    ? "md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    : "md:flex flex-col gap-6"}`
             }>
                 {recentPosts.map((post: any) => (
                     <Link href={`/blog/${post.slug}`} key={post.id} className="block group font-sans blog-posts">
