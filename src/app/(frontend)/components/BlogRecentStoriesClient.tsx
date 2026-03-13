@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BlogFallbackHero } from "./BlogFallbackHero";
 import { GcsImage } from "@/lib/GcsImage";
@@ -11,6 +11,12 @@ interface BlogRecentStoriesClientProps {
 
 export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClientProps) {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    
+    useEffect(() => {
+        if (window.innerWidth < 768) {
+            setViewMode("list");
+        }
+    }, []);
 
     if (recentPosts.length === 0) return null;
 
