@@ -33,6 +33,22 @@ export interface PostSummary {
 }
 
 /**
+ * Fetch all distinct tags from published posts' customMetaData JSON field.
+ */
+export async function getDistinctTags(): Promise<string[]> {
+    const db = getPool()
+    const { rows } = await db.query<{ tag: string }>(
+        `SELECT DISTINCT jsonb_array_elements_text(custom_meta_data->'tags') AS tag
+         FROM posts
+         WHERE _status = 'published'
+           AND custom_meta_data IS NOT NULL
+           AND custom_meta_data ? 'tags'
+         ORDER BY tag`
+    )
+    return rows.map(r => r.tag)
+}
+
+/**
  * Fetch all posts directly from the DB, filtered by status.
  * Includes responsive image variant URLs (thumbnail, medium, large) for optimized rendering.
  * This bypasses Payload CMS's draft versioning system.

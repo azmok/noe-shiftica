@@ -4,7 +4,7 @@ import { Footer } from "../components/Footer";
 import { BlogFallbackHero } from "../components/BlogFallbackHero";
 import { BlogRecentStoriesClient } from "../components/BlogRecentStoriesClient";
 import Link from "next/link";
-import { getPostsByStatus } from "@/lib/db";
+import { getPostsByStatus, getDistinctTags } from "@/lib/db";
 import { GcsImage } from "@/lib/GcsImage";
 
 // 記事が更新された時の revalidatePath により再生成されます
@@ -15,8 +15,12 @@ export default async function BlogPage() {
   // posts テーブルの _status = 'published' の記事のみ直接クエリ
   // Payload CMS のドラフトバージョン管理を完全にバイパスする
   let posts: Awaited<ReturnType<typeof getPostsByStatus>> = [];
+  let tags: string[] = [];
   try {
-    posts = await getPostsByStatus('published');
+    [posts, tags] = await Promise.all([
+      getPostsByStatus('published'),
+      getDistinctTags(),
+    ]);
   } catch (error) {
     console.error("Failed to fetch posts:", error);
   }
@@ -136,21 +140,25 @@ export default async function BlogPage() {
               )}
 
               {/* Mobile Tag Scroll */}
-              <div className="md:hidden -mx-4 overflow-x-auto flex items-center gap-3 px-4 no-scrollbar">
-                {["All", "Design", "AI", "Development", "Business"].map((tag, i) => (
+              {tags.length > 0 && (
+                <div className="md:hidden -mx-4 overflow-x-auto flex items-center gap-3 px-4 no-scrollbar">
                   <Link
-                    key={tag}
-                    href={i === 0 ? "/blog" : `/blog/tag/${tag}`}
-                    className={`px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all ${
-                      i === 0
-                        ? "bg-(--mobile-surface) shadow-(--mobile-shadow-inset) text-(--mobile-text-primary)"
-                        : "bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-secondary)"
-                    }`}
+                    href="/blog"
+                    className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-(--mobile-surface) shadow-(--mobile-shadow-inset) text-(--mobile-text-primary)"
                   >
-                    {tag}
+                    All
                   </Link>
-                ))}
-              </div>
+                  {tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/blog/tag/${encodeURIComponent(tag)}`}
+                      className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-secondary)"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
               {/* Search Bar (Tablet focus) */}
               <div className="hidden sm:block lg:hidden mt-4">
