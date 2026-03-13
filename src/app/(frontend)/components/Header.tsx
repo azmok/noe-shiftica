@@ -150,7 +150,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
                 alt="Noe Shiftica"
                 width={32}
                 height={32}
-                className={`${isBlogPage ? "h-6 md:h-8" : "block h-6 md:h-8"} w-auto opacity-90`}
+                className={`${isBlogPage ? "h-6 md:h-8" : "block h-6 md:h-8"} w-auto max-h-full object-contain opacity-90`}
                 priority
               />
             </Link>

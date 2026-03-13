@@ -4,7 +4,18 @@
       "Bash(ls -la /c/Users/genta/projects/noe-shiftica.dev/noe-shiftica*.json 2>/dev/null | head -5)",
       "Bash(git ls-tree:*)",
       "Bash(grep -r \"TODO\\\\|FIXME\\\\|HACK\\\\|XXX\\\\|CRITICAL\\\\|SECURITY\" /c/Users/genta/projects/noe-shiftica.dev/src --include=\"*.ts\" --include=\"*.tsx\" 2>/dev/null | head -20)",
-      "Bash(node -e \"const sharp = require\\('sharp'\\); console.log\\('sharp available'\\);\" 2>&1 | head -5)"
+      "Bash(node -e \"const sharp = require\\('sharp'\\); console.log\\('sharp available'\\);\" 2>&1 | head -5)",
+      "Bash(gh run:*)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\(x86\\)/**)",
+      "Read(//c/Users/genta/scoop/shims/**)",
+      "Read(//c/Users/genta/scoop/apps/**)",
+      "Read(//c/Users/genta/.local/bin//**)",
+      "Read(//c/Users/genta/**)",
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls -la /c/Users/genta/projects/noe-shiftica.dev/public/assets/ && file /c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg 2>/dev/null; python3 -c \"from PIL import Image; img = Image.open\\('/c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg'\\); print\\('White JPG:', img.size\\)\" 2>/dev/null || identify /c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg 2>/dev/null)"
     ]
   }
 }
