@@ -8,12 +8,12 @@ export function BlogFallbackHero() {
             <div className="relative w-full h-full bg-[#e0e5ec] flex flex-col items-center justify-center">
                 <svg className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-60" viewBox="0 0 800 400">
                     <path 
-                        className="fill-none stroke-[#a3b1c6] stroke-[2] stroke-linecap-round animate-[trace_10s_ease-in-out_infinite_alternate]" 
+                        className="fill-none stroke-[#a3b1c6] stroke-2 stroke-linecap-round animate-[trace_10s_ease-in-out_infinite_alternate]" 
                         d="M100,200 C150,100 300,300 400,200 S650,100 700,200" 
                         style={{ filter: "blur(1px)", strokeDasharray: 1000, strokeDashoffset: 1000 }}
                     />
                     <path 
-                        className="fill-none stroke-[#a3b1c6] stroke-[2] stroke-linecap-round animate-[trace_10s_ease-in-out_infinite_alternate]" 
+                        className="fill-none stroke-[#a3b1c6] stroke-2 stroke-linecap-round animate-[trace_10s_ease-in-out_infinite_alternate]" 
                         d="M200,350 Q400,150 600,350" 
                         style={{ filter: "blur(1px)", strokeDasharray: 1000, strokeDashoffset: 1000, animationDelay: "-2s", opacity: 0.3 }} 
                     />
