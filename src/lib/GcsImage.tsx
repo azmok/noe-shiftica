@@ -92,9 +92,15 @@ export function GcsImage({
     const isLocalPayload = src?.startsWith('/api/');
     
     if (isLocalPayload && (isProduction || isFirebase)) {
-        const filename = src.replace('/api/media/file/', '');
-        const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
-        finalSrc = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`;
+        try {
+            const filename = src?.replace('/api/media/file/', '') || '';
+            if (filename) {
+                const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
+                finalSrc = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`;
+            }
+        } catch (e) {
+            console.error(`[DEBUG ERROR] GcsImage filename extraction failed for src: ${src}`, e);
+        }
     }
 
     // Initialize state. If we already loaded this exact URL in this session, start as true.
