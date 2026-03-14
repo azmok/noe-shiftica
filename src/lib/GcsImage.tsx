@@ -109,19 +109,24 @@ export function GcsImage({
     // Fix for Firebase App Hosting loopback deadlocks:
     let finalSrc = src;
     const isLocalPayload = src.startsWith('/api/');
-    const isProduction = process.env.NODE_ENV === 'production';
-    const isFirebase = !!process.env.FIREBASE_CONFIG;
+    
+    // Safety check for process.env in client-side
+    const env = (typeof process !== 'undefined' ? process.env : {}) as any;
+    const isProduction = env.NODE_ENV === 'production';
+    const isFirebase = !!env.FIREBASE_CONFIG;
 
     // Use direct GCS URL in production to bypass slow proxy
     if (isLocalPayload && (isProduction || isFirebase)) {
         const filename = src.replace('/api/media/file/', '');
-        const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
+        const bucket = env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
         finalSrc = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`;
     }
 
     // preOptimized=true: Payload pre-generated variant → skip /_next/image proxy → GCS CDN direct
     // isLocalPayload: /api/ paths on Firebase → skip to avoid loopback deadlock
-    const shouldDisableOptimization = preOptimized || isLocalPayload;
+    // IMPORTANT: For 0.1-0.2s speed, we use unoptimized={true} for all production images
+    // because GCS already serves optimized variants if requested.
+    const shouldDisableOptimization = preOptimized || (isLocalPayload && (isProduction || isFirebase));
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority

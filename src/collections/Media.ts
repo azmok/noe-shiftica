@@ -12,6 +12,29 @@ export const Media: CollectionConfig = {
       required: true,
     },
   ],
+  hooks: {
+    afterRead: [
+      ({ doc }) => {
+        const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app'
+        const getDirectUrl = (filename: string) => 
+          `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`
+
+        if (doc.filename) {
+          doc.url = getDirectUrl(doc.filename)
+        }
+
+        if (doc.sizes) {
+          Object.keys(doc.sizes).forEach((size) => {
+            if (doc.sizes[size].filename) {
+              doc.sizes[size].url = getDirectUrl(doc.sizes[size].filename)
+            }
+          })
+        }
+
+        return doc
+      },
+    ],
+  },
   upload: {
     // Auto-generate resized variants via Sharp on every upload
     // These are stored in GCS alongside the original
