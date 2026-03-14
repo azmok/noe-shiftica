@@ -40,6 +40,18 @@ export const Media: CollectionConfig = {
     // These are stored in GCS alongside the original
     imageSizes: [
       {
+        name: 'adminList',
+        width: 100,
+        height: 100,
+        position: 'centre',
+      },
+      {
+        name: 'adminPreview',
+        width: 480,
+        height: 360,
+        position: 'centre',
+      },
+      {
         // Blog list grid cards (4:3 aspect), small screens
         name: 'thumbnail',
         width: 400,
@@ -62,6 +74,6 @@ export const Media: CollectionConfig = {
       },
     ],
     // Allow Next.js Image optimization to work with GCS URLs
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: 'adminList',
   },
 }
