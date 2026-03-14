@@ -15,7 +15,12 @@
       "Bash(npm run:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(ls -la /c/Users/genta/projects/noe-shiftica.dev/public/assets/ && file /c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg 2>/dev/null; python3 -c \"from PIL import Image; img = Image.open\\('/c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg'\\); print\\('White JPG:', img.size\\)\" 2>/dev/null || identify /c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg 2>/dev/null)"
+      "Bash(ls -la /c/Users/genta/projects/noe-shiftica.dev/public/assets/ && file /c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg 2>/dev/null; python3 -c \"from PIL import Image; img = Image.open\\('/c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg'\\); print\\('White JPG:', img.size\\)\" 2>/dev/null || identify /c/Users/genta/projects/noe-shiftica.dev/public/assets/NS_logo_White.jpg 2>/dev/null)",
+      "Bash(cd \"C:\\\\Users\\\\genta\\\\projects\\\\noe-shiftica.dev\" && pnpm run build 2>&1)",
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
+      "Bash(cd \"C:\\\\Users\\\\genta\\\\projects\\\\noe-shiftica.dev\" && pnpm run build 2>&1 | tail -30)",
+      "Bash(cd \"C:\\\\Users\\\\genta\\\\projects\\\\noe-shiftica.dev\" && echo \"n\" | firebase apphosting:secrets:set REVALIDATE_SECRET 2>&1 || true)",
+      "Bash(git push:*)"
     ]
   }
 }
