@@ -9,7 +9,7 @@ import { GcsImage } from "@/lib/GcsImage";
 
 // 記事が更新された時の revalidatePath により再生成されます
 // 記事が更新された時の revalidatePath により再生成されます
-export const revalidate = 0;
+export const revalidate = 12592000;
 
 export default async function BlogPage() {
   // posts テーブルの _status = 'published' の記事のみ直接クエリ

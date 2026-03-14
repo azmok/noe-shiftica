@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * GcsImage
  *
@@ -76,6 +78,17 @@ export function GcsImage({
     showShimmer = false,
 }: GcsImageProps) {
     const [isLoaded, setIsLoaded] = React.useState(false);
+
+    // When browser restores the page from bfcache (back/forward navigation),
+    // React state resets to false. This listener catches the persisted restore
+    // and immediately marks the image as loaded so it doesn't flash invisible.
+    React.useEffect(() => {
+        const handlePageShow = (event: PageTransitionEvent) => {
+            if (event.persisted) setIsLoaded(true);
+        };
+        window.addEventListener('pageshow', handlePageShow);
+        return () => window.removeEventListener('pageshow', handlePageShow);
+    }, []);
 
     if (!src) return null;
 
