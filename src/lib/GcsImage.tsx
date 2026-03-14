@@ -64,6 +64,12 @@ const toBase64 = (str: string) =>
         : window.btoa(str)
 
 /**
+ * Global cache to track loaded URLs in this session.
+ * Prevents FOIC (Flash of Invisible Content) when navigating back/forward.
+ */
+const loadedUrls = new Set<string>();
+
+/**
  * Full-fill image that behaves like background-image: cover.
  * Parent element MUST have position: relative and a defined size.
  */
@@ -77,28 +83,45 @@ export function GcsImage({
     preOptimized = false,
     showShimmer = false,
 }: GcsImageProps) {
-    const [isLoaded, setIsLoaded] = React.useState(false);
+    // Determine the environment once, consistently. Use public env vars for client-side visibility.
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isFirebase = !!process.env.NEXT_PUBLIC_GCS_BUCKET; 
+
+    // Calculate finalSrc at the top to be consistent across renders
+    let finalSrc = src;
+    const isLocalPayload = src?.startsWith('/api/');
+    
+    if (isLocalPayload && (isProduction || isFirebase)) {
+        const filename = src.replace('/api/media/file/', '');
+        const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
+        finalSrc = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`;
+    }
+
+    // Initialize state. If we already loaded this exact URL in this session, start as true.
+    const [isLoaded, setIsLoaded] = React.useState(() => {
+        return typeof window !== 'undefined' && loadedUrls.has(finalSrc);
+    });
+    
     const imgRef = React.useRef<HTMLImageElement>(null);
 
-    // Fix for SSG hydration race condition:
-    // On SSG pages, the browser may finish loading the image BEFORE React hydrates
-    // and attaches the onLoad handler. In that case, onLoad never fires and the
-    // image stays invisible (opacity: 0 when showShimmer=true).
-    // Checking img.complete on mount catches this case.
-    // 1. Initial check (Mount/Hydration)
+    // 1. Ensure we mark it as loaded if it's already complete on mount (common for cache/back navigation)
     React.useEffect(() => {
+        if (!finalSrc) return;
+        
         const checkImage = () => {
             if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
+                loadedUrls.add(finalSrc);
                 setIsLoaded(true);
             }
         };
-        checkImage();
-        // Also check after a tiny delay for cases where 'complete' updates slightly after mount
-        const timer = setTimeout(checkImage, 10);
-        return () => clearTimeout(timer);
-    }, [src]);
 
-    // 2. BFCache check (Back-Forward navigation)
+        checkImage();
+        // Fallback for tricky hydration cases
+        const timer = setTimeout(checkImage, 100); 
+        return () => clearTimeout(timer);
+    }, [finalSrc]);
+
+    // 2. Handle BFCache (back-forward cache) specifically
     React.useEffect(() => {
         const handlePageShow = (event: PageTransitionEvent) => {
             if (event.persisted) {
@@ -110,22 +133,6 @@ export function GcsImage({
     }, []);
 
     if (!src) return null;
-
-    // Fix for Firebase App Hosting loopback deadlocks:
-    let finalSrc = src;
-    const isLocalPayload = src.startsWith('/api/');
-    
-    // Safety check for process.env in client-side
-    const env = (typeof process !== 'undefined' ? process.env : {}) as any;
-    const isProduction = env.NODE_ENV === 'production';
-    const isFirebase = !!env.FIREBASE_CONFIG;
-
-    // Use direct GCS URL in production to bypass slow proxy
-    if (isLocalPayload && (isProduction || isFirebase)) {
-        const filename = src.replace('/api/media/file/', '');
-        const bucket = env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
-        finalSrc = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`;
-    }
 
     // preOptimized=true: Payload pre-generated variant → skip /_next/image proxy → GCS CDN direct
     // isLocalPayload: /api/ paths on Firebase → skip to avoid loopback deadlock
@@ -151,6 +158,7 @@ export function GcsImage({
             blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
             unoptimized={shouldDisableOptimization}
             onLoad={() => {
+                loadedUrls.add(finalSrc);
                 setIsLoaded(true);
             }}
             onError={() => {
