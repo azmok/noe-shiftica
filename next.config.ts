@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
     // Image sizes: smaller increments for UI components.
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Quality 75 default — excellent visual quality at ~40% smaller file size vs q90
-    qualities: [30, 50, 75],
+    qualities: [25, 50, 75],
   },
 };
 
