@@ -72,7 +72,7 @@ export function GcsImage({
     alt,
     priority = false,
     className = '',
-    quality = 30,
+    quality = 50,
     sizes,
     preOptimized = false,
     showShimmer = false,
@@ -130,8 +130,8 @@ export function GcsImage({
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority
-        ? "(max-width: 1024px) 33vw, 724px" // Hero images
-        : "(max-width: 640px) 25vw, (max-width: 1024px) 25vw, 25vw"; // Card/Sidebar images
+        ? "(max-width: 1024px) 100vw, 1200px" // Hero images
+        : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"; // Grid/Card images
 
     const imageElement = (
         <Image
