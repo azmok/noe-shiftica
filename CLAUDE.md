@@ -45,8 +45,10 @@
 ## 6. Session Context Protocol
 
 ### A. Context Retrieval (Start of Session)
-- **Action**: Before any task, read `.antigravity/memory-personalized.md` if it exists.
-- **Integration**: If relevant context exists (past fixes, preferences, logic patterns), explicitly reflect it in the current task's `plan.md`.
+- **Action**: Before any task, read the following files if they exist:
+  1. `.antigravity/memory-personalized.md` — session context, preferences, past decisions
+  2. `.antigravity/bug-history.md` — past bug fixes, root causes, and prevention notes
+- **Integration**: If relevant context exists in either file, explicitly reflect it in the current task's `plan.md`.
 
 ### B. Pre-task Snapshot (Interruptions)
 - **Action**: If interrupted or a new urgent task is injected, summarize the current state and learnings into `.antigravity/memory-personalized.md` before switching context.
@@ -58,6 +60,20 @@
   > - **Preferences**: (User-specific constraints or coding style)
   > - **Plan Impact**: (How this affects future implementation steps)
 - **Cleanup**: Periodically merge redundant entries and remove outdated information (more than 3 months old) to prevent context bloat.
+
+### D. Bug Fix Memory Archiving
+- **Trigger**: Whenever a bug is identified AND fixed (regardless of size), immediately append a record to `.antigravity/bug-history.md`.
+- **Do NOT skip this step** even for minor or "obvious" fixes. Every fix is a future prevention.
+- **Format**:
+  ```markdown
+  ### [YYYY-MM-DD HH:mm] Bug: <short title>
+  - **Error**: (Exact error message or symptom)
+  - **Root Cause**: (What actually caused it — be specific)
+  - **File(s) Modified**: (e.g., `src/app/api/posts/route.ts`)
+  - **Fix Summary**: (What was changed and why it resolved the issue)
+  - **Prevention Note**: (What to watch out for in the future / related patterns to avoid)
+  ```
+- **Cleanup**: Remove entries older than 6 months unless they document a recurring or critical class of bug.
 
 ## 7. Data Layer: Neon DB & Firebase Cloud Storage (CRITICAL — UNTOUCHABLE)
 
