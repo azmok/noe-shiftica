@@ -78,6 +78,18 @@ export function GcsImage({
     showShimmer = false,
 }: GcsImageProps) {
     const [isLoaded, setIsLoaded] = React.useState(false);
+    const imgRef = React.useRef<HTMLImageElement>(null);
+
+    // Fix for SSG hydration race condition:
+    // On SSG pages, the browser may finish loading the image BEFORE React hydrates
+    // and attaches the onLoad handler. In that case, onLoad never fires and the
+    // image stays invisible (opacity: 0 when showShimmer=true).
+    // Checking img.complete on mount catches this case.
+    React.useEffect(() => {
+        if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+            setIsLoaded(true);
+        }
+    }, [src]);
 
     // When browser restores the page from bfcache (back/forward navigation),
     // React state resets to false. This listener catches the persisted restore
@@ -108,6 +120,7 @@ export function GcsImage({
 
     const imageElement = (
         <Image
+            ref={imgRef}
             src={src}
             alt={alt}
             fill
