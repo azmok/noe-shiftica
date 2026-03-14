@@ -28,7 +28,7 @@ environmentVariables:
   - variable: NEXT_PUBLIC_SERVER_URL
     value: "https://noe-shiftica.com"
 
-  - variable: GCS_BUCKET
+  - variable: NEXT_PUBLIC_GCS_BUCKET
     value: "noe-shiftica.firebasestorage.app"
 
   - variable: GCS_PROJECT_ID

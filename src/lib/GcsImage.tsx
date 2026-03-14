@@ -88,9 +88,7 @@ export function GcsImage({
     React.useEffect(() => {
         const isComplete = imgRef.current?.complete;
         const naturalWidth = imgRef.current?.naturalWidth;
-        console.log(`[GcsImage] Mount check: ${src}`, { isComplete, naturalWidth });
         if (isComplete && naturalWidth && naturalWidth > 0) {
-            console.log(`[GcsImage] Already loaded on mount: ${src}`);
             setIsLoaded(true);
         }
     }, [src]);
@@ -109,13 +107,21 @@ export function GcsImage({
     if (!src) return null;
 
     // Fix for Firebase App Hosting loopback deadlocks:
+    let finalSrc = src;
     const isLocalPayload = src.startsWith('/api/');
     const isProduction = process.env.NODE_ENV === 'production';
     const isFirebase = !!process.env.FIREBASE_CONFIG;
 
+    // Use direct GCS URL in production to bypass slow proxy
+    if (isLocalPayload && (isProduction || isFirebase)) {
+        const filename = src.replace('/api/media/file/', '');
+        const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app';
+        finalSrc = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`;
+    }
+
     // preOptimized=true: Payload pre-generated variant → skip /_next/image proxy → GCS CDN direct
     // isLocalPayload: /api/ paths on Firebase → skip to avoid loopback deadlock
-    const shouldDisableOptimization = preOptimized || (isLocalPayload && (isProduction || isFirebase));
+    const shouldDisableOptimization = preOptimized || isLocalPayload;
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority
@@ -125,7 +131,7 @@ export function GcsImage({
     const imageElement = (
         <Image
             ref={imgRef}
-            src={src}
+            src={finalSrc}
             alt={alt}
             fill
             sizes={sizes || defaultSizes}
@@ -135,11 +141,10 @@ export function GcsImage({
             blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
             unoptimized={shouldDisableOptimization}
             onLoad={() => {
-                console.log(`[GcsImage] onLoad success: ${src}`);
                 setIsLoaded(true);
             }}
-            onError={(e) => {
-                console.error(`[GcsImage] onLoad ERROR: ${src}`, e);
+            onError={() => {
+                setIsLoaded(true); // Don't block UI if image fails
             }}
             style={{ 
                 objectFit: 'cover', 
