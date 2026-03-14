@@ -9,7 +9,7 @@ export const Posts: CollectionConfig = {
             // プレビューしたい実際のフロントエンドのURLを指定する
             url: ({ data }) => {
                 const url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
-                return `${url}/blog/${data?.slug || 'preview'}?preview=true`;
+                return `${url}/blog/${data?.slug || 'preview'}/preview`;
             },
         },
         defaultColumns: ['title', '_status', 'publishedAt', 'updatedAt'],

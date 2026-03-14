@@ -8,9 +8,11 @@ import { RichText } from '@payloadcms/richtext-lexical/react';
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { LivePreview } from "./LivePreview";
 import { PostArticle } from "./PostArticle";
 import { Metadata } from "next";
+
+// Cache for up to ~146 days; revalidated on-demand via Posts.ts afterChange hook
+export const revalidate = 12592000;
 
 export async function generateMetadata({
     params,
@@ -90,14 +92,10 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({
     params,
-    searchParams,
 }: {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ preview?: string }>;
 }) {
     const { slug } = await params;
-    const { preview } = await searchParams;
-    const isPreview = preview === 'true';
     const payload = await getPayload({ config: configPromise });
 
     // Fetch the post matching the slug
@@ -107,15 +105,12 @@ export default async function BlogPostPage({
             slug: {
                 equals: decodeURIComponent(slug),
             },
-            ...(isPreview ? {} : {
-                _status: {
-                    equals: 'published',
-                },
-            }),
+            _status: {
+                equals: 'published',
+            },
         },
         depth: 1,
         limit: 1,
-        draft: isPreview,
     });
 
     if (!posts.docs || posts.docs.length === 0) {
@@ -165,13 +160,7 @@ export default async function BlogPostPage({
     return (
         <div className="md:bg-(--color-neu-bg-light) bg-(--mobile-bg) md:text-slate-900 text-(--mobile-text-primary) min-h-screen flex flex-col font-sans antialiased relative overflow-x-hidden transition-colors duration-500">
             <Header />
-
-            {isPreview ? (
-                <LivePreview initialPost={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
-            ) : (
-                <PostArticle post={post} prevPost={prevPost} nextPost={nextPost} />
-            )}
-
+            <PostArticle post={post} prevPost={prevPost} nextPost={nextPost} />
             <Footer variant="blog" />
         </div>
     );
