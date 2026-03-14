@@ -163,6 +163,12 @@ h6 {
   border: none;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); /* Subtle shadow instead of heavy neomorphism for the article itself */
 }
+.post-content-body a {
+  color: var(--color-secondary);
+  opacity: 0.75;
+  font-weight: bold;
+  text-decoration: underline;
+}
 
 .post-title {
   font-family: var(--font-sans);
@@ -600,3 +606,31 @@ footer{
 #concept .text-area-2{
   font-weight: 200;
 }
+
+/* --- Shimmer / Skeleton Effect --- */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.skeleton {
+  background: #f1f1f3;
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 40%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.2) 60%,
+    transparent 100%
+  );
+  background-size: 100% 100%;
+  animation: shimmer 2.5s infinite linear;
+  z-index: 1;
+}

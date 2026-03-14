@@ -70,6 +70,7 @@ export default async function BlogPage() {
                                   alt={featuredPost.title}
                                   priority
                                   preOptimized={!!preGenUrl}
+                                  showShimmer={true}
                                   className="group-hover:scale-110"
                                 />
                               </>
@@ -116,6 +117,7 @@ export default async function BlogPage() {
                               src={imgUrl}
                               alt={featuredPost.title}
                               priority
+                              showShimmer={true}
                               className="w-full h-full object-cover"
                             />
                           );
