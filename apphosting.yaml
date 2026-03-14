@@ -24,3 +24,12 @@ environmentVariables:
 
   - variable: REVALIDATE_SECRET
     secret: REVALIDATE_SECRET
+
+  - variable: NEXT_PUBLIC_SERVER_URL
+    value: "https://noe-shiftica.com"
+
+  - variable: GCS_BUCKET
+    value: "noe-shiftica.firebasestorage.app"
+
+  - variable: GCS_PROJECT_ID
+    value: "noe-shiftica"
