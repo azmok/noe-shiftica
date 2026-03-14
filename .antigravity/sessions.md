@@ -29,8 +29,9 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 
 ### [2026-03-15 00:32] Session Summary
 - **Autonomous UX & Efficiency Mandate**: 
-    - The user has authorized the agent to proactively implement UX and efficiency improvements (e.g., caching strategies, navigation fixes, performance optimizations) without waiting for explicit confirmation for every detail.
+    - The user has authorized the agent to proactively implement UX and efficiency improvements (e.g., caching strategies, navigation fixes, performance optimizations).
     - **Logic-Only Scope**: This mandate applies strictly to back-end logic, API handling, and non-visual client-side logic.
-    - **STRICT UI/Styling Restriction**: I am FORBIDDEN from modifying UI design, styling (Tailwind, CSS), or layouts without explicit instructions, even if the intent is to improve UX.
-    - This applies to any change that clearly serves to increase site reliability, speed, or user experience consistency.
-- **Plan Impact**: I will be proactive in technical optimizations but remain strictly hands-off on design/styling unless explicitly directed.
+    - **STRICT UI/Styling Restriction**: I am FORBIDDEN from modifying UI design, styling (Tailwind, CSS), or layouts without explicit instructions.
+- **Core UX Philosophy**: Azuma places the highest priority on "Instant Load" experiences. "The fastest technology" means 0.1s-0.2s targets. Any lag over 3s is considered a failure.
+- **Communication Nuance**: Azuma might occasionally type "クライアント" (Client) when referring to "クラやん" (Kurayan). This should be interpreted as the latter in the "Oje & Kurayan" partner context.
+- **Plan Impact**: Technical efficiency is the key. I will always prioritize speed and seamless SPA navigation in all future implementations.
