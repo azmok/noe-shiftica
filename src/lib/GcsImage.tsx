@@ -85,20 +85,25 @@ export function GcsImage({
     // and attaches the onLoad handler. In that case, onLoad never fires and the
     // image stays invisible (opacity: 0 when showShimmer=true).
     // Checking img.complete on mount catches this case.
+    // 1. Initial check (Mount/Hydration)
     React.useEffect(() => {
-        const isComplete = imgRef.current?.complete;
-        const naturalWidth = imgRef.current?.naturalWidth;
-        if (isComplete && naturalWidth && naturalWidth > 0) {
-            setIsLoaded(true);
-        }
+        const checkImage = () => {
+            if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
+                setIsLoaded(true);
+            }
+        };
+        checkImage();
+        // Also check after a tiny delay for cases where 'complete' updates slightly after mount
+        const timer = setTimeout(checkImage, 10);
+        return () => clearTimeout(timer);
     }, [src]);
 
-    // When browser restores the page from bfcache (back/forward navigation),
-    // React state resets to false. This listener catches the persisted restore
-    // and immediately marks the image as loaded so it doesn't flash invisible.
+    // 2. BFCache check (Back-Forward navigation)
     React.useEffect(() => {
         const handlePageShow = (event: PageTransitionEvent) => {
-            if (event.persisted) setIsLoaded(true);
+            if (event.persisted) {
+                setIsLoaded(true);
+            }
         };
         window.addEventListener('pageshow', handlePageShow);
         return () => window.removeEventListener('pageshow', handlePageShow);

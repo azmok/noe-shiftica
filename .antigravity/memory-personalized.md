@@ -9,7 +9,7 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**: Future UI components should prioritize Tailwind CSS classes over `styled-jsx` to avoid "oversized icon" issues in production. Always add explicit `w-* h-*` classes to SVGs regardless of `width`/`height` attributes.
 
 ### [2026-03-14 17:42] Session Summary
-- **Learned/Decided**: The user (Azuma) has set a strict "Hands-Off" rule for `src/app/(frontend)/components/Footer.tsx`. 
+- **Learned/Decided**: The user (Azuma) has set a strict "Hands-Hands-Off" rule for `src/app/(frontend)/components/Footer.tsx`. 
 - **Preferences**: This file must NEVER be modified unless an explicit instruction for it is given. It is a protected component for now.
 - **Plan Impact**: Even if the footer looks broken or inconsistent during other UI tasks, skip it entirely.
 
@@ -17,3 +17,8 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: Adjusted the site-wide base font size to 16px (from 18px). Recalculated blog typography to maintain the Airbnb Newsroom targets on the new base: H1 (46px / 2.875rem), H2 (32px / 2rem), H3/Body (18px / 1.125rem).
 - **Preferences**: Azuma prefers keeping specific absolute pixel targets for readability/aesthetics even when the root font size changes.
 - **Plan Impact**: Assume a 16px base for all future typography work and use verified rem ratios to hit Airbnb-style targets.
+
+### [2026-03-14 23:59] Session Summary
+- **Learned/Decided**: Resolved a critical production image loading failure caused by missing env vars, GCS rules, and loopback deadlocks. Detailed log is in `bug-history.md`.
+- **Preferences**: When pushing to Git, always report the status in green text at the end of the response using the phrase "Gitプッシュしたで".
+- **Plan Impact**: Follow the green-text reporting rule for all future git actions.
