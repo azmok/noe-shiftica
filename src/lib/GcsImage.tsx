@@ -156,7 +156,7 @@ export function GcsImage({
                 objectPosition: 'center',
                 opacity: isLoaded ? 1 : (showShimmer ? 0 : 1),
             }}
-            className={`transition-all duration-700 ease-in-out ${className}`}
+            className={`transition-all duration-200 ease-in-out ${className}`}
         />
     );
 
