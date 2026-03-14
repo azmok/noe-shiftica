@@ -113,7 +113,7 @@ If a modification to Neon DB or Firebase Cloud Storage logic is identified as ne
 4. Wait for explicit "approved" confirmation before touching a single line.
 
 ## 8. Auto-Commit Protocol
-1. `git add .` → 2. `git diff --cached` → 3. Summarize in Japanese → 4. `git commit -m "[summary with Claude Code] <Japanese summary>"` → 5. Report to user.
+1. `git add .` → 2. `git diff --cached` → 3. Summarize in Japanese → 4. `git commit -m "[summary with Claude Code] <Japanese summary>"` → 5. `git push` and report summary and git push action with green colored text to the user.
 
 ## 9. Reusable Prompt Templates
 - Always check `.claude/notouch.md` for standard scope-lock templates before starting any UI task.
