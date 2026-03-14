@@ -2,7 +2,6 @@
 [ここにやりたいことを書く]
 
 ## SURGICAL SCOPE (ABSOLUTE)
-- Modify ONLY: `src/components/Foo.tsx` > `handleClick` function
 - Touch NOTHING else. Not even imports. Not even comments.
 
 ## FORBIDDEN ACTIONS

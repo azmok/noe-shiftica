@@ -15,7 +15,7 @@ export const PostArticle: React.FC<{
     const readingTime = (post as any).readingTime || calculateReadingTime(post.content);
 
     return (
-        <main className="[&_a]:text-sky-500 [&_a]:font-bold [&_a]:underline post-main grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
+        <main className="post-main grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
                     <p className="font-bold">Preview Mode</p>

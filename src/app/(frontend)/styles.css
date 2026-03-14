@@ -97,7 +97,7 @@
 }
 
 html {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 32px;
   background: var(--background);
   -webkit-font-smoothing: antialiased;
@@ -152,7 +152,7 @@ h6 {
 /* --- Blog Post Premium Styling (Airbnb Inspired) --- */
 .post-main {
   --blog-content-width: 872px;
-  --blog-font-size-base: 1rem; /* 18px exactly on 18px base */
+  --blog-font-size-base: 1.125rem; /* 18px exactly on 16px base */
   --blog-line-height-base: 1.55;
   --blog-text-color: #2c3e50;
   --blog-heading-color: #222222;
@@ -166,7 +166,7 @@ h6 {
 
 .post-title {
   font-family: var(--font-sans);
-  font-size: 2.55rem !important; /* 46px precisely (46/18) */
+  font-size: 2.875rem !important; /* 46px precisely (46/16) */
   line-height: 1.13 !important; /* 52px */
   font-weight: 500 !important;
   color: var(--blog-heading-color);
@@ -206,7 +206,7 @@ h6 {
 }
 
 .post-main .prose h2 {
-  font-size: 1.77rem; /* 32px precisely (32/18) */
+  font-size: 2rem; /* 32px precisely (32/16) */
   line-height: 1.125; /* 36px */
   font-weight: 500;
   margin-top: 3.5rem;
@@ -216,7 +216,7 @@ h6 {
 }
 
 .post-main .prose h3 {
-  font-size: 1rem; /* 18px precisely (18/18) */
+  font-size: 1.125rem; /* 18px precisely (18/16) */
   line-height: 1.22; /* 22px */
   font-weight: 500;
   margin-top: 2.5rem;
