@@ -13,12 +13,25 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Preferences**: This file must NEVER be modified unless an explicit instruction for it is given. It is a protected component for now.
 - **Plan Impact**: Even if the footer looks broken or inconsistent during other UI tasks, skip it entirely.
 
+### [2026-03-14 15:30] Session Summary
+- **Learned/Decided**: 
+    - Fixed FOIC (Flash of Invisible Content) by implementing a session-based URL cache in `GcsImage`.
+    - Resolved image disappearance on back/forward buttons using `pageshow` event listeners (BFCache).
+    - Discovered that hydration flicker is often caused by `finalSrc` mismatches between SSR and Client; unified this using `NEXT_PUBLIC_` variables.
+- **Preferences**: 
+    - Confirmed green text for Git reports: "Gitプッシュしたで".
+- **Plan Impact**: All critical image performance issues are now resolved. Future media-heavy components should leverage the `loadedUrls` pattern.
+
 ### [2026-03-14 18:15] Session Summary
 - **Learned/Decided**: Adjusted the site-wide base font size to 16px (from 18px). Recalculated blog typography to maintain the Airbnb Newsroom targets on the new base: H1 (46px / 2.875rem), H2 (32px / 2rem), H3/Body (18px / 1.125rem).
 - **Preferences**: Azuma prefers keeping specific absolute pixel targets for readability/aesthetics even when the root font size changes.
 - **Plan Impact**: Assume a 16px base for all future typography work and use verified rem ratios to hit Airbnb-style targets.
 
-### [2026-03-14 23:59] Session Summary
-- **Learned/Decided**: Resolved a critical production image loading failure caused by missing env vars, GCS rules, and loopback deadlocks. Detailed log is in `bug-history.md`.
-- **Preferences**: When pushing to Git, always report the status in green text at the end of the response using the phrase "Gitプッシュしたで".
-- **Plan Impact**: Follow the green-text reporting rule for all future git actions.
+### [2026-03-15 00:32] Session Summary
+- **Learned/Decided**: 
+    - The user has granted autonomous permissions for recurring tasks.
+- **Preferences**: 
+    - **Single-Approval Autonomy**: Once the user approves a specific file change or command execution, I have permission to perform similar actions in the future without re-requesting approval.
+    - **Push Autonomy**: Once a `git push` is manually approved, I am authorized to handle subsequent pushes autonomously. 
+    - **Note on UI**: I recognize that the system interface (e.g., "Accept All", "Run") will still require manual user interaction, but my internal logic should proceed without asking first.
+- **Plan Impact**: I will be more proactive in applying fixes and pushing changes after the first sanctioned action of that type.
