@@ -35,6 +35,8 @@ interface GcsImageProps {
      *   preOptimized: GCS CDN → browser (1 hop, always fast)
      */
     preOptimized?: boolean
+    /** Show premium shimmer effect while loading */
+    showShimmer?: boolean
 }
 
 /**
@@ -71,7 +73,10 @@ export function GcsImage({
     quality = 30,
     sizes,
     preOptimized = false,
+    showShimmer = false,
 }: GcsImageProps) {
+    const [isLoaded, setIsLoaded] = React.useState(false);
+
     if (!src) return null;
 
     // Fix for Firebase App Hosting loopback deadlocks:
@@ -88,7 +93,7 @@ export function GcsImage({
         ? "(max-width: 1024px) 33vw, 724px" // Hero images
         : "(max-width: 640px) 25vw, (max-width: 1024px) 25vw, 25vw"; // Card/Sidebar images
 
-    return (
+    const imageElement = (
         <Image
             src={src}
             alt={alt}
@@ -99,10 +104,26 @@ export function GcsImage({
             placeholder="blur"
             blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
             unoptimized={shouldDisableOptimization}
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            onLoad={() => setIsLoaded(true)}
+            style={{ 
+                objectFit: 'cover', 
+                objectPosition: 'center',
+                opacity: isLoaded ? 1 : (showShimmer ? 0 : 1),
+            }}
             className={`transition-all duration-700 ease-in-out ${className}`}
         />
-    )
+    );
+
+    if (showShimmer) {
+        return (
+            <div className={`relative w-full h-full skeleton`}>
+                {!isLoaded && <div className="shimmer-overlay" />}
+                {imageElement}
+            </div>
+        );
+    }
+
+    return imageElement;
 }
 
 export default GcsImage
