@@ -12,3 +12,8 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: The user (Azuma) has set a strict "Hands-Off" rule for `src/app/(frontend)/components/Footer.tsx`. 
 - **Preferences**: This file must NEVER be modified unless an explicit instruction for it is given. It is a protected component for now.
 - **Plan Impact**: Even if the footer looks broken or inconsistent during other UI tasks, skip it entirely.
+
+### [2026-03-14 18:15] Session Summary
+- **Learned/Decided**: Adjusted the site-wide base font size to 16px (from 18px). Recalculated blog typography to maintain the Airbnb Newsroom targets on the new base: H1 (46px / 2.875rem), H2 (32px / 2rem), H3/Body (18px / 1.125rem).
+- **Preferences**: Azuma prefers keeping specific absolute pixel targets for readability/aesthetics even when the root font size changes.
+- **Plan Impact**: Assume a 16px base for all future typography work and use verified rem ratios to hit Airbnb-style targets.
