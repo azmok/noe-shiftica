@@ -286,6 +286,109 @@ h6 {
   color: #0f172a;
 }
 
+/* --- Ordered List --- */
+.post-main .prose ol {
+  list-style-type: decimal;
+  list-style-position: outside;
+  padding-left: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.post-main .prose ol li {
+  margin-bottom: 0.75rem;
+  line-height: var(--blog-line-height-base);
+  padding-left: 0.25rem;
+}
+
+.post-main .prose ol li::marker {
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+/* Nested lists */
+.post-main .prose ul ul,
+.post-main .prose ol ol,
+.post-main .prose ul ol,
+.post-main .prose ol ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Blockquote --- */
+.post-main .prose blockquote {
+  border-left: 3px solid var(--color-secondary);
+  margin: 2.5rem 0;
+  padding: 1rem 1.5rem;
+  background: rgba(107, 45, 160, 0.04);
+  border-radius: 0 10px 10px 0;
+  color: #475569;
+  font-style: italic;
+}
+
+.post-main .prose blockquote p {
+  margin-bottom: 0;
+}
+
+/* --- Inline Code --- */
+.post-main .prose code:not(pre code) {
+  background: #f1f5f9;
+  color: var(--color-secondary);
+  padding: 0.15em 0.45em;
+  border-radius: 5px;
+  font-size: 0.875em;
+  font-family: var(--font-mono);
+  border: 1px solid #e2e8f0;
+}
+
+/* --- Code Block --- */
+.post-main .prose pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1.5rem;
+  border-radius: 14px;
+  overflow-x: auto;
+  margin: 2rem 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  font-family: var(--font-mono);
+}
+
+.post-main .prose pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+  border: none;
+}
+
+/* --- Horizontal Rule --- */
+.post-main .prose hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 3.5rem 0;
+}
+
+/* --- Strong & Em --- */
+.post-main .prose strong {
+  font-weight: 600;
+  color: var(--blog-heading-color);
+}
+
+.post-main .prose em {
+  font-style: italic;
+  color: #475569;
+}
+
+/* --- Figcaption --- */
+.post-main .prose figcaption {
+  text-align: center;
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+  letter-spacing: 0.02em;
+}
+
 /* === Mobile Typography Override for Blog Posts (Airbnb Inspired) === */
 @media (max-width: 768px) {
   .post-content-body {
@@ -309,6 +412,35 @@ h6 {
     padding-left: 30px !important;
     margin-top: 32px !important;
     margin-bottom: 32px !important;
+  }
+
+  .post-content-body ol {
+    list-style-type: decimal !important;
+    padding-left: 30px !important;
+    margin-top: 32px !important;
+    margin-bottom: 32px !important;
+  }
+
+  .post-content-body blockquote {
+    border-left: 3px solid var(--color-secondary) !important;
+    padding: 0.75rem 1.25rem !important;
+    margin: 2rem 0 !important;
+    background: rgba(107, 45, 160, 0.04) !important;
+    border-radius: 0 8px 8px 0 !important;
+    font-style: italic !important;
+    color: #444 !important;
+  }
+
+  .post-content-body pre {
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    padding: 1rem !important;
+    overflow-x: auto !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .post-content-body hr {
+    margin: 2.5rem 0 !important;
   }
 
   .post-content-body li {
@@ -633,4 +765,4 @@ footer{
   background-size: 100% 100%;
   animation: shimmer 2.5s infinite linear;
   z-index: 1;
-}
+}

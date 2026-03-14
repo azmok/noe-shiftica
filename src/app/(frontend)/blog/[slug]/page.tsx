@@ -20,50 +20,57 @@ export async function generateMetadata({
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const { slug } = await params;
-    const payload = await getPayload({ config: configPromise });
+    try {
+        const payload = await getPayload({ config: configPromise });
 
-    const posts = await payload.find({
-        collection: "posts",
-        where: {
-            slug: {
-                equals: decodeURIComponent(slug),
+        const posts = await payload.find({
+            collection: "posts",
+            where: {
+                slug: {
+                    equals: decodeURIComponent(slug),
+                },
             },
-        },
-        depth: 1,
-        limit: 1,
-    });
+            depth: 1,
+            limit: 1,
+        });
 
-    if (!posts.docs || posts.docs.length === 0) {
-        return {};
+        if (!posts.docs || posts.docs.length === 0) {
+            return {};
+        }
+
+        const post = posts.docs[0];
+        const cmd = (post.customMetaData as Record<string, any>) || {};
+
+        // Prioritize customMetaData for SEO fields
+        const title = cmd.seo_title || cmd.title || post.title;
+        const description = cmd.seo_description || cmd.description || "";
+
+        // OpenGraph images fallback logic
+        const ogImage = cmd.og_image || (post.coverImage && typeof post.coverImage === 'object' ? (post.coverImage as any).url : '');
+
+        return {
+            title: title,
+            description: description,
+            openGraph: {
+                title: cmd.og_title || title,
+                description: cmd.og_description || description,
+                type: 'article',
+                publishedTime: post.publishedAt || undefined,
+                ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title: cmd.twitter_title || cmd.og_title || title,
+                description: cmd.twitter_description || cmd.og_description || description,
+                ...(ogImage ? { images: [ogImage] } : {}),
+            },
+        };
+    } catch (error) {
+        console.error(`Metadata generation failed for slug: ${slug}`, error);
+        return {
+            title: "Noe Shiftica Journal",
+        };
     }
-
-    const post = posts.docs[0];
-    const cmd = (post.customMetaData as Record<string, any>) || {};
-
-    // Prioritize customMetaData for SEO fields
-    const title = cmd.seo_title || cmd.title || post.title;
-    const description = cmd.seo_description || cmd.description || "";
-
-    // OpenGraph images fallback logic
-    const ogImage = cmd.og_image || (post.coverImage && typeof post.coverImage === 'object' ? (post.coverImage as any).url : '');
-
-    return {
-        title: title,
-        description: description,
-        openGraph: {
-            title: cmd.og_title || title,
-            description: cmd.og_description || description,
-            type: 'article',
-            publishedTime: post.publishedAt || undefined,
-            ...(ogImage ? { images: [{ url: ogImage }] } : {}),
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: cmd.twitter_title || cmd.og_title || title,
-            description: cmd.twitter_description || cmd.og_description || description,
-            ...(ogImage ? { images: [ogImage] } : {}),
-        },
-    };
 }
 
 // 事前ビルド（SSG）するslugのリストを返す関数

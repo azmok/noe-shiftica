@@ -33,3 +33,6 @@ environmentVariables:
 
   - variable: GCS_PROJECT_ID
     value: "noe-shiftica"
+
+  - variable: GCS_BUCKET
+    value: "noe-shiftica.firebasestorage.app"
