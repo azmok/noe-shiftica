@@ -28,10 +28,9 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**: Assume a 16px base for all future typography work and use verified rem ratios to hit Airbnb-style targets.
 
 ### [2026-03-15 00:32] Session Summary
-- **Learned/Decided**: 
-    - The user has granted autonomous permissions for recurring tasks.
-- **Preferences**: 
-    - **Single-Approval Autonomy**: Once the user approves a specific file change or command execution, I have permission to perform similar actions in the future without re-requesting approval.
-    - **Push Autonomy**: Once a `git push` is manually approved, I am authorized to handle subsequent pushes autonomously. 
-    - **Note on UI**: I recognize that the system interface (e.g., "Accept All", "Run") will still require manual user interaction, but my internal logic should proceed without asking first.
-- **Plan Impact**: I will be more proactive in applying fixes and pushing changes after the first sanctioned action of that type.
+- **Autonomous UX & Efficiency Mandate**: 
+    - The user has authorized the agent to proactively implement UX and efficiency improvements (e.g., caching strategies, navigation fixes, performance optimizations) without waiting for explicit confirmation for every detail.
+    - **Logic-Only Scope**: This mandate applies strictly to back-end logic, API handling, and non-visual client-side logic.
+    - **STRICT UI/Styling Restriction**: I am FORBIDDEN from modifying UI design, styling (Tailwind, CSS), or layouts without explicit instructions, even if the intent is to improve UX.
+    - This applies to any change that clearly serves to increase site reliability, speed, or user experience consistency.
+- **Plan Impact**: I will be proactive in technical optimizations but remain strictly hands-off on design/styling unless explicitly directed.
