@@ -12,6 +12,8 @@ export const PostArticle: React.FC<{
     prevPost?: Post | null
     nextPost?: Post | null
 }> = ({ post, isPreview, prevPost, nextPost }) => {
+    // console.log(`[DEBUG] Rendering PostArticle for ${post.slug}...`);
+    
     const readingTime = (post as any).readingTime || calculateReadingTime(post.content);
 
     return (
@@ -30,19 +32,23 @@ export const PostArticle: React.FC<{
                     {/* Immersive Hero */}
                     <div className="relative w-full aspect-square sm:aspect-video rounded-b-[40px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
                         {(() => {
-                            const img = (post.heroImage || post.coverImage);
-                            if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                const finalUrl = img.sizes?.large?.url || img.url;
-                                return (
-                                    <GcsImage
-                                        src={finalUrl}
-                                        alt={post.title}
-                                        priority
-                                        preOptimized={!!img.sizes?.large}
-                                        showShimmer={true}
-                                        className="w-full h-full object-cover"
-                                    />
-                                );
+                            try {
+                                const img = (post.heroImage || post.coverImage);
+                                if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                    const finalUrl = img.sizes?.large?.url || img.url;
+                                    return (
+                                        <GcsImage
+                                            src={finalUrl}
+                                            alt={post.title}
+                                            priority
+                                            preOptimized={!!img.sizes?.large}
+                                            showShimmer={true}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    );
+                                }
+                            } catch (e) {
+                                console.error(`[DEBUG ERROR] HeroImage render failed for ${post.slug}:`, e);
                             }
                             return <BlogFallbackHero />;
                         })()}
@@ -51,12 +57,10 @@ export const PostArticle: React.FC<{
                         <div className="absolute top-16 left-6 right-6">
                             <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2 px-1">
                                 <span className="bg-(--color-neu-primary) text-black px-2 py-0.5 rounded-sm">Journal</span>
-                                {/* <span>•</span> */}
                                 {readingTime > 0 && (
                                     <>
                                         <span className="text-slate-200">|</span>
                                         <span className="text-slate-200 text-[0.75rem] font-extralight font-(--font-serif) tracking-[-1px] flex items-center gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z" /></svg>
                                             読了目安: {readingTime}分
                                         </span>
                                     </>
@@ -105,11 +109,19 @@ export const PostArticle: React.FC<{
                             prose-img:rounded-(--mobile-radius-sm)
                             prose-img:shadow-lg
                         ">
-                            {post.content && typeof post.content === 'object' && 'root' in post.content ? (
-                                <RichText data={post.content as any} />
-                            ) : (
-                                <div dangerouslySetInnerHTML={{ __html: post.content as any }} />
-                            )}
+                            {(() => {
+                                try {
+                                    if (post.content && typeof post.content === 'object' && 'root' in post.content) {
+                                        return <RichText data={post.content as any} />;
+                                    } else if (post.content) {
+                                        return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
+                                    }
+                                } catch (e) {
+                                    // Soft failure for content rendering
+                                    return <div className="p-4 bg-red-50 text-red-500 rounded">Content failed to load.</div>;
+                                }
+                                return null;
+                            })()}
                         </div>
 
                         {/* Mobile Tags */}
@@ -197,22 +209,26 @@ export const PostArticle: React.FC<{
                         <div className="w-full aspect-video rounded-2xl overflow-hidden mb-12 shadow-inner p-2 bg-slate-100">
                             <div className="w-full h-full rounded-xl overflow-hidden relative group">
                                 {(() => {
-                                    const img = (post.heroImage || post.coverImage);
-                                    if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                        const finalUrl = img.sizes?.large?.url || img.url;
-                                        return (
-                                            <>
-                                                <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
-                                                <GcsImage
-                                                    src={finalUrl}
-                                                    alt={post.title}
-                                                    priority
-                                                    preOptimized={!!img.sizes?.large}
-                                                    showShimmer={true}
-                                                    className="group-hover:scale-105"
-                                                />
-                                            </>
-                                        );
+                                    try {
+                                        const img = (post.heroImage || post.coverImage);
+                                        if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                            const finalUrl = img.sizes?.large?.url || img.url;
+                                            return (
+                                                <>
+                                                    <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
+                                                    <GcsImage
+                                                        src={finalUrl}
+                                                        alt={post.title}
+                                                        priority
+                                                        preOptimized={!!img.sizes?.large}
+                                                        showShimmer={true}
+                                                        className="group-hover:scale-105"
+                                                    />
+                                                </>
+                                            );
+                                        }
+                                    } catch (e) {
+                                        console.error(`[DEBUG ERROR] Desktop Hero render failed for ${post.slug}:`, e);
                                     }
                                     return <BlogFallbackHero />;
                                 })()}
@@ -238,11 +254,18 @@ export const PostArticle: React.FC<{
                             prose-a:transition-all
                             hover:prose-a:text-(--color-neu-primary)/80
                         ">
-                            {post.content && typeof post.content === 'object' && 'root' in post.content ? (
-                                <RichText data={post.content as any} />
-                            ) : (
-                                <div dangerouslySetInnerHTML={{ __html: post.content as any }} />
-                            )}
+                        {(() => {
+                            try {
+                                if (post.content && typeof post.content === 'object' && 'root' in post.content) {
+                                    return <RichText data={post.content as any} />;
+                                } else if (post.content) {
+                                    return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
+                                }
+                            } catch (e) {
+                                // console.error(`[DEBUG ERROR] Desktop RichText render failed for ${post.slug}:`, e);
+                            }
+                            return null;
+                        })()}
                         </div>
 
                         {/* Tags */}
