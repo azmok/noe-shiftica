@@ -86,7 +86,11 @@ export function GcsImage({
     // image stays invisible (opacity: 0 when showShimmer=true).
     // Checking img.complete on mount catches this case.
     React.useEffect(() => {
-        if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+        const isComplete = imgRef.current?.complete;
+        const naturalWidth = imgRef.current?.naturalWidth;
+        console.log(`[GcsImage] Mount check: ${src}`, { isComplete, naturalWidth });
+        if (isComplete && naturalWidth && naturalWidth > 0) {
+            console.log(`[GcsImage] Already loaded on mount: ${src}`);
             setIsLoaded(true);
         }
     }, [src]);
@@ -130,7 +134,13 @@ export function GcsImage({
             placeholder="blur"
             blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
             unoptimized={shouldDisableOptimization}
-            onLoad={() => setIsLoaded(true)}
+            onLoad={() => {
+                console.log(`[GcsImage] onLoad success: ${src}`);
+                setIsLoaded(true);
+            }}
+            onError={(e) => {
+                console.error(`[GcsImage] onLoad ERROR: ${src}`, e);
+            }}
             style={{ 
                 objectFit: 'cover', 
                 objectPosition: 'center',
