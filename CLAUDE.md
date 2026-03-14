@@ -45,14 +45,14 @@
 ## 6. Session Context Protocol
 
 ### A. Context Retrieval (Start of Session)
-- **Action**: Before any task, read `.claude/memory.md` if it exists.
+- **Action**: Before any task, read `.antigravity/memory-personalized.md` if it exists.
 - **Integration**: If relevant context exists (past fixes, preferences, logic patterns), explicitly reflect it in the current task's `plan.md`.
 
 ### B. Pre-task Snapshot (Interruptions)
-- **Action**: If interrupted or a new urgent task is injected, summarize the current state and learnings into `.claude/memory.md` before switching context.
+- **Action**: If interrupted or a new urgent task is injected, summarize the current state and learnings into `.antigravity/memory-personalized.md` before switching context.
 
 ### C. Memory Archiving (End of Session)
-- **Action**: Upon task completion or session end, extract unique learnings and append them to `.claude/memory.md` in the following format:
+- **Action**: Upon task completion or session end, extract unique learnings and append them to `.antigravity/memory-personalized.md` in the following format:
   > ### [YYYY-MM-DD HH:mm] Session Summary
   > - **Learned/Decided**: (Technical insights or decisions)
   > - **Preferences**: (User-specific constraints or coding style)
