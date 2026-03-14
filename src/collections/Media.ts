@@ -25,8 +25,9 @@ export const Media: CollectionConfig = {
 
         if (doc.sizes) {
           Object.keys(doc.sizes).forEach((size) => {
-            if (doc.sizes[size].filename) {
-              doc.sizes[size].url = getDirectUrl(doc.sizes[size].filename)
+            const sizeData = doc.sizes[size]
+            if (sizeData && typeof sizeData === 'object' && sizeData.filename) {
+              sizeData.url = getDirectUrl(sizeData.filename)
             }
           })
         }
