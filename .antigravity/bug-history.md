@@ -26,20 +26,10 @@
   - **Performance**: Never proxy binary data (images/videos) through a serverless function in production; use direct CDN/Storage URLs.
   - **Safe Env Checks**: Always use a safe wrapper like `(typeof process !== 'undefined' ? process.env : {})` for client-side environment variable access.
   - **CORS**: Remember to set GCS CORS when moving to direct-from-browser serving.
-### [2026-03-14 15:15] Bug: FOIC (Flash of Invisible Content) & BFCache Image Disappearance
-- **Error**: Images flicker (become invisible via opacity: 0) during hydration or disappear when navigating back/forward.
-- **Root Cause**: 
-    1. Server/Client `finalSrc` mismatch: `process.env` checks differed between environments, causing URL changes during hydration.
-    2. React State Loss: `isLoaded` reset to `false` during navigation even if the browser already had the image in cache.
-- **File(s) Modified**: `src/lib/GcsImage.tsx`, `.env.local`
-- **Fix Summary**: 
-    - Forced consistent `finalSrc` calculation using `NEXT_PUBLIC_GCS_BUCKET`.
-    - Implemented a session-level `loadedUrls` cache (`Set<string>`) to initialize `isLoaded` state.
-    - Added `pageshow` listener to handle BFCache restoration.
-- **Prevention Note**: Always ensure `finalSrc` is identical between SSR and Client. Use global session sets to track "already loaded" assets in SPA navigation.
-### [2026-03-15 00:08] Bug: Images invisible on back/forward navigation or hydration
-- **Error**: Images occasionally stay blank (opacity: 0) when using browser back/forward buttons or on initial page load (shimmmer visible or just empty).
-- **Root Cause**: React state (`isLoaded`) resets to `false` on navigation/hydration, but the `onLoad` event may not fire if the browser already has the image in cache and it's marked as 'complete'.
-- **File(s) Modified**: `src/lib/GcsImage.tsx`
-- **Fix Summary**: Added `img.complete` check inside `useEffect` with a small timer fallback to catch already-loaded images during hydration. Also added a `pageshow` listener to handle BFCache restoration specifically.
-- **Prevention Note**: Always check for `.complete` status on client-side components that hide elements until loaded, as `onLoad` is not guaranteed for cached resources.
+### [2026-03-15 01:00] Summary: Image Performance & Navigation Fixes
+- **Issues Resolved**:
+    1. **Direct CDN Access**: Bypassed proxies to target 0.1s loading from GCS.
+    2. **FOIC (Flash of Invisible Content)**: Fixed flickering during hydration by ensuring SSR/Client source consistency and using a session-level URL cache.
+    3. **BFCache Restoration**: Fixed images disappearing on "Back/Forward" buttons using `pageshow` listeners and `.complete` status checks.
+- **Root Causes**: Source URL mismatches, React state reset on navigation, and `onLoad` not firing for cached assets.
+- **Protocol**: Always check `img.complete` on mount and use `loadedUrls` Set for instant display in SPAs.
