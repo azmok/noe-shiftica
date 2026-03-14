@@ -15,7 +15,7 @@ export const PostArticle: React.FC<{
     const readingTime = (post as any).readingTime || calculateReadingTime(post.content);
 
     return (
-        <main className="grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
+        <main className="[&_a]:text-sky-500 [&_a]:font-bold [&_a]:underline post-main grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
                     <p className="font-bold">Preview Mode</p>
@@ -167,20 +167,18 @@ export const PostArticle: React.FC<{
                         {/* Title Section */}
                         <div className="mb-10">
                             <div className="flex items-center gap-4 mb-8">
-                                <span className="bg-(--color-neu-primary)/10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-(--color-neu-primary)">
+                                <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-(--color-neu-primary) bg-(--color-neu-primary)/5 px-3 py-1 rounded-sm">
                                     Journal
                                 </span>
                                 {post.publishedAt && (
                                     <div className="flex items-center gap-3">
-                                        <span className="text-slate-400 text-sm font-medium flex items-center gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                        <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
                                             {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
                                         </span>
                                         {readingTime > 0 && (
                                             <>
                                                 <span className="text-slate-200">|</span>
-                                                <span className="text-slate-400 text-sm font-medium flex items-center gap-1.5">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z" /></svg>
+                                                <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
                                                     読了目安: {readingTime}分
                                                 </span>
                                             </>
@@ -256,7 +254,7 @@ export const PostArticle: React.FC<{
                                         <Link
                                             key={index}
                                             href={`/blog/tag/${tag}`}
-                                            className="px-4 py-2 rounded-xl bg-(--color-neu-bg-light) neu-flat text-sm font-bold text-slate-400 hover:text-(--color-neu-primary) hover:scale-105 transition-all"
+                                            className="px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[13px] font-medium text-slate-500 hover:text-(--color-neu-primary) hover:border-(--color-neu-primary)/30 transition-all"
                                         >
                                             #{tag}
                                         </Link>
