@@ -68,7 +68,7 @@ export function GcsImage({
     alt,
     priority = false,
     className = '',
-    quality = 80,
+    quality = 30,
     sizes,
     preOptimized = false,
 }: GcsImageProps) {
