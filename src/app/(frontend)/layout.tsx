@@ -31,6 +31,7 @@ const shipporiMincho = Shippori_Mincho({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://noeshiftica.com"),
   title: {
     template: "%s | Noe Shiftica",
     default: "Noe Shiftica | Design the Shift.",
