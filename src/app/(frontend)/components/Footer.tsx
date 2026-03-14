@@ -20,8 +20,8 @@ export function Footer({ variant = "landing" }: FooterProps) {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 px-4">
           <div className="lg:col-span-4 space-y-0">
-            <Link href="/" className="inline-block text-xs rounded-full px-0 py-[3px]">
-              <span className="text-[2rem] font-bold tracking-tighter opacity-90">Noe Shiftica</span>
+            <Link href="/" className="inline-block text-xs rounded-full px-5 pt-[10px] pb-[15px] leading-none text-[2rem] font-bold tracking-tighter align-middle opacity-90">
+              Noe Shiftica
             </Link>
             <div
               className={`text-[8px] max-w-xs font-light ${isBlog ? "text-slate-500" : "text-white/40"
@@ -50,7 +50,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-0 py-[11px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -77,7 +77,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] transition-colors font-light rounded-full px-0 py-[11px] ${isBlog
+                    className={`text-[12px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
