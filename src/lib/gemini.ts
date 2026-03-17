@@ -21,8 +21,10 @@ export interface EnrichedContent {
 
 export async function enrichPostContent(title: string, content: string): Promise<EnrichedContent> {
     console.log(`[AI-ENRICH] Starting enrichment for: "${title}"`)
-    // Switching to 2.5 as 2.0 returned "no longer available to new users" 404
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+    // gemini-2.5-flash is the available stable model for this API key
+    const modelName = 'gemini-2.5-flash'
+    console.log(`[AI-ENRICH] Using model: ${modelName}`)
+    const model = genAI.getGenerativeModel({ model: modelName })
 
     const prompt = `
     You are an expert SEO and content strategist. 
