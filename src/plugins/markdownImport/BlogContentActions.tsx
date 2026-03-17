@@ -275,7 +275,13 @@ export const BlogContentActions: React.FC = () => {
                 body: JSON.stringify({ title, content }),
             })
 
-            if (!response.ok) throw new Error('AI Enrichment failed')
+            console.log('[BLOG-ACTIONS] Calling /api/ai-enrich-post...')
+            if (!response.ok) {
+                const errText = await response.text().catch(() => '(unreadable)')
+                console.error('[BLOG-ACTIONS] AI Enrichment HTTP error:', response.status, response.statusText)
+                console.error('[BLOG-ACTIONS] Error body:', errText)
+                throw new Error(`AI Enrichment failed: ${response.status} ${response.statusText} — ${errText}`)
+            }
 
             const aiResult = await response.json()
             console.log('[BLOG-ACTIONS] AI Result received:', aiResult)

@@ -81,10 +81,27 @@ export const markdownImportPlugin = (): Plugin => {
                 method: 'post',
                 handler: async (req) => {
                     try {
-                        const { title, content } = await (req as unknown as Request).json()
+                        // Use .text() + JSON.parse to avoid issues with Payload req consuming the body stream
+                        // (same pattern as /convert-markdown which is confirmed working)
+                        console.log('[AI-ENRICH] Parsing request body...')
+                        const rawBody = await (req as unknown as Request).text()
+                        console.log('[AI-ENRICH] Raw body length:', rawBody.length)
+
+                        let title: string, content: any
+                        try {
+                            const parsed = JSON.parse(rawBody)
+                            title = parsed.title
+                            content = parsed.content
+                        } catch (parseErr) {
+                            console.error('[AI-ENRICH] Failed to parse request body as JSON:', rawBody.substring(0, 200))
+                            return Response.json({ error: 'Invalid JSON body', details: String(parseErr) }, { status: 400 })
+                        }
+
                         console.group('[AI-ENRICH] Request for:', title)
+                        console.log('[AI-ENRICH] GEMINI_API_KEY present:', !!process.env.GEMINI_API_KEY, '| Length:', process.env.GEMINI_API_KEY?.length)
 
                         // Call Gemini API
+                        console.log('[AI-ENRICH] Calling enrichPostContent...')
                         const result = await enrichPostContent(title, JSON.stringify(content))
 
                         // Resolve Categories (Convert names to IDs, creating if necessary)
@@ -122,8 +139,10 @@ export const markdownImportPlugin = (): Plugin => {
 
                         return Response.json(result)
                     } catch (error) {
-                        console.error('Error in AI enrichment:', error)
-                        return Response.json({ error: 'Failed to enrich content' }, { status: 500 })
+                        const errMsg = error instanceof Error ? error.message : String(error)
+                        const errStack = error instanceof Error ? error.stack : undefined
+                        console.error('[AI-ENRICH] Error in endpoint handler:', errMsg, errStack)
+                        return Response.json({ error: 'Failed to enrich content', details: errMsg }, { status: 500 })
                     }
                 },
             },
