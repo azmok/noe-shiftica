@@ -48,3 +48,17 @@
   - **Configuration Sync**: Ensure `apphosting.yaml` maps `variable: NAME` to `secret: NAME` correctly, and that the secret version actually exists in Secret Manager.
   - **Agentic CLI Handling**: Use `--force --data-file -` or piped input (`echo "val" | ...`) to avoid interactive/TTY hangups in automated scripts/agents.
   - **Payload Endpoints**: Always use `.text()` + `JSON.parse()` for body parsing in custom endpoints.
+ 
+### [2026-03-18 00:00] Bug: AI Content Optimizer 403 Forbidden (Secret Not Attached)
+- **Error**: Clicking "✨ AI Content Optimizer" in Admin returned HTTP 500. Logs showed `status: 403, statusText: 'Forbidden'` from Gemini API despite API key existing in Secret Manager.
+- **Root Cause**:
+  - `GEMINI_API_KEY` was present in Google Cloud Secret Manager, but **not associated with the App Hosting backend**.
+  - App Hosting results in an empty environment variable if the secret version exists but the backend lacks permission or the specific "attachment" via App Hosting commands.
+- **File(s) Modified**:
+  - `src/lib/gemini.ts` (added detailed error diag), `src/plugins/markdownImport/index.ts` (error propagation), `.antigravity/rules.md`.
+- **Fix Summary**:
+  - Re-registered the secret specifically using `firebase apphosting:secrets:set GEMINI_API_KEY`.
+  - Confirmed and verified the attachment status using `firebase apphosting:secrets:describe`.
+  - Added "API key working" local test script verification.
+- **Prevention Note**:
+  - **Verification**: Always run `firebase apphosting:secrets:describe [KEY]` to ensure the secret is ENABLED and recognized by the specific project/backend. Values in Secret Manager do NOT mean they are available to App Hosting by default.
