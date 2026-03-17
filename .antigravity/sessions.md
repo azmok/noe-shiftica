@@ -27,11 +27,14 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Preferences**: Azuma prefers keeping specific absolute pixel targets for readability/aesthetics even when the root font size changes.
 - **Plan Impact**: Assume a 16px base for all future typography work and use verified rem ratios to hit Airbnb-style targets.
 
-### [2026-03-15 00:32] Session Summary
-- **Autonomous UX & Efficiency Mandate**: 
-    - The user has authorized the agent to proactively implement UX and efficiency improvements (e.g., caching strategies, navigation fixes, performance optimizations).
-    - **Logic-Only Scope**: This mandate applies strictly to back-end logic, API handling, and non-visual client-side logic.
-    - **STRICT UI/Styling Restriction**: I am FORBIDDEN from modifying UI design, styling (Tailwind, CSS), or layouts without explicit instructions.
-- **Core UX Philosophy**: Azuma places the highest priority on "Instant Load" experiences. "The fastest technology" means 0.1s-0.2s targets. Any lag over 3s is considered a failure.
-- **Communication Nuance**: Azuma might occasionally type "クライアント" (Client) when referring to "クラやん" (Kurayan). This should be interpreted as the latter in the "Oje & Kurayan" partner context.
-- **Plan Impact**: Technical efficiency is the key. I will always prioritize speed and seamless SPA navigation in all future implementations.
+### [2026-03-17 22:45] Session Summary
+- **Learned/Decided**: 
+    - **Payload Custom Endpoints**: `PayloadRequest` does not support the Web API `.json()` method reliably. Custom endpoints should use `await req.text()` then `JSON.parse(text)` for robustness.
+    - **Firebase App Hosting Secrets**: Environment variables set in the Firebase Console GUI are **NOT** recognized as secrets by `apphosting.yaml`. 機密情報 (Secrets) must be registered via the Firebase CLI to be accessible when referenced via `secret: NAME`.
+    - **CLI Agentic Blockage**: The Firebase CLI hangs indefinitely on interactive prompts (like masking secret input) when run in a non-TTY agentic terminal. 
+- **Preferences**: 
+    - Azuma prefers utilizing the host-side TTY (PowerShell) for interactive CLI tasks, while the agent focuses on non-interactive automated fixes using `--force` and pipes.
+- **Plan Impact**: 
+    - AI Content Optimizer is now operational in production. 
+    - Future secret management tasks should default to non-interactive CLI patterns or request user host-side execution to avoid hangups.
+    - Always verify environment variable presence via backend logs (`[AI-ENRICH]` tagged logs added).
