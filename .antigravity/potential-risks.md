@@ -22,15 +22,15 @@ This file contains anticipated bugs and architectural risks based on the project
 - **Cause**: PayloadCMS v3 has a significant initialization cost in serverless environments during "Cold Starts".
 - **Prevention**: Increase `timeoutSeconds` in `apphosting.yaml` to at least 60s and consider increasing `minInstances` if traffic allows.
 
-### 5. Google Cloud Secret Manager Permission Gap
-- **Symptom**: App runs locally but fails in production with "Environment variable X is undefined".
-- **Cause**: The Service Account for App Hosting does not have the "Secret Manager Secret Accessor" role for specific secrets.
-- **Prevention**: Explicitly grant permissions in the Google Cloud Console for every new secret added.
+### 5. Google Cloud Secret Manager Sync Gap
+- **Symptom**: App runs locally but fails in production with `undefined` env vars, even after setting them in the Firebase Console.
+- **Cause**: Variables set in the Firebase GUI are "Plain Env Vars". If `apphosting.yaml` references a secret (`secret: NAME`), it EXCLUSIVELY looks in Secret Manager. Plain variables in the GUI won't satisfy this requirement.
+- **Prevention**: Always use the Firebase CLI to register secrets. Ensure the Cloud Run Service Account has `Secret Manager Secret Accessor` permissions.
 
-### 6. Edge Runtime vs. Node.js Runtime Conflict
-- **Symptom**: `Module not found: Can't resolve 'fs'` or similar errors during build.
-- **Cause**: Payload v3 and some Firebase SDKs require a full Node.js environment and will fail if a Next.js route is forced into `runtime: 'edge'`.
-- **Prevention**: Default to `nodejs` runtime unless absolutely necessary and compatible.
+### 11. Interactive CLI Hangups in Agentic Environments
+- **Symptom**: Deployment scripts or Agent commands (like `firebase apphosting:secrets:set`) hang indefinitely (1h+).
+- **Cause**: The CLI is waiting for interactive input (e.g., masking a password) on a non-TTY terminal.
+- **Prevention**: Use non-interactive flags (`--force`, `--data-file -`) and piped input (`echo "secret" | cmd`) to bypass prompts.
 
 ### 7. Large Payload Upload Body Limit
 - **Symptom**: Uploading large images/files via Payload UI returns `413 Payload Too Large`.

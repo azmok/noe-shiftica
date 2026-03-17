@@ -1,5 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
+if (!process.env.GEMINI_API_KEY) {
+    console.warn('[GEMINI] WARNING: GEMINI_API_KEY is not set. AI features will fail.')
+}
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export interface EnrichedContent {
@@ -21,9 +25,12 @@ export interface EnrichedContent {
 
 export async function enrichPostContent(title: string, content: string): Promise<EnrichedContent> {
     console.log(`[AI-ENRICH] Starting enrichment for: "${title}"`)
-    // gemini-2.5-flash is the available stable model for this API key
+    // Available models (2026-03):
+    //  Stable: gemini-2.5-pro, gemini-2.5-flash, gemini-2.5-flash-lite
+    //  Preview: gemini-3.1-pro-preview, gemini-3-flash-preview
     const modelName = 'gemini-2.5-flash'
     console.log(`[AI-ENRICH] Using model: ${modelName}`)
+    console.log(`[AI-ENRICH] GEMINI_API_KEY present: ${!!process.env.GEMINI_API_KEY} | Length: ${process.env.GEMINI_API_KEY?.length ?? 0}`)
     const model = genAI.getGenerativeModel({ model: modelName })
 
     const prompt = `
@@ -95,7 +102,20 @@ export async function enrichPostContent(title: string, content: string): Promise
 
         return enrichedByAi
     } catch (error) {
-        console.error('[AI-ENRICH] Error in enrichPostContent:', error)
-        throw new Error('Failed to enrich content with AI')
+        // Surface as much detail as possible for diagnosis
+        const isGoogleAiError = error && typeof error === 'object' && 'status' in error
+        if (isGoogleAiError) {
+            const e = error as any
+            console.error('[AI-ENRICH] GoogleGenerativeAI API Error:', {
+                status: e.status,
+                statusText: e.statusText,
+                message: e.message,
+                errorDetails: e.errorDetails,
+            })
+        } else {
+            console.error('[AI-ENRICH] Error in enrichPostContent:', error)
+        }
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to enrich content with AI: ${message}`)
     }
 }

@@ -140,9 +140,12 @@ export const markdownImportPlugin = (): Plugin => {
                         return Response.json(result)
                     } catch (error) {
                         const errMsg = error instanceof Error ? error.message : String(error)
-                        const errStack = error instanceof Error ? error.stack : undefined
-                        console.error('[AI-ENRICH] Error in endpoint handler:', errMsg, errStack)
-                        return Response.json({ error: 'Failed to enrich content', details: errMsg }, { status: 500 })
+                        const errCause = error instanceof Error && error.cause ? String(error.cause) : undefined
+                        console.error('[AI-ENRICH] Error in endpoint handler:', errMsg, error instanceof Error ? error.stack : '')
+                        return Response.json(
+                            { error: 'Failed to enrich content', details: errMsg, cause: errCause },
+                            { status: 500 }
+                        )
                     }
                 },
             },
