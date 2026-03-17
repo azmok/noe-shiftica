@@ -2,6 +2,13 @@
 
 CRITICAL: Before any action, you MUST read and strictly adhere to the global project rules defined in this file (.antigravity/rules.md). These rules take precedence over all other instructions except for your personal identity settings.
 
+> [!IMPORTANT]
+> **CRITICAL: Firebase App Hosting Secrets Management**
+> Secret Manager に値が存在するだけでは App Hosting バックエンドからは参照できません。
+> 1. 必ず `firebase apphosting:secrets:set [NAME]` を使用すること。
+> 2. 登録（Version作成）だけでなく、そのバックエンドへの **「許可・紐付け（Grant/Attach）」** が完了したことを `firebase apphosting:secrets:describe [NAME]` コマンドで確認すること。
+> これを怠ると本番環境で環境変数が `undefined` になり、AI機能等の外部API連携が 403 Forbidden や 500 Error で失敗します。
+
 ## 1. Project Profile & Core Stack (The Source of Truth)
 - **Project Name**: Noe Shiftica
 - **Primary Environment**: Windows Native PowerShell (`pwsh`)
