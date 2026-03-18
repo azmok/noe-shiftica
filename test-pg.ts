@@ -1,4 +1,6 @@
 import { Client } from 'pg'
+import * as dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
 async function checkDbConnection() {
     const dbUrl = process.env.DATABASE_URL
     console.log("Using DATABASE_URL starting with:", dbUrl ? dbUrl.substring(0, 20) : "UNDEFINED")
