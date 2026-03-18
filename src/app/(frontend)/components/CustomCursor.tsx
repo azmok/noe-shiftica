@@ -79,7 +79,7 @@ export function CustomCursor() {
         setIsHoveringFeatured(true);
       }
 
-      if (target.closest(".blog-posts") || target.closest(".posts.featured")) return;
+      if (target.closest(".blog-posts") || target.closest(".posts.featured") || target.closest(".no-custom-cursor")) return;
 
       const interactiveEl = target.closest("a, button, [role='button']") as HTMLElement;
 

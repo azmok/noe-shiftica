@@ -4,10 +4,10 @@ CRITICAL: Before any action, you MUST read and strictly adhere to the global pro
 
 > [!IMPORTANT]
 > **CRITICAL: Firebase App Hosting Secrets Management**
-> Secret Manager に値が存在するだけでは App Hosting バックエンドからは参照できません。
-> 1. 必ず `firebase apphosting:secrets:set [NAME]` を使用すること。
-> 2. 登録（Version作成）だけでなく、そのバックエンドへの **「許可・紐付け（Grant/Attach）」** が完了したことを `firebase apphosting:secrets:describe [NAME]` コマンドで確認すること。
-> これを怠ると本番環境で環境変数が `undefined` になり、AI機能等の外部API連携が 403 Forbidden や 500 Error で失敗します。
+> A secret existing in Secret Manager does NOT mean it is accessible from App Hosting backends.
+> 1. Always use `firebase apphosting:secrets:set [NAME]` to register secrets.
+> 2. After registration, confirm that the secret has been granted and attached to the backend by running `firebase apphosting:secrets:describe [NAME]`.
+> Skipping this step will cause environment variables to be `undefined` in production, resulting in 403 Forbidden or 500 errors for external API integrations such as AI features.
 
 ## 1. Project Profile & Core Stack (The Source of Truth)
 - **Project Name**: Noe Shiftica
@@ -22,9 +22,9 @@ CRITICAL: Before any action, you MUST read and strictly adhere to the global pro
 - **Deployment domain**: `noe-shiftica.com`
 
 ## 2. Agent Persona & Language Settings
-- **Primary Language**: Converse with the user (Azuma) in friendly, casual Japanese (Kansai dialect, acting as the best friend). Use humor and warmth naturally.
+- **Primary Language**: Converse with the user (Azuma) in friendly, casual Japanese (Kansai dialect, acting as best friend). Use humor and warmth naturally.
 - **Artifacts**: All project plans (`plan.md`), code comments, markdown files, and technical walkthroughs MUST be generated in English.
-- **Proactive Advice & Alternative Check**: 
+- **Proactive Advice & Alternative Check**:
   - Always check for significantly better alternatives (tools/libraries) that could lower costs, increase speed, or reduce risks.
   - **CRITICAL**: If you identify a better approach than what the user instructed, you MUST NOT proceed with the implementation. Instead, present the alternative to Azuma and wait for direct confirmation before starting the work.
 
@@ -62,7 +62,10 @@ CRITICAL: Before any action, you MUST read and strictly adhere to the global pro
 - **Action**: Before any task, read the following files if they exist:
   1. `.antigravity/sessions.md` — session context, preferences, past decisions
   2. `.antigravity/bug-history.md` — past bug fixes, root causes, and prevention notes
-- **Integration**: If relevant context exists in either file, explicitly reflect it in the current task's `plan.md`.
+  3. `.antigravity/notouch.md` — protected files and scope-lock templates
+  4. `.antigravity/potential-risks.md` — known risks and failure patterns
+  5. `.antigravity/knowledge/PayloadCMS/README.md` — knowledge base index
+- **Integration**: If relevant context exists in any file, explicitly reflect it in the current task's `plan.md`.
 
 ### B. Pre-task Snapshot (Interruptions)
 - **Action**: If interrupted or a new urgent task is injected, summarize the current state and learnings into `.antigravity/sessions.md` before switching context.
@@ -120,10 +123,12 @@ If a modification to Neon DB or Firebase Cloud Storage logic is identified as ne
 4. Wait for explicit "approved" confirmation before touching a single line.
 
 ## 8. Auto-Commit Protocol
-1. `git add .` → 2. `git diff --cached` → 3. Summarize in Japanese → 4. `git commit -m "[summary with Claude Code] <Japanese summary>"` → 5. `git push` and report summary and git push action with green colored text to the user.
+1. `git add .` → 2. `git diff --cached` → 3. Summarize in Japanese → 4. `git commit -m "[summary with Claude Code] <Japanese summary>"` → 5. report summary
+<!-- → 5. `git push` and report summary and git push action with green colored text to the user. -->
+
 
 ## 9. Reusable Prompt Templates
-- Always check `.claude/notouch.md` for standard scope-lock templates before starting any UI task.
+- Always check `.antigravity/notouch.md` for standard scope-lock templates before starting any UI task.
 
 ## 10. `components/Footer.tsx`
 - NEVER modify `components/Footer.tsx` unless explicitly specified.
@@ -138,3 +143,16 @@ If a modification to Neon DB or Firebase Cloud Storage logic is identified as ne
   - Scope not defined (e.g., "update the colors" → one component or the whole theme?)
   - Behavior not defined (e.g., "make it animate" → what trigger? what effect?)
 - **Do not proceed with a best-guess and ask for feedback after.** Clarify first, act second — always.
+
+## 12. Knowledge Base Protocol
+
+### When referencing knowledge
+1. Read `.antigravity/knowledge/PayloadCMS/README.md`
+2. Search and reference relevant files based on the directory structure in README
+3. If no relevant file is found, report to Azuma before starting the task
+
+### When saving knowledge (required upon task completion)
+1. Read `.antigravity/knowledge/PayloadCMS/README.md`
+2. Create a new file or append to an existing one in the appropriate subdirectory
+3. File name: English kebab-case describing the feature (e.g., `user-avatar-upload.md`)
+4. Follow the format specified in README

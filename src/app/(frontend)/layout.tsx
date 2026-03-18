@@ -31,7 +31,7 @@ const shipporiMincho = Shippori_Mincho({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://noeshiftica.com"),
+  metadataBase: new URL("https://noe-shiftica.com"),
   title: {
     template: "%s | Noe Shiftica",
     default: "Noe Shiftica | Design the Shift.",
@@ -49,7 +49,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    url: "https://noeshiftica.com", // FIXME: Actual Domain Later
+    url: "https://noe-shiftica.com",
     siteName: "Noe Shiftica",
     title: "Noe Shiftica | Design the Shift.",
     description: "AIとデザインでビジネスの本質を設計するスタジオ。",
@@ -69,6 +69,7 @@ export const metadata = {
 };
 
 import { MobileBottomNav } from "./components/MobileBottomNav";
+import { JsonLd } from "./components/JsonLd";
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
@@ -101,6 +102,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       </head>
       <body suppressHydrationWarning>
         <ProgressBar />
+        <JsonLd />
         <CustomCursor />
         <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
           {children}
