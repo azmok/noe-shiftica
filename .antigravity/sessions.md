@@ -38,3 +38,19 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - AI Content Optimizer is now operational in production. 
     - Future secret management tasks should default to non-interactive CLI patterns or request user host-side execution to avoid hangups.
     - Always verify environment variable presence via backend logs (`[AI-ENRICH]` tagged logs added).
+
+### [2026-03-18 10:00] Session Summary
+- **Learned/Decided**: Established and confirmed the structured knowledge base hierarchy within `.antigravity/knowledge/PayloadCMS/`.
+- **Preferences**: The folder roles are strictly divided as follows:
+    - `PayloadCMS/README.md` → Root knowledge.
+    - `frontend/ui/` → Next.js components, styles, layouts.
+    - `frontend/logic/` → Client-side API calls, state management, hooks.
+    - `backend/admin-ui/` → Payload Admin Panel customization.
+    - `backend/logic/` → Collection definitions, API routes, DB operations.
+- **Plan Impact**: All future documentation relating to specific functional logic or UI must be added to these respective directories under `.antigravity/knowledge/PayloadCMS/` using markdown files named after the feature/function name.
+
+### [2026-03-18 10:20] Session Summary
+- **Learned/Decided**: Next.js (App Router) confirms that placing JSON-LD via `next/script` directly within the `return` of a Server Component (effectively inside `<body>`) is the modern best practice. It ensures reliability, avoids duplication issues in `<head>`, and integrates seamlessly with Server Components.
+- **Preferences**: For future structured data additions, use the component-based approach (`JsonLd.tsx`) pattern rather than the Metadata API's `other` field for better flexibility.
+- **Plan Impact**: Documented this pattern as a persistent knowledge asset in `.antigravity/knowledge/PayloadCMS/frontend/logic/seo-json-ld.md`.
+
