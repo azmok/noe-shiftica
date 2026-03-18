@@ -106,7 +106,7 @@ export function PastelTopology() {
         }
         const renderer = sharedRenderer;
 
-        const geometry = new THREE.IcosahedronGeometry(2, 40);
+        const geometry = new THREE.IcosahedronGeometry(2, 20);
         const material = new THREE.ShaderMaterial({
             vertexShader,
             fragmentShader,
