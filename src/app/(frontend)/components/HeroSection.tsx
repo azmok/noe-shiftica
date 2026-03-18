@@ -1,8 +1,13 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
-import { PastelTopology } from "./PastelTopology";
+
+const PastelTopology = dynamic(
+  () => import("./PastelTopology").then((m) => ({ default: m.PastelTopology })),
+  { ssr: false, loading: () => null }
+);
 
 interface HeroSectionProps {
   fadeIn: Variants;
@@ -21,7 +26,7 @@ export function HeroSection({ fadeIn }: HeroSectionProps) {
       >
         <motion.h1
           custom={1}
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={fadeIn}
           className="hero-h1 heading-1 oxanium-heading text-right"

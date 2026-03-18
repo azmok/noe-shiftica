@@ -1,4 +1,5 @@
-import { Inconsolata, DM_Sans, DM_Serif_Display, Shippori_Mincho } from "next/font/google";
+import { Inconsolata, DM_Sans, DM_Serif_Display, Shippori_Mincho, Oxanium } from "next/font/google";
+import Script from "next/script";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
 import { ProgressBar } from "./components/ProgressBar";
@@ -28,6 +29,13 @@ const shipporiMincho = Shippori_Mincho({
   variable: "--font-shippori-mincho",
   display: "swap",
   weight: ["400", "500", "600"],
+});
+
+const oxanium = Oxanium({
+  subsets: ["latin"],
+  variable: "--font-oxanium",
+  display: "swap",
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata = {
@@ -77,29 +85,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html 
       lang="ja" 
-      className={`${inconsolata.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${shipporiMincho.variable}`} 
+      className={`${inconsolata.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${shipporiMincho.variable} ${oxanium.variable}`}
       data-scroll-behavior="smooth" 
       suppressHydrationWarning
     >
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(d) {
-                var config = {
-                  kitId: 'jtq7dsy',
-                  scriptTimeout: 3000,
-                  async: true
-                },
-                h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\\bwf-loading\\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-              })(document);
-            `,
-          }}
-        />
-      </head>
       <body suppressHydrationWarning>
         <ProgressBar />
         <JsonLd />
@@ -108,6 +97,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           {children}
         </main>
         <MobileBottomNav />
+        <Script
+          id="typekit"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(d){var config={kitId:'jtq7dsy',scriptTimeout:3000,async:true},h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\\bwf-loading\\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)})(document);`,
+          }}
+        />
       </body>
     </html>
   );

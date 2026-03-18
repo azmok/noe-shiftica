@@ -52,7 +52,7 @@
 }
 
 .oxanium-heading {
-  font-family: "Oxanium", sans-serif !important;
+  font-family: var(--font-oxanium), sans-serif !important;
   font-optical-sizing: none;
   font-weight: 600;
   letter-spacing: 3.3px;
