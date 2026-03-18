@@ -12,26 +12,28 @@ export function JsonLd() {
         'image': 'https://noe-shiftica.com/og-image.png',
         'address': {
           '@type': 'PostalAddress',
-          'addressLocality': '東近江市',
-          'addressRegion': '滋賀県',
+          'addressLocality': '渋谷区',
+          'addressRegion': '東京都',
           'addressCountry': 'JP',
+          'postalCode': '150-0043',
+          'streetAddress': '道玄坂1丁目10番8号渋谷道玄坂東急ビル2F−C'
         },
         'geo': {
           '@type': 'GeoCoordinates',
-          'latitude': 35.1147,
-          'longitude': 136.2048,
+          'latitude': 35.6581,
+          'longitude': 139.6975,
         },
         'areaServed': [
           {
             '@type': 'AdministrativeArea',
-            'name': '滋賀県',
+            'name': '東京都',
           },
           {
             '@type': 'Country',
             'name': 'JP',
           },
         ],
-        'description': 'Next.js, React, PayloadCMSを用いたWeb開発と生成AI導入支援を提供する滋賀県東近江市の制作会社です。本質的なデザインと最新技術でビジネスの転換を設計します。',
+        'description': 'Next.js, React, PayloadCMSを用いたWeb開発と生成AI導入支援を提供する東京都渋谷区のスタジオです。本質的なデザインと最新技術でビジネスの転換を設計します。',
         'priceRange': '¥150,000 - ¥1,000,000+',
         'knowsAbout': ['Next.js', 'React', 'PayloadCMS', 'Generative AI', 'Web Design'],
       },

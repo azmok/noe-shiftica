@@ -220,7 +220,7 @@ export default function AboutPage() {
                 Design the Shift with Me!
               </h3>
               <p className="text-[#FFFFFF] text-lg mb-6 font-medium">
-                滋賀県東近江市から、あなたの「Want To」を加速させる。
+                東京・渋谷を拠点に、フルリモートで全国対応。あなたの「Want To」を加速させる。
               </p>
               <p className="text-white/80 leading-relaxed">
                 「こんにちは、あずまです！AIという最強の武器と、認知科学に基づいたデザインで、あなたのビジネスの本質を形にします。一人で運営しているからこそ、あなたの想いに200%コミットできる。難しいことは全部お任せください！一緒に、世界を驚かせるシフトを起こしましょう！」

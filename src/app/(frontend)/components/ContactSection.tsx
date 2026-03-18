@@ -26,8 +26,8 @@ export function ContactSection({ fadeIn }: ContactSectionProps) {
           <h2 className="text-4xl md:text-[5.5rem] font-serif font-bold mb-6 heading-2 oxanium-heading">
             Let's Work Together.
           </h2>
-          <p className="text-xl text-[#FFFFFF] mb-6">まず話しましょう。</p>
-          <p className="text-white/70 test-center">
+          <p className="font-medium text-xl text-[#FFFFFF] mb-6">まず話しましょう。</p>
+          <p className="font-thin text-[0.9375rem] leading-[1.5rem] text-white/70 test-center">
             「うちに合うのかな？」と思ったら、そのまま相談してください。
             <br />
             現状のヒアリングと方向性の確認だけでも大歓迎です。
@@ -162,7 +162,7 @@ export function ContactSection({ fadeIn }: ContactSectionProps) {
                 </Button>
               </div>
               <p className="text-xs text-white/40 mt-8">
-                対応時間：11:00〜19:00 ｜ 返信は原則24時間以内
+                返信は原則24時間以内。打ち合わせはすべてオンライン（Zoom / Google Meet）対応です。
               </p>
             </div>
           </form>
