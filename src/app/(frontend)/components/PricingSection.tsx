@@ -22,10 +22,10 @@ export function PricingSection({ fadeIn }: PricingSectionProps) {
           <h2 className="text-4xl md:text-[5.5rem] font-serif font-bold mb-4 heading-2 oxanium-heading">
             Pricing
           </h2>
-          <p className="text-xl text-[#FFFFFF] mb-6">
+          <p className="text-xl text-[#b8b8b8] mb-6">
             明確な価格。隠れた費用なし。
           </p>
-          <p className="text-white/70">
+          <p className="section-desc-2 text-[1rem] text-[#919090] leading-relaxed font-light">
             必要な費用は、何のために・誰に・いくらかかるかを必ず事前に説明します。
             <br />
             不要な管理費や意味不明な月額請求は一切ありません。
@@ -97,14 +97,16 @@ export function PricingSection({ fadeIn }: PricingSectionProps) {
           <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
             <span className="text-[#FFFFFF]">●</span> 保守費用について
           </h4>
-          <p className="text-white/80 text-xs leading-relaxed mb-4">
+          <p className="text-white/80 text-xs leading-relaxed">
+            (オプション)<br />
             月額保守：¥5,000〜¥10,000 /
             月（サーバー維持・軽微な修正・運用サポート込）
+            <span className="text-white/50 text-xs leading-relaxed inline-block mt-2">
+              ＊
+              別途、年間約6,000円のランニングコスト（サーバー＋ドメイン費用）がかかります。<span className="text-[#c2cf2d] text-xs leading-relaxed inline-block mt-2">各サービス会社への直接のお支払いです。</span>
+            </span>
           </p>
-          <p className="text-white/50 text-xs leading-relaxed">
-            ＊
-            別途、年間約6,000円のランニングコスト（サーバー＋ドメイン費用）がかかります。各サービス会社への直接のお支払いです。
-          </p>
+
         </motion.div>
       </div>
     </section>

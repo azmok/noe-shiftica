@@ -102,7 +102,7 @@ export function Faq() {
                   className="relative w-full flex items-center justify-between p-6 md:p-8 text-left transition-colors no-custom-cursor"
                   aria-expanded={isOpen}
                 >
-                  <span className="text-[1rem] md:text-[1.1rem] tracking-[0.09em] font-medium pr-8">
+                  <span className="text-[1rem] md:text-[1.05rem] tracking-[0.09em] font-medium pr-8">
                     {item.question}
                   </span>
                   <motion.span

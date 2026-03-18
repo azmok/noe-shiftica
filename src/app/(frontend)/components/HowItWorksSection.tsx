@@ -21,7 +21,7 @@ export function HowItWorksSection({ fadeIn }: HowItWorksSectionProps) {
           <h2 className="text-4xl md:text-[5.5rem] font-serif font-bold mb-4 heading-2 oxanium-heading">
             How it Works.
           </h2>
-          <p className="text-xl text-[#FFFFFF]">
+          <p className="text-xl text-[#b8b8b8]">
             最短1週間で公開まで。迷いを潰す5ステップ。
           </p>
         </motion.div>
@@ -63,14 +63,14 @@ export function HowItWorksSection({ fadeIn }: HowItWorksSectionProps) {
               variants={fadeIn}
               className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group"
             >
-              <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#FFFFFF] bg-[#050505] text-[#FFFFFF] font-mono text-xs font-bold z-10 shrink-0 md:order-1 md:group-odd:-ml-[20px] md:group-even:-mr-[20px] shadow-[0_0_10px_rgba(204,221,0,0.5)]">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#FFFFFF] bg-[#050505] text-[#FFFFFF] font-mono text-[1rem] font-bold z-10 shrink-0 md:order-1 md:group-odd:-ml-[20px] md:group-even:-mr-[20px] shadow-[0_0_10px_rgba(204,221,0,0.5)]">
                 {item.step}
               </div>
               <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-[#111111]/30 border border-white/10 hover:bg-[#111111]/60 transition-colors">
-                <h3 className="text-xl font-bold mb-2 text-white">
+                <h3 className="text-[1.625rem] font-bold mb-2 text-[#bdbdbd]">
                   {item.phase}
                 </h3>
-                <p className="text-white/70 text-xs leading-relaxed">
+                <p className="section-desc-2 text-[1rem] text-[#919090] leading-relaxed font-light">
                   {item.desc}
                 </p>
               </div>
