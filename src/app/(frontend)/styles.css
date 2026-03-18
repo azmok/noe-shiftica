@@ -766,3 +766,6 @@ footer{
   animation: shimmer 2.5s infinite linear;
   z-index: 1;
 }
+footer li {
+  margin-bottom: 0;
+}
