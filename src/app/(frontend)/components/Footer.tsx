@@ -72,6 +72,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
             <ul className="space-y-1 pl-0">
               {[
                 { name: "Privacy Policy", href: "/privacy" },
+                { name: "特定商取引法に基づく表記", href: "/tokusho" },
                 { name: "Terms of Service", href: "/terms" },
               ].map((link) => (
                 <li key={link.name}>

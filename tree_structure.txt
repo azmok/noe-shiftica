@@ -1,0 +1,203 @@
+├── .agent
+│   └── skills
+│       ├── find-skills
+│       │   └── SKILL.md
+│       ├── frontend-design
+│       │   ├── LICENSE.txt
+│       │   └── SKILL.md
+│       ├── vercel-react-best-practices
+│       │   ├── rules
+│       │   ├── AGENTS.md
+│       │   ├── README.md
+│       │   └── SKILL.md
+│       └── web-design-guidelines
+│           └── SKILL.md
+├── scripts
+├── public
+│   ├── assets
+│   │   ├── NS_logo_Black.png
+│   │   ├── NS_logo_White.jpg
+│   │   └── profile-icon.PNG
+│   ├── images
+│   │   └── azuma.png
+│   ├── apple-touch-icon-precomposed.png
+│   ├── apple-touch-icon.png
+│   ├── favicon.ico
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── legal
+│   ├── privacy-policy.md
+│   └── tokusho.md
+├── functions
+│   ├── src
+│   │   └── index.ts
+│   ├── .eslintrc.js
+│   ├── .gitignore
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── tsconfig.dev.json
+│   └── tsconfig.json
+├── fallback-images
+│   ├── fallback-image-neumorphism-1.html
+│   └── noe-shiftica.code-workspace
+├── src
+│   ├── app
+│   │   ├── (frontend)
+│   │   │   ├── about
+│   │   │   ├── blog
+│   │   │   ├── components
+│   │   │   ├── contact
+│   │   │   ├── privacy
+│   │   │   ├── terms
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── styles.css
+│   │   ├── (payload)
+│   │   │   ├── admin
+│   │   │   ├── api
+│   │   │   ├── custom.scss
+│   │   │   └── layout.tsx
+│   │   └── api
+│   │       ├── contact
+│   │       ├── fix-posts
+│   │       ├── github-models
+│   │       └── revalidate
+│   ├── collections
+│   │   ├── Categories.ts
+│   │   ├── Media.ts
+│   │   ├── Posts.ts
+│   │   └── Users.ts
+│   ├── features
+│   │   ├── htmlSource
+│   │   │   ├── conversion.ts
+│   │   │   ├── feature.client.tsx
+│   │   │   ├── feature.server.ts
+│   │   │   └── HtmlSourcePlugin.tsx
+│   │   └── markdownPaste
+│   │       ├── client.tsx
+│   │       └── server.ts
+│   ├── lib
+│   │   ├── calculateReadingTime.ts
+│   │   ├── db.ts
+│   │   ├── GcsImage.tsx
+│   │   ├── gemini.ts
+│   │   └── translateToSlug.ts
+│   ├── migrations
+│   │   ├── 20260226_111056_initial_setup.json
+│   │   ├── 20260226_111056_initial_setup.ts
+│   │   ├── 20260304_050000_add_posts_drafts.ts
+│   │   ├── 20260307_171744_sync_local_to_prod_schema.json
+│   │   ├── 20260307_171744_sync_local_to_prod_schema.ts
+│   │   ├── 20260310_145217_add_customMetaData_field.json
+│   │   ├── 20260310_145217_add_customMetaData_field.ts
+│   │   ├── 20260310_153133_add_description_field.json
+│   │   ├── 20260310_153133_add_description_field.ts
+│   │   ├── 20260315_add_media_admin_sizes.ts
+│   │   └── index.ts
+│   ├── plugins
+│   │   └── markdownImport
+│   │       ├── BlogContentActions.tsx
+│   │       └── index.ts
+│   ├── scripts
+│   │   ├── sync-data.ts
+│   │   └── sync.py
+│   ├── payload-types.ts
+│   └── payload.config.ts
+├── docs
+│   ├── design_system.md
+│   ├── doc_concept.txt
+│   ├── doc_lp.txt
+│   ├── doc1.txt
+│   ├── doc2.txt
+│   ├── extract.py
+│   ├── NS_ConceptSheet_v3_Final.docx
+│   ├── NS_LP,About,SiteMap.docx
+│   └── vitasovic.md
+├── ~
+│   └── Library
+│       └── CloudStorage
+│           └── GoogleDrive-indexlove0815@icloud.com
+├── .github
+│   └── workflows
+│       ├── deploy-notification.yml
+│       └── neon-backup.yml
+├── .claude
+│   └── settings.local.json
+├── .agents
+│   ├── skills
+│   │   ├── find-skills
+│   │   │   └── SKILL.md
+│   │   ├── frontend-design
+│   │   │   ├── LICENSE.txt
+│   │   │   └── SKILL.md
+│   │   ├── vercel-react-best-practices
+│   │   │   ├── rules
+│   │   │   ├── AGENTS.md
+│   │   │   ├── README.md
+│   │   │   └── SKILL.md
+│   │   └── web-design-guidelines
+│   │       └── SKILL.md
+│   └── workflows
+│       └── start-dev.md
+├── ext
+│   ├── marcodelia.antigravity-auto-run-pro-1.5.7.vsix
+│   └── pesosz.antigravity-auto-accept-1.1.0.vsix
+├── payload_output.txt
+├── package.json
+├── package-lock.json
+├── output-trees.ps1
+├── Out-File
+├── noe-shiftica-d216ff091a9d.json
+├── noe-shiftica.dev.code-workspace
+├── next.config.ts
+├── next-env.d.ts
+├── pnpm-lock.yaml
+├── notouch-prompt.md
+├── postcss.config.mjs
+├── test-all.mjs
+├── README.md
+├── rollouts.json
+├── skills-lock.json
+├── storage.rules
+├── task.md.resolved
+├── logs.json
+├── test-api.js
+├── test-fetch.mjs
+├── test-markdown.ts
+├── test-pg.ts
+├── tree_structure.txt
+├── tsc_error.txt
+├── re-deploy.md
+├── lexical-test.json
+├── firebase.json
+├── history-prompt.txt
+├── .env
+├── .env.local
+├── .firebaserc
+├── .gitignore
+├── .neon
+├── .npmrc
+├── apphosting_backends.json
+├── apphosting_rollouts.json
+├── apphosting.yaml
+├── backends.json
+├── build_error_v2.txt
+├── build_error_v3.txt
+├── build_error_v4_raw.json
+├── build_local_v2.log
+├── build_local.log
+├── build_output.txt
+├── build_ts.log
+├── bun.lock
+├── CLAUDE.md
+├── docker-compose.yml
+├── eslint.config.mjs
+├── tsconfig.json
+├── firestore.indexes.json
+├── firestore.rules
+├── folder_structure.txt
+├── implementation_plan.resolved.md
+└── tsconfig.tsbuildinfo

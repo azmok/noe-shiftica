@@ -5,7 +5,7 @@ import { motion, Variants } from "framer-motion";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Button } from "../components/ui/Button";
-import Head from "next/head";
+import Image from "next/image";
 
 export default function AboutPage() {
   const fadeIn: Variants = {
@@ -192,6 +192,40 @@ export default function AboutPage() {
             <p className="text-center text-xl font-serif text-[#FFFFFF] font-bold mt-10">
               「AIで速く、人間で美しく。」これが、Noe Shifticaの制作原則です。
             </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 2.5. Profile Section */}
+      <section className="py-20 px-6 relative z-10">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            custom={7}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="flex flex-col md:flex-row items-center gap-12 bg-[#111111]/40 border border-white/10 p-8 md:p-16 rounded-3xl"
+          >
+            <div className="w-48 h-48 md:w-64 md:h-64 relative shrink-0">
+              <Image
+                src="/images/azuma.png"
+                alt="Azuma"
+                fill
+                className="object-cover rounded-2xl grayscale"
+              />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-3xl md:text-4xl font-serif font-bold mb-2">
+                Design the Shift with Me!
+              </h3>
+              <p className="text-[#FFFFFF] text-lg mb-6 font-medium">
+                滋賀県東近江市から、あなたの「Want To」を加速させる。
+              </p>
+              <p className="text-white/80 leading-relaxed">
+                「こんにちは、あずまです！AIという最強の武器と、認知科学に基づいたデザインで、あなたのビジネスの本質を形にします。一人で運営しているからこそ、あなたの想いに200%コミットできる。難しいことは全部お任せください！一緒に、世界を驚かせるシフトを起こしましょう！」
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
