@@ -18,9 +18,9 @@ export function Footer({ variant = "landing" }: FooterProps) {
         }`}
     >
       <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 px-4">
-          <div className="lg:col-span-4 space-y-0">
-            <Link href="/" className="inline-block text-xs rounded-full px-5 pt-[10px] pb-[15px] leading-none text-[2rem] font-bold tracking-tighter align-middle opacity-90">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-24 gap-12 mb-16 px-4">
+          <div className="lg:col-span-7 space-y-0">
+            <Link href="/" className="inline-block mt-[-10px] ml-[-23px] text-xs rounded-full px-5 pt-[10px] pb-[15px] leading-none text-[2rem] font-bold tracking-tighter align-middle opacity-90">
               Noe Shiftica
             </Link>
             <div
@@ -33,14 +33,14 @@ export function Footer({ variant = "landing" }: FooterProps) {
             </div>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-5">
             <h3
-              className={`text-[12px] font-bold uppercase tracking-[0.2em] mb-2 ${isBlog ? "text-slate-400" : "text-white/30"
+              className={`text-[1.25rem] font-bold uppercase tracking-widest mb-2 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
               Navigation
             </h3>
-            <ul className="space-y-1.5 pl-0">
+            <ul className="space-y-1.5 pl-1">
               {[
                 { name: "About", href: "/about" },
                 { name: "Services", href: "/#services" },
@@ -50,7 +50,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full inline-block -ml-5 px-5 py-[11px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -62,14 +62,14 @@ export function Footer({ variant = "landing" }: FooterProps) {
             </ul>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-5">
             <h3
-              className={`text-[12px] font-bold uppercase tracking-[0.2em] mb-3 ${isBlog ? "text-slate-400" : "text-white/30"
+              className={`text-[1.25rem] font-bold uppercase tracking-widest mb-2 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
               Support
             </h3>
-            <ul className="space-y-1 pl-0">
+            <ul className="space-y-1 pl-1">
               {[
                 { name: "Privacy Policy", href: "/privacy" },
                 { name: "特定商取引法に基づく表記", href: "/tokusho" },
@@ -78,7 +78,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] transition-colors font-light rounded-full px-5 py-[11px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full inline-block -ml-5 px-5 py-[11px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -90,14 +90,14 @@ export function Footer({ variant = "landing" }: FooterProps) {
             </ul>
           </div>
 
-          <div className="lg:col-span-4 sm:col-span-2">
+          <div className="lg:col-span-7 sm:col-span-2">
             <h3
-              className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-4 ${isBlog ? "text-slate-400" : "text-white/30"
+              className={`text-[1.25rem] font-bold uppercase tracking-widest mb-2 ${isBlog ? "text-slate-400" : "text-white/30"
                 }`}
             >
               Stay Connected
             </h3>
-            <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex flex-wrap gap-4 mb-6 pl-1">
               {[
                 { name: "X", icon: Twitter, href: "https://twitter.com" },
                 { name: "GitHub", icon: Github, href: "https://github.com" },
