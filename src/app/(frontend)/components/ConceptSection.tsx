@@ -21,11 +21,11 @@ export function ConceptSection({ fadeIn }: ConceptSectionProps) {
           <h2 className="text-4xl md:text-[5.5rem] font-serif font-light mb-6 heading-2 oxanium-heading">
             AI × Design.
             <br />
-            <span className="text-area-1 text-xl md:text-2xl font-sans text-[#FFFFFF] block mt-4 font-normal">
+            <span className="text-area-1 text-xl md:text-2xl font-sans text-[#b8b8b8] block mt-4 font-normal">
               制作コストを削減して、その分を「質」に全振りする。
             </span>
           </h2>
-          <p className="text-area-2 text-lg text-white/70 leading-relaxed">
+          <p className="section-desc-2 text-[1rem] text-[#919090] leading-relaxed font-light">
             従来のWeb制作は、品質を上げれば費用がかかり、費用を抑えればテンプレートになる。
             <br />
             Noe

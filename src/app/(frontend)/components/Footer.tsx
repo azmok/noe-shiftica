@@ -50,7 +50,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full inline-block -ml-5 px-[13px] py-[5px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full inline-block -ml-3 px-[13px] py-[5px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}
@@ -78,7 +78,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full inline-block -ml-5 px-[13px] py-[5px] ${isBlog
+                    className={`text-[12px] leading-[16px] transition-colors font-light rounded-full inline-block -ml-3 px-[13px] py-[5px] ${isBlog
                       ? "text-white/60 hover:text-(--color-neu-primary)"
                       : "text-white/60 hover:text-white"
                       }`}

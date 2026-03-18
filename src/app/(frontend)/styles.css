@@ -735,9 +735,6 @@ header {
 footer{
   color: var(--color-text-sub2);
 }
-#concept .text-area-2{
-  font-weight: 200;
-}
 
 /* --- Shimmer / Skeleton Effect --- */
 @keyframes shimmer {
@@ -768,4 +765,7 @@ footer{
 }
 footer li {
   margin-bottom: 0;
+}
+footer li a{
+  color: #818181;
 }
