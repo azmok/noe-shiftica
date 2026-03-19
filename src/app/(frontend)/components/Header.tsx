@@ -116,14 +116,14 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
         className={`fixed transition-all duration-500 transform top-0 left-0 w-full h-16 md:h-12 z-50 hidden md:block ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         } ${
-          hasBackdrop || isBlogPage ? "bg-white shadow-sm" : "bg-transparent"
+          isBlogPage ? "bg-white shadow-sm" : "bg-transparent"
         }`}
       >
         {/* ブラーレイヤー */}
         <div
-          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'}`}
+          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.01)',
+            backgroundColor: isBlogPage ? 'rgba(255, 255, 255, 0.05)' : 'rgba(5, 5, 5, 0.1)',
             backdropFilter: 'blur(40px) saturate(180%)',
             WebkitBackdropFilter: 'blur(40px) saturate(180%)',
             maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
