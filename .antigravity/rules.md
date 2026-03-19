@@ -156,3 +156,4 @@ If a modification to Neon DB or Firebase Cloud Storage logic is identified as ne
 2. Create a new file or append to an existing one in the appropriate subdirectory
 3. File name: English kebab-case describing the feature (e.g., `user-avatar-upload.md`)
 4. Follow the format specified in README
+5. Start the very first heading as an H1 (using a single hash #)

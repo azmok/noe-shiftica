@@ -49,6 +49,16 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - `backend/logic/` → Collection definitions, API routes, DB operations.
 - **Plan Impact**: All future documentation relating to specific functional logic or UI must be added to these respective directories under `.antigravity/knowledge/PayloadCMS/` using markdown files named after the feature/function name.
 
+### [2026-03-18 11:30] Session Summary
+- **Learned/Decided**:
+    - PSI mobile LCP 108.6s の根本原因を特定・修正。原因は4層構造：①LCP要素(`<h1>`)がframer-motionの`initial="hidden"`でopacity:0スタート、②Three.js/PastelTopologyがクリティカルパスに含まれ初期JSバンドルを圧迫、③TypeKitスクリプトが`<head>`でrender-blocking、④OxaniumがGoogle Fonts直接リンクでrender-blocking。
+    - `initial={false}`はframer-motionのSSR済み要素に対して「初期アニメーションをスキップし、animate値を即反映」する正しいイディオム。LCP要素には必ず使うべき。
+    - `next/dynamic({ ssr: false, loading: () => null })`でWebGLコンポーネント(Three.js)を遅延ロードすることで、初期バンドルから除外できる。
+    - next/font/googleで読み込んだフォントはfont-familyが`__FontName_hash`形式にリネームされる。CSSで`"FontName"`直接参照は無効になるため、必ず`var(--font-variable)`に変更する必要がある。
+    - TypeKitは`<Script strategy="afterInteractive">`で`<body>`末尾に移動するとrender-blockingが解消される。Adobe FontsのFOUT（フォント置換チラつき）はLCP 108sと比べ無視できるトレードオフ。
+- **Preferences**: LCPに関わるパフォーマンス改善はUI Freezeルールの例外と判断して対応（ただしvisual designは維持）。
+- **Plan Impact**: 今後のヒーローセクション実装では①above-the-foldのmotion要素は`initial={false}`を使う、②重いWebGLや外部ライブラリは`next/dynamic`で遅延ロード、③フォントは全てnext/fontで管理 をデフォルトとする。
+
 ### [2026-03-18 10:20] Session Summary
 - **Learned/Decided**: Next.js (App Router) confirms that placing JSON-LD via `next/script` directly within the `return` of a Server Component (effectively inside `<body>`) is the modern best practice. It ensures reliability, avoids duplication issues in `<head>`, and integrates seamlessly with Server Components.
 - **Preferences**: For future structured data additions, use the component-based approach (`JsonLd.tsx`) pattern rather than the Metadata API's `other` field for better flexibility.
