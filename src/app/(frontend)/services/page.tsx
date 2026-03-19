@@ -185,7 +185,7 @@ export default function ServicesPage() {
               href="https://demo-static-mirai-foundry.pages.dev/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group neu-dark-flat aspect-[4/3] rounded-3xl overflow-hidden relative border border-white/5 block"
+              className="group neu-dark-flat aspect-[2/1] rounded-xl overflow-hidden relative border border-white/5 block"
             >
               <img
                 src="/works/mirai-foundry-thumb.png"
@@ -201,7 +201,7 @@ export default function ServicesPage() {
 
             {/* Placeholder cards */}
             {[2, 3].map((item) => (
-              <div key={item} className="neu-dark-flat aspect-[4/3] rounded-3xl flex items-center justify-center border border-white/5">
+              <div key={item} className="neu-dark-flat aspect-[2/1] rounded-3xl flex items-center justify-center border border-white/5">
                 <div className="flex flex-col items-center text-[#919191] opacity-40">
                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#919191] mb-6 flex items-center justify-center">
                     <span className="text-xl font-light">?</span>
