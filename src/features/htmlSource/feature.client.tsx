@@ -11,8 +11,18 @@ import { createClientFeature } from '@payloadcms/richtext-lexical/client'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useCallback, useState, useEffect } from 'react'
 
+import { html as beautifyHtml } from 'js-beautify'
+
 import { HtmlSourcePlugin, HtmlSourceToolbarButton } from './HtmlSourcePlugin'
 import { htmlToLexical, lexicalToHtml } from './conversion'
+
+function formatHtml(raw: string): string {
+  return beautifyHtml(raw, {
+    indent_size: 2,
+    wrap_line_length: 120,
+    preserve_newlines: false,
+  })
+}
 
 // ----------------------------------------------------------------
 // ツールバーボタンのラッパー
@@ -71,7 +81,7 @@ function HtmlSourceOverlayPlugin() {
   useEffect(() => {
     function onEnter(e: Event) {
       const { html } = (e as CustomEvent<{ html: string }>).detail
-      setHtmlValue(html)
+      setHtmlValue(formatHtml(html))
       setParseError(null)
       setIsSourceMode(true)
       // ツールバーボタンと状態を同期
