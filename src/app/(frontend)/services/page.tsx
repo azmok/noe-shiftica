@@ -180,7 +180,27 @@ export default function ServicesPage() {
             <p className="text-[#919191] text-lg md:text-xl">Coming Soon — 実績は随時更新します。</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item) => (
+            {/* Real project card */}
+            <a
+              href="https://demo-static-mirai-foundry.pages.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group neu-dark-flat aspect-[4/3] rounded-3xl overflow-hidden relative border border-white/5 block"
+            >
+              <img
+                src="/works/mirai-foundry-thumb.png"
+                alt="MIRAI FOUNDRY — Digital Artifacts Foundry"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                <p className="text-xs tracking-widest uppercase text-[#919191] mb-1">Web Design / Static</p>
+                <h3 className="text-white text-xl font-bold">MIRAI FOUNDRY</h3>
+                <p className="text-[#919191] text-sm mt-1">Digital Artifacts Foundry — Tokyo/Berlin</p>
+              </div>
+            </a>
+
+            {/* Placeholder cards */}
+            {[2, 3].map((item) => (
               <div key={item} className="neu-dark-flat aspect-[4/3] rounded-3xl flex items-center justify-center border border-white/5">
                 <div className="flex flex-col items-center text-[#919191] opacity-40">
                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#919191] mb-6 flex items-center justify-center">
