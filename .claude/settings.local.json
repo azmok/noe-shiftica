@@ -21,7 +21,9 @@
       "Bash(cd \"C:\\\\Users\\\\genta\\\\projects\\\\noe-shiftica.dev\" && pnpm run build 2>&1 | tail -30)",
       "Bash(cd \"C:\\\\Users\\\\genta\\\\projects\\\\noe-shiftica.dev\" && echo \"n\" | firebase apphosting:secrets:set REVALIDATE_SECRET 2>&1 || true)",
       "Bash(git push:*)",
-      "Bash(pnpm run:*)"
+      "Bash(pnpm run:*)",
+      "Bash(npm install:*)",
+      "Bash(bun add:*)"
     ]
   }
 }

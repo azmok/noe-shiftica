@@ -99,9 +99,9 @@ export function Footer({ variant = "landing" }: FooterProps) {
             </h3>
             <div className="flex flex-wrap gap-4 mb-6 pl-1">
               {[
-                { name: "X", icon: Twitter, href: "https://twitter.com" },
-                { name: "GitHub", icon: Github, href: "https://github.com" },
-                { name: "LinkedIn", icon: Linkedin, href: "https://linkedin.com" },
+                { name: "X", icon: Twitter, href: "https://x.com/noeShiftica" },
+                { name: "GitHub", icon: Github, href: "https://github.com/azmok" },
+                { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/in/azuma-okumura-66184913a/" },
                 { name: "Mail", icon: Mail, href: "mailto:info@noeshiftica.com" },
               ].map((social) => (
                 <a

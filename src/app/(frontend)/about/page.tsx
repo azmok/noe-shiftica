@@ -230,6 +230,48 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* 会社概要 Section */}
+      <section className="py-20 px-6 relative z-10">
+        <div className="container mx-auto max-w-3xl">
+          <motion.div
+            custom={8}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <h3 className="text-3xl font-serif font-bold mb-10 text-white border-b border-white/20 pb-4 inline-block">
+              会社概要
+            </h3>
+            <div className="overflow-hidden rounded-2xl border border-white/10">
+              {[
+                { label: '屋号', value: 'Noe Shiftica' },
+                { label: '代表者名', value: '奥村 東（オクムラ アズマ）' },
+                { label: '所在地', value: '〒150-0043 東京都渋谷区道玄坂1丁目10番8号\n渋谷道玄坂東急ビル2F−C' },
+                { label: 'お問い合わせ', value: 'info@noe-shiftica.com' },
+                { label: '電話番号', value: 'メールにてお問い合わせください。\nお問い合わせいただいた際に遅滞なく開示いたします。' },
+                { label: 'サービス内容', value: 'ウェブサイト制作・デザイン・フロントエンド開発' },
+              ].map((row, i) => (
+                <div
+                  key={row.label}
+                  className={`flex flex-col sm:flex-row ${i % 2 === 0 ? 'bg-white/5' : 'bg-transparent'} border-b border-white/10 last:border-0`}
+                >
+                  <div className="sm:w-40 shrink-0 px-6 py-4 text-white/50 text-sm font-medium">
+                    {row.label}
+                  </div>
+                  <div className="px-6 py-4 text-white/90 text-sm leading-relaxed whitespace-pre-line">
+                    {row.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-xs text-text-link text-right">
+              <a href="/tokusho" className="underline hover:text-text-link/70 transition-colors">特定商取引法に基づく表記はこちら</a>
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* 3. CTA Section */}
       <section className="py-24 px-6 relative z-10 border-t border-white/10 bg-linear-to-b from-transparent to-background-void">
         <div className="container mx-auto max-w-4xl text-center">

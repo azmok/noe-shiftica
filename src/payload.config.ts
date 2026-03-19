@@ -21,6 +21,8 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { markdownImportPlugin } from './plugins/markdownImport'
+import { ogImagePlugin } from './plugins/og-image'
+
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceFeature } from './features/htmlSource/feature.server'
 
@@ -68,6 +70,11 @@ const config = buildConfig({
       },
     }),
     markdownImportPlugin(),
+    ogImagePlugin({
+      collection: 'posts',
+      heroImageField: 'heroImage',
+      ogImageField: 'ogImage',
+    }),
   ],
 }).catch(e => {
   console.error("PAYLOAD CONFIG ERROR:", e);

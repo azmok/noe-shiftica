@@ -96,11 +96,12 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   }, [lastScrollY, isMobileMenuOpen, isHomePage, hideTopThreshold]);
 
   const navLinks = [
-    { name: "Concept", href: "/#concept" },
-    { name: "How It Works", href: "/#how-it-works" },
+    { name: "Home", href: "/" },
+    { name: "Services", href: "/services" },
     { name: "Pricing", href: "/#pricing" },
     { name: "About", href: "/about" },
     { name: "Blog", href: "/blog" },
+    { name: "Contact", href: "/#contact" },
   ];
 
   const hasBackdrop = alwaysBackdrop || isScrolled;
@@ -112,7 +113,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
     <>
       <header
         className={`fixed transition-all duration-500 transform ${isBlogPage ? "hidden md:block top-0 left-0 w-full h-16 md:h-12 z-50" : "top-0 left-0 w-full md:h-12 z-50"
-          } ${isVisible ? "translate-y-0" : isBlogPage ? "-translate-y-full" : "-translate-y-full"} ${hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
+          } ${isVisible ? "translate-y-0" : "-translate-y-full"} ${hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
           }`}
       >
         {/* ブラーレイヤー (Hidden on mobile blog page for clean sample look, shown on desktop for all pages) */}
@@ -128,9 +129,9 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           }}
         />
 
-        <div className={`w-full h-full mx-auto flex items-center justify-between md:justify-end md:gap-x-12 relative z-120`}>
+        <div className={`w-full h-full mx-auto flex items-center justify-between md:justify-end md:gap-x-12 px-6 md:px-0 relative z-120`}>
 
-          {/* Mobile Back Button (Detail Page only) */}
+          {/* Mobile Back Button (Detail Page only) - Always on the left if present */}
           {isBlogPage && (
             <div className="md:hidden flex-1">
               {isBlogDetail && (
@@ -145,7 +146,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           )}
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-8 md:order-1">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -157,8 +158,8 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
             ))}
           </nav>
 
-          {/* Logo */}
-          <div className={`hidden md:flex items-center ${isBlogPage ? "md:flex-initial" : "md:flex-initial"} justify-end`}>
+          {/* Logo (Mobile & Desktop) - last in order to be far right on desktop */}
+          <div className={`${isBlogPage ? "hidden md:flex" : "flex"} items-center justify-between w-full md:w-auto md:order-2`}>
             <Link href="/" className="flex items-center gap-2 relative z-110">
               <Image
                 src={logoSrc}
@@ -170,6 +171,16 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
                 style={{ height: '32px', width: 'auto' }}
               />
             </Link>
+
+            {/* Mobile Menu Button for non-blog pages */}
+            {!isBlogPage && (
+              <button 
+                className="md:hidden p-2 text-white/80 hover:text-white transition-colors"
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <Menu size={24} />
+              </button>
+            )}
           </div>
 
           {/* Spacer for centering on mobile blog page if back button exists */}

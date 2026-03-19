@@ -11,6 +11,7 @@ import { HowItWorksSection } from "./components/HowItWorksSection";
 import { PricingSection } from "./components/PricingSection";
 import { ContactSection } from "./components/ContactSection";
 import { Faq } from "./components/Faq";
+import { SideNav } from "./components/SideNav";
 
 export default function HomePage() {
   // Fade In variants (Shared between sections)
@@ -30,6 +31,7 @@ export default function HomePage() {
         style={{ background: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
       />
       <Header />
+      <SideNav />
 
       <HeroSection fadeIn={fadeIn} />
       
