@@ -164,6 +164,13 @@ export default function ServicesPage() {
               制作着手前のキャンセルは全額返金いたします。制作開始後のキャンセルは、着手金（総額の50%）の返金を承りかねます。
             </p>
           </div>
+          <div className="mt-4 neu-dark-flat rounded-2xl p-6 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <CheckCircle size={24} className="text-[#A060D0] shrink-0 mt-0.5" />
+            <p className="text-[#919191] text-sm leading-relaxed">
+              <span className="text-white font-semibold">お支払い方法：</span>
+              Stripeを通じて、クレジット／デビットカード・銀行振込に対応しています。今後コンビニ支払い・PayPay・Paidy等にも対応予定です。
+            </p>
+          </div>
         </section>
 
         {/* 5. Works */}
