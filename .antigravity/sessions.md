@@ -64,3 +64,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Preferences**: For future structured data additions, use the component-based approach (`JsonLd.tsx`) pattern rather than the Metadata API's `other` field for better flexibility.
 - **Plan Impact**: Documented this pattern as a persistent knowledge asset in `.antigravity/knowledge/PayloadCMS/frontend/logic/seo-json-ld.md`.
 
+
+### [2026-03-20 05:48] Session Summary
+- **Learned/Decided**: 
+    - The correct "Source of Truth" for the PC Header background on scroll is a **Gradient Backdrop-Filter** (Glassmorphism) effect, NOT a solid `bg-white`.
+    - Component Rule: Use `bg-transparent` for the main header container on non-blog pages. 
+    - Backdrop Logic: Use an absolute-positioned `div` with `maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)'` and `backdropFilter: 'blur(40px) saturate(180%)'`.
+    - Scroll Transition: Set the backdrop layer to `opacity-0` when not scrolled and `opacity-100` when `isScrolled` is true.
+- **Preferences**: Azuma confirmed this is the "default" (規定値) for PC access.
+- **Plan Impact**: Any future UI fixes that accidentally change the header background to a solid color must be rejected or reverted to this standard.
