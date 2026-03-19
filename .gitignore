@@ -42,3 +42,30 @@ next-env.d.ts
 
 # key for GCS
 noe-shiftica-d216ff091a9d.json
+
+# Firebase App Hosting operation files (may contain secrets)
+*_backends.json
+backends.json
+apphosting_backends.json
+*_rollouts.json
+rollouts.json
+apphosting_rollouts.json
+
+# Service account / credential JSON files
+*-adminsdk*.json
+service-account*.json
+*-credentials.json
+firebase-admin*.json
+
+# Private keys and certificates
+*.key
+*.p12
+*.pfx
+*.cert
+*.crt
+
+# Debug / build log snapshots
+build_error*.json
+build_error*.txt
+logs.json
+lexical-test.json
