@@ -23,7 +23,27 @@
       "Bash(git push:*)",
       "Bash(pnpm run:*)",
       "Bash(npm install:*)",
-      "Bash(bun add:*)"
+      "Bash(bun add:*)",
+      "Bash(gcloud logging:*)",
+      "Bash(gcloud.cmd logging:*)",
+      "Bash(where gcloud:*)",
+      "Bash(powershell -Command \"Get-Command gcloud -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
+      "Bash(powershell -Command \"& 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=\\\\\"cloud_run_revision\\\\\" AND resource.labels.service_name=\\\\\"noe-shiftica\\\\\"' --project=noe-shiftica --limit=100 --format='table\\(timestamp,textPayload,jsonPayload.message\\)' --order=desc 2>&1 | Select-Object -First 200\")",
+      "Bash(\"/c/Users/genta/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" config list 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' config list\" 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision' --project=noe-shiftica --limit=50 --order=desc --format=json\" 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision AND \\(textPayload=~\\\\\"Failed to fetch\\\\\" OR textPayload=~\\\\\"database\\\\\" OR textPayload=~\\\\\"DATABASE\\\\\" OR textPayload=~\\\\\"ECONNREFUSED\\\\\" OR textPayload=~\\\\\"timeout\\\\\" OR textPayload=~\\\\\"Error\\\\\" OR textPayload=~\\\\\"posts\\\\\"\\)' --project=noe-shiftica --limit=50 --order=desc --format='value\\(timestamp,textPayload\\)'\" 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision AND textPayload=~\\\\\"Error\\\\\"' --project=noe-shiftica --limit=80 --order=desc --format='value\\(timestamp,textPayload\\)'\" 2>&1)",
+      "Bash(Select-String -Pattern \"Error|error|failed|Failed|posts|database|Database|ECONN|timeout|fetch\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision' --project=noe-shiftica --limit=300 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Where-Object { \\\\$_ -match 'Error|error|failed|Failed|posts|database|Database|ECONN|timeout|fetch|pg|pool|connect' }\n\" 2>&1)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm install:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' auth list\" 2>&1)",
+      "Bash(firebase:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision' --project=noe-shiftica --limit=200 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Where-Object { \\\\$_ -match 'Error|error|failed|Failed|warn|WARN|Cannot|cannot|undefined|null|ECONN|timeout|secret|Secret' }\n\" 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision' --project=noe-shiftica --limit=500 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Select-Object -First 100\n\" 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=build' --project=noe-shiftica --limit=100 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Where-Object { \\\\$_ -match 'Error|error|failed|Failed|FAIL|success|SUCCESS|finish|Finish|Step' } | Select-Object -First 50\n\" 2>&1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=build' --project=noe-shiftica --limit=20 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Select-Object -First 40\n\" 2>&1)"
     ]
   }
 }
