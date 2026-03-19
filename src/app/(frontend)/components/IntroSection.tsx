@@ -23,9 +23,9 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
           AIと最新技術で、
           Webサイトとデジタル体験を設計する。<br />
           あなたのビジネスに必要な「見た目」と「体験」をつくります。
-          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light text-center">
+          <span className="block mt-4 text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light text-center">
             テンプレートではなく、あなただけの世界観を。最短1週間、15万円〜。
-          </p>
+          </span>
         </motion.p>
         <motion.div
           custom={2}
