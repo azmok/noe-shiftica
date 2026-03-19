@@ -1,0 +1,149 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { Monitor, FileText, Bot, ArrowRight, LayoutTemplate, DollarSign, RefreshCw } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Services | Noe Shiftica',
+  description: 'What We Do. Noe Shifticaが提供する3つのこと。',
+};
+
+export default function ServicesPage() {
+  return (
+    <main className="min-h-screen pt-32 pb-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+      {/* 1. Hero */}
+      <section className="mb-32 flex flex-col items-center text-center">
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-[#CCDD00] relative inline-block">
+          What We Do.
+          <span className="absolute -bottom-2 left-0 w-full h-1 bg-[#CCDD00] shadow-[0_0_12px_#CCDD00] rounded-full"></span>
+        </h1>
+        <p className="text-[#919191] text-lg md:text-xl mt-6 tracking-wider">
+          Noe Shifticaが提供する3つのこと
+        </p>
+      </section>
+
+      {/* 2. Services (3カード) */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-32">
+        {/* Card 1 */}
+        <div className="neu-dark-flat hover:neu-dark-pressed transition-all duration-300 p-8 md:p-10 rounded-3xl flex flex-col items-start text-left group">
+          <div className="text-[#CCDD00] mb-8 p-4 rounded-full bg-[#CCDD00]/10 group-hover:scale-110 transition-transform duration-300">
+            <Monitor size={48} strokeWidth={1.5} />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#ffffff] mb-4">Web Design & Build</h2>
+          <p className="text-[#919191] mb-8 flex-1 leading-relaxed text-lg">
+            LP・ポートフォリオ・コーポレートサイト。テンプレートなし、ブランドから設計。
+          </p>
+          <div className="flex flex-wrap gap-2 text-sm text-white/80">
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Next.js</span>
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Tailwind CSS</span>
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Figma</span>
+          </div>
+        </div>
+
+        {/* Card 2 */}
+        <div className="neu-dark-flat hover:neu-dark-pressed transition-all duration-300 p-8 md:p-10 rounded-3xl flex flex-col items-start text-left group">
+          <div className="text-[#6B2DA0] mb-8 p-4 rounded-full bg-[#6B2DA0]/10 group-hover:scale-110 transition-transform duration-300">
+            <FileText size={48} strokeWidth={1.5} />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#ffffff] mb-4">CMS & Content Operations</h2>
+          <p className="text-[#919191] mb-8 flex-1 leading-relaxed text-lg">
+            公開後も自分で更新できる設計。PayloadCMS でブログ・実績・採用など拡張可能。運用マニュアル付き。
+          </p>
+          <div className="flex flex-wrap gap-2 text-sm text-white/80">
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Payload CMS</span>
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Neon</span>
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">PostgreSQL</span>
+          </div>
+        </div>
+
+        {/* Card 3 */}
+        <div className="neu-dark-flat hover:neu-dark-pressed transition-all duration-300 p-8 md:p-10 rounded-3xl flex flex-col items-start text-left group relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-[#CCDD00] text-[#050505] text-xs font-bold px-4 py-1.5 rounded-bl-xl shadow-lg">Premium</div>
+          <div className="text-[#A060D0] mb-8 p-4 rounded-full bg-[#A060D0]/10 group-hover:scale-110 transition-transform duration-300">
+            <Bot size={48} strokeWidth={1.5} />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#ffffff] mb-4">AI Workflow Integration</h2>
+          <p className="text-[#919191] mb-8 flex-1 leading-relaxed text-lg">
+            業務フローへのAI組み込み。自動化設計・ツール選定。Premiumプランの中心サービス。要相談ベース。
+          </p>
+          <div className="flex flex-wrap gap-2 text-sm text-white/80">
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Claude AI</span>
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">n8n</span>
+            <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Automation</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Tech Stack */}
+      <section className="mb-32 flex flex-col items-center">
+        <h2 className="text-sm md:text-base font-bold tracking-[0.3em] text-[#919191] uppercase mb-10 text-center">Powered By Technology</h2>
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+          {['Next.js', 'Payload CMS', 'Neon', 'Tailwind CSS', 'Claude AI', 'Vercel'].map((tech) => (
+            <div key={tech} className="neu-dark-flat px-6 py-3 md:px-8 md:py-4 rounded-xl text-[#CCDD00] font-semibold text-sm md:text-lg border border-white/5">
+              {tech}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. こんな方へ */}
+      <section className="mb-32">
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-[#ffffff] mb-12">こんな方へ</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="neu-dark-flat p-8 rounded-2xl flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 border border-white/5 text-center md:text-left">
+            <div className="text-[#A060D0] flex-shrink-0"><LayoutTemplate size={40} /></div>
+            <p className="text-[#ffffff] font-medium leading-snug text-lg">テンプレートに飽きた方</p>
+          </div>
+          <div className="neu-dark-flat p-8 rounded-2xl flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 border border-white/5 text-center md:text-left">
+            <div className="text-[#CCDD00] flex-shrink-0"><DollarSign size={40} /></div>
+            <p className="text-[#ffffff] font-medium leading-snug text-lg">制作費が不透明で不安な方</p>
+          </div>
+          <div className="neu-dark-flat p-8 rounded-2xl flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 border border-white/5 text-center md:text-left">
+            <div className="text-[#6B2DA0] flex-shrink-0"><RefreshCw size={40} /></div>
+            <p className="text-[#ffffff] font-medium leading-snug text-lg">公開後も育てたいサイトを持<br className="hidden lg:block"/>ちたい方</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Works */}
+      <section className="mb-32">
+        <div className="flex flex-col items-center md:items-start mb-12">
+          <h2 className="text-5xl md:text-6xl font-bold text-[#ffffff] mb-4">Works.</h2>
+          <p className="text-[#919191] text-lg md:text-xl">Coming Soon — 実績は随時更新します。</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="neu-dark-flat aspect-[4/3] rounded-3xl flex items-center justify-center border border-white/5">
+              <div className="flex flex-col items-center text-[#919191] opacity-40">
+                <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#919191] mb-6 flex items-center justify-center">
+                  <span className="text-xl font-light">?</span>
+                </div>
+                <p className="text-sm tracking-widest uppercase">Project {item}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 6. CTA */}
+      <section className="flex flex-col items-center text-center mt-32 mb-16">
+        <h2 className="text-4xl md:text-6xl font-bold text-[#ffffff] mb-6">Ready to Shift?</h2>
+        <p className="text-[#919191] text-lg md:text-xl mb-12 max-w-2xl mx-auto">
+          まず話しましょう。相談は無料。押し売りなし。
+        </p>
+        <Link 
+          href="/contact" 
+          className="neu-dark-btn flex items-center justify-center space-x-3 px-10 py-5 rounded-full text-xl font-bold group transition-transform hover:scale-105"
+          style={{ 
+            background: 'linear-gradient(145deg, #dce811, #abc200)', 
+            color: '#050505', 
+            borderColor: 'transparent',
+            boxShadow: '6px 6px 12px #000000, -6px -6px 12px #121212' 
+          }}
+        >
+          <span>無料相談を予約する</span>
+          <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </section>
+    </main>
+  );
+}
