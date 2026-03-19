@@ -39,6 +39,7 @@ environmentVariables:
 
   # AI / LLM API keys (required for AI Content Optimizer)
   - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
 
   - variable: GITHUB_TOKEN
     secret: GITHUB_TOKEN
