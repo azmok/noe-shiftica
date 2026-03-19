@@ -7,6 +7,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronLeft } from "lucide-react";
 import { Button } from "./ui/Button";
+import { useMobileMenu } from "@/context/MobileMenuContext";
 
 interface HeaderProps {
   alwaysBackdrop?: boolean;
@@ -14,8 +15,8 @@ interface HeaderProps {
 }
 
 export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderProps) {
+  const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
@@ -112,14 +113,15 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   return (
     <>
       <header
-        className={`fixed transition-all duration-500 transform ${isBlogPage ? "hidden md:block top-0 left-0 w-full h-16 md:h-12 z-50" : "top-0 left-0 w-full md:h-12 z-50"
-          } ${isVisible ? "translate-y-0" : "-translate-y-full"} ${hasBackdrop || isBlogPage ? "bg-white md:bg-transparent shadow-sm md:shadow-none" : "bg-transparent"
-          }`}
+        className={`fixed transition-all duration-500 transform top-0 left-0 w-full h-16 md:h-12 z-50 hidden md:block ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        } ${
+          hasBackdrop || isBlogPage ? "bg-white shadow-sm" : "bg-transparent"
+        }`}
       >
-        {/* ブラーレイヤー (Hidden on mobile blog page for clean sample look, shown on desktop for all pages) */}
+        {/* ブラーレイヤー */}
         <div
-          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'
-            } ${isBlogPage ? 'hidden md:block' : ''}`}
+          className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-90'}`}
           style={{
             backgroundColor: 'rgba(255, 255, 255, 0.01)',
             backdropFilter: 'blur(40px) saturate(180%)',
@@ -131,17 +133,15 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
 
         <div className={`w-full h-full mx-auto flex items-center justify-between md:justify-end md:gap-x-12 px-6 md:px-0 relative z-120`}>
 
-          {/* Mobile Back Button (Detail Page only) - Always on the left if present */}
-          {isBlogPage && (
+          {/* Mobile Back Button (Blog detail page only) */}
+          {isBlogDetail && (
             <div className="md:hidden flex-1">
-              {isBlogDetail && (
-                <Link
-                  href="/blog"
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-primary)"
-                >
-                  <ChevronLeft size={24} />
-                </Link>
-              )}
+              <Link
+                href="/blog"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-primary)"
+              >
+                <ChevronLeft size={24} />
+              </Link>
             </div>
           )}
 
@@ -158,35 +158,20 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
             ))}
           </nav>
 
-          {/* Logo (Mobile & Desktop) - last in order to be far right on desktop */}
-          <div className={`${isBlogPage ? "hidden md:flex" : "flex"} items-center justify-between w-full md:w-auto md:order-2`}>
+          {/* Logo (Mobile & Desktop) */}
+          <div className="flex items-center justify-between w-full md:w-auto md:order-2">
             <Link href="/" className="flex items-center gap-2 relative z-110">
               <Image
                 src={logoSrc}
                 alt="Noe Shiftica"
                 width={32}
                 height={32}
-                className={`${isBlogPage ? "h-6 md:h-8" : "block h-6 md:h-8"} w-auto max-h-full object-contain opacity-90`}
+                className="block h-6 md:h-8 w-auto max-h-full object-contain opacity-90"
                 priority
                 style={{ height: '32px', width: 'auto' }}
               />
             </Link>
-
-            {/* Mobile Menu Button for non-blog pages */}
-            {!isBlogPage && (
-              <button 
-                className="md:hidden p-2 text-white/80 hover:text-white transition-colors"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu size={24} />
-              </button>
-            )}
           </div>
-
-          {/* Spacer for centering on mobile blog page if back button exists */}
-          {isBlogPage && <div className="md:hidden flex-1 flex ml-auto justify-end">
-            {/* Future right side icons if any */}
-          </div>}
         </div>
       </header>
 

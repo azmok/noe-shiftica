@@ -78,6 +78,8 @@ export const metadata = {
 
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { JsonLd } from "./components/JsonLd";
+import { MobileMenuProvider } from "@/context/MobileMenuContext";
+import { MobileMenuButton } from "@/components/MobileMenuButton";
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
@@ -90,13 +92,16 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
-        <ProgressBar />
-        <JsonLd />
-        <CustomCursor />
-        <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
-          {children}
-        </main>
-        <MobileBottomNav />
+        <MobileMenuProvider>
+          <ProgressBar />
+          <JsonLd />
+          <CustomCursor />
+          <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
+            {children}
+          </main>
+          <MobileBottomNav />
+          <MobileMenuButton />
+        </MobileMenuProvider>
         <Script
           id="typekit"
           strategy="afterInteractive"
