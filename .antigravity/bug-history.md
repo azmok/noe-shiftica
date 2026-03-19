@@ -1,5 +1,24 @@
 # Noe Shiftica Bug History
 
+### [2026-03-20 XX:XX] Bug: Blog shows 0 articles in production
+- **Error**: `Failed to fetch posts: Error: connect ECONNREFUSED 127.0.0.1:5432`
+- **Root Cause**:
+  1. `pg` Pool uses TCP connections and defaults to `localhost:5432` when `DATABASE_URL` is `undefined`. Firebase App Hosting (Cloud Run) does not inject secrets at build time, causing the DB query to fail silently.
+  2. `export const revalidate = 12592000` caused the blog page to be statically cached at build time with 0 posts, persisting for ~145 days.
+- **File(s) Modified**:
+  - `src/lib/db.ts`
+  - `src/app/(frontend)/blog/page.tsx`
+  - `package.json`
+- **Fix Summary**:
+  - Replaced `pg` (TCP Pool singleton) with `@neondatabase/serverless` (HTTP-based, serverless-safe).
+  - Changed `export const revalidate = 12592000` to `export const dynamic = 'force-dynamic'` to prevent stale build-time caching.
+  - Moved `pg`/`@types/pg` to devDependencies (still used by local `check-sql-data.ts` script).
+  - Added `@neondatabase/serverless` as a production dependency.
+- **Prevention Note**:
+  - Never use `pg` Pool directly in serverless environments (Firebase App Hosting / Cloud Run). Always use `@neondatabase/serverless`.
+  - For pages that fetch DB data, avoid very long `revalidate` values. Use `force-dynamic` or on-demand revalidation (`revalidatePath`) instead.
+  - After this code fix, manually verify `DATABASE_URL` secret is attached to the App Hosting backend: `firebase apphosting:secrets:describe DATABASE_URL`.
+
 ### [2026-03-14 23:45] Bug: Production Image Loading Failure & Slowness
 - **Error**: Images were return 404 (Not Found) or 403 (Forbidden) in production. Some remained in 'pending' state forever. Hard refresh caused `ReferenceError: process is not defined`. CORS errors blocked direct GCS fetches.
 - **Root Cause**:
