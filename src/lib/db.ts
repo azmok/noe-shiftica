@@ -1,15 +1,11 @@
-import { Pool } from 'pg'
+import { neon } from '@neondatabase/serverless'
 
-// Singleton pool reused across requests  
-let pool: Pool | null = null
-
-function getPool(): Pool {
-    if (!pool) {
-        pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-        })
+function getSql() {
+    const connectionString = process.env.DATABASE_URL
+    if (!connectionString) {
+        throw new Error('DATABASE_URL environment variable is not set')
     }
-    return pool
+    return neon(connectionString)
 }
 
 export type PostStatus = 'published' | 'draft'
@@ -36,15 +32,15 @@ export interface PostSummary {
  * Fetch all distinct tags from published posts' customMetaData JSON field.
  */
 export async function getDistinctTags(): Promise<string[]> {
-    const db = getPool()
-    const { rows } = await db.query<{ tag: string }>(
-        `SELECT DISTINCT jsonb_array_elements_text(custom_meta_data->'tags') AS tag
-         FROM posts
-         WHERE _status = 'published'
-           AND custom_meta_data IS NOT NULL
-           AND custom_meta_data ? 'tags'
-         ORDER BY tag`
-    )
+    const sql = getSql()
+    const rows = await sql`
+        SELECT DISTINCT jsonb_array_elements_text(custom_meta_data->'tags') AS tag
+        FROM posts
+        WHERE _status = 'published'
+          AND custom_meta_data IS NOT NULL
+          AND custom_meta_data ? 'tags'
+        ORDER BY tag
+    ` as { tag: string }[]
     return rows.map(r => r.tag)
 }
 
@@ -54,28 +50,27 @@ export async function getDistinctTags(): Promise<string[]> {
  * This bypasses Payload CMS's draft versioning system.
  */
 export async function getPostsByStatus(status: PostStatus = 'published'): Promise<PostSummary[]> {
-    const db = getPool()
-    const { rows } = await db.query<PostSummary>(
-        `SELECT
-           p.id,
-           p.title,
-           p.slug,
-           p._status                         AS status,
-           p.published_at                    AS "publishedAt",
-           m.url                             AS "heroUrl",
-           m.sizes_thumbnail_url             AS "heroThumbnailUrl",
-           m.sizes_medium_url                AS "heroMediumUrl",
-           m.sizes_large_url                 AS "heroLargeUrl",
-           m2.url                            AS "coverUrl",
-           m2.sizes_thumbnail_url            AS "coverThumbnailUrl",
-           m2.sizes_medium_url               AS "coverMediumUrl",
-           m2.sizes_large_url                AS "coverLargeUrl"
-         FROM posts p
-         LEFT JOIN media m  ON p.hero_image_id  = m.id
-         LEFT JOIN media m2 ON p.cover_image_id = m2.id
-         WHERE p._status = $1
-         ORDER BY p.published_at DESC NULLS LAST`,
-        [status],
-    )
+    const sql = getSql()
+    const rows = await sql`
+        SELECT
+          p.id,
+          p.title,
+          p.slug,
+          p._status                         AS status,
+          p.published_at                    AS "publishedAt",
+          m.url                             AS "heroUrl",
+          m.sizes_thumbnail_url             AS "heroThumbnailUrl",
+          m.sizes_medium_url                AS "heroMediumUrl",
+          m.sizes_large_url                 AS "heroLargeUrl",
+          m2.url                            AS "coverUrl",
+          m2.sizes_thumbnail_url            AS "coverThumbnailUrl",
+          m2.sizes_medium_url               AS "coverMediumUrl",
+          m2.sizes_large_url                AS "coverLargeUrl"
+        FROM posts p
+        LEFT JOIN media m  ON p.hero_image_id  = m.id
+        LEFT JOIN media m2 ON p.cover_image_id = m2.id
+        WHERE p._status = ${status}
+        ORDER BY p.published_at DESC NULLS LAST
+    ` as PostSummary[]
     return rows
 }
