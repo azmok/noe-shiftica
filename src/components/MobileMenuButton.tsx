@@ -8,7 +8,7 @@ import { useMobileMenu } from "@/context/MobileMenuContext";
 export function MobileMenuButton() {
   const pathname = usePathname();
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const isDarkTheme = pathname === "/" || pathname === "/about" || pathname === "/services";
@@ -25,17 +25,15 @@ export function MobileMenuButton() {
       const currentScrollY = window.scrollY;
       
       // 50px以上スクロールしている場合のみダウン/アップ判定
-      if (currentScrollY > 50) {
-        if (currentScrollY > lastScrollY) {
-          // Downward scroll
-          setIsVisible(true);
-        } else {
-          // Upward scroll
-          setIsVisible(false);
-        }
-      } else {
-        // トップ付近では非表示
+      if (currentScrollY < lastScrollY) {
+        // Scrolled UP: Show
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        // Scrolled DOWN & exceeded threshold: Hide
         setIsVisible(false);
+      } else if (currentScrollY <= 50) {
+        // Top area: Show
+        setIsVisible(true);
       }
       
       setLastScrollY(currentScrollY);
@@ -45,9 +43,9 @@ export function MobileMenuButton() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, isMobileMenuOpen]);
 
-  // ルート変更時に非表示にリセット
+  // ルート変更時に表示にリセット
   useEffect(() => {
-    setIsVisible(false);
+    setIsVisible(true);
   }, [pathname]);
 
   return (
