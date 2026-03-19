@@ -18,11 +18,14 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
           variants={fadeIn}
-          className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
+          className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light text-center"
         >
-          AIと最新技術を武器に、あなたのビジネスに必要な「見た目」と「体験」を設計します。
-          <br className="hidden md:block" />
-          テンプレートではなく、あなただけの世界観を。最短1週間、15万円〜。
+          AIと最新技術で、
+          Webサイトとデジタル体験を設計する。<br />
+          あなたのビジネスに必要な「見た目」と「体験」をつくります。
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light text-center">
+            テンプレートではなく、あなただけの世界観を。最短1週間、15万円〜。
+          </p>
         </motion.p>
         <motion.div
           custom={2}
