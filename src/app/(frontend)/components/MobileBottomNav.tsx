@@ -44,6 +44,9 @@ export function MobileBottomNav() {
   
   if (!isAllowed) return null;
 
+  // TEMPORARILY HIDDEN — restoring mobile header
+  return null;
+
   const isDarkTheme = pathname === "/" || pathname === "/about";
 
   return (
