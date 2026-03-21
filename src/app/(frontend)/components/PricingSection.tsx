@@ -86,7 +86,17 @@ export function PricingSection({ fadeIn, onPlanSelect }: PricingSectionProps) {
                   href="#contact"
                   variant="outline"
                   className="w-full mt-2"
-                  onClick={() => onPlanSelect?.(budgetMapping[plan.name])}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onPlanSelect?.(budgetMapping[plan.name]);
+                    
+                    // 確実にスクロールさせるための処理（Linkのデフォルト動作をキャンセルして手動実行）
+                    setTimeout(() => {
+                      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                      // URLハッシュも念のため更新
+                      window.history.pushState(null, '', '#contact');
+                    }, 50);
+                  }}
                 >
                   選択する
                 </Button>
