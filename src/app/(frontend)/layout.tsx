@@ -81,6 +81,8 @@ import { JsonLd } from "./components/JsonLd";
 import { MobileMenuProvider } from "@/context/MobileMenuContext";
 import { MobileMenuButton } from "@/components/MobileMenuButton";
 
+import GoogleAnalytics from "./components/GoogleAnalytics";
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
@@ -92,6 +94,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
+        <GoogleAnalytics />
         <MobileMenuProvider>
           <ProgressBar />
           <JsonLd />
