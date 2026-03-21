@@ -43,3 +43,9 @@ environmentVariables:
 
   - variable: GITHUB_TOKEN
     secret: GITHUB_TOKEN
+
+  - variable: NEXT_PUBLIC_GA_MEASUREMENT_ID
+    value: G-XXXXXXXXXX
+    availability:
+      - BUILD
+      - RUNTIME
