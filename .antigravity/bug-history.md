@@ -81,3 +81,10 @@
   - Added "API key working" local test script verification.
 - **Prevention Note**:
   - **Verification**: Always run `firebase apphosting:secrets:describe [KEY]` to ensure the secret is ENABLED and recognized by the specific project/backend. Values in Secret Manager do NOT mean they are available to App Hosting by default.
+
+### [2026-03-22 03:45] Bug: GoogleAnalytics Component Import Error
+- **Error**: `Module '"./components/GoogleAnalytics"' has no exported member 'GoogleAnalytics'.`
+- **Root Cause**: The component was created with a `default export`, but imported as a `named export` in `layout.tsx`.
+- **File(s) Modified**: `src/app/(frontend)/layout.tsx`
+- **Fix Summary**: Changed the import syntax from `{ GoogleAnalytics }` to `GoogleAnalytics`.
+- **Prevention Note**: Always verify whether a new component uses `export default` or `export const` before writing the import statement in the layout.
