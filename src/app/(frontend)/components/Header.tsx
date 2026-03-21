@@ -116,7 +116,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
         className={`fixed transition-all duration-500 transform top-0 left-0 w-full h-16 md:h-12 z-50 hidden md:block ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         } ${
-          isBlogPage ? "bg-white shadow-sm" : "bg-transparent"
+          "bg-transparent"
         }`}
       >
         {/* ブラーレイヤー */}
