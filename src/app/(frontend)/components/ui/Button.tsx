@@ -44,7 +44,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     if (href) {
       return (
-        <Link href={href} className={combinedClasses}>
+        <Link href={href} className={combinedClasses} {...(props as any)}>
           {children}
         </Link>
       );

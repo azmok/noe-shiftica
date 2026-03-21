@@ -74,6 +74,13 @@ export default function ServicesPage() {
               <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">n8n</span>
               <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Automation</span>
             </div>
+            <Link
+              href="/services/scenarios"
+              className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#A060D0] hover:text-[#CCDD00] transition-colors duration-200 group"
+            >
+              <span>事例シナリオを見る</span>
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </section>
 

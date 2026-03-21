@@ -6,9 +6,16 @@ import { Button } from "./ui/Button";
 
 interface PricingSectionProps {
   fadeIn: Variants;
+  onPlanSelect?: (budget: string) => void;
 }
 
-export function PricingSection({ fadeIn }: PricingSectionProps) {
+export function PricingSection({ fadeIn, onPlanSelect }: PricingSectionProps) {
+  const budgetMapping: Record<string, string> = {
+    Lite: "15",
+    Standard: "35",
+    Premium: "unknown",
+  };
+
   return (
     <section id="pricing" className="py-32 px-6 relative z-10">
       <div className="container mx-auto max-w-6xl">
@@ -79,6 +86,7 @@ export function PricingSection({ fadeIn }: PricingSectionProps) {
                   href="#contact"
                   variant="outline"
                   className="w-full mt-2"
+                  onClick={() => onPlanSelect?.(budgetMapping[plan.name])}
                 >
                   選択する
                 </Button>

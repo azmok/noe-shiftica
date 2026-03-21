@@ -7,11 +7,20 @@ import { Button } from "./ui/Button";
 
 interface ContactSectionProps {
   fadeIn: Variants;
+  selectedBudget?: string;
 }
 
-export function ContactSection({ fadeIn }: ContactSectionProps) {
+export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [budget, setBudget] = useState("");
+
+  // プラン選択時に予算を更新
+  React.useEffect(() => {
+    if (selectedBudget) {
+      setBudget(selectedBudget);
+    }
+  }, [selectedBudget]);
 
   return (
     <section id="contact" className="py-32 px-6 relative z-10">
@@ -126,6 +135,8 @@ export function ContactSection({ fadeIn }: ContactSectionProps) {
                 <select
                   id="budget"
                   name="budget"
+                  value={budget}
+                  onChange={(e) => setBudget(e.target.value)}
                   disabled={isSubmitting}
                   className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
                 >
