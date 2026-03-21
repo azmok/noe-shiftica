@@ -11,8 +11,8 @@ import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
 import { Metadata } from "next";
 
-// Cache for up to ~146 days; revalidated on-demand via Posts.ts afterChange hook
-export const revalidate = 12592000;
+// Static generation with on-demand revalidation via Posts.ts afterChange/afterDelete hooks
+export const dynamic = 'force-static';
 
 export async function generateMetadata({
     params,
