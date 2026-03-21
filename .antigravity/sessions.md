@@ -73,3 +73,13 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - Scroll Transition: Set the backdrop layer to `opacity-0` when not scrolled and `opacity-100` when `isScrolled` is true.
 - **Preferences**: Azuma confirmed this is the "default" (規定値) for PC access.
 - **Plan Impact**: Any future UI fixes that accidentally change the header background to a solid color must be rejected or reverted to this standard.
+
+### [2026-03-22 03:45] Session Summary
+- **Learned/Decided**: 
+    - Successfully integrated Google Analytics (GA4) using a client-side component and `next/script`.
+    - Confirmed that `.env.local` can store the GA Measurement ID while `apphosting.yaml` exposes it to the production environment.
+    - Verification with `pnpm build` confirmed that the script injection doesn't break the build or hydration.
+- **Preferences**: 
+    - User prefers using standard `next/script` patterns for third-party integrations (as per Step 1 in the request).
+- **Plan Impact**: 
+    - GA measurement is now active and configurable via environment variables in Firebase App Hosting.
