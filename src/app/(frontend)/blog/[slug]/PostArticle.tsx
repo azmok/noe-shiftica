@@ -57,14 +57,6 @@ export const PostArticle: React.FC<{
                         <div className="absolute top-16 left-6 right-6">
                             <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2 px-1">
                                 <span className="bg-(--color-neu-primary) text-black px-2 py-0.5 rounded-sm">Journal</span>
-                                {readingTime > 0 && (
-                                    <>
-                                        <span className="text-slate-200">|</span>
-                                        <span className="text-slate-200 text-[0.75rem] font-extralight font-(--font-serif) tracking-[-1px] flex items-center gap-1.5">
-                                            読了目安: {readingTime}分
-                                        </span>
-                                    </>
-                                )}
                             </div>
                         </div>
 
@@ -73,7 +65,14 @@ export const PostArticle: React.FC<{
                                 {post.title}
                             </h1>
                             <div className="flex items-center gap-3 text-white/60 text-xs">
-                                <span>{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
+                                <div className="flex flex-col">
+                                    <span>{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
+                                    {readingTime > 0 && (
+                                        <span className="text-(--color-neu-primary) font-bold mt-1">
+                                            読了目安: {readingTime}分
+                                        </span>
+                                    )}
+                                </div>
                                 <span className="w-1 h-1 rounded-full bg-white/40" />
                                 <span>Noe Shiftica Editorial</span>
                             </div>
