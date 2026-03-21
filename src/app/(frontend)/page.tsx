@@ -12,8 +12,11 @@ import { PricingSection } from "./components/PricingSection";
 import { ContactSection } from "./components/ContactSection";
 import { Faq } from "./components/Faq";
 import { SideNav } from "./components/SideNav";
+import { useState } from "react";
 
 export default function HomePage() {
+  const [selectedBudget, setSelectedBudget] = useState<string>("");
+
   // Fade In variants (Shared between sections)
   const fadeIn: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -41,11 +44,11 @@ export default function HomePage() {
 
       <HowItWorksSection fadeIn={fadeIn} />
 
-      <PricingSection fadeIn={fadeIn} />
+      <PricingSection fadeIn={fadeIn} onPlanSelect={setSelectedBudget} />
 
       <Faq />
 
-      <ContactSection fadeIn={fadeIn} />
+      <ContactSection fadeIn={fadeIn} selectedBudget={selectedBudget} />
 
       <Footer />
     </div>
