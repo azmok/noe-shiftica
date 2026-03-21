@@ -76,7 +76,12 @@ export default function ServicesPage() {
             </div>
             <Link
               href="/services/scenarios"
-              className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#A060D0] hover:text-[#CCDD00] transition-colors duration-200 group"
+              className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 group hover:scale-105"
+              style={{
+                background: 'linear-gradient(145deg, #A060D0, #6B2DA0)',
+                color: '#ffffff',
+                boxShadow: '4px 4px 10px #000000, -2px -2px 8px #1a1a1a',
+              }}
             >
               <span>事例シナリオを見る</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

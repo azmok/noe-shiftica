@@ -29,7 +29,7 @@ export default function ScenariosPage() {
         {/* Intro */}
         <section className="mb-20 flex justify-center">
           <p className="text-[#919191] text-sm leading-relaxed max-w-2xl text-center">
-            「AIが難しい、というイメージは正しくない。正確には、AIを正しく設計すれば、あなたは何も難しいことをしなくていい。2つのシナリオで、具体的にイメージしてみてください。」
+            「むずかしいことは、全部こちらでやります。あなたがするのは、いつも通り仕事をするだけ。2つの事例で、どんな変化が起きたか見てみましょう。」
           </p>
         </section>
 
@@ -45,7 +45,7 @@ export default function ScenariosPage() {
           </h2>
 
           <p className="text-[#919191] text-sm mb-8">
-            大阪・北堀江で個人経営するネイルサロン、オーナーのMさん（一人運営）
+            大阪・北堀江でネイルサロンを一人で切り盛りするMさん
           </p>
 
           {/* Before */}
@@ -53,10 +53,10 @@ export default function ScenariosPage() {
             <p className="text-xs tracking-widest text-[#919191] uppercase mb-3">BEFORE</p>
             <ul className="space-y-2 text-white text-sm leading-relaxed list-none pl-0">
               {[
-                'Instagramの予約DMが来る',
-                'LINEに誘導して日程調整',
-                '施術後に「レビュー書いてもらえませんか」と手打ちでメッセージ',
-                '翌月になったら「そろそろいかがですか？」のリピート促進も手打ち',
+                'お客さんからの予約メッセージに気づくのが遅れる',
+                '日程のやりとりを手打ちで何往復もする',
+                '施術が終わったら、お礼のメッセージも手打ち',
+                '「そろそろ来ませんか？」の声かけも、全部自分でやっていた',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="text-[#919191] shrink-0 mt-0.5">—</span>
@@ -65,7 +65,7 @@ export default function ScenariosPage() {
               ))}
             </ul>
             <p className="text-[#919191] text-sm mt-4 italic">
-              「一人でやってるから、手を動かしてる間はスマホが触れない。気づいたら返信が4時間後になってた、なんてことも日常茶飯事。」
+              「施術中はスマホを触れない。気づいたら返信が4時間後、なんてことも毎日のように起きていた。」
             </p>
           </div>
 
@@ -74,12 +74,11 @@ export default function ScenariosPage() {
             <p className="text-xs tracking-widest text-[#CCDD00] uppercase mb-4">AFTER</p>
             <div className="flex flex-col items-start gap-0 max-w-md">
               {[
-                'Instagram DM着信',
-                'n8n が検知・Claude が文脈読解',
-                '「ご希望の日程を教えてください」と自動返信',
-                '日程が決まったらGoogleカレンダーに登録',
-                '施術完了の翌日 → Claudeが個別文でお礼DM生成・自動送信',
-                '28日後 → 「次回のご予約はいかがですか？」リマインドも自動',
+                'お客さんからメッセージが届く',
+                '自動で内容を読み取り、日程の確認メッセージを送る',
+                '日程が決まったら、カレンダーに自動で登録される',
+                '施術の翌日、お礼のメッセージが自動で届く',
+                '約1ヶ月後、「次回はいかがですか？」のメッセージも自動で届く',
               ].map((step, i, arr) => (
                 <div key={i} className="flex flex-col items-start w-full">
                   <div className="neu-dark-flat rounded-xl px-6 py-3 text-sm text-white border border-white/5 w-full">
@@ -105,9 +104,9 @@ export default function ScenariosPage() {
             <p className="text-xs tracking-widest text-[#A060D0] uppercase mb-3">POINT</p>
             <ul className="space-y-3">
               {[
-                '「AI＝難しい」ではなく、DMの返信が速くなったという体験だけがクライアントに残る',
-                'n8nのワークフローはNoe Shifticaが構築・保守するので、オーナーは触らなくていい',
-                '月額運用費の範囲内で動き続ける',
+                'Mさんは何もしていない。でも、お客さんには「返信が早い」と思われている',
+                '仕組みの管理はNoe Shifticaが行うため、Mさんが設定を触ることはない',
+                '追加の費用なく、毎日24時間動き続ける',
               ].map((point, i) => (
                 <li key={i} className="flex items-start gap-3 text-[#919191] text-sm">
                   <CheckCircle size={16} className="text-[#CCDD00] shrink-0 mt-0.5" />
@@ -130,7 +129,7 @@ export default function ScenariosPage() {
           </h2>
 
           <p className="text-[#919191] text-sm mb-8">
-            滋賀県内の中小製造業、総務兼採用担当のKさん（2名体制）
+            滋賀の中小企業で、採用担当を兼務するKさん（総務2名体制）
           </p>
 
           {/* Before */}
@@ -138,10 +137,9 @@ export default function ScenariosPage() {
             <p className="text-xs tracking-widest text-[#919191] uppercase mb-3">BEFORE</p>
             <ul className="space-y-2 text-white text-sm leading-relaxed list-none pl-0">
               {[
-                '応募フォームのPDFをダウンロード',
-                'Excelの管理表に手入力（氏名・年齢・経験年数・希望職種…）',
-                '部長に「今週の応募者一覧です」とメールで転送',
-                '「この人、前職どんな感じだっけ？」と聞かれるたびに元のPDFを掘り返す',
+                '応募書類が届くたびに、内容を手で表に転記する',
+                '「今週の応募者一覧」を上司にメールで送る',
+                '上司に「この人どんな人だっけ？」と聞かれるたびに、書類を一から探し直す',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="text-[#919191] shrink-0 mt-0.5">—</span>
@@ -150,7 +148,7 @@ export default function ScenariosPage() {
               ))}
             </ul>
             <p className="text-[#919191] text-sm mt-4 italic">
-              「応募が10件来た週は、それだけで半日消えていた。」
+              「応募が10件来た週は、それだけで半日が消えた。本来の仕事が後回しになっていた。」
             </p>
           </div>
 
@@ -159,11 +157,10 @@ export default function ScenariosPage() {
             <p className="text-xs tracking-widest text-[#CCDD00] uppercase mb-4">AFTER</p>
             <div className="flex flex-col items-start gap-0 max-w-md">
               {[
-                '求人サイトから応募メール着信',
-                'n8n が添付PDF・フォームデータを取得',
-                'Claude がPDFを読んでサマリー生成（名前・年齢・スキル・前職・一言コメント付き）',
-                'Notionのデータベースに自動登録',
-                '毎週月曜 9:00 → 部長へ「今週の応募サマリー」をSlackで自動送信',
+                '応募書類が届く',
+                '自動で内容を読み取り、必要な情報だけをまとめる',
+                '一覧表に自動で追加される',
+                '毎週月曜の朝、上司に「今週の応募まとめ」が自動で届く',
               ].map((step, i, arr) => (
                 <div key={i} className="flex flex-col items-start w-full">
                   <div className="neu-dark-flat rounded-xl px-6 py-3 text-sm text-white border border-white/5 w-full">
@@ -181,7 +178,7 @@ export default function ScenariosPage() {
 
           {/* Quote */}
           <blockquote className="border-l-4 border-[#CCDD00] pl-6 mt-8 italic text-white text-lg">
-            「月曜の朝に部長から『今週は何人来た？』って聞かれるのが怖くて。でも今は私が出社する前に、もうSlackに届いてるんです」
+            「月曜の朝に部長から『今週は何人来た？』って聞かれるのが怖くて。でも今は私が出社する前に、もう届いてるんです」
           </blockquote>
 
           {/* Key points */}
@@ -189,9 +186,9 @@ export default function ScenariosPage() {
             <p className="text-xs tracking-widest text-[#A060D0] uppercase mb-3">POINT</p>
             <ul className="space-y-3">
               {[
-                'クライアントが触るのはNotionとSlackだけ。どちらも既存ツール',
-                'Claudeが「読んで整理する」部分を担うから、担当者はPDFを開かなくていい',
-                '「AIが採用する」ではなく、「AIが準備する、判断は人間」という設計',
+                'KさんはいつものツールをいつものSS使うだけ。新しいことを覚える必要はない',
+                '書類を読んでまとめる作業は、すべて自動で行われる',
+                '「AIが採用する」ではなく、「AIが準備して、判断は人間がする」という設計',
               ].map((point, i) => (
                 <li key={i} className="flex items-start gap-3 text-[#919191] text-sm">
                   <CheckCircle size={16} className="text-[#CCDD00] shrink-0 mt-0.5" />
@@ -205,7 +202,7 @@ export default function ScenariosPage() {
         {/* Bottom CTA */}
         <section className="flex flex-col items-center text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            あなたの業務なら、何が自動化できるか。
+            あなたの仕事で、何を自動化できるか。
           </h2>
           <p className="text-[#919191] text-lg md:text-xl mb-12 max-w-2xl mx-auto">
             まず話しましょう。相談は無料。押し売りなし。
