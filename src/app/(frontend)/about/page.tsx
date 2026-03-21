@@ -265,7 +265,7 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-6 text-xs text-text-link text-right">
+            <p className="mt-6 pt-3 text-xs text-text-link text-right">
               <a href="/tokusho" className="underline hover:text-text-link/70 transition-colors">特定商取引法に基づく表記はこちら</a>
             </p>
           </motion.div>
