@@ -221,7 +221,7 @@ export default function ServicesPage() {
           </p>
           <Link
             href="/#contact"
-            className="neu-dark-btn flex items-center justify-center space-x-3 px-10 py-5 rounded-full text-xl font-bold group transition-transform hover:scale-105"
+            className="mt-4 neu-dark-btn flex items-center justify-center space-x-3 px-10 py-5 rounded-full text-xl font-bold group transition-transform hover:scale-105"
             style={{
               background: 'linear-gradient(145deg, #dce811, #abc200)',
               color: '#050505',
