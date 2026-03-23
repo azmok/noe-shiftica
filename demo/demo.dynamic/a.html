@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFE with TAILS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Sans+JP:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #2A2421;
+            /* Dark base */
+            overflow-x: hidden;
+        }
+
+        .font-serif-en {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Custom image mask utility */
+        .svg-clipped-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body class="text-[#2A2421] antialiased">
+
+    <!-- 1. Header Section -->
+    <header class="bg-[#2A2421] text-white py-6 px-8 relative z-20">
+        <h1 class="font-serif-en text-3xl italic tracking-wider">LIFE with TAILS</h1>
+    </header>
+
+    <!-- 2. Hero Section -->
+    <section
+        class="relative bg-[#A5B096] w-full min-h-[90vh] flex items-center justify-center overflow-hidden z-10 pt-10">
+        <!-- Background Layered Blobs -->
+        <!-- 1. Large Sandy Deco Blob -->
+        <svg class="absolute inset-0 w-full h-full object-cover text-[#EFE6D5] opacity-90 transform scale-110 pointer-events-none"
+            viewBox="0 0 1000 800" fill="currentColor">
+            <path
+                d="M920,320C960,450,880,580,780,680C680,780,500,850,350,820C200,790,80,660,40,520C0,380,50,230,150,130C250,30,420,-20,580,10C740,40,880,190,920,320Z" />
+        </svg>
+
+        <!-- 2. Hero Image with SVG Mask -->
+        <div class="relative z-10 w-[95%] max-w-6xl aspect-[16/9] md:aspect-[1.8/1]">
+            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-2xl" preserveAspectRatio="none">
+                <defs>
+                    <clipPath id="hero-main-mask" clipPathUnits="objectBoundingBox">
+                        <path
+                            d="M0.1,0.4 C0.05,0.2 0.25,0.05,0.5,0.1 C0.75,0.15,0.9,0.05,0.95,0.3 C1.0,0.55,0.95,0.85,0.75,0.95 C0.5,1.05,0.25,0.95,0.1,0.8 C-0.05,0.65,0.15,0.6,0.1,0.4 Z" />
+                    </clipPath>
+                    <!-- Dark Overlay Mask for Text Legibility -->
+                    <filter id="hero-darken">
+                        <feColorMatrix type="matrix" values="0.7 0 0 0 0 0 0.7 0 0 0 0 0 0.7 0 0 0 0 0 1 0" />
+                    </filter>
+                </defs>
+                <image
+                    href="https://images.unsplash.com/photo-1516733725897-15214fe214bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80"
+                    x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice"
+                    clip-path="url(#hero-main-mask)" filter="url(#hero-darken)" />
+            </svg>
+
+            <!-- Centered Text Over Image -->
+            <div class="absolute inset-0 flex items-center justify-center p-6 text-center">
+                <h2
+                    class="font-serif-en text-white italic text-4xl md:text-7xl lg:text-8xl leading-[1.1] drop-shadow-[0_5px_15px_rgba(0,0,0,0.4)]">
+                    Design Your Life<br>with Them
+                </h2>
+            </div>
+        </div>
+
+        <!-- Wave divider removed as it's not present in the clean Hero crop of the image -->
+    </section>
+
+    <!-- 3. Philosophy Section -->
+    <section class="bg-[#DF9F7E] relative py-32 px-6 z-10">
+        <!-- Top Wave Divider (Sage to Peach) -->
+        <svg class="absolute top-0 left-0 w-full h-24 text-[#A5B096] transform -translate-y-[99%]"
+            viewBox="0 0 1440 100" fill="currentColor" preserveAspectRatio="none">
+            <path d="M0,50 C300,100 500,0 800,40 C1100,80 1300,20 1440,50 L1440,100 L0,100 Z" />
+        </svg>
+
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16 relative z-10">
+            <!-- Left Side: Layered Blobs -->
+            <div class="w-full md:w-1/2 relative aspect-square md:aspect-[4/5]">
+                <!-- Decorative Sand Blob (Behind) -->
+                <svg class="absolute inset-0 w-[110%] h-[110%] -top-[5%] -left-[5%] text-[#EFE6D5] opacity-50 pointer-events-none"
+                    viewBox="0 0 200 200" fill="currentColor">
+                    <path
+                        d="M150,40C170,60,185,95,180,130C175,165,150,200,115,215C80,230,35,220,15,185C-5,150,-10,90,15,55C40,20,90,-10,125,5C160,20,130,20,150,40Z" />
+                </svg>
+
+                <!-- Main Image Blob -->
+                <svg viewBox="0 0 200 250" class="w-full h-full drop-shadow-2xl relative z-10">
+                    <defs>
+                        <clipPath id="philosophy-mask-refined">
+                            <path
+                                d="M160,50C180,75,190,115,175,150C160,185,120,215,85,220C50,225,15,200,5,160C-5,120,5,65,30,35C55,5,95,-10,130,10C165,30,140,25,160,50Z" />
+                        </clipPath>
+                    </defs>
+                    <image
+                        href="https://images.unsplash.com/photo-1516733725897-15214fe214bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        x="0" y="0" width="200" height="250" preserveAspectRatio="xMidYMid slice"
+                        clip-path="url(#philosophy-mask-refined)" style="filter: grayscale(1) contrast(1.1);"></image>
+                </svg>
+            </div>
+
+            <!-- Right Side: The Philosophy Card -->
+            <div class="w-full md:w-1/2 bg-[#FDFBF7] p-12 md:p-20 rounded-[4rem] shadow-2xl relative">
+                <h3 class="font-serif-en text-4xl md:text-5xl mb-8 italic text-[#2A2421]">The Philosophy</h3>
+                <div class="space-y-6 text-sm text-[#2A2421]/80 leading-loose tracking-wider">
+                    <p>犬との暮らしは、単なる飼育ではなく、共に生きるデザインです。私たちは、愛犬との生活空間を「整える」ことで、双方のウェルビーイングを高めます。</p>
+                    <p>私たちのアプローチは、エディトリアルな視点から、日常の些細な瞬間を美しく切り取り、機能的で心地よいライフスタイルを提案します。</p>
+                    <p>LIFE with TAILSは、あなたと愛犬との関係を見つめ直し、新しい生活様式を作り上げるためのプラットフォーム・スタジオです。</p>
+                </div>
+                <div class="mt-12 pt-8">
+                    <p class="text-[#2A2421]/60 text-lg border-b border-[#2A2421]/20 inline-block pb-1 italic">Director
+                        / Kenji Satoh</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Wave Divider (Peach to Sand) -->
+        <svg class="absolute bottom-0 left-0 w-full h-24 text-[#EFE6D5] transform translate-y-[99%]"
+            viewBox="0 0 1440 100" fill="currentColor" preserveAspectRatio="none">
+            <path d="M0,50 C400,0 600,100 1000,50 C1200,25 1350,60 1440,50 L1440,100 L0,100 Z" />
+        </svg>
+    </section>
+
+    <!-- 4. Daily Insight Section -->
+    <section class="bg-[#EFE6D5] relative py-32 px-6 overflow-visible z-10">
+        <!-- Giant Background Text: Daily Insigh -->
+        <div class="absolute top-10 left-0 w-full overflow-hidden flex justify-center pointer-events-none z-0">
+            <span class="font-serif-en text-[18vw] leading-none text-[#DF9F7E] opacity-[0.12] whitespace-nowrap">Daily
+                Insigh</span>
+        </div>
+
+        <div class="max-w-7xl mx-auto relative z-10 pt-20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-end">
+                <!-- Card 1 -->
+                <div class="flex flex-col items-start px-4">
+                    <div class="w-full mb-8 relative">
+                        <svg viewBox="0 0 100 80" class="w-full h-auto drop-shadow-xl">
+                            <defs>
+                                <clipPath id="card-mask-1-refined" clipPathUnits="objectBoundingBox">
+                                    <path
+                                        d="M0.1,0 C0.9,0, 1,0.1, 1,0.2 L1,0.8 C1,0.9, 0.9,1, 0.8,1 L0.2,1 C0.1,1, 0,0.9, 0,0.8 L0,0.2 C0,0.1, 0.1,0, 0.1,0 Z" />
+                                </clipPath>
+                            </defs>
+                            <image
+                                href="https://images.unsplash.com/photo-1516733725897-15214fe214bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                x="0" y="0" width="100" height="80" preserveAspectRatio="xMidYMid slice"
+                                clip-path="url(#card-mask-1-refined)" style="filter: grayscale(1);"></image>
+                        </svg>
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <span class="px-2 py-0.5 text-[8px] bg-[#DF9F7E] text-white tracking-widest uppercase">Dec
+                            2024</span>
+                        <span
+                            class="px-2 py-0.5 text-[8px] bg-[#A5B096] text-white tracking-widest uppercase">Article</span>
+                    </div>
+                    <h4 class="text-sm font-bold mb-3 tracking-widest text-[#2A2421] leading-relaxed">
+                        子のそよみを整える、静かな時間とパートナーシップ</h4>
+                    <p class="text-[10px] text-[#2A2421]/60 leading-relaxed tracking-wider">
+                        愛犬との穏やかな生活を実現するための、日々のルーティンや空間づくりのヒントをご紹介します。</p>
+                </div>
+
+                <!-- Card 2: The White Blob Card -->
+                <div class="relative flex flex-col items-center px-4 -mb-16 md:-mb-24 scale-105">
+                    <!-- Large White Background Blob -->
+                    <svg class="absolute inset-0 w-[120%] h-[140%] -top-[20%] -left-[10%] text-white drop-shadow-2xl pointer-events-none"
+                        viewBox="0 0 200 250" fill="currentColor">
+                        <path
+                            d="M100,20 C140,20 180,50 180,100 C180,150 160,230 100,230 C40,230 20,150 20,100 C20,50 60,20 100,20 Z" />
+                    </svg>
+
+                    <div class="relative z-10 w-full flex flex-col items-center text-center pb-20">
+                        <div class="w-full mb-8">
+                            <svg viewBox="0 0 100 85" class="w-full h-auto drop-shadow-lg">
+                                <defs>
+                                    <clipPath id="card-mask-2-refined" clipPathUnits="objectBoundingBox">
+                                        <path
+                                            d="M0.15,0 C0.85,0, 1,0.1, 1,0.25 L1,0.75 C1,0.9, 0.85,1, 0.75,1 L0.25,1 C0.1,1, 0,0.9, 0,0.75 L0,0.25 C0,0.1, 0.15,0, 0.15,0 Z" />
+                                    </clipPath>
+                                </defs>
+                                <image
+                                    href="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                    x="0" y="0" width="100" height="85" preserveAspectRatio="xMidYMid slice"
+                                    clip-path="url(#card-mask-2-refined)" style="filter: grayscale(1);"></image>
+                            </svg>
+                        </div>
+                        <div class="flex gap-2 mb-4">
+                            <span class="px-2 py-0.5 text-[8px] bg-[#DF9F7E] text-white tracking-widest uppercase">Dec
+                                2024</span>
+                            <span
+                                class="px-2 py-0.5 text-[8px] bg-[#A5B096] text-white tracking-widest uppercase">Product</span>
+                        </div>
+                        <h4 class="text-sm font-bold mb-3 tracking-widest text-[#2A2421] leading-relaxed max-w-[200px]">
+                            エディトリアル視点で選ぶ、今月のドッググッズ</h4>
+                        <p class="text-[10px] text-[#2A2421]/60 leading-relaxed tracking-wider max-w-[220px]">
+                            機能性とデザイン性を兼ね備えた、生活空間に馴染む上質なアイテムを絶えずご紹介。</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flex flex-col items-start px-4">
+                    <div class="w-full mb-8 relative">
+                        <svg viewBox="0 0 100 80" class="w-full h-auto drop-shadow-xl">
+                            <defs>
+                                <clipPath id="card-mask-3-refined" clipPathUnits="objectBoundingBox">
+                                    <path
+                                        d="M0.1,0 C0.9,0, 1,0.1, 1,0.2 L1,0.8 C1,0.9, 0.9,1, 0.8,1 L0.2,1 C0.1,1, 0,0.9, 0,0.8 L0,0.2 C0,0.1, 0.1,0, 0.1,0 Z" />
+                                </clipPath>
+                            </defs>
+                            <image
+                                href="https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                x="0" y="0" width="100" height="80" preserveAspectRatio="xMidYMid slice"
+                                clip-path="url(#card-mask-3-refined)" style="filter: grayscale(1);"></image>
+                        </svg>
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <span class="px-2 py-0.5 text-[8px] bg-[#DF9F7E] text-white tracking-widest uppercase">Dec
+                            2024</span>
+                        <span
+                            class="px-2 py-0.5 text-[8px] bg-[#A5B096] text-white tracking-widest uppercase">Care</span>
+                    </div>
+                    <h4 class="text-sm font-bold mb-3 tracking-widest text-[#2A2421] leading-relaxed">
+                        素材と機能の調和。厳選されたケアアイテム</h4>
+                    <p class="text-[10px] text-[#2A2421]/60 leading-relaxed tracking-wider">
+                        愛犬の肌や被毛に優しい自然由来成分で作られた、安心のケアプロダクト。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Wave Divider (Sand to Sage Green) -->
+        <svg class="absolute bottom-0 left-0 w-full h-24 text-[#A5B096] transform translate-y-[99%] z-20"
+            viewBox="0 0 1440 100" fill="currentColor" preserveAspectRatio="none">
+            <path d="M0,20 C300,80 500,10 800,60 C1100,110 1300,30 1440,70 L1440,100 L0,100 Z" />
+        </svg>
+    </section>
+
+    <!-- 5. Portfolio / Style Section -->
+    <section class="bg-[#98A590] relative py-20 px-6 z-10 overflow-hidden">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h3 class="font-serif-en text-4xl italic text-[#2A2421]">Portfolio / Style</h3>
+                    <p class="text-xs tracking-widest text-[#2A2421]/60 mt-2 uppercase">Visual Archives 0024</p>
+                </div>
+                <span class="font-serif-en text-6xl md:text-8xl text-white/30 italic">02</span>
+            </div>
+
+            <!-- 4 Dogs Gallery with Organic Shapes -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 items-center">
+
+                <!-- Dog 1 -->
+                <div class="aspect-[4/5] w-full transform -translate-y-4">
+                    <svg viewBox="0 0 200 250" class="w-full h-full drop-shadow-xl">
+                        <defs>
+                            <clipPath id="port-mask-1">
+                                <path
+                                    d="M150,40C170,60,185,95,180,130C175,165,150,200,115,215C80,230,35,220,15,185C-5,150,-10,90,15,55C40,20,90,-10,125,5C160,20,130,20,150,40Z" />
+                            </clipPath>
+                        </defs>
+                        <!-- Beige backing blob -->
+                        <path
+                            d="M150,40C170,60,185,95,180,130C175,165,150,200,115,215C80,230,35,220,15,185C-5,150,-10,90,15,55C40,20,90,-10,125,5C160,20,130,20,150,40Z"
+                            fill="#EFE6D5" />
+                        <image
+                            href="https://images.unsplash.com/photo-1594149929911-78975a43d4f5?auto=format&fit=crop&w=400&q=80"
+                            x="0" y="0" width="200" height="250" preserveAspectRatio="xMidYMid slice"
+                            clip-path="url(#port-mask-1)"></image>
+                    </svg>
+                </div>
+
+                <!-- Dog 2 -->
+                <div class="aspect-[4/5] w-full transform translate-y-8">
+                    <svg viewBox="0 0 200 250" class="w-full h-full drop-shadow-xl">
+                        <defs>
+                            <clipPath id="port-mask-2">
+                                <path
+                                    d="M160,50C180,75,190,115,175,150C160,185,120,215,85,220C50,225,15,200,5,160C-5,120,5,65,30,35C55,5,95,-10,130,10C165,30,140,25,160,50Z" />
+                            </clipPath>
+                        </defs>
+                        <!-- Dark backing blob -->
+                        <path
+                            d="M160,50C180,75,190,115,175,150C160,185,120,215,85,220C50,225,15,200,5,160C-5,120,5,65,30,35C55,5,95,-10,130,10C165,30,140,25,160,50Z"
+                            fill="#2A2421" />
+                        <image
+                            href="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=400&q=80"
+                            x="0" y="0" width="200" height="250" preserveAspectRatio="xMidYMid slice"
+                            clip-path="url(#port-mask-2)" style="mix-blend-mode: luminosity;"></image>
+                    </svg>
+                </div>
+
+                <!-- Dog 3 -->
+                <div class="aspect-[4/5] w-full transform -translate-y-2">
+                    <svg viewBox="0 0 200 250" class="w-full h-full drop-shadow-xl">
+                        <defs>
+                            <clipPath id="port-mask-3">
+                                <path
+                                    d="M145,35C165,60,175,100,165,140C155,180,125,210,90,215C55,220,15,195,5,155C-5,115,10,60,35,30C60,0,100,-15,125,10C150,35,125,10,145,35Z" />
+                            </clipPath>
+                        </defs>
+                        <!-- Peach backing blob -->
+                        <path
+                            d="M145,35C165,60,175,100,165,140C155,180,125,210,90,215C55,220,15,195,5,155C-5,115,10,60,35,30C60,0,100,-15,125,10C150,35,125,10,145,35Z"
+                            fill="#DF9F7E" />
+                        <image
+                            href="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80"
+                            x="0" y="0" width="200" height="250" preserveAspectRatio="xMidYMid slice"
+                            clip-path="url(#port-mask-3)"></image>
+                    </svg>
+                </div>
+
+                <!-- Dog 4 -->
+                <div class="aspect-[4/5] w-full transform translate-y-6">
+                    <svg viewBox="0 0 200 250" class="w-full h-full drop-shadow-xl">
+                        <defs>
+                            <clipPath id="port-mask-4">
+                                <path
+                                    d="M155,45C175,70,185,110,170,145C155,180,115,205,80,210C45,215,10,190,0,150C-10,110,10,55,35,25C60,-5,100,-10,130,15C160,40,135,20,155,45Z" />
+                            </clipPath>
+                        </defs>
+                        <!-- Sand backing blob -->
+                        <path
+                            d="M155,45C175,70,185,110,170,145C155,180,115,205,80,210C45,215,10,190,0,150C-10,110,10,55,35,25C60,-5,100,-10,130,15C160,40,135,20,155,45Z"
+                            fill="#EFE6D5" />
+                        <image
+                            href="https://images.unsplash.com/photo-1517423568366-8b83523034fd?auto=format&fit=crop&w=400&q=80"
+                            x="0" y="0" width="200" height="250" preserveAspectRatio="xMidYMid slice"
+                            clip-path="url(#port-mask-4)" style="mix-blend-mode: luminosity;"></image>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bottom Wavy Divider (Green to Sand) -->
+        <svg class="absolute bottom-0 left-0 w-full h-24 md:h-32 text-[#EFE6D5]" viewBox="0 0 1440 100"
+            fill="currentColor" preserveAspectRatio="none">
+            <path d="M0,60 C350,120 550,10 850,50 C1150,90 1350,20 1440,60 L1440,100 L0,100 Z"></path>
+        </svg>
+    </section>
+
+    <!-- 6. Service Section -->
+    <section class="bg-[#EFE6D5] relative py-32 px-6 overflow-hidden z-10">
+        <!-- Background SVG Blobs -->
+        <!-- Top Left Large White Blob -->
+        <svg class="absolute top-0 left-0 w-[80%] md:w-[70%] h-auto text-white pointer-events-none transform -translate-x-1/4 -translate-y-1/4" viewBox="0 0 500 500" fill="currentColor">
+            <path d="M430.5,145.5C460.1,202.1,440.5,285.1,399.8,341.1C359.1,397.1,297.2,426.1,230.1,430.1C163,434.1,90.6,413.1,46.5,362.5C2.4,311.9,-13.4,231.7,11.1,165.1C35.6,98.5,100.4,45.5,175.1,19.2C249.8,-7.1,334.3,3.3,385.5,50.5C400,65,415.9,88.9,430.5,145.5Z" />
+        </svg>
+
+        <!-- Bottom Right Large White Blob -->
+        <svg class="absolute bottom-0 right-0 w-[70%] md:w-[60%] h-auto text-white pointer-events-none transform translate-x-1/4 translate-y-1/4" viewBox="0 0 500 500" fill="currentColor">
+            <path d="M410.5,120.5C450.1,180.1,475.5,250.1,455.8,310.1C436.1,370.1,371.2,420.1,300.1,435.1C229,450.1,151.6,430.1,90.5,385.5C29.4,340.9,-15.4,271.7,4.1,210.1C23.6,148.5,107.4,94.5,185.1,65.2C262.8,35.9,334.3,31.3,375.5,70.5C390,85,395.9,98.9,410.5,120.5Z" />
+        </svg>
+
+        <div class="max-w-4xl mx-auto relative z-10 px-4">
+            <div class="mb-20">
+                <h3 class="font-serif-en text-5xl md:text-6xl text-[#2A2421] italic mb-4">Service</h3>
+                <div class="w-12 h-[1px] bg-[#2A2421]/30"></div>
+            </div>
+
+            <div class="space-y-16">
+                <!-- Service 1 -->
+                <div class="flex flex-row items-center justify-between pb-10 border-b border-[#2A2421]/10">
+                    <div class="flex items-center gap-8 md:gap-12">
+                        <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 relative text-[#DF9F7E]">
+                            <svg viewBox="0 0 100 100" class="w-full h-full" fill="currentColor">
+                                <path d="M85,40C92,52,90,68,82,79C75,90,61,96,48,95C35,94,22,86,14,75C6,65,2,52,6,40C10,28,21,18,35,11C49,4,66,0,75,6C85,13,79,29,85,40Z" />
+                                <text x="50" y="58" font-size="28" fill="#2A2421" text-anchor="middle" font-family="sans-serif">✂</text>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-serif-en text-2xl md:text-3xl text-[#2A2421] mb-2">Standard Design</h4>
+                            <p class="text-[9px] md:text-xs text-[#2A2421]/50 tracking-[0.2em] leading-relaxed max-w-sm md:max-w-md uppercase">シンプルなベーシックケア。毛並みを整え、健康状態をチェックする基本のプランです。</p>
+                        </div>
+                    </div>
+                    <div class="font-serif-en text-xl md:text-2xl text-[#2A2421] italic whitespace-nowrap pl-4">¥12,000 〜</div>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="flex flex-row items-center justify-between pb-10 border-b border-[#2A2421]/10">
+                    <div class="flex items-center gap-8 md:gap-12">
+                        <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 relative text-[#DF9F7E]">
+                            <svg viewBox="0 0 100 100" class="w-full h-full" fill="currentColor">
+                                <path d="M82,35C90,48,92,65,85,77C79,89,63,96,48,95C33,94,18,85,10,72C2,60,0,44,6,30C12,16,25,5,40,1C55,-3,72,-1,78,10C85,22,75,23,82,35Z" />
+                                <text x="50" y="58" font-size="28" fill="#2A2421" text-anchor="middle" font-family="sans-serif">✤</text>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-serif-en text-2xl md:text-3xl text-[#2A2421] mb-2">Kinematic Care</h4>
+                            <p class="text-[9px] md:text-xs text-[#2A2421]/50 tracking-[0.2em] leading-relaxed max-w-sm md:max-w-md uppercase">マッサージを取り入れたスペシャルケア。筋肉の緊張をほぐし、血行を促進します。</p>
+                        </div>
+                    </div>
+                    <div class="font-serif-en text-xl md:text-2xl text-[#2A2421] italic whitespace-nowrap pl-4">¥18,000 〜</div>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="flex flex-row items-center justify-between pb-10 border-b border-[#2A2421]/10">
+                            <p class="text-[10px] md:text-xs text-gray-500 tracking-widest leading-relaxed max-w-md">
+                                写真撮影込みのトータルパッケージ。美しく整った姿をプロのカメラマンが記録に残します。愛犬との絆を永遠の記録として残す、特別なセッションです。</p>
+                        </div>
+                    </div>
+                    <div class="font-serif-en text-xl md:text-2xl text-[#2A2421] italic whitespace-nowrap">¥33,000 〜
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Wavy Divider (Sand to Peach) -->
+    <svg class="absolute bottom-0 left-0 w-full h-24 md:h-32 text-[#DF9F7E]" viewBox="0 0 1440 100" fill="currentColor"
+        preserveAspectRatio="none">
+        <path d="M0,40 C250,90 450,10 750,50 C1050,90 1250,20 1440,60 L1440,100 L0,100 Z"></path>
+    </svg>
+    </section>
+
+    <!-- 7. CTA Section -->
+    <section class="bg-[#DF9F7E] relative py-24 px-6 text-center z-10 flex flex-col items-center justify-center">
+        <h2 class="text-2xl md:text-4xl font-medium mb-8 leading-relaxed">
+            一緒に、暮らしを<br>整えていきませんか？
+        </h2>
+        <a href="#"
+            class="inline-block bg-[#2A2421] text-white px-10 py-4 rounded-full text-sm tracking-widest hover:bg-black transition duration-300">
+            MAKE AN APPOINTMENT
+        </a>
+
+        <!-- Bottom Wavy Divider (Peach to Dark Footer) -->
+        <svg class="absolute bottom-0 left-0 w-full h-16 md:h-24 text-[#2A2421]" viewBox="0 0 1440 100"
+            fill="currentColor" preserveAspectRatio="none">
+            <path d="M0,70 C400,20 600,100 1000,50 C1200,25 1350,60 1440,40 L1440,100 L0,100 Z"></path>
+        </svg>
+    </section>
+
+    <!-- 8. Footer -->
+    <footer class="bg-[#2A2421] text-white/50 py-12 px-6 text-center relative z-20">
+        <p class="text-xs tracking-widest uppercase">
+            &copy; 2024 LIFE WITH TAILS. EDITORIAL KINEMATICS.
+        </p>
+    </footer>
+
+</body>
+
+</html>

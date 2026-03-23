@@ -106,7 +106,39 @@ export function HtmlEmbedBlock({ bodyHtml, embedCss, title }: Props) {
       }
     }
     
+    // 3. Handle fragment navigation (TOC links) inside Shadow DOM.
+    // Standard browser fragment navigation doesn't work across Shadow DOM boundaries.
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest('a')
+      if (target && target.hash && target.origin === window.location.origin) {
+        const id = target.hash.slice(1)
+        const element = shadow.getElementById(id)
+        if (element) {
+          e.preventDefault()
+          
+          // Calculate the global position of the element
+          // We use getBoundingClientRect() + current scroll to get the absolute document position
+          const rect = element.getBoundingClientRect()
+          const scrollTarget = window.pageYOffset + rect.top - 100 // 100px offset for sticky header
+
+          window.scrollTo({
+            top: scrollTarget,
+            behavior: 'smooth'
+          })
+          
+          // Update URL hash without triggering browser's default jump
+          window.history.pushState(null, '', target.hash)
+        }
+      }
+    }
+
+    shadow.addEventListener('click', handleLinkClick as EventListener)
+
     runScripts()
+
+    return () => {
+      shadow.removeEventListener('click', handleLinkClick as EventListener)
+    }
 
   }, [bodyHtml, embedCss])
 
@@ -115,7 +147,7 @@ export function HtmlEmbedBlock({ bodyHtml, embedCss, title }: Props) {
       ref={hostRef} 
       id="uploaded-content"
       aria-label={title || 'Embedded Content'} 
-      className="w-full rounded-2xl overflow-hidden bg-transparent"
+      className="w-full rounded-2xl bg-transparent"
     />
   )
 }
