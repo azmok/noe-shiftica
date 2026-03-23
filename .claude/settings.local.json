@@ -43,7 +43,9 @@
       "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision' --project=noe-shiftica --limit=200 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Where-Object { \\\\$_ -match 'Error|error|failed|Failed|warn|WARN|Cannot|cannot|undefined|null|ECONN|timeout|secret|Secret' }\n\" 2>&1)",
       "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=cloud_run_revision' --project=noe-shiftica --limit=500 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Select-Object -First 100\n\" 2>&1)",
       "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=build' --project=noe-shiftica --limit=100 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Where-Object { \\\\$_ -match 'Error|error|failed|Failed|FAIL|success|SUCCESS|finish|Finish|Step' } | Select-Object -First 50\n\" 2>&1)",
-      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=build' --project=noe-shiftica --limit=20 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Select-Object -First 40\n\" 2>&1)"
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"\n\\\\$logs = & 'C:\\\\Users\\\\genta\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd' logging read 'resource.type=build' --project=noe-shiftica --limit=20 --order=desc --format='value\\(timestamp,textPayload\\)' 2>&1\n\\\\$logs | Select-Object -First 40\n\" 2>&1)",
+      "Bash(ls:*)",
+      "WebFetch(domain:firebasestorage.googleapis.com)"
     ]
   }
 }

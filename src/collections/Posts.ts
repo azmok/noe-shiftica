@@ -139,6 +139,13 @@ export const Posts: CollectionConfig = {
                 position: 'sidebar',
                 description: 'MarkdownのFrontmatterに含まれる未知のメタデータがここに格納されます',
             },
-        }
+        },
+        {
+            name: 'htmlEmbed',
+            type: 'upload',
+            relationTo: 'html-files',
+            label: '埋め込みHTMLファイル',
+            required: false,
+        },
     ],
 }

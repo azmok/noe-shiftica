@@ -20,6 +20,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
+import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { ogImagePlugin } from './plugins/og-image'
 
@@ -36,7 +37,7 @@ const config = buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Posts],
+  collections: [Users, Media, Categories, Posts, HtmlFiles],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
@@ -61,6 +62,7 @@ const config = buildConfig({
     gcsStorage({
       collections: {
         media: true,
+        'html-files': true,
       },
       bucket: process.env.GCS_BUCKET || (process.env.FIREBASE_CONFIG ? JSON.parse(process.env.FIREBASE_CONFIG).storageBucket : 'noe-shiftica.firebasestorage.app'),
       options: {

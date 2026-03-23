@@ -5,6 +5,7 @@ import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
+import { HtmlEmbedBlock } from "@/components/HtmlEmbedBlock"
 
 export const PostArticle: React.FC<{
     post: Post
@@ -122,6 +123,15 @@ export const PostArticle: React.FC<{
                                 return null;
                             })()}
                         </div>
+
+                        {/* HTML Embed */}
+                        {(post as any).htmlEmbed?.bodyHtml && (
+                            <HtmlEmbedBlock
+                                bodyHtml={(post as any).htmlEmbed.bodyHtml}
+                                embedCss={(post as any).htmlEmbed.embedCss ?? ''}
+                                title={post.title}
+                            />
+                        )}
 
                         {/* Mobile Tags */}
                         {(() => {
@@ -266,6 +276,15 @@ export const PostArticle: React.FC<{
                             return null;
                         })()}
                         </div>
+
+                        {/* HTML Embed */}
+                        {(post as any).htmlEmbed?.bodyHtml && (
+                            <HtmlEmbedBlock
+                                bodyHtml={(post as any).htmlEmbed.bodyHtml}
+                                embedCss={(post as any).htmlEmbed.embedCss ?? ''}
+                                title={post.title}
+                            />
+                        )}
 
                         {/* Tags */}
                         {(() => {

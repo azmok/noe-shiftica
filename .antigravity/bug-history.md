@@ -88,3 +88,13 @@
 - **File(s) Modified**: `src/app/(frontend)/layout.tsx`
 - **Fix Summary**: Changed the import syntax from `{ GoogleAnalytics }` to `GoogleAnalytics`.
 - **Prevention Note**: Always verify whether a new component uses `export default` or `export const` before writing the import statement in the layout.
+
+### [2026-03-24 00:20] Bug: Magnetic Cursor Size Mismatch on Hover
+- **Error**: The magnetic `<CustomCursor />` component appeared slightly smaller than the target buttons upon hover. It did not perfectly snap to the edges of the button.
+- **Root Cause**: The CTA buttons had a CSS animation class `hover:scale-105`. The `<CustomCursor />` measures the element's `getBoundingClientRect()` width and height precisely at the moment of the `mouseover` event (which is before the transition visually completes). As the button scales up visually to 105%, the cursor remains stuck at 100% size, creating a gap between the cursor bounds and the physical button.
+- **File(s) Modified**:
+  - `src/app/(frontend)/services/page.tsx`
+  - `src/app/(frontend)/services/scenarios/page.tsx`
+  - `src/app/(frontend)/services/cms-content-operations/page.tsx`
+- **Fix Summary**: Removed `hover:scale-105` (and its accompanying `transition-transform`) from the buttons. 
+- **Prevention Note**: When using dynamic Javascript-based magnetic cursors that dynamically bind to an element's bounding rect, **avoid using CSS scaling transforms (`scale`) on hover** for those target elements. Doing so causes an inherent state/render mismatch unless the cursor also hooks into `ResizeObserver` or continuously polls the dimension changes (which harms performance).

@@ -26,7 +26,7 @@ export default function ServicesPage() {
         </section>
 
         {/* 2. Services (3カード) */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-32">
+        <section id="services-exmaples" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-32">
           {/* Card 1 */}
           <div className="neu-dark-flat hover:neu-dark-pressed transition-all duration-300 p-8 md:p-10 rounded-3xl flex flex-col items-start text-left group">
             <div className="text-[#CCDD00] mb-8 p-4 rounded-full bg-[#CCDD00]/10 group-hover:scale-110 transition-transform duration-300">
@@ -37,9 +37,9 @@ export default function ServicesPage() {
               LP・ポートフォリオ・コーポレートサイト。テンプレートなし、ブランドから設計。
             </p>
             <div className="flex flex-wrap gap-2 text-sm text-white/80">
-              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Next.js</span>
+              {/* <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Next.js</span>
               <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Tailwind CSS</span>
-              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Figma</span>
+              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Figma</span> */}
             </div>
           </div>
 
@@ -53,10 +53,22 @@ export default function ServicesPage() {
               公開後も自分で更新できる設計。PayloadCMS でブログ・実績・採用など拡張可能。運用マニュアル付き。
             </p>
             <div className="flex flex-wrap gap-2 text-sm text-white/80">
-              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Payload CMS</span>
+              {/* <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Payload CMS</span>
               <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Neon</span>
-              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">PostgreSQL</span>
+              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">PostgreSQL</span> */}
             </div>
+            <Link
+              href="/services/cms-content-operations"
+              className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 group"
+              style={{
+                background: 'linear-gradient(145deg, #A060D0, #6B2DA0)',
+                color: '#ffffff',
+                boxShadow: '4px 4px 10px #000000, -2px -2px 8px #1a1a1a',
+              }}
+            >
+              <span>事例詳細を見る</span>
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
 
           {/* Card 3 */}
@@ -70,34 +82,67 @@ export default function ServicesPage() {
               業務フローへのAI組み込み。自動化設計・ツール選定。Premiumプランの中心サービス。要相談ベース。
             </p>
             <div className="flex flex-wrap gap-2 text-sm text-white/80">
-              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Claude AI</span>
+              {/* <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Claude AI</span>
               <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">n8n</span>
-              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Automation</span>
+              <span className="bg-[#121212] px-4 py-1.5 rounded-full border border-white/5">Automation</span> */}
             </div>
             <Link
               href="/services/scenarios"
-              className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 group hover:scale-105"
+              className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 group"
               style={{
                 background: 'linear-gradient(145deg, #A060D0, #6B2DA0)',
                 color: '#ffffff',
                 boxShadow: '4px 4px 10px #000000, -2px -2px 8px #1a1a1a',
               }}
             >
-              <span>事例シナリオを見る</span>
+              <span>事例詳細を見る</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </section>
 
         {/* 3. Tech Stack */}
-        <section className="mb-32 flex flex-col items-center">
-          <h2 className="text-sm md:text-base font-bold tracking-[0.3em] text-[#919191] uppercase mb-10 text-center">Powered By Technology</h2>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            {['Next.js', 'Payload CMS', 'Neon', 'Tailwind CSS', 'Claude AI', 'Vercel'].map((tech) => (
-              <div key={tech} className="neu-dark-flat px-6 py-3 md:px-8 md:py-4 rounded-xl text-[#CCDD00] font-semibold text-sm md:text-lg border border-white/5">
-                {tech}
-              </div>
-            ))}
+        <section className="mb-32">
+          <h2 className="text-sm md:text-base font-bold tracking-[0.3em] text-[#919191] uppercase mb-16 text-center">Powered By Technology</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 w-full max-w-4xl mx-auto text-left">
+            <div>
+              <h3 className="text-primary font-serif text-xl mb-8 flex items-center gap-3 tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Tech Stack
+              </h3>
+              <ul className="space-y-5">
+                {[
+                  { name: "Next.js", dev: "Framework" },
+                  { name: "Payload CMS", dev: "Headless CMS" },
+                  { name: "Tailwind CSS", dev: "Styling" },
+                  { name: "Cloud AI (Gemini)", dev: "AI Engine" }
+                ].map((item, i) => (
+                  <li key={i} className="flex justify-between items-end border-b border-white/5 pb-2 group">
+                    <span className="text-white/80 font-medium tracking-tight group-hover:text-white transition-colors">{item.name}</span>
+                    <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] font-light mb-1">{item.dev}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-primary font-serif text-xl mb-8 flex items-center gap-3 tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Cloud Technology
+              </h3>
+              <ul className="space-y-5">
+                {[
+                  { name: "Firebase App Hosting", dev: "Hosting" },
+                  { name: "Firebase Cloud Storage", dev: "Media" },
+                  { name: "Neon", dev: "Database" }
+                ].map((item, i) => (
+                  <li key={i} className="flex justify-between items-end border-b border-white/5 pb-2 group">
+                    <span className="text-white/80 font-medium tracking-tight group-hover:text-white transition-colors">{item.name}</span>
+                    <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] font-light mb-1">{item.dev}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -189,7 +234,6 @@ export default function ServicesPage() {
         <section className="mb-32">
           <div className="flex flex-col items-center md:items-start mb-12">
             <h2 className="text-5xl md:text-6xl font-bold text-[#ffffff] mb-4">Works.</h2>
-            <p className="text-[#919191] text-lg md:text-xl">Coming Soon — 実績は随時更新します。</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Real project card */}
@@ -233,7 +277,7 @@ export default function ServicesPage() {
           </p>
           <Link
             href="/#contact"
-            className="mt-4 neu-dark-btn flex items-center justify-center space-x-3 px-10 py-5 rounded-full text-xl font-bold group transition-transform hover:scale-105"
+            className="mt-4 neu-dark-btn flex items-center justify-center space-x-3 px-10 py-5 rounded-full text-xl font-bold group"
             style={{
               background: 'linear-gradient(145deg, #dce811, #abc200)',
               color: '#050505',
