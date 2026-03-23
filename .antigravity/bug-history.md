@@ -98,3 +98,17 @@
   - `src/app/(frontend)/services/cms-content-operations/page.tsx`
 - **Fix Summary**: Removed `hover:scale-105` (and its accompanying `transition-transform`) from the buttons. 
 - **Prevention Note**: When using dynamic Javascript-based magnetic cursors that dynamically bind to an element's bounding rect, **avoid using CSS scaling transforms (`scale`) on hover** for those target elements. Doing so causes an inherent state/render mismatch unless the cursor also hooks into `ResizeObserver` or continuously polls the dimension changes (which harms performance).
+
+### [2026-03-24 01:40] Bug: Shadow DOM CSS Scoping Conflict (Dark Theme not applying)
+- **Error**: Embedded HTML content displayed with a white background instead of the intended dark theme, despite the CSS being present in the Shadow DOM.
+- **Root Cause**:
+  1. **Specificity Conflict**: The Shadow Host element (the wrapper `div` in React) had a Tailwind class `bg-transparent`. In CSS specificity rules, styles applied directly to an element from the outer document (like `bg-transparent`) override the internal `:host` styles from within the Shadow DOM.
+  2. **Selector Mismatch**: Mapping the `#uploaded-content` ID to `:host` inside the Shadow DOM prevented the rule from reaching the internal root element. Since the host's background was forced to transparent, the intended dark background was lost.
+- **File(s) Modified**:
+  - `src/collections/HtmlFiles.ts`
+  - `src/components/HtmlEmbedBlock.tsx`
+- **Fix Summary**:
+  - **Backend**: Updated `extractFromHtml` to transform the original `<body>` tag into a `<div id="uploaded-content">`.
+  - **Backend**: Rewrote `body` CSS rules to target `#uploaded-content`.
+  - **Frontend**: Stopped mapping `#uploaded-content` to `:host` inside the Shadow DOM's `<style>` tag. This allows the internal rule to target the internal root `div` directly, effectively bypassing the host-level transparent background override.
+- **Prevention Note**: When styling the root of an embedded Shadow DOM, avoid relying solely on `:host` if the host element is subject to external layout/transparency classes. Instead, transform the content to have a specific root ID and target that ID internally to ensure style dominance within the container.

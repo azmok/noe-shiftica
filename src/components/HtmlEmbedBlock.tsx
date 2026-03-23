@@ -14,9 +14,109 @@ export function HtmlEmbedBlock({ bodyHtml, embedCss, title }: Props) {
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
+    
+    // Create or reuse open shadow root
     const shadow = host.shadowRoot ?? host.attachShadow({ mode: 'open' })
-    shadow.innerHTML = `${embedCss ?? ''}${bodyHtml}`
+
+    // Build the initial DOM string
+    const hostCss = `
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+          min-height: 100%;
+          background-color: transparent; /* fallback */
+        }
+        /* Force injected root to fill the screen to prevent white gaps */
+        body, #uploaded-content {
+          min-height: 100%;
+          margin: 0;
+          display: block;
+        }
+      </style>
+    `
+    // Set raw HTML first (scripts will NOT execute here)
+    shadow.innerHTML = `${hostCss}\n${embedCss ?? ''}\n${bodyHtml}`
+
+    // 1. Rewrite CSS in injected <style> tags to scope html/:root and body to #uploaded-content
+    const styleTags = Array.from(shadow.querySelectorAll('style'))
+    styleTags.forEach(style => {
+      if (style.textContent) {
+        // Replace html/:root with :host for the shadow boundary (global variables, etc.)
+        style.textContent = style.textContent.replace(
+          /(^|\}|;|,|\s)(html|:root)(?=\s*[,{\.#:])/gi,
+          '$1:host'
+        )
+        // Transform 'body' into '#uploaded-content' so it targets the internal root div.
+        // We DO NOT map '#uploaded-content' to ':host' here because the host's external 
+        // Tailwind classes (like bg-transparent) would override the internal background color.
+        style.textContent = style.textContent.replace(
+          /(^|\}|;|,|\s)body(?=\s*[,{\.#:])/gi,
+          '$1#uploaded-content'
+        )
+      }
+    })
+
+    // 2. Re-evaluate and execute scripts to allow graphs to render.
+    // Browsers block <script> tags added via innerHTML. We must clone and append them manually.
+    const scripts = Array.from(shadow.querySelectorAll('script'))
+    
+    const runScripts = async () => {
+      for (const oldScript of scripts) {
+        const newScript = document.createElement('script')
+        
+        // Copy all attributes (like src, type, async)
+        Array.from(oldScript.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value)
+        })
+        
+        // Temporarily patch document to fallback to shadow root for specific queries during script execution.
+        // This is crucial for graph libraries that blindly call document.getElementById()
+        const code = oldScript.innerHTML
+        if (code) {
+          newScript.innerHTML = `
+            (function() {
+              const shadowRoot = document.currentScript ? document.currentScript.getRootNode() : null;
+              const originalGetElementById = document.getElementById.bind(document);
+              document.getElementById = function(id) {
+                return (shadowRoot && shadowRoot.getElementById && shadowRoot.getElementById(id)) || originalGetElementById(id);
+              };
+              try {
+                ${code}
+              } catch(e) {
+                console.error("Error evaluating script in Shadow DOM:", e);
+              } finally {
+                document.getElementById = originalGetElementById;
+              }
+            })();
+          `
+        }
+        
+        // Wait for external libraries (like Plotly.js / ECharts.js) to load before proceeding
+        if (newScript.src) {
+          await new Promise((resolve) => {
+            newScript.onload = resolve
+            newScript.onerror = resolve // proceed even on error to unblock others
+            oldScript.replaceWith(newScript)
+          })
+        } else {
+          // Inline scripts execute synchronously upon insertion
+          oldScript.replaceWith(newScript)
+        }
+      }
+    }
+    
+    runScripts()
+
   }, [bodyHtml, embedCss])
 
-  return <div ref={hostRef} aria-label={title} />
+  return (
+    <div 
+      ref={hostRef} 
+      id="uploaded-content"
+      aria-label={title || 'Embedded Content'} 
+      className="w-full rounded-2xl overflow-hidden bg-transparent"
+    />
+  )
 }
+
