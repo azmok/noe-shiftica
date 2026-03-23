@@ -141,10 +141,9 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                   className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
                 >
                   <option value="">選択してください</option>
-                  <option value="15">〜15万</option>
-                  <option value="35">15〜35万</option>
-                  <option value="more">35万〜</option>
-                  <option value="unknown">未定</option>
+                  <option value="15">15万円から</option>
+                  <option value="35">35万円から</option>
+                  <option value="unknown">要相談</option>
                 </select>
               </div>
               <div className="space-y-2">

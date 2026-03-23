@@ -38,7 +38,7 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
           <Button href="#contact" variant="primary" size="lg" className="w-full sm:w-auto">
             無料相談を予約する
           </Button>
-          <Button href="#works" variant="outline" size="lg" className="w-full sm:w-auto">
+          <Button href="/services#services-exmaples" variant="outline" size="lg" className="w-full sm:w-auto">
             実績を見る ↓
           </Button>
         </motion.div>
@@ -52,6 +52,60 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
         >
           返信は24時間以内 ・ 相談無料 ・ 押し売りなし
         </motion.p>
+
+        {/* Tech Stack & Cloud Technology Sections */}
+        <div className="mt-28 grid grid-cols-1 md:grid-cols-2 gap-16 w-full max-w-4xl mx-auto text-left border-t border-white/5 pt-16">
+          <motion.div 
+            custom={4}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <h3 className="text-primary font-serif text-xl mb-8 flex items-center gap-3 tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              Tech Stack
+            </h3>
+            <ul className="space-y-5">
+              {[
+                { name: "Next.js", dev: "Framework" },
+                { name: "Payload CMS", dev: "Headless CMS" },
+                { name: "Tailwind CSS", dev: "Styling" },
+                { name: "Cloud AI (Gemini)", dev: "AI Engine" }
+              ].map((item, i) => (
+                <li key={i} className="flex justify-between items-end border-b border-white/5 pb-2 group">
+                  <span className="text-white/80 font-medium tracking-tight group-hover:text-white transition-colors">{item.name}</span>
+                  <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] font-light mb-1">{item.dev}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div 
+            custom={5}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <h3 className="text-primary font-serif text-xl mb-8 flex items-center gap-3 tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              Cloud Technology
+            </h3>
+            <ul className="space-y-5">
+              {[
+                { name: "Firebase App Hosting", dev: "Hosting" },
+                { name: "Firebase Cloud Storage", dev: "Media" },
+                { name: "Neon", dev: "Database" }
+              ].map((item, i) => (
+                <li key={i} className="flex justify-between items-end border-b border-white/5 pb-2 group">
+                  <span className="text-white/80 font-medium tracking-tight group-hover:text-white transition-colors">{item.name}</span>
+                  <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] font-light mb-1">{item.dev}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
