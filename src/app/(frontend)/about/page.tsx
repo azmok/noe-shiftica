@@ -284,7 +284,7 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">
               Ready to Shift?
             </h2>
-            <p className="text-xl text-white/80 mb-10">
+            <p className="text-xl text-white/80 mb-2! md:mb-10">
               一緒に、あなたのブランドを設計しましょう。
             </p>
             <Button href="/#contact" variant="primary" size="lg">

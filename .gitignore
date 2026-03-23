@@ -40,9 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# key for GCS
-noe-shiftica-d216ff091a9d.json
-
+# keys for GCS / Service Accounts
+noe-shiftica-*.json
 # Firebase App Hosting operation files (may contain secrets)
 *_backends.json
 backends.json
