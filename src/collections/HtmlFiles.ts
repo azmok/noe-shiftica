@@ -1,5 +1,42 @@
 import type { CollectionConfig } from 'payload'
 
+function synchronizeTOC(bodyHtml: string): string {
+  // 1. Collect all fragment links and their text
+  const links: { [id: string]: string } = {}
+  const linkRegex = /<a\s[^>]*?href=["']#(.*?)["'][^>]*>(.*?)<\/a>/gi
+  let lMatch
+  while ((lMatch = linkRegex.exec(bodyHtml)) !== null) {
+    const id = lMatch[1]
+    const text = lMatch[2].replace(/<[^>]*>/g, '').trim()
+    if (id && text) {
+      links[id] = text
+    }
+  }
+
+  // 2. Identify headings and update IDs
+  return bodyHtml.replace(/<(h[1-6])([^>]*)>([\s\S]*?)<\/\1>/gi, (fullTag, tag, attrs, content) => {
+    const headingText = content.replace(/<[^>]*>/g, '').trim()
+    if (!headingText) return fullTag
+
+    const idMatch = attrs.match(/id=["'](.*?)["']/)
+    const currentId = idMatch ? idMatch[1] : null
+
+    if (currentId && links[currentId]) return fullTag
+
+    for (const [id, linkText] of Object.entries(links)) {
+      if (headingText === linkText || headingText.includes(linkText) || linkText.includes(headingText)) {
+        if (currentId) {
+          const newAttrs = attrs.replace(/id=["'](.*?)["']/, `id="${id}"`)
+          return `<${tag}${newAttrs}>${content}</${tag}>`
+        } else {
+          return `<${tag} id="${id}"${attrs}>${content}</${tag}>`
+        }
+      }
+    }
+    return fullTag
+  })
+}
+
 function extractFromHtml(html: string): { bodyHtml: string; embedCss: string } {
   // <link rel="stylesheet"> tags (Google Fonts etc.)
   const linkMatches = html.match(/<link[^>]+rel=["']?stylesheet["']?[^>]*\/?>/gi) ?? []
@@ -28,6 +65,9 @@ function extractFromHtml(html: string): { bodyHtml: string; embedCss: string } {
     
     bodyHtml = `<div${finalAttrs}>${content}</div>`
   }
+
+  // Synchronize TOC links and IDs
+  bodyHtml = synchronizeTOC(bodyHtml)
 
   return { bodyHtml, embedCss }
 }
@@ -88,16 +128,14 @@ export const HtmlFiles: CollectionConfig = {
       name: 'bodyHtml',
       type: 'textarea',
       admin: {
-        readOnly: true,
-        description: 'HTMLファイルから自動抽出された body コンテンツ',
+        description: 'HTMLファイルから自動抽出された body コンテンツ（手動編集不可避な場合はここを修正）',
       },
     },
     {
       name: 'embedCss',
       type: 'textarea',
       admin: {
-        readOnly: true,
-        description: 'HTMLファイルから自動抽出された CSS スタイル',
+        description: 'HTMLファイルから自動抽出された CSS スタイル（手動編集不可避な場合はここを修正）',
       },
     },
   ],
