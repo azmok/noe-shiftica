@@ -92,3 +92,14 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - **STRICT SCOPE LOCK**: For all future tasks, the rule of "NOT touching `src/collections/*` or protected files" is RE-INSTATED. This task was a one-time exception only.
 - **Plan Impact**:
     - Always prioritize `beforeChange` for field auto-population to ensure atomicity and avoid UI sync issues.
+
+### [2026-03-29 18:19] Session Summary
+- **Learned/Decided**:
+    - **Mobile Scroll Lock (Safari)**: `HtmlEmbedBlock.tsx` injects external HTML into a Shadow DOM. Mobile Safari can allow `<style id="...">` tags and direct `document.body.classList` manipulation from inside the shadow to affect the outer document. This caused `overflow: hidden !important` to lock the page scroll on iOS.
+    - **Root Cause was in Content, not Code**: The embedded HTML file (`noe-blog-vs-freelance-1.html`) itself contained `<body class="antigravity-scroll-lock">` and the corresponding `<style>` and JS. The `src/` codebase had no `antigravity-scroll-lock` references.
+    - **Fix Strategy**: Added defensive sanitization in `HtmlEmbedBlock.tsx` after `shadow.innerHTML`: removes scroll-lock `<style>` by ID, strips scroll-lock classes, skips matching scripts. The TOC navigation (`handleLinkClick`) was NOT touched.
+    - **Reports**: Created `.antigravity/error-log-scroll-lock.txt` and `.antigravity/bug-report-scroll-lock.md`.
+- **Preferences**:
+    - For future HTML imports, avoid applying `overflow: hidden` to `body`/`html` or using `document.body.classList` for scroll state — these escape Shadow DOM on mobile Safari.
+- **Plan Impact**:
+    - `HtmlEmbedBlock.tsx` now defensively sanitizes scroll-lock artifacts from all embedded HTML.
