@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/Button";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 interface ContactSectionProps {
   fadeIn: Variants;
@@ -69,6 +71,23 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeIn}
+          className="flex justify-center mb-16"
+        >
+          <Link
+            id="hearing-cta-button"
+            href="/hearing"
+            className="inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold text-lg transition-all group border"
+          >
+            <Sparkles size={20} className="group-hover:animate-pulse" />
+            まずはヒアリングシートを試してみる
+          </Link>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeIn}
           className="bg-[#111111]/30 border border-[#888888]/30 p-8 md:p-12 rounded-3xl"
         >
           {/* コンタクトフォーム */}
@@ -127,7 +146,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                   name="name"
                   required
                   disabled={isSubmitting}
-                  className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
+                  className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
                 />
               </div>
               <div className="space-y-2">
@@ -140,7 +159,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                   name="email"
                   required
                   disabled={isSubmitting}
-                  className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
+                  className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
                 />
               </div>
             </div>
@@ -155,7 +174,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                 rows={5}
                 required
                 disabled={isSubmitting}
-                className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors resize-none"
+                className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors resize-none"
               ></textarea>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -169,7 +188,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                   value={budget}
                   onChange={(e) => setBudget(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
+                  className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
                 >
                   <option value="">選択してください</option>
                   <option value="15">15万円から</option>
@@ -187,7 +206,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                   name="timeline"
                   disabled={isSubmitting}
                   placeholder="例：3ヶ月以内"
-                  className="w-full bg-[#050505] border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
+                  className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
                 />
               </div>
             </div>

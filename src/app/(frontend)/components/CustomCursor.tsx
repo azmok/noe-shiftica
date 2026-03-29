@@ -25,6 +25,7 @@ export function CustomCursor() {
 
   const mouseX = useRef(0);
   const mouseY = useRef(0);
+  const hoveredElementRef = useRef<HTMLElement | null>(null);
 
   // "normal" = 遅延なしのマウス追従
   // "hovered" = ホバー要素の座標に完全固定
@@ -40,6 +41,7 @@ export function CustomCursor() {
   // パス名（ページ遷移）が変わった際に、強制的にカーソルの残存ホバー状態をキャンセルする
   useEffect(() => {
     setHoveredElProps(null);
+    hoveredElementRef.current = null;
     setIsHoveringFeatured(false);
     stateRef.current = "normal";
     xAnimRef.current?.stop();
@@ -98,6 +100,7 @@ export function CustomCursor() {
         const computedStyle = window.getComputedStyle(el);
 
         stateRef.current = "hovered";
+        hoveredElementRef.current = el;
         xAnimRef.current?.stop();
         yAnimRef.current?.stop();
 
@@ -131,6 +134,7 @@ export function CustomCursor() {
           return; // 要素内部の移動は無視
         }
 
+        hoveredElementRef.current = null;
         setHoveredElProps(null);
         stateRef.current = "springing";
         xAnimRef.current?.stop();
@@ -151,7 +155,7 @@ export function CustomCursor() {
     };
   }, [cursorX, cursorY]);
 
-  // Handle springing loop via direct tick over motionvalues
+  // Handle position loop via direct tick over motionvalues
   useEffect(() => {
     if (isMobile) return;
 
@@ -159,6 +163,7 @@ export function CustomCursor() {
 
     const loop = () => {
       if (!isMounted) return;
+      
       if (stateRef.current === "springing") {
         const tx = mouseX.current - 13;
         const ty = mouseY.current - 13;
@@ -168,7 +173,7 @@ export function CustomCursor() {
         const dx = tx - cx;
         const dy = ty - cy;
 
-        // Snappy lerp (35% approach per frame = butter smooth curve without stutter)
+        // Snappy lerp
         cursorX.set(cx + dx * 0.35);
         cursorY.set(cy + dy * 0.35);
 
@@ -177,7 +182,29 @@ export function CustomCursor() {
           cursorX.set(tx);
           cursorY.set(ty);
         }
+      } else if (stateRef.current === "hovered" && hoveredElementRef.current) {
+        // ホバー中も常に位置をアップデートし、アニメーション（移動）に追従させる
+        const rect = hoveredElementRef.current.getBoundingClientRect();
+        
+        // props経由での更新（幅・高さ用）
+        setHoveredElProps(prev => {
+          if (!prev || prev.left !== rect.left || prev.top !== rect.top || prev.width !== rect.width || prev.height !== rect.height) {
+            return {
+              width: rect.width,
+              height: rect.height,
+              left: rect.left,
+              top: rect.top,
+              borderRadius: prev?.borderRadius || "0px"
+            };
+          }
+          return prev;
+        });
+
+        // 位置の更新
+        cursorX.set(rect.left);
+        cursorY.set(rect.top);
       }
+      
       loopRef.current = requestAnimationFrame(loop);
     };
 
@@ -187,22 +214,6 @@ export function CustomCursor() {
       cancelAnimationFrame(loopRef.current);
     };
   }, [isMobile, cursorX, cursorY]);
-
-  // ホバー対象が存在する場合のみ、固定位置へのスムーズな吸着アニメーションを発火
-  useEffect(() => {
-    if (hoveredElProps && stateRef.current === "hovered") {
-      const elCenterX = hoveredElProps.left + hoveredElProps.width / 2;
-      const elCenterY = hoveredElProps.top + hoveredElProps.height / 2;
-
-      const targetX = elCenterX - hoveredElProps.width / 2;
-      const targetY = elCenterY - hoveredElProps.height / 2;
-
-      xAnimRef.current?.stop();
-      yAnimRef.current?.stop();
-      xAnimRef.current = animate(cursorX, targetX, { type: "tween", ease: [0.23, 1, 0.32, 1], duration: 0.15 });
-      yAnimRef.current = animate(cursorY, targetY, { type: "tween", ease: [0.23, 1, 0.32, 1], duration: 0.15 });
-    }
-  }, [hoveredElProps, cursorX, cursorY]);
 
   if (isMobile) return null;
 
