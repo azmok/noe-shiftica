@@ -231,7 +231,7 @@ export default function ServicesPage() {
         </section>
 
         {/* 5. Works */}
-        <section className="mb-32">
+        <section className="mb-32" id="works">
           <div className="flex flex-col items-center md:items-start mb-12">
             <h2 className="text-5xl md:text-6xl font-bold text-[#ffffff] mb-4">Works.</h2>
           </div>
