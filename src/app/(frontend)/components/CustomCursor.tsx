@@ -183,26 +183,34 @@ export function CustomCursor() {
           cursorY.set(ty);
         }
       } else if (stateRef.current === "hovered" && hoveredElementRef.current) {
-        // ホバー中も常に位置をアップデートし、アニメーション（移動）に追従させる
-        const rect = hoveredElementRef.current.getBoundingClientRect();
-        
-        // props経由での更新（幅・高さ用）
-        setHoveredElProps(prev => {
-          if (!prev || prev.left !== rect.left || prev.top !== rect.top || prev.width !== rect.width || prev.height !== rect.height) {
-            return {
-              width: rect.width,
-              height: rect.height,
-              left: rect.left,
-              top: rect.top,
-              borderRadius: prev?.borderRadius || "0px"
-            };
-          }
-          return prev;
-        });
+        // 対象の要素が画面遷移やReactの再描画によってDOMから消え去った場合、
+        // mouseoutイベントが発火しないため、ここで検知して強制的に状態を解除する。
+        if (!document.body.contains(hoveredElementRef.current)) {
+          hoveredElementRef.current = null;
+          setHoveredElProps(null);
+          stateRef.current = "springing";
+        } else {
+          // ホバー中も常に位置をアップデートし、アニメーション（移動）に追従させる
+          const rect = hoveredElementRef.current.getBoundingClientRect();
+          
+          // props経由での更新（幅・高さ用）
+          setHoveredElProps(prev => {
+            if (!prev || prev.left !== rect.left || prev.top !== rect.top || prev.width !== rect.width || prev.height !== rect.height) {
+              return {
+                width: rect.width,
+                height: rect.height,
+                left: rect.left,
+                top: rect.top,
+                borderRadius: prev?.borderRadius || "0px"
+              };
+            }
+            return prev;
+          });
 
-        // 位置の更新
-        cursorX.set(rect.left);
-        cursorY.set(rect.top);
+          // 位置の更新
+          cursorX.set(rect.left);
+          cursorY.set(rect.top);
+        }
       }
       
       loopRef.current = requestAnimationFrame(loop);
