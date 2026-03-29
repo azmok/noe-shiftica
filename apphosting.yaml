@@ -44,6 +44,12 @@ environmentVariables:
   - variable: GITHUB_TOKEN
     secret: GITHUB_TOKEN
 
+  # Neon DB backup (triggered on article create/update)
+  - variable: NEON_API_TOKEN
+    secret: NEON_API_TOKEN
+  - variable: NEON_PROJECT_ID
+    value: "proud-hall-53361784"
+
   - variable: NEXT_PUBLIC_GA_MEASUREMENT_ID
     value: G-XXXXXXXXXX
     availability:

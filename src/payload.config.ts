@@ -23,6 +23,7 @@ import { Posts } from './collections/Posts'
 import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { ogImagePlugin } from './plugins/og-image'
+import { neonBackupPlugin } from './plugins/neon-backup'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceFeature } from './features/htmlSource/feature.server'
@@ -76,6 +77,9 @@ const config = buildConfig({
       collection: 'posts',
       heroImageField: 'heroImage',
       ogImageField: 'ogImage',
+    }),
+    neonBackupPlugin({
+      collections: ['posts'],
     }),
   ],
 }).catch(e => {
