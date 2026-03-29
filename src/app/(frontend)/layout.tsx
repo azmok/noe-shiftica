@@ -67,6 +67,9 @@ export const metadata = {
     title: "Noe Shiftica | Design the Shift.",
     description: "AIとデザインでビジネスの本質を設計するスタジオ。",
   },
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/favicon.ico",
     apple: [
