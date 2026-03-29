@@ -69,8 +69,8 @@ export const Media: CollectionConfig = {
       {
         // Featured posts, hero images (16:9-ish)
         name: 'large',
-        width: 1200,
-        height: 800,
+        width: 1920,
+        height: 1080,
         position: 'centre',
       },
       {
