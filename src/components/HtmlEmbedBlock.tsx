@@ -35,8 +35,21 @@ export function HtmlEmbedBlock({ bodyHtml, embedCss, title }: Props) {
         }
       </style>
     `
+    // Pre-sanitize: strip scroll-lock markup BEFORE injecting into Shadow DOM.
+    // Mobile Safari can leak <style> tags from inside shadows to the outer document,
+    // so we must remove them at the string level before innerHTML is ever set.
+    const sanitizeScrollLock = (html: string) =>
+      html
+        // Remove any <style> tag that references "antigravity-scroll-lock" or "scroll-lock"
+        .replace(/<style[^>]*>[\s\S]*?scroll-lock[\s\S]*?<\/style>/gi, '')
+        // Remove the scroll-lock class wherever it appears in class attributes
+        .replace(/\bantigravity-scroll-lock\b/g, '')
+
+    const sanitizedBodyHtml = sanitizeScrollLock(bodyHtml)
+    const sanitizedEmbedCss = sanitizeScrollLock(embedCss ?? '')
+
     // Set raw HTML first (scripts will NOT execute here)
-    shadow.innerHTML = `${hostCss}\n${embedCss ?? ''}\n${bodyHtml}`
+    shadow.innerHTML = `${hostCss}\n${sanitizedEmbedCss}\n${sanitizedBodyHtml}`
 
     // 1. Rewrite CSS in injected <style> tags to scope html/:root and body to #uploaded-content
     const styleTags = Array.from(shadow.querySelectorAll('style'))
@@ -63,6 +76,15 @@ export function HtmlEmbedBlock({ bodyHtml, embedCss, title }: Props) {
     
     const runScripts = async () => {
       for (const oldScript of scripts) {
+        // Skip scripts that manipulate scroll-lock on document.body — these escape the Shadow DOM
+        // and affect the outer page scroll, causing mobile Safari scroll lock issues.
+        const scriptSrc = oldScript.src || ''
+        const scriptContent = oldScript.innerHTML || ''
+        if (/scroll-lock|antigravity-scroll-lock/i.test(scriptSrc + scriptContent)) {
+          oldScript.remove()
+          continue
+        }
+
         const newScript = document.createElement('script')
         
         // Copy all attributes (like src, type, async)
