@@ -14,7 +14,7 @@
 
   /* Typography */
     --font-sans: 
-    "source-han-sans-japanese", /* Adobe Fonts - ExtraLight / Light default */
+    var(--font-noto-sans-jp), /* Noto Sans JP (next/font/google) */
     "Helvetica Neue", /* macOS/iOS, Helvetica fallback */
     Arial, /* Windows, Helvetica fallback */
     "Hiragino Kaku Gothic ProN", /* older macOS/iOS */
@@ -26,7 +26,6 @@
     sans-serif;
 
     --font-serif:
-    "source-han-serif-japanese", /* Adobe Fonts */
     "PP Neue Montreal", /* Custom English font */
     "Space Grotesk", /* Custom English font */
     "Hiragino Mincho ProN", /* macOS/iOS */
