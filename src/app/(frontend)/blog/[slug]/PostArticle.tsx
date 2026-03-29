@@ -36,13 +36,13 @@ export const PostArticle: React.FC<{
                             try {
                                 const img = (post.heroImage || post.coverImage);
                                 if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                    const finalUrl = img.sizes?.large?.url || img.url;
+                                    const finalUrl = img.sizes?.medium?.url || img.url;
                                     return (
                                         <GcsImage
                                             src={finalUrl}
                                             alt={post.title}
                                             priority
-                                            preOptimized={!!img.sizes?.large}
+                                            preOptimized={!!img.sizes?.medium}
                                             showShimmer={true}
                                             className="w-full h-full object-cover"
                                         />
@@ -221,7 +221,7 @@ export const PostArticle: React.FC<{
                                     try {
                                         const img = (post.heroImage || post.coverImage);
                                         if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                            const finalUrl = img.sizes?.large?.url || img.url;
+                                            const finalUrl = img.sizes?.medium?.url || img.url;
                                             return (
                                                 <>
                                                     <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
@@ -229,7 +229,7 @@ export const PostArticle: React.FC<{
                                                         src={finalUrl}
                                                         alt={post.title}
                                                         priority
-                                                        preOptimized={!!img.sizes?.large}
+                                                        preOptimized={!!img.sizes?.medium}
                                                         showShimmer={true}
                                                         className="group-hover:scale-105"
                                                     />
