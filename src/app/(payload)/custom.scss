@@ -100,7 +100,26 @@
   
   .drawer__content-children {
     /* 編集しやすくするために下部に余白を追加 */
-    padding-bottom: 40vh !important;
+    padding-bottom: 50vh !important;
+  }
+}
+
+/* 
+  Mobile specific UI overrides for HTML editor drawing UX. 
+  Hides the bulky file thumbnail and constrains the textarea.
+*/
+.file-details .thumbnail {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  /* Prevent textarea from expanding to infinity, solving the touch freeze bug */
+  .drawer__content textarea {
+    max-height: 45vh !important;
+    min-height: 250px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    font-size: 16px !important; /* Prevents auto zoom in iOS */
   }
 }
 
