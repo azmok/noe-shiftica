@@ -43,8 +43,9 @@ export const Posts: CollectionConfig = {
         livePreview: {
             // プレビューしたい実際のフロントエンドのURLを指定する
             url: ({ data }) => {
-                const url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
-                return `${url}/blog/${data?.slug || 'preview'}/preview`;
+                // 相対パスを返すことで、localhost、IPアドレス、本番環境のドメインなど、
+                // アクセスしているブラウザのドメインを自動的に引き継ぎます。
+                return `/blog/${data?.slug || 'preview'}/preview`;
             },
         },
         defaultColumns: ['title', '_status', 'publishedAt', 'updatedAt'],
