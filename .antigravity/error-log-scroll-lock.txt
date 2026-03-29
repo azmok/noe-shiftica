@@ -1,0 +1,66 @@
+# Error Log: Mobile Scroll Lock Bug
+
+**Date**: 2026-03-29
+**Reporter**: Oje (AI)
+**Severity**: Medium (UX-breaking on mobile Safari only)
+
+---
+
+## Observed Symptom
+
+On mobile Safari (iOS), accessing the blog post:
+`https://noe-shiftica.com/blog/freelancer-vs-noeshiftica-web-production-guide`
+
+caused the page to be **completely unscrollable** on initial load.
+
+- Tapping anywhere on the screen unlocked the scroll.
+- The issue did **not** reproduce on Chrome DevTools mobile emulation.
+- Other posts with HTML embeds were **not** affected.
+
+---
+
+## DOM Evidence
+
+The following was observed in the live DOM immediately after page load:
+
+```html
+<!-- Dynamically injected <style> tag from embedded HTML -->
+<style id="antigravity-scroll-lock-style">
+  html:root body.antigravity-scroll-lock {
+    overflow: hidden !important;
+  }
+</style>
+
+<!-- The class was also present on the outer <body> -->
+<body class="antigravity-scroll-lock ...">
+```
+
+---
+
+## Root Cause
+
+**File**: Firebase Storage hosted `noe-blog-vs-freelance-1.html`
+**Vector**: `HtmlEmbedBlock.tsx` injects the file's HTML into a Shadow DOM using `shadow.innerHTML`.
+
+The embedded HTML file included:
+1. A `<style id="antigravity-scroll-lock-style">` that sets `overflow: hidden !important` on `body`.
+2. A `<body class="antigravity-scroll-lock">` element.
+3. Inline JavaScript that toggled this class based on tap events.
+
+**Why it escaped the Shadow DOM**: The CSS rewrite logic in `HtmlEmbedBlock.tsx` transforms `body` selectors to `#uploaded-content`. However, the `id`-targeted `<style>` tag (`antigravity-scroll-lock-style`) was being applied in a way that mobile Safari allowed it to affect the outer `document.body`, causing the scroll lock.
+
+Additionally, the inline JS could directly call `document.body.classList.add('antigravity-scroll-lock')` which targets the real outer body, not the shadow.
+
+---
+
+## Fix Applied
+
+**File modified**: `src/components/HtmlEmbedBlock.tsx`
+
+Added two sanitization steps immediately after `shadow.innerHTML` is set:
+
+1. **Style tag removal**: `shadow.getElementById('antigravity-scroll-lock-style')?.remove()`
+2. **Class removal**: Strip `scroll-lock` classes from all shadow DOM elements via `querySelectorAll`
+3. **Script skip**: In `runScripts`, any script whose content matches `/scroll-lock|antigravity-scroll-lock/i` is removed and skipped.
+
+The TOC fragment navigation (`handleLinkClick`) scroll logic was **not modified**.
