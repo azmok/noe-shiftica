@@ -53,6 +53,28 @@ CRITICAL: Before any action, you MUST read and strictly adhere to the global pro
 - **Logic Autonomy**: You have permission to proactively implement logic-based UX improvements (e.g., caching, performance, data sync) as documented in `.antigravity/sessions.md`.
 - **STRICT UI Freeze**: This autonomy NEVER extends to visual elements. You are STRICTLY PROHIBITED from modifying CSS, Tailwind classes, layouts, or any UI design elements without explicit instruction, even if intended for UX improvement.
 
+### 4-E. Image Cache Protocol (HIGHEST PRIORITY — MANDATORY)
+> ⚠️ **This rule exists because back/forward navigation caused full image re-fetching on every visit. It must NEVER be regressed.**
+
+All image components that manage loading state MUST implement a **dual-layer cache** combining in-memory and sessionStorage:
+
+1. **Module-level in-memory Set** (`memoryLoadedUrls`): for instant lookup during SPA navigation within the same JS context.
+2. **`sessionStorage` persistence** (`gcs_loaded_urls` key, JSON array): survives JS module re-initialization caused by `force-dynamic` pages (which set `Cache-Control: no-store`, disabling BFCache).
+
+**Why `sessionStorage` is required (not just in-memory)**:
+- Pages using `export const dynamic = 'force-dynamic'` receive `Cache-Control: no-store` in the HTTP response.
+- `no-store` prevents BFCache. The browser makes a full page reload on back/forward.
+- On full reload, all JS module-level variables (including `Set` / `Map`) are re-initialized to their initial empty state.
+- Without sessionStorage, `isLoaded` always starts `false` → shimmer/opacity-0 appears even for already-seen images.
+
+**Implementation requirements** (see `src/lib/GcsImage.tsx` for the canonical pattern):
+- `isUrlCached(url)`: checks memory first, then sessionStorage.
+- `markUrlAsLoaded(url)`: writes to both memory and sessionStorage.
+- `useState(() => isUrlCached(finalSrc))`: initialize React state from cache on every mount.
+- Cap sessionStorage array at 200 entries to prevent quota bloat.
+- Wrap all sessionStorage calls in try/catch (private mode / quota exceeded).
+- Keep the `pageshow` event handler for genuine BFCache restores (`event.persisted === true`).
+
 ## 5. Deployment & Debugging Protocol (Auto-Diagnostic)
 - **Execution Steps**: Log Retrieval → Root Cause Analysis → Strict Lockfile Sync (`pnpm i`) → Vulnerability Checks → Verification (`pnpm run build`).
 

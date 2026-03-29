@@ -64,10 +64,46 @@ const toBase64 = (str: string) =>
         : window.btoa(str)
 
 /**
- * Global cache to track loaded URLs in this session.
- * Prevents FOIC (Flash of Invisible Content) when navigating back/forward.
+ * In-memory cache: fast lookup for SPA navigation within the same JS context.
  */
-const loadedUrls = new Set<string>();
+const memoryLoadedUrls = new Set<string>();
+
+/**
+ * sessionStorage-backed cache: survives force-dynamic page reloads on back/forward.
+ * force-dynamic sets Cache-Control: no-store, preventing BFCache. On reload the JS
+ * module re-initializes, so we must persist known-loaded URLs in sessionStorage.
+ */
+const SESSION_KEY = 'gcs_loaded_urls';
+
+function isUrlCached(url: string): boolean {
+    if (typeof window === 'undefined') return false;
+    if (memoryLoadedUrls.has(url)) return true;
+    try {
+        const stored = sessionStorage.getItem(SESSION_KEY);
+        if (!stored) return false;
+        const arr: string[] = JSON.parse(stored);
+        return arr.includes(url);
+    } catch {
+        return false;
+    }
+}
+
+function markUrlAsLoaded(url: string): void {
+    memoryLoadedUrls.add(url);
+    if (typeof window === 'undefined') return;
+    try {
+        const stored = sessionStorage.getItem(SESSION_KEY);
+        const arr: string[] = stored ? JSON.parse(stored) : [];
+        if (!arr.includes(url)) {
+            arr.push(url);
+            // Cap at 200 entries to avoid storage bloat
+            const trimmed = arr.length > 200 ? arr.slice(-200) : arr;
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(trimmed));
+        }
+    } catch {
+        // sessionStorage may be unavailable (private mode, quota exceeded)
+    }
+}
 
 /**
  * Full-fill image that behaves like background-image: cover.
@@ -103,10 +139,9 @@ export function GcsImage({
         }
     }
 
-    // Initialize state. If we already loaded this exact URL in this session, start as true.
-    const [isLoaded, setIsLoaded] = React.useState(() => {
-        return typeof window !== 'undefined' && loadedUrls.has(finalSrc);
-    });
+    // Initialize state. Check both memory cache and sessionStorage so back/forward
+    // navigation on force-dynamic pages (which reload the JS module) still skips shimmer.
+    const [isLoaded, setIsLoaded] = React.useState(() => isUrlCached(finalSrc));
     
     const imgRef = React.useRef<HTMLImageElement>(null);
 
@@ -116,7 +151,7 @@ export function GcsImage({
         
         const checkImage = () => {
             if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
-                loadedUrls.add(finalSrc);
+                markUrlAsLoaded(finalSrc);
                 setIsLoaded(true);
             }
         };
@@ -163,7 +198,7 @@ export function GcsImage({
             unoptimized={shouldDisableOptimization}
             {...(priority ? { fetchPriority: 'high' } : {})}
             onLoad={() => {
-                loadedUrls.add(finalSrc);
+                markUrlAsLoaded(finalSrc);
                 setIsLoaded(true);
             }}
             onError={() => {
