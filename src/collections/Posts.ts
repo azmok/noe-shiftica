@@ -23,8 +23,9 @@ const populateOgImage: CollectionBeforeChangeHook = async ({ data, req }) => {
                 depth: 0,
             });
 
-            if (mediaDoc && mediaDoc.url) {
-                data.ogImage = mediaDoc.url;
+            if (mediaDoc) {
+                // Prefer the OG-optimized variant (1200×630); fall back to original
+                data.ogImage = (mediaDoc.sizes as any)?.og?.url || mediaDoc.url || FALLBACK_OG_IMAGE;
             } else {
                 data.ogImage = FALLBACK_OG_IMAGE;
             }

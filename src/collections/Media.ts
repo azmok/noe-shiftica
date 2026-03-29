@@ -73,6 +73,13 @@ export const Media: CollectionConfig = {
         height: 800,
         position: 'centre',
       },
+      {
+        // OG image for social media (Twitter/X, Facebook, LINE) — recommended 1200×630
+        name: 'og',
+        width: 1200,
+        height: 630,
+        position: 'centre',
+      },
     ],
     // Allow Next.js Image optimization to work with GCS URLs
     adminThumbnail: 'adminList',
