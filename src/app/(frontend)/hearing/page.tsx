@@ -52,8 +52,19 @@ export default function HearingPage() {
   const [isEditingFromSummary, setIsEditingFromSummary] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  const getStepFromUrl = () => {
+    if (typeof window === 'undefined') return 0;
+    const params = new URLSearchParams(window.location.search);
+    const step = params.get('step');
+    if (step === 'summary') return questions.length;
+    const stepNum = parseInt(step || '1');
+    return Math.max(0, Math.min(stepNum - 1, questions.length));
+  };
+
   useEffect(() => {
     setIsMounted(true);
+    let initialStep = 0;
+    
     try {
       const itemStr = localStorage.getItem(STORAGE_KEY);
       if (itemStr) {
@@ -68,7 +79,7 @@ export default function HearingPage() {
           // すべての質問に回答済みの場合は、サマリー画面（最後のステップ）から開始する
           const allAnswered = questions.every(q => data[q.id] && data[q.id].length > 0);
           if (allAnswered) {
-            setCurrentStep(questions.length);
+            initialStep = questions.length;
           }
         }
       }
@@ -76,11 +87,34 @@ export default function HearingPage() {
       console.error(e);
     }
     
-    // URLパラメータでサマリー表示が指定されている場合（バッジからの遷移など）
+    // URLパラメータの優先順位
+    const urlStep = getStepFromUrl();
     const params = new URLSearchParams(window.location.search);
-    if (params.get('view') === 'summary') {
-      setCurrentStep(questions.length);
+    if (params.has('step') || params.get('view') === 'summary') {
+      initialStep = urlStep;
     }
+
+    setCurrentStep(initialStep);
+
+    // Initial state setup to handle the first back button
+    const stepParam = initialStep === questions.length ? 'summary' : (initialStep + 1).toString();
+    window.history.replaceState({ step: initialStep }, "", `?step=${stepParam}`);
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state) {
+        if (typeof event.state.step === 'number') {
+          setCurrentStep(event.state.step);
+        }
+        setIsEditingFromSummary(!!event.state.isEditingFromSummary);
+      } else {
+        // Fallback for popstate without state (initial load etc)
+        setCurrentStep(getStepFromUrl());
+        setIsEditingFromSummary(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const saveToLocal = (dataToSave: Record<string, string[]>, subsToSave: Record<string, Record<string, string>>) => {
@@ -129,9 +163,17 @@ export default function HearingPage() {
   };
 
   const changeStep = (dir: number, dataToValidate?: Record<string, string[]>) => {
+    if (dir === -1) {
+      window.history.back();
+      return;
+    }
+
     if (isEditingFromSummary) {
       setIsEditingFromSummary(false);
-      setCurrentStep(questions.length);
+      const nextStep = questions.length;
+      const stepParam = 'summary';
+      window.history.pushState({ step: nextStep, isEditingFromSummary: false }, "", `?step=${stepParam}`);
+      setCurrentStep(nextStep);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -146,7 +188,11 @@ export default function HearingPage() {
       }
     }
 
-    setCurrentStep(prev => Math.min(Math.max(prev + dir, 0), questions.length));
+    const nextStep = Math.min(Math.max(currentStep + dir, 0), questions.length);
+    const stepParam = nextStep === questions.length ? 'summary' : (nextStep + 1).toString();
+    
+    window.history.pushState({ step: nextStep, isEditingFromSummary: false }, "", `?step=${stepParam}`);
+    setCurrentStep(nextStep);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -309,8 +355,11 @@ export default function HearingPage() {
                       </div>
                       <button
                         onClick={() => {
+                          const nextStep = idx;
+                          const stepParam = (nextStep + 1).toString();
+                          window.history.pushState({ step: nextStep, isEditingFromSummary: true }, "", `?step=${stepParam}`);
                           setIsEditingFromSummary(true);
-                          setCurrentStep(idx);
+                          setCurrentStep(nextStep);
                         }}
                         className="bg-transparent text-[11px] text-[#E2FF3D] border border-[#E2FF3D]/50 px-3 py-1 rounded hover:bg-[#E2FF3D] hover:text-[#08080A] transition-colors whitespace-nowrap shrink-0"
                       >
