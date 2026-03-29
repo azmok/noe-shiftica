@@ -104,6 +104,15 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
     - `HtmlEmbedBlock.tsx` now defensively sanitizes scroll-lock artifacts from all embedded HTML.
 
+### [2026-03-30] Session Summary
+- **Learned/Decided**:
+    - **iOS Safari textarea scroll in fixed overlay (Payload drawer)**: Desktop mobile emulators bypass OS-level touch event handling, so scroll works fine there. Real iPhone fails because body scroll is not locked AND because Payload's drawer calls `preventDefault` on bubbled `touchmove` events.
+    - **The 4-rule pattern for iOS fixed overlays inside Payload drawer**: (1) Lock body on open via `position:fixed + top:-${scrollY}px + overflow:hidden`, (2) use `overflow-y:scroll` (not `auto`) on the textarea, (3) add `overscroll-behavior:contain`, (4) attach `touchmove` listener on the textarea with `e.stopPropagation()` and `{ passive: false }` to block Payload's drawer from calling `preventDefault`.
+    - **`WebkitOverflowScrolling: 'touch'` is dead**: Deprecated since iOS 13, does nothing on modern devices.
+    - **`stopPropagation` vs `preventDefault`**: On the textarea's touchmove, use `stopPropagation` ONLY. Calling `preventDefault` would kill the textarea's own native scroll.
+- **Preferences**: Always test iOS scroll behavior on real device — emulators are not reliable for this class of bug.
+- **Plan Impact**: All future fullscreen/modal overlays inside Payload CMS drawers that include a scrollable child must apply this 4-rule pattern.
+
 ### [2026-03-29 20:00] Session Summary
 - **Learned/Decided**:
     - **HtmlSourcePlugin textarea (Safari)**: `minHeight` on textarea causes page-level scroll in Safari admin panel. Replacing with fixed `height: calc(100vh - 180px)` + `overflowY: auto` creates a properly scrollable full-screen editor.
