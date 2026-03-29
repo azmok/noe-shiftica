@@ -180,3 +180,22 @@
   - **This pattern is now LAW — see `rules.md` § 4-E**. All image cache state that must survive page reloads MUST use sessionStorage, not just in-memory variables.
   - `pageshow` with `event.persisted` only fires for genuine BFCache; it does NOT help on full reloads caused by `no-store`.
   - Never rely on module-level variables alone for state that must persist across `Cache-Control: no-store` page reloads.
+
+### [2026-03-30] Bug: iOS Safari Vertical Scroll Locked in MobileFullscreenEditor
+- **Error**: On actual iPhone (local dev + production), the fullscreen HTML editor textarea could not be scrolled vertically. Desktop mobile emulator worked fine.
+- **Root Cause**:
+  1. **Body scroll not locked**: `document.body` was not fixed when the overlay opened, so iOS Safari interpreted vertical swipes as body scroll bounce events and captured them before they reached the textarea.
+  2. **`overflow-y` not explicit**: The textarea had no `overflowY` set (only `flex: 1`). iOS Safari does not reliably enable textarea internal scroll without explicit `overflow-y: scroll`.
+  3. **Deprecated property**: `WebkitOverflowScrolling: 'touch'` is ignored on iOS 13+ and does nothing.
+  4. **Payload drawer `preventDefault` interference** (decisive root cause): Payload CMS's built-in drawer component attaches a `touchmove` listener to the drawer and calls `preventDefault()` on it. This prevents the browser's default scroll behavior for ALL touchmove events bubbling up from inside the drawer — including those originating from the textarea — completely killing native textarea scroll even after the first three fixes were applied.
+- **File(s) Modified**: `src/components/MobileFullscreenEditor/index.tsx`
+- **Fix Summary**:
+  - Added `useEffect` body scroll lock: `position: fixed`, `top: -${scrollY}px`, `overflow: hidden` on open; restore + `window.scrollTo` on close.
+  - Replaced `WebkitOverflowScrolling: 'touch'` with `overflowY: 'scroll'` and `overscrollBehavior: 'contain'` on textarea.
+  - Added `overflow: 'hidden'` to the fixed container div.
+  - **Key fix**: Added `{ passive: false }` `touchmove` listener on textarea that calls `e.stopPropagation()`. This prevents the event from bubbling to Payload's drawer handler. `stopPropagation` (NOT `preventDefault`) is used — calling `preventDefault` would re-kill the textarea's own native scroll.
+- **Prevention Note**:
+  - Desktop emulators do NOT reproduce iOS Safari touch event capture issues — always test on real device.
+  - For any `position: fixed` overlay inside a **Payload CMS drawer** with a scrollable child on iOS: (1) lock body scroll on open, (2) use `overflow-y: scroll` (not `auto`) on the inner scroll target, (3) add `overscroll-behavior: contain`, (4) attach `touchmove` listener with `stopPropagation` on the scrollable element (`{ passive: false }` required).
+  - The scroll lock pattern must restore `window.scrollY` on close to avoid position jump.
+  - `stopPropagation` vs `preventDefault`: never call `preventDefault` on the textarea's own touchmove — that kills its scroll. Only `stopPropagation` to block parent interference.
