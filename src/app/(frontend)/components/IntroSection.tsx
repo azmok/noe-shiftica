@@ -38,7 +38,7 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
           <Button href="#contact" variant="primary" size="lg" className="w-full sm:w-auto">
             無料相談を予約する
           </Button>
-          <Button href="/services#services-exmaples" variant="outline" size="lg" className="w-full sm:w-auto">
+          <Button href="/services#works" variant="outline" size="lg" className="w-full sm:w-auto">
             実績を見る ↓
           </Button>
         </motion.div>
@@ -55,7 +55,7 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
 
         {/* Tech Stack & Cloud Technology Sections */}
         <div className="mt-28 grid grid-cols-1 md:grid-cols-2 gap-16 w-full max-w-4xl mx-auto text-left border-t border-white/5 pt-16">
-          <motion.div 
+          <motion.div
             custom={4}
             initial="hidden"
             whileInView="visible"
@@ -81,7 +81,7 @@ export function IntroSection({ fadeIn }: IntroSectionProps) {
             </ul>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             custom={5}
             initial="hidden"
             whileInView="visible"
