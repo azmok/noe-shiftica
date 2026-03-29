@@ -58,7 +58,7 @@ export default async function BlogPage() {
                     <div className="border border-solid border-slate-400 bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5">
                       <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
                         {(() => {
-                          const preGenUrl = featuredPost.heroLargeUrl || featuredPost.coverLargeUrl;
+                          const preGenUrl = featuredPost.heroMediumUrl || featuredPost.coverMediumUrl;
                           const imgUrl = preGenUrl || featuredPost.heroUrl || featuredPost.coverUrl;
                           if (imgUrl) {
                             return (
