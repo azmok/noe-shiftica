@@ -119,6 +119,29 @@
     padding-bottom: 50vh !important;
   }
 
+  /* Shrink the header to absolute minimum size */
+  .doc-drawer__header {
+    padding: 4px 8px !important;
+    margin: 0 !important;
+    min-height: auto !important;
+  }
+  
+  .doc-drawer__header-content {
+    margin-bottom: 2px !important;
+  }
+  
+  .doc-drawer__header-text {
+    font-size: 14px !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .id-label {
+    font-size: 10px !important;
+    margin: 0 !important;
+    padding: 2px 4px !important;
+  }
+
   /* Completely hide the file thumbnail, details header, and document controls on mobile to maximize space */
   .file-details,
   .doc-controls__content {
