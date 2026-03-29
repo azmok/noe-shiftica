@@ -22,7 +22,7 @@ import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
-import { ogImagePlugin } from './plugins/og-image'
+
 import { neonBackupPlugin } from './plugins/neon-backup'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
@@ -73,11 +73,7 @@ const config = buildConfig({
       },
     }),
     markdownImportPlugin(),
-    ogImagePlugin({
-      collection: 'posts',
-      heroImageField: 'heroImage',
-      ogImageField: 'ogImage',
-    }),
+
     neonBackupPlugin({
       collections: ['posts'],
     }),

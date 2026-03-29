@@ -1,5 +1,39 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { translateToSlug } from '../lib/translateToSlug'
+
+const FALLBACK_OG_IMAGE =
+    'https://firebasestorage.googleapis.com/v0/b/noe-shiftica.firebasestorage.app/o/og-images%2FScreenshot%202026-03-20%20033637.png?alt=media&token=85010d4b-7b48-4a64-9288-b19e7e43c2c4'
+
+const populateOgImage: CollectionBeforeChangeHook = async ({ data, req }) => {
+    // Check if status is becoming "published"
+    // In beforeChange, the key is usually just data.status or data._status depending on how drafting is implemented.
+    // Based on previous code, it's doc.status.
+    if (data._status === 'published' || data.status === 'published') {
+        try {
+            const heroImageId = data.heroImage;
+            if (!heroImageId) {
+                data.ogImage = FALLBACK_OG_IMAGE;
+                return data;
+            }
+
+            // Fetch the media document to get the URL
+            const mediaDoc = await req.payload.findByID({
+                collection: 'media',
+                id: typeof heroImageId === 'object' ? heroImageId.id : heroImageId,
+                depth: 0,
+            });
+
+            if (mediaDoc && mediaDoc.url) {
+                data.ogImage = mediaDoc.url;
+            } else {
+                data.ogImage = FALLBACK_OG_IMAGE;
+            }
+        } catch (e) {
+            console.error('[populateOgImage] error:', e);
+        }
+    }
+    return data;
+}
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
@@ -23,6 +57,7 @@ export const Posts: CollectionConfig = {
         read: () => true,
     },
     hooks: {
+        beforeChange: [populateOgImage],
         beforeValidate: [
             async ({ data }) => {
                 // Auto-generate slug from title only when slug is empty
@@ -146,6 +181,16 @@ export const Posts: CollectionConfig = {
             relationTo: 'html-files',
             label: '埋め込みHTMLファイル',
             required: false,
+        },
+        {
+            name: 'ogImage',
+            type: 'text',
+            label: 'OG画像URL',
+            admin: {
+                position: 'sidebar',
+                readOnly: true,
+                description: '記事公開時にHero Imageから自動生成されます。',
+            },
         },
     ],
 }
