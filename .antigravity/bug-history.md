@@ -162,3 +162,21 @@
   - **Backend**: Rewrote `body` CSS rules to target `#uploaded-content`.
   - **Frontend**: Stopped mapping `#uploaded-content` to `:host` inside the Shadow DOM's `<style>` tag. This allows the internal rule to target the internal root `div` directly, effectively bypassing the host-level transparent background override.
 - **Prevention Note**: When styling the root of an embedded Shadow DOM, avoid relying solely on `:host` if the host element is subject to external layout/transparency classes. Instead, transform the content to have a specific root ID and target that ID internally to ensure style dominance within the container.
+
+### [2026-03-30 00:00] Bug: Back/Forward Button Re-fetches Images from Server
+- **Error**: On `/blog` (and any `force-dynamic` page), pressing the browser back/forward button caused all `GcsImage` components to show the shimmer/opacity-0 state and re-fetch images from the server, despite being loaded on a prior visit in the same browser session.
+- **Root Cause**:
+  1. `force-dynamic` pages receive `Cache-Control: no-store` in the HTTP response set by Next.js.
+  2. Browsers cannot store pages with `no-store` in BFCache, so back/forward triggers a **full page reload** (not a BFCache restore).
+  3. On full reload, all JavaScript module-level variables are re-initialized. The previous `loadedUrls = new Set<string>()` was reset to empty on every reload.
+  4. `isLoaded` initialized to `false` → `opacity: 0` and shimmer appeared for all images.
+- **File(s) Modified**: `src/lib/GcsImage.tsx`
+- **Fix Summary**:
+  - Replaced single module-level `Set` with a **dual-layer cache**: in-memory `memoryLoadedUrls` Set + `sessionStorage` persistence (`gcs_loaded_urls` JSON array, capped at 200 entries).
+  - `isUrlCached(url)`: checks memory first, then sessionStorage.
+  - `markUrlAsLoaded(url)`: writes to both layers atomically.
+  - `useState(() => isUrlCached(finalSrc))`: initializes from cache on mount — works even after full reload.
+- **Prevention Note**:
+  - **This pattern is now LAW — see `rules.md` § 4-E**. All image cache state that must survive page reloads MUST use sessionStorage, not just in-memory variables.
+  - `pageshow` with `event.persisted` only fires for genuine BFCache; it does NOT help on full reloads caused by `no-store`.
+  - Never rely on module-level variables alone for state that must persist across `Cache-Control: no-store` page reloads.
