@@ -93,6 +93,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       data-scroll-behavior="smooth" 
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://firebasestorage.googleapis.com" />
+        <link rel="preconnect" href="https://storage.googleapis.com" />
+        <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+      </head>
       <body suppressHydrationWarning>
         <GoogleAnalytics />
         <MobileMenuProvider>

@@ -140,18 +140,16 @@ export function GcsImage({
 
     if (!src) return null;
 
-    // preOptimized=true: Payload pre-generated variant → skip /_next/image proxy → GCS CDN direct
-    // isLocalPayload: /api/ paths on Firebase → skip to avoid loopback deadlock
-    // IMPORTANT: For 0.1-0.2s speed, we use unoptimized={true} for all production images
-    // because GCS already serves optimized variants if requested.
-    const shouldDisableOptimization = preOptimized || (isLocalPayload && (isProduction || isFirebase));
+    // IMPORTANT: For 0.5s speed, we want Next.js to optimize most images (AVIF/WebP)
+    // unless preOptimized is explicitly requested for tiny variants.
+    const shouldDisableOptimization = preOptimized && src.includes('thumbnail');
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority
-        ? "(max-width: 1024px) 100vw, 1200px" // Hero images
+        ? "(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1200px" // Hero images
         : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"; // Grid/Card images
 
-    const imageElement = (
+    return (
         <Image
             ref={imgRef}
             src={finalSrc}
@@ -163,6 +161,7 @@ export function GcsImage({
             placeholder="blur"
             blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
             unoptimized={shouldDisableOptimization}
+            {...(priority ? { fetchPriority: 'high' } : {})}
             onLoad={() => {
                 loadedUrls.add(finalSrc);
                 setIsLoaded(true);
@@ -173,22 +172,12 @@ export function GcsImage({
             style={{ 
                 objectFit: 'cover', 
                 objectPosition: 'center',
-                opacity: isLoaded ? 1 : (showShimmer ? 0 : 1),
+                opacity: isLoaded ? 1 : 0, // Simplified opacity logic
+                transition: 'opacity 0.2s ease-in-out',
             }}
-            className={`transition-all duration-200 ease-in-out ${className}`}
+            className={className}
         />
     );
-
-    if (showShimmer) {
-        return (
-            <div className={`relative w-full h-full skeleton`}>
-                {!isLoaded && <div className="shimmer-overlay" />}
-                {imageElement}
-            </div>
-        );
-    }
-
-    return imageElement;
 }
 
 export default GcsImage
