@@ -99,6 +99,40 @@
 - **Fix Summary**: Removed `hover:scale-105` (and its accompanying `transition-transform`) from the buttons. 
 - **Prevention Note**: When using dynamic Javascript-based magnetic cursors that dynamically bind to an element's bounding rect, **avoid using CSS scaling transforms (`scale`) on hover** for those target elements. Doing so causes an inherent state/render mismatch unless the cursor also hooks into `ResizeObserver` or continuously polls the dimension changes (which harms performance).
 
+### [2026-03-29 07:45] Bug: Blog Individual Page Hero Image Not Displayed in Production
+- **Error**: Hero image on individual blog post pages (`/blog/[slug]`) shows `BlogFallbackHero` (blank) in production, while the same article's thumbnail displays correctly on the list page (`/blog`).
+- **Root Cause**:
+  1. **`force-static` + ISR timing mismatch**: The individual page was `force-static`, triggering ISR (on-demand static generation). When a post was first visited before its hero image was uploaded/attached in Payload CMS, the page was statically generated and CDN-cached WITHOUT the hero image.
+  2. **Stale-while-revalidate window**: `revalidatePath` was called correctly on `afterChange`, but `x-nextjs-stale-time: 300` meant the CDN served the stale (no-image) version for up to 5 minutes before regenerating.
+  3. **List page unaffected**: The blog list page uses `force-dynamic` which fetches fresh data on every request via direct SQL (`getPostsByStatus`), so thumbnails always reflect the latest DB state.
+- **File(s) Modified**: `src/app/(frontend)/blog/[slug]/page.tsx`
+- **Fix Summary**: Changed `export const dynamic` from `'force-static'` to `'force-dynamic'`. The page now fetches fresh data from Payload on every request, identical to the blog list page behavior.
+- **Prevention Note**:
+  - **Do NOT use `force-static` for content pages that may be updated post-publish** (e.g., adding images after the initial publish). Use `force-dynamic` instead.
+  - The blog list page (`force-dynamic`) was always correct; the individual page had been inconsistent.
+  - `generateStaticParams` is now effectively a no-op (ignored by `force-dynamic`), but left in place for potential future use.
+
+### [2026-03-29 08:00] Bug: Neon DB Backup Not Triggered on Article Create/Update
+- **Error**: Neon DB backup branch was not updated when articles were created or modified via PayloadCMS admin. The backup only ran on code push to `main`.
+- **Root Cause**:
+  1. `neon-backup.yml` workflow only triggers on `push` to `main` — data changes in Payload admin are completely independent of code pushes.
+  2. `NEON_API_TOKEN` and `NEON_PROJECT_ID` were not registered in `apphosting.yaml`, so any server-side Neon API calls from production would fail silently.
+  3. The GitHub Actions workflow created the backup branch without specifying `parent_id`, relying on Neon's default (which happens to be primary, but was ambiguous).
+- **File(s) Modified**:
+  - `src/plugins/neon-backup/index.ts` (new file)
+  - `src/payload.config.ts`
+  - `apphosting.yaml`
+  - `.github/workflows/neon-backup.yml`
+- **Fix Summary**:
+  - Created `neonBackupPlugin`: a Payload plugin that adds an `afterChange` hook to Posts. On every create/update, it calls the Neon API (fire-and-forget) to delete the old `backup/pre-deploy` branch and create a fresh fork from the primary branch.
+  - Added `NEON_PROJECT_ID=proud-hall-53361784` to `.env.local` and `apphosting.yaml` (plain value).
+  - Added `NEON_API_TOKEN` to `apphosting.yaml` as a Secret Manager reference.
+  - Fixed `neon-backup.yml` to explicitly set `parent_id` to the primary branch ID when creating the backup.
+- **Prevention Note**:
+  - CMS data backups must be triggered by data events (Payload hooks), not code events (git push).
+  - Always register all server-side API tokens in `apphosting.yaml` — `.env.local`-only vars won't be available in production.
+  - Neon branch creation: always specify `parent_id` explicitly to avoid ambiguity.
+
 ### [2026-03-24 01:40] Bug: Shadow DOM CSS Scoping Conflict (Dark Theme not applying)
 - **Error**: Embedded HTML content displayed with a white background instead of the intended dark theme, despite the CSS being present in the Shadow DOM.
 - **Root Cause**:
