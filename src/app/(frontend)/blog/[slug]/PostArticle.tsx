@@ -15,7 +15,12 @@ export const PostArticle: React.FC<{
 }> = ({ post, isPreview, prevPost, nextPost }) => {
     // console.log(`[DEBUG] Rendering PostArticle for ${post.slug}...`);
     
-    const readingTime = (post as any).readingTime || calculateReadingTime(post.content);
+    const htmlBodyHtml: string = (post as any).htmlEmbed?.bodyHtml || ''
+    const readingTime =
+        (post as any).readingTime ||
+        calculateReadingTime(post.content) + calculateReadingTime(htmlBodyHtml) ||
+        1 // Minimum 1 minute for any published post
+
 
     return (
         <main className="post-main grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
