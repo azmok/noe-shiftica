@@ -113,42 +113,52 @@
 }
 
 @media (max-width: 768px) {
-  /* Maximize space for editing HTML and CSS */
-  .drawer__content-children {
-    padding: 8px 0 !important; /* 横の余白を完全にゼロにする */
-    padding-bottom: 50vh !important;
-  }
-
-  .drawer__content,
-  .drawer__content-children {
-    overflow-y: scroll !important;
+  /* ==========================================================
+     BRUTE-FORCE iOS SAFARI SCROLL FIX
+     ========================================================== */
+     
+  /* 
+    1. ドロワー（モーダル）のルートコンテナを、スマホの物理的・仮想的な
+       「現在の画面の高さ (100dvh)」にガッチリ固定します。
+       これがないと、中身が膨張したときに画面外へ突き抜けてしまい
+       永遠にスクロール不可能（フリーズ）になります。
+  */
+  .drawer__content {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
+    position: fixed !important; /* 親からの束縛を切って画面全体に固定 */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    overscroll-behavior: none !important; /* iOS特有のゴムバンド効果でのフリーズを無効化 */
   }
 
-  /* Shrink the header to absolute minimum size */
+  .drawer__content-children {
+    padding: 8px 0 !important;
+    padding-bottom: 70vh !important; /* 下部に超絶巨大な余白。キーボードが出ても絶対平気 */
+    height: auto !important;
+    overflow: visible !important; /* 子要素はそのまま伸ばす */
+  }
+
+  /* 2. ヘッダーを最小化 */
   .doc-drawer__header {
-    padding: 4px !important; /* 横余白を最小化 */
+    padding: 4px !important;
     margin: 0 !important;
-    min-height: auto !important;
+    min-height: 40px !important;
+    background: var(--theme-elevation-50) !important;
+    position: sticky !important; /* ヘッダーだけ画面上部に固定 */
+    top: 0 !important;
+    z-index: 999 !important;
   }
   
-  .doc-drawer__header-content {
-    margin-bottom: 2px !important;
-  }
-  
-  .doc-drawer__header-text {
-    font-size: 14px !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-  }
+  .doc-drawer__header-content { margin-bottom: 2px !important; }
+  .doc-drawer__header-text { font-size: 14px !important; margin: 0 !important; line-height: 1 !important; }
+  .id-label { font-size: 10px !important; margin: 0 !important; padding: 2px !important; }
 
-  .id-label {
-    font-size: 10px !important;
-    margin: 0 !important;
-    padding: 2px !important;
-  }
-
-  /* Completely hide the file thumbnail, details header, and document controls on mobile to maximize space */
+  /* 3. 不要なUI要素の完全抹消 (スペース確保) */
   .file-details,
   .doc-controls__content {
     display: none !important;
@@ -156,38 +166,48 @@
   
   .field-type {
     margin-bottom: 12px !important;
-    padding: 0 2px !important; /* Extremely tight horizontal padding */
+    padding: 0 4px !important;
   }
 
   .field-label {
     font-size: 12px !important;
     margin-bottom: 4px !important;
-    padding-left: 2px !important;
   }
 
   /* 
-     iOS Safari Textarea Scroll Fix 
-     Instead of making the textarea scroll (which iOS fails at), 
-     we make its parent wrapper scrollable and let the textarea expand!
+    3. テキストエリアの強行突破 
+    中の textarea は指定行数で止める（70vh）。
+    スマホでスクロールするときの主役はこの textarea 自身とする！
   */
   .drawer__content .field-type__wrap {
-    max-height: 75vh !important;
-    overflow-y: scroll !important;
-    -webkit-overflow-scrolling: touch !important;
-    border: 1px solid var(--theme-elevation-200); /* Add border to wrapper */
-    border-radius: 4px;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
   }
 
   .drawer__content textarea {
-    height: auto !important;
-    min-height: 75vh !important;
-    overflow: hidden !important; 
-    border: none !important; /* Remove border from textarea itself */
-    resize: none !important;
-    font-size: 13px !important; 
+    height: 70dvh !important; /* iOSの画面高さの70%を保証 */
+    max-height: 70dvh !important;
+    min-height: 300px !important;
+    overflow-y: scroll !important; /* 強制的に自分のスクロールバーを持たせる */
+    -webkit-overflow-scrolling: touch !important; /* iOSお決まりの魔法の言葉 */
+    touch-action: pan-y !important; /* タッチイベントの握りつぶしを阻止 */
+    
+    /* 
+      iOS Safari特有の「16px以下の入力欄をタップすると勝手にズームする極悪仕様」を
+      回避するため、フォントサイズはApple指定の16pxに強制しつつ、行間を詰めて視認性を高めます。
+    */
+    font-size: 16px !important; 
+    line-height: 1.2 !important;
+    letter-spacing: -0.5px !important; /* 文字間を詰めて0.8倍風の密度にする */
+    
     padding: 8px !important;
     font-family: monospace !important;
-    line-height: 1.5 !important;
-    touch-action: pan-y !important; /* Force touch panning */
+    border: 1px solid var(--theme-elevation-200) !important;
+    resize: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
+
