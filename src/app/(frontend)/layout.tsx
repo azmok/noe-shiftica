@@ -1,4 +1,4 @@
-import { Inconsolata, DM_Sans, DM_Serif_Display, Shippori_Mincho, Oxanium } from "next/font/google";
+import { Inconsolata, DM_Sans, DM_Serif_Display, Shippori_Mincho, Oxanium, Noto_Sans_JP } from "next/font/google";
 import Script from "next/script";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
@@ -36,6 +36,13 @@ const oxanium = Oxanium({
   variable: "--font-oxanium",
   display: "swap",
   weight: ["200", "300", "400", "500", "600", "700", "800"],
+});
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ["latin"],
+  variable: "--font-noto-sans-jp",
+  display: "swap",
+  weight: ["400", "500", "700"],
 });
 
 export const metadata = {
@@ -92,7 +99,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html 
       lang="ja" 
-      className={`${inconsolata.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${shipporiMincho.variable} ${oxanium.variable}`}
+      className={`${inconsolata.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${shipporiMincho.variable} ${oxanium.variable} ${notoSansJP.variable}`}
       data-scroll-behavior="smooth" 
       suppressHydrationWarning
     >
@@ -113,13 +120,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <MobileBottomNav />
           <MobileMenuButton />
         </MobileMenuProvider>
-        <Script
-          id="typekit"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(d){var config={kitId:'jtq7dsy',scriptTimeout:3000,async:true},h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\\bwf-loading\\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)})(document);`,
-          }}
-        />
+
       </body>
     </html>
   );
