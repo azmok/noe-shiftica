@@ -91,11 +91,16 @@
   Safari sometimes prevents the parent from scrolling vertically when body expands. 
 */
 @media (max-width: 768px) {
+  .drawer__content,
   .drawer__content-children {
-    overflow-y: auto !important;
+    overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior: contain;
+  }
+  
+  .drawer__content-children {
     /* 編集しやすくするために下部に余白を追加 */
     padding-bottom: 40vh !important;
   }
 }
+
