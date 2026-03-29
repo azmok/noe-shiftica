@@ -61,12 +61,25 @@ export default function HearingPage() {
         if (Date.now() - item.timestamp > EXPIRE_TIME) {
           localStorage.removeItem(STORAGE_KEY);
         } else {
-          setSavedData(item.data || {});
+          const data = item.data || {};
+          setSavedData(data);
           setSubData(item.subData || {});
+
+          // すべての質問に回答済みの場合は、サマリー画面（最後のステップ）から開始する
+          const allAnswered = questions.every(q => data[q.id] && data[q.id].length > 0);
+          if (allAnswered) {
+            setCurrentStep(questions.length);
+          }
         }
       }
     } catch (e) {
       console.error(e);
+    }
+    
+    // URLパラメータでサマリー表示が指定されている場合（バッジからの遷移など）
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('view') === 'summary') {
+      setCurrentStep(questions.length);
     }
   }, []);
 

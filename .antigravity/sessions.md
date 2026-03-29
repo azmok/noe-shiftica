@@ -103,3 +103,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - For future HTML imports, avoid applying `overflow: hidden` to `body`/`html` or using `document.body.classList` for scroll state — these escape Shadow DOM on mobile Safari.
 - **Plan Impact**:
     - `HtmlEmbedBlock.tsx` now defensively sanitizes scroll-lock artifacts from all embedded HTML.
+
+### [2026-03-29 20:00] Session Summary
+- **Learned/Decided**:
+    - **HtmlSourcePlugin textarea (Safari)**: `minHeight` on textarea causes page-level scroll in Safari admin panel. Replacing with fixed `height: calc(100vh - 180px)` + `overflowY: auto` creates a properly scrollable full-screen editor.
+    - **Preview page + Safari ITP**: `payload.find({ draft: true })` without `overrideAccess: true` can fail when Safari blocks admin session cookies in the preview iframe context. Adding `overrideAccess: true` ensures drafts are always accessible regardless of auth state.
+    - **GcsImage preOptimized bug**: `shouldDisableOptimization = preOptimized && src.includes('thumbnail')` was incorrect — medium/large Payload-generated variants were still going through the Next.js proxy (2-hop) instead of being served directly from GCS CDN (1-hop). Removed the `thumbnail` check so all `preOptimized: true` images bypass the proxy.
+    - **AVIF vs WebP**: Changed `formats` to `["image/webp"]` only. AVIF encodes ~10x slower than WebP on first request, causing >1s waits. For the 0.5s target, WebP is the better default.
+- **Preferences**: Sub-0.5s image loading requires both format selection (WebP over AVIF) AND avoiding proxy hops (preOptimized direct CDN).
+- **Plan Impact**: Future image optimization: always use `preOptimized: true` for Payload-generated variants (medium/large/thumbnail) for direct CDN serving.

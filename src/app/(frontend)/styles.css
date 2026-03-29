@@ -608,6 +608,19 @@ svg {
   /* differenceと白背景で反転効果 */
 }
 
+/* 特別なCTAボタン用スタイル */
+#hearing-cta-button {
+  background-color: var(--color-primary) !important;
+  color: var(--color-secondary) !important;
+  border-color: rgba(107, 45, 160, 0.2) !important;
+  box-shadow: 0 0 20px rgba(204, 221, 0, 0.3) !important;
+}
+
+#hearing-cta-button:hover {
+  background-color: #c9e62f !important;
+  box-shadow: 0 0 30px rgba(204, 221, 0, 0.5) !important;
+}
+
 .custom-cursor.featured-hover {
   background-color: #ffffff !important;
   mix-blend-mode: difference !important;

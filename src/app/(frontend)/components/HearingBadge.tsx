@@ -64,7 +64,7 @@ export function HearingBadge() {
   };
 
   const navigateToHearing = () => {
-    router.push('/hearing');
+    router.push('/hearing?view=summary');
     setIsOpen(false);
   };
 
