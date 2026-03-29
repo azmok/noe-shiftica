@@ -48,7 +48,9 @@ export async function generateMetadata({
         const description = cmd.seo_description || cmd.description || "";
 
         // OpenGraph images fallback logic
-        const ogImage = cmd.og_image || (post.coverImage && typeof post.coverImage === 'object' ? (post.coverImage as any).url : '');
+        // cmd.og_image must be an absolute URL; relative paths (slugs from frontmatter) are ignored
+        const cmdOgImage = cmd.og_image && (cmd.og_image.startsWith('http://') || cmd.og_image.startsWith('https://')) ? cmd.og_image : null;
+        const ogImage = cmdOgImage || post.ogImage || (post.coverImage && typeof post.coverImage === 'object' ? (post.coverImage as any).url : '');
 
         return {
             title: title,
