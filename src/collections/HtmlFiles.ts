@@ -132,6 +132,9 @@ export const HtmlFiles: CollectionConfig = {
       type: 'textarea',
       admin: {
         description: 'HTMLファイルから自動抽出された body コンテンツ（手動編集不可避な場合はここを修正）',
+        components: {
+          Field: '@/components/MobileFullscreenEditor#MobileFullscreenEditor',
+        },
       },
     },
     {
@@ -139,6 +142,9 @@ export const HtmlFiles: CollectionConfig = {
       type: 'textarea',
       admin: {
         description: 'HTMLファイルから自動抽出された CSS スタイル（手動編集不可避な場合はここを修正）',
+        components: {
+          Field: '@/components/MobileFullscreenEditor#MobileFullscreenEditor',
+        },
       },
     },
   ],
