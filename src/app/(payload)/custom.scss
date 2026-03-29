@@ -119,6 +119,12 @@
     padding-bottom: 50vh !important;
   }
 
+  .drawer__content,
+  .drawer__content-children {
+    overflow-y: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
   /* Shrink the header to absolute minimum size */
   .doc-drawer__header {
     padding: 4px !important; /* 横余白を最小化 */
@@ -159,17 +165,29 @@
     padding-left: 2px !important;
   }
 
-  /* Make textareas take up 75% of screen height for massive editing space */
-  .drawer__content textarea {
-    height: 75vh !important;
+  /* 
+     iOS Safari Textarea Scroll Fix 
+     Instead of making the textarea scroll (which iOS fails at), 
+     we make its parent wrapper scrollable and let the textarea expand!
+  */
+  .drawer__content .field-type__wrap {
     max-height: 75vh !important;
-    overflow-y: auto !important;
+    overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch !important;
-    font-size: 13px !important; /* 0.8倍の文字サイズ（16px -> 13px）にしてコード全体の視認性を上げる */
+    border: 1px solid var(--theme-elevation-200); /* Add border to wrapper */
+    border-radius: 4px;
+  }
+
+  .drawer__content textarea {
+    height: auto !important;
+    min-height: 75vh !important;
+    overflow: hidden !important; 
+    border: none !important; /* Remove border from textarea itself */
+    resize: none !important;
+    font-size: 13px !important; 
     padding: 8px !important;
     font-family: monospace !important;
     line-height: 1.5 !important;
+    touch-action: pan-y !important; /* Force touch panning */
   }
 }
-
-
