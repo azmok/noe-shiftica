@@ -47,17 +47,19 @@ export function CustomCursor() {
   }, [pathname]);
 
   useEffect(() => {
-    // Check if device is mobile, touch-enabled, or simulated in dev tools
-    const isTouchDevice =
-      "ontouchstart" in window ||
-      navigator.maxTouchPoints > 0 ||
-      window.matchMedia("(pointer: coarse)").matches ||
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    
+    const updateDeviceType = () => {
+      if (!mediaQuery.matches || window.innerWidth <= 768) {
+        setIsMobile(true);
+      } else {
+        setIsMobile(false);
+      }
+    };
 
-    if (isTouchDevice || window.innerWidth <= 768) {
-      setIsMobile(true);
-      return;
-    }
+    updateDeviceType();
+    mediaQuery.addEventListener("change", updateDeviceType);
+    window.addEventListener("resize", updateDeviceType);
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.current = e.clientX;
@@ -141,6 +143,8 @@ export function CustomCursor() {
     window.addEventListener("mouseout", handleMouseOut);
 
     return () => {
+      mediaQuery.removeEventListener("change", updateDeviceType);
+      window.removeEventListener("resize", updateDeviceType);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseover", handleMouseOver);
       window.removeEventListener("mouseout", handleMouseOut);
