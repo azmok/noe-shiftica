@@ -35,6 +35,30 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // iOS Safari body scroll lock: prevent touch events from being captured by the background page
+  useEffect(() => {
+    if (isOpen) {
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      document.body.style.overflow = 'hidden'
+    } else {
+      const scrollY = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+      window.scrollTo(0, parseInt(scrollY || '0') * -1)
+    }
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   // If desktop, just render a regular textarea
   if (!isMobile) {
     return (
@@ -95,7 +119,8 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
             zIndex: 9999999, /* Force it over EVERYTHING (Header, Modals, Drawers) */
             background: 'var(--theme-bg)',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            overflow: 'hidden'
           }}
         >
           {/* Header Controls */}
@@ -157,7 +182,8 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
               resize: 'none',
               background: 'var(--theme-bg)',
               color: 'var(--theme-text)',
-              WebkitOverflowScrolling: 'touch' // Enable standard smooth scrolling on iOS!
+              overflowY: 'scroll' as const,       // iOS Safari requires explicit 'scroll', not 'auto'
+              overscrollBehavior: 'contain' as const // Prevent scroll from propagating to body
             }}
           />
         </div>
