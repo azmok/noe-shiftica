@@ -140,9 +140,9 @@ export function GcsImage({
 
     if (!src) return null;
 
-    // IMPORTANT: For 0.5s speed, we want Next.js to optimize most images (AVIF/WebP)
-    // unless preOptimized is explicitly requested for tiny variants.
-    const shouldDisableOptimization = preOptimized && src.includes('thumbnail');
+    // IMPORTANT: For 0.5s speed, serve preOptimized variants (medium/large/thumbnail)
+    // directly from GCS CDN (1 hop) instead of routing through Next.js image proxy (2 hops).
+    const shouldDisableOptimization = preOptimized;
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority
@@ -173,7 +173,7 @@ export function GcsImage({
                 objectFit: 'cover', 
                 objectPosition: 'center',
                 opacity: isLoaded ? 1 : 0, // Simplified opacity logic
-                transition: 'opacity 0.2s ease-in-out',
+                transition: 'opacity 0.1s ease-in-out',
             }}
             className={className}
         />

@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Priority: AVIF (50% smaller than WebP) > WebP > Original
-    formats: ["image/avif", "image/webp"],
+    // WebP only: ~10x faster to encode than AVIF on first request (sub-0.5s target)
+    formats: ["image/webp"],
     // Allow Next.js to optimize images served from Google Cloud Storage
     remotePatterns: [
       {

@@ -22,7 +22,7 @@ const STYLES = {
   },
   textarea: {
     width: '100%',
-    minHeight: '400px',
+    height: 'calc(100vh - 180px)',
     fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
     fontSize: '13px',
     lineHeight: '1.6',
@@ -35,6 +35,7 @@ const STYLES = {
     outline: 'none',
     boxSizing: 'border-box' as const,
     marginTop: '8px',
+    overflowY: 'auto' as const,
   },
   errorBanner: {
     marginTop: '6px',
