@@ -110,6 +110,15 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
     }
 
     if (ta) {
+      // FIX: stop touchmove from bubbling to Payload's drawer handler which calls preventDefault.
+      // We must NOT call preventDefault here — that would kill native textarea scroll too.
+      // non-passive is required to call stopPropagation reliably before passive listeners run.
+      const stopProp = (e: TouchEvent) => {
+        e.stopPropagation()
+        addLine(`[FIX] stopPropagation called. defPrev=${e.defaultPrevented} scrollTop=${ta.scrollTop.toFixed(0)}`)
+      }
+      ta.addEventListener('touchmove', stopProp, { passive: false })
+
       ta.addEventListener('touchstart', onTaStart, { passive: true })
       ta.addEventListener('touchmove', onTaMove, { passive: true })
       ta.addEventListener('touchend', onTaEnd, { passive: true })
@@ -124,6 +133,7 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
 
     return () => {
       if (ta) {
+        ta.removeEventListener('touchmove', stopProp)
         ta.removeEventListener('touchstart', onTaStart)
         ta.removeEventListener('touchmove', onTaMove)
         ta.removeEventListener('touchend', onTaEnd)
