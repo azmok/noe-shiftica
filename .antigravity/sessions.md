@@ -83,21 +83,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**: 
     - GA measurement is now active and configurable via environment variables in Firebase App Hosting.
 
-### [2026-03-29 17:00] Session Summary
+### [2026-03-29 17:15] Session Summary
 - **Learned/Decided**:
-  - Neon DB backups must be driven by Payload `afterChange` hooks, not GitHub Actions code-push triggers. Created `neonBackupPlugin` as a reusable Payload plugin for this purpose.
-  - Neon Project ID for this project: `proud-hall-53361784`. Production branch ID: `br-lively-fog-a1yapuxn` (primary). The API key is scoped to this project.
-  - `ep-shy-silence-a1mbjeqg` is the **compute endpoint** ID (not branch ID). The production branch ID is `br-lively-fog-a1yapuxn`.
-  - Fire-and-forget pattern (`.catch()` without `await`) is the correct approach for non-blocking side effects in Payload hooks.
+    - **ogImage Population**: Using an `afterChange` hook with `payload.update` in Payload v3 can cause "Canceled" network errors and UI instability. The correct and atomic approach is using a `beforeChange` hook to set the value on the `data` object.
+    - **Media URLs in Hooks**: Direct GCS URLs for media are generated in the `Media` collection's `afterRead` hook. In `beforeChange` hooks of other collections, use `payload.findByID` on the `media` collection to trigger its hooks and retrieve the generated URL.
+    - **Scope Exception**: As recorded, the user (Azuma) allowed modifying `src/collections/Posts.ts` and `src/payload.config.ts` specifically for this fix.
+- **Preferences**:
+    - **STRICT SCOPE LOCK**: For all future tasks, the rule of "NOT touching `src/collections/*` or protected files" is RE-INSTATED. This task was a one-time exception only.
 - **Plan Impact**:
-  - Any future data-critical side effects (notifications, sync) should be implemented as Payload plugins with fire-and-forget hooks, not external cron/CI triggers.
-  - Before going to production, NEON_API_TOKEN must be registered in Firebase Secret Manager via CLI: `firebase apphosting:secrets:set NEON_API_TOKEN`
-
-### [2026-03-29 16:35] Session Summary
-- **Learned/Decided**: 
-    - Implemented `ogImagePlugin` using Payload v3's `CollectionAfterChangeHook`.
-    - Confirmed that `afterChange` hooks can trigger infinite loops if they unrestrictedly `payload.update()`. Handled this by strictly checking `if (doc.status === 'published' && previousDoc?.status !== 'published')` before executing the update logic.
-- **Preferences**: 
-    - The fallback generic OG image URL is hardcoded per user specification for safe fallback when media is not present.
-- **Plan Impact**: 
-    - The `Posts` collection now automatically derives an `ogImage` string from the `heroImage` relationship object during publication only.
+    - Always prioritize `beforeChange` for field auto-population to ensure atomicity and avoid UI sync issues.

@@ -267,6 +267,10 @@ export interface Post {
     | boolean
     | null;
   htmlEmbed?: (number | null) | HtmlFile;
+  /**
+   * 記事公開時にHero Imageから自動生成されます。
+   */
+  ogImage?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -503,6 +507,7 @@ export interface PostsSelect<T extends boolean = true> {
   heroImage?: T;
   customMetaData?: T;
   htmlEmbed?: T;
+  ogImage?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
