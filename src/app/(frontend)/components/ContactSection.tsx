@@ -14,6 +14,8 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [budget, setBudget] = useState("");
+  const [hasHearingData, setHasHearingData] = useState(false);
+  const [includeHearingData, setIncludeHearingData] = useState(true);
 
   // プラン選択時に予算を更新
   React.useEffect(() => {
@@ -21,6 +23,23 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
       setBudget(selectedBudget);
     }
   }, [selectedBudget]);
+
+  // ヒアリングデータの有無を確認
+  React.useEffect(() => {
+    try {
+      const itemStr = localStorage.getItem('noeShiftica_Hearing_Data');
+      if (itemStr) {
+        const item = JSON.parse(itemStr);
+        if (Date.now() - item.timestamp <= 7 * 24 * 60 * 60 * 1000) {
+          setHasHearingData(true);
+        } else {
+          localStorage.removeItem('noeShiftica_Hearing_Data');
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   return (
     <section id="contact" className="py-32 px-6 relative z-10">
@@ -57,12 +76,24 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
             e.preventDefault();
             setIsSubmitting(true);
             const formData = new FormData(e.currentTarget);
+            
+            let finalHearingData = null;
+            if (hasHearingData && includeHearingData) {
+              try {
+                const itemStr = localStorage.getItem('noeShiftica_Hearing_Data');
+                if (itemStr) {
+                  finalHearingData = JSON.parse(itemStr);
+                }
+              } catch(e) {}
+            }
+
             const data = {
               name: formData.get('name'),
               email: formData.get('email'),
               message: formData.get('message'),
               budget: formData.get('budget'),
               timeline: formData.get('timeline'),
+              hearingData: finalHearingData,
             };
 
             try {
@@ -160,6 +191,20 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                 />
               </div>
             </div>
+            
+            {hasHearingData && (
+              <div className="pt-2 text-left">
+                <label className="flex items-center gap-4 cursor-pointer p-4 bg-[#E2FF3D]/5 border border-[#E2FF3D]/20 rounded-xl hover:border-[#E2FF3D]/50 transition-colors select-none group">
+                  <div className={`w-5 h-5 flex items-center justify-center border-2 rounded-md ${includeHearingData ? 'border-[#E2FF3D] bg-[#E2FF3D]' : 'border-[#8A8A93] bg-[#121216]'} transition-all shrink-0 group-hover:border-[#E2FF3D]`}>
+                    {includeHearingData && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#08080A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                  </div>
+                  <span className="text-[14px] font-bold text-white leading-tight">
+                    💡 先ほど入力したヒアリングシートの内容を一緒に送信する
+                  </span>
+                </label>
+              </div>
+            )}
+
             <div className="pt-12 md:pt-14 text-center">
               <div className={isSubmitting ? "opacity-50 pointer-events-none mb-8" : "mb-8"}>
                 <Button

@@ -12,7 +12,53 @@ export async function POST(request: Request) {
         console.log(`[DEBUG] Is dummy key used?: ${apiKey === 're_dummy_key_for_build_bypass'}`);
         console.log(`[DEBUG] RESEND_API_KEY from env: ${process.env.RESEND_API_KEY ? 'Set' : 'Not set'}`);
 
-        const { name, email, message, budget, timeline } = await request.json();
+        const { name, email, message, budget, timeline, hearingData } = await request.json();
+
+        let hearingTextAdmin = '';
+        let hearingTextCustomer = '';
+
+        if (hearingData && hearingData.data) {
+            const data = hearingData.data;
+            const subData = hearingData.subData || {};
+            const qMap: Record<string, string> = {
+                'q1': 'ビジネスジャンル',
+                'q2': 'Webサイトを作る目的',
+                'q3': '主なターゲット',
+                'q4': 'サイトに欲しい強み',
+                'q5': 'サイトの雰囲気',
+                'q6': 'ビジュアルのメイン',
+                'q7': '参考サイトイメージ',
+                'q8': 'ページ数のイメージ',
+                'q9': 'コンテンツの更新頻度',
+                'q10': '必要な機能',
+                'q11': 'ドメイン・サーバーの準備',
+                'q12': '制作予算のイメージ',
+                'q13': '公開希望の時期',
+                'q14': '素材の準備状況'
+            };
+            const formatAnswers = (ans: string[], qId: string) => {
+                if (!ans || !ans.length) return '未回答';
+                return ans.map(a => {
+                    const subText = subData[qId] && subData[qId][a];
+                    return `・${a}${subText ? ` (${subText})` : ''}`;
+                }).join('<br>');
+            };
+            const hearingRows = Object.keys(qMap).map((qId, index) => {
+                const ansStr = formatAnswers(data[qId], qId);
+                return `<p style="margin-bottom:8px"><strong>Q${index + 1}. ${qMap[qId]}:</strong><br>${ansStr}</p>`;
+            }).join('');
+
+            hearingTextAdmin = `
+        <br><hr>
+        <h3>📊 添付されたヒアリングシートの内容</h3>
+        ${hearingRows}
+      `;
+            hearingTextCustomer = `
+        <br><hr>
+        <h3>📊 以下のヒアリングシート内容も同時に受け付けました</h3>
+        ${hearingRows}
+      `;
+        }
 
         if (!name || !email || !message) {
             return NextResponse.json(
@@ -36,6 +82,7 @@ export async function POST(request: Request) {
         <p><strong>ご予算感:</strong> ${budget || '未定'}</p>
         <p><strong>公開希望時期:</strong> ${timeline || '未定'}</p>
         <hr>
+        ${hearingTextCustomer}
         <p>引き続きよろしくお願いいたします。</p>
         <p>Noe Shiftica</p>
       `,
@@ -60,6 +107,7 @@ export async function POST(request: Request) {
         <p><strong>ご予算感:</strong> ${budget}</p>
         <p><strong>公開希望時期:</strong> ${timeline}</p>
         <hr>
+        ${hearingTextAdmin}
       `,
         });
 
