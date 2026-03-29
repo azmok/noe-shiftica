@@ -85,3 +85,17 @@
     font-size: 14px;
   }
 }
+
+/* 
+  Fix mobile Safari scrolling issues for Drawer modal content (e.g. HtmlFiles editor).
+  Safari sometimes prevents the parent from scrolling vertically when body expands. 
+*/
+@media (max-width: 768px) {
+  .drawer__content-children {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+    /* 編集しやすくするために下部に余白を追加 */
+    padding-bottom: 40vh !important;
+  }
+}

@@ -36,6 +36,8 @@ const STYLES = {
     boxSizing: 'border-box' as const,
     marginTop: '8px',
     overflowY: 'auto' as const,
+    WebkitOverflowScrolling: 'touch',
+    overscrollBehavior: 'contain',
   },
   errorBanner: {
     marginTop: '6px',
