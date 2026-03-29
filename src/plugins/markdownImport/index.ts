@@ -87,14 +87,32 @@ export const markdownImportPlugin = (): Plugin => {
                         const rawBody = await (req as unknown as Request).text()
                         console.log('[AI-ENRICH] Raw body length:', rawBody.length)
 
-                        let title: string, content: any
+                        let title: string, content: any, htmlContent: string
                         try {
                             const parsed = JSON.parse(rawBody)
                             title = parsed.title
                             content = parsed.content
+                            htmlContent = parsed.htmlContent || ''
                         } catch (parseErr) {
                             console.error('[AI-ENRICH] Failed to parse request body as JSON:', rawBody.substring(0, 200))
                             return Response.json({ error: 'Invalid JSON body', details: String(parseErr) }, { status: 400 })
+                        }
+
+                        // Build content string for AI analysis
+                        // Priority: htmlContent (from HTML import) > richText content
+                        let contentStr = ''
+                        if (htmlContent) {
+                            // Strip HTML tags and clean up whitespace for plain-text AI input
+                            contentStr = htmlContent
+                                .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                                .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+                                .replace(/<[^>]+>/g, ' ')
+                                .replace(/\s+/g, ' ')
+                                .trim()
+                                .substring(0, 8000) // Cap context length for API efficiency
+                            console.log(`[AI-ENRICH] Using HTML embed content (${contentStr.length} chars)`)
+                        } else {
+                            contentStr = JSON.stringify(content)
                         }
 
                         console.group('[AI-ENRICH] Request for:', title)
@@ -102,7 +120,7 @@ export const markdownImportPlugin = (): Plugin => {
 
                         // Call Gemini API
                         console.log('[AI-ENRICH] Calling enrichPostContent...')
-                        const result = await enrichPostContent(title, JSON.stringify(content))
+                        const result = await enrichPostContent(title, contentStr)
 
                         // Resolve Categories (Convert names to IDs, creating if necessary)
                         if (result.categories && Array.isArray(result.categories)) {
@@ -151,9 +169,10 @@ export const markdownImportPlugin = (): Plugin => {
             },
         ]
 
-        // 2. Inject UI component into Posts collection
+        // 2. Inject UI component and lifecycle hooks into Posts collection
         config.collections = (config.collections || []).map((collection) => {
             if (collection.slug === 'posts') {
+                // --- Add sidebar UI field ---
                 collection.fields = [
                     {
                         name: 'markdownImportUI',
@@ -167,6 +186,53 @@ export const markdownImportPlugin = (): Plugin => {
                     },
                     ...collection.fields,
                 ]
+
+                // --- Add beforeValidate hook to allow publishing with htmlEmbed but no content ---
+                // The content field is required: true in Posts.ts, so we inject a minimal
+                // non-breaking space Lexical structure when content is absent but htmlEmbed is present.
+                const existingBeforeValidate = collection.hooks?.beforeValidate || []
+                collection.hooks = {
+                    ...(collection.hooks || {}),
+                    beforeValidate: [
+                        ...existingBeforeValidate,
+                        async (args: any) => {
+                            const data = args?.data ?? {}
+                            const hasTextContent =
+                                data?.content &&
+                                typeof data.content === 'object' &&
+                                'root' in data.content &&
+                                (data.content as any).root?.children?.some((node: any) =>
+                                    node.children?.some((child: any) => child.text?.trim())
+                                )
+
+                            if (!hasTextContent && data?.htmlEmbed) {
+                                // Insert a single non-breaking space as placeholder to satisfy required: true
+                                // This renders as invisible whitespace in the frontend
+                                data.content = {
+                                    root: {
+                                        children: [
+                                            {
+                                                children: [
+                                                    {
+                                                        detail: 0, format: 0, mode: 'normal',
+                                                        style: '', text: '\u00A0',
+                                                        type: 'text', version: 1,
+                                                    },
+                                                ],
+                                                direction: 'ltr', format: '',
+                                                indent: 0, type: 'paragraph', version: 1,
+                                            },
+                                        ],
+                                        direction: 'ltr', format: '',
+                                        indent: 0, type: 'root', version: 1,
+                                    },
+                                }
+                                console.log('[MARKDOWN-PLUGIN] Injected placeholder content for HTML-embed-only post.')
+                            }
+                            return data
+                        },
+                    ],
+                }
             }
             return collection
         })
