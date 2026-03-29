@@ -119,8 +119,9 @@
     padding-bottom: 50vh !important;
   }
 
-  /* Completely hide the file thumbnail and details header on mobile to maximize space */
-  .file-details {
+  /* Completely hide the file thumbnail, details header, and document controls on mobile to maximize space */
+  .file-details,
+  .doc-controls__content {
     display: none !important;
   }
   
