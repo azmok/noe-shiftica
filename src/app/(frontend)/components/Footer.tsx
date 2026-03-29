@@ -43,7 +43,7 @@ export function Footer({ variant = "landing" }: FooterProps) {
             <ul className="space-y-1.5 pl-1">
               {[
                 { name: "About", href: "/about" },
-                { name: "Services", href: "/#services" },
+                { name: "Services", href: "/services" },
                 { name: "Pricing", href: "/#pricing" },
                 { name: "Blog", href: "/blog" },
               ].map((link) => (
