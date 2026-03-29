@@ -27,6 +27,7 @@ export default async function BlogPostPreviewPage({
         depth: 1,
         limit: 1,
         draft: true,
+        overrideAccess: true,
     });
 
     if (!posts.docs || posts.docs.length === 0) {
@@ -48,6 +49,7 @@ export default async function BlogPostPreviewPage({
             sort: '-publishedAt',
             limit: 1,
             depth: 0,
+            overrideAccess: true,
         });
         prevPost = prevPostsRes.docs[0] || null;
 
@@ -60,6 +62,7 @@ export default async function BlogPostPreviewPage({
             sort: 'publishedAt',
             limit: 1,
             depth: 0,
+            overrideAccess: true,
         });
         nextPost = nextPostsRes.docs[0] || null;
     }
