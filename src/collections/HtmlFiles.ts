@@ -123,6 +123,9 @@ export const HtmlFiles: CollectionConfig = {
       type: 'text',
       label: 'ファイル説明',
       required: false,
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: 'bodyHtml',
