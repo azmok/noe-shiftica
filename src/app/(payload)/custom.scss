@@ -115,13 +115,13 @@
 @media (max-width: 768px) {
   /* Maximize space for editing HTML and CSS */
   .drawer__content-children {
-    padding: 12px 8px !important; 
+    padding: 8px 0 !important; /* 横の余白を完全にゼロにする */
     padding-bottom: 50vh !important;
   }
 
   /* Shrink the header to absolute minimum size */
   .doc-drawer__header {
-    padding: 4px 8px !important;
+    padding: 4px !important; /* 横余白を最小化 */
     margin: 0 !important;
     min-height: auto !important;
   }
@@ -139,7 +139,7 @@
   .id-label {
     font-size: 10px !important;
     margin: 0 !important;
-    padding: 2px 4px !important;
+    padding: 2px !important;
   }
 
   /* Completely hide the file thumbnail, details header, and document controls on mobile to maximize space */
@@ -150,11 +150,13 @@
   
   .field-type {
     margin-bottom: 12px !important;
+    padding: 0 2px !important; /* Extremely tight horizontal padding */
   }
 
   .field-label {
     font-size: 12px !important;
     margin-bottom: 4px !important;
+    padding-left: 2px !important;
   }
 
   /* Make textareas take up 75% of screen height for massive editing space */
