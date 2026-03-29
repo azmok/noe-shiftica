@@ -126,17 +126,15 @@ export const HtmlFiles: CollectionConfig = {
     },
     {
       name: 'bodyHtml',
-      type: 'code',
+      type: 'textarea',
       admin: {
-        language: 'html',
         description: 'HTMLファイルから自動抽出された body コンテンツ（手動編集不可避な場合はここを修正）',
       },
     },
     {
       name: 'embedCss',
-      type: 'code',
+      type: 'textarea',
       admin: {
-        language: 'css',
         description: 'HTMLファイルから自動抽出された CSS スタイル（手動編集不可避な場合はここを修正）',
       },
     },
