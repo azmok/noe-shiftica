@@ -119,10 +119,9 @@
     padding-bottom: 50vh !important;
   }
 
-  /* Reduce empty spacing */
+  /* Completely hide the file thumbnail and details header on mobile to maximize space */
   .file-details {
-    padding: 4px !important;
-    margin-bottom: 8px !important;
+    display: none !important;
   }
   
   .field-type {
