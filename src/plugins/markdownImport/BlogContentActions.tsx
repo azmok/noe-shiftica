@@ -19,8 +19,10 @@ export const BlogContentActions: React.FC = () => {
     const fieldTitle = useField<string>({ path: 'title' })
     const fieldContent = useField<any>({ path: 'content' })
     const fieldCustomMetaData = useField<Record<string, any>>({ path: 'customMetaData' })
+    const fieldHtmlEmbed = useField<any>({ path: 'htmlEmbed' })
 
     const metaData = fieldCustomMetaData?.value || {}
+    const hasHtmlEmbed = !!fieldHtmlEmbed?.value
     const { id } = useDocumentInfo()
     const pathname = usePathname()
 
@@ -259,6 +261,7 @@ export const BlogContentActions: React.FC = () => {
         const title = fieldTitle?.value
         const content = fieldContent?.value
         const currentMeta = fieldCustomMetaData?.value || {}
+        const htmlEmbedValue = fieldHtmlEmbed?.value
 
         if (!title) {
             alert('Please enter a title first.')
@@ -269,10 +272,35 @@ export const BlogContentActions: React.FC = () => {
         console.group('[BLOG-ACTIONS] AI Optimizing...')
 
         try {
+            // Resolve bodyHtml from the htmlEmbed relationship field
+            let htmlContent = ''
+            if (htmlEmbedValue) {
+                // Case 1: Admin form populated the full object (depth > 0)
+                if (typeof htmlEmbedValue === 'object' && htmlEmbedValue !== null && htmlEmbedValue.bodyHtml) {
+                    htmlContent = htmlEmbedValue.bodyHtml
+                    console.log('[BLOG-ACTIONS] Using bodyHtml from populated htmlEmbed object.')
+                } else {
+                    // Case 2: Only ID is available — fetch from API
+                    const embedId = typeof htmlEmbedValue === 'object' ? htmlEmbedValue.id : htmlEmbedValue
+                    if (embedId) {
+                        try {
+                            const res = await fetch(`/api/html-files/${embedId}`)
+                            if (res.ok) {
+                                const doc = await res.json()
+                                htmlContent = doc.bodyHtml || ''
+                                console.log('[BLOG-ACTIONS] Fetched bodyHtml from /api/html-files/{id}.')
+                            }
+                        } catch (e) {
+                            console.warn('[BLOG-ACTIONS] Could not fetch htmlEmbed content:', e)
+                        }
+                    }
+                }
+            }
+
             const response = await fetch('/api/ai-enrich-post', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, content }),
+                body: JSON.stringify({ title, content, htmlContent }),
             })
 
             console.log('[BLOG-ACTIONS] Calling /api/ai-enrich-post...')
@@ -333,7 +361,7 @@ export const BlogContentActions: React.FC = () => {
             setIsOptimizing(false)
             console.groupEnd()
         }
-    }, [fieldTitle?.value, fieldContent?.value, fieldCustomMetaData?.value, dispatchFields])
+    }, [fieldTitle?.value, fieldContent?.value, fieldCustomMetaData?.value, fieldHtmlEmbed?.value, dispatchFields])
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0 0.5rem 1rem' }}>
@@ -364,8 +392,18 @@ export const BlogContentActions: React.FC = () => {
                 className="btn btn--style-primary btn--size-small"
                 style={{ width: '100%' }}
             >
-                {isOptimizing ? 'Optimizing...' : '✨ AI Content Optimizer'}
+                {isOptimizing
+                    ? 'Optimizing...'
+                    : hasHtmlEmbed
+                        ? '✨ AI Optimizer (HTML Import)'
+                        : '✨ AI Content Optimizer'
+                }
             </button>
+            {hasHtmlEmbed && (
+                <p style={{ fontSize: '0.7rem', color: '#6366f1', marginTop: '-0.25rem', fontWeight: '600' }}>
+                    📎 HTMLインポートを検出 — インポートの内容を分析してメタデータを生成します
+                </p>
+            )}
 
             <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.25rem' }}>
                 Import first, then optimize. Remember to check AI suggestions before publishing.
