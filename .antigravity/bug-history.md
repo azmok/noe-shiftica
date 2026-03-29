@@ -112,6 +112,22 @@
   - The blog list page (`force-dynamic`) was always correct; the individual page had been inconsistent.
   - `generateStaticParams` is now effectively a no-op (ignored by `force-dynamic`), but left in place for potential future use.
 
+### [2026-03-29 17:30] Bug: OG Image Not Appearing in Twitter/X Card Despite ogImage Field Being Set
+- **Error**: Twitter/X card showed no image (or incorrect page URL as image) when sharing blog articles, even though `post.ogImage` was populated with a valid GCS URL.
+- **Root Cause**:
+  1. **Missing `post.ogImage` in metadata**: `page.tsx` line 51 used `cmd.og_image || coverImage.url`, skipping `post.ogImage` entirely.
+  2. **Relative path in `customMetaData.og_image`**: Markdown frontmatter set `og_image` to a slug (e.g. `"want-to-mindset-anti-aging-science"`). With `metadataBase: new URL("https://noe-shiftica.com")` in layout, Next.js auto-prefixed this to a page URL, not an image URL.
+  3. **All existing published posts had empty `ogImage`**: The `beforeChange` hook was added after articles were published, so existing posts never had `ogImage` populated.
+- **File(s) Modified**: `src/app/(frontend)/blog/[slug]/page.tsx`
+- **Fix Summary**:
+  - Added `post.ogImage` as the second priority in the `ogImage` fallback chain (after `cmd.og_image`).
+  - Added URL validation: `cmd.og_image` is only used if it starts with `http://` or `https://`; relative paths are discarded.
+  - Batch-updated all 9 existing published posts with heroImage via Admin API to populate their `ogImage` field.
+- **Prevention Note**:
+  - Whenever adding a new auto-populated field, immediately backfill existing records.
+  - `customMetaData` fields from Markdown frontmatter may contain slugs/relative paths. Always validate absolute URL before using as `og:image`.
+  - `metadataBase` in layout will silently convert relative strings to absolute page URLs — this is a common footgun for OG images.
+
 ### [2026-03-29 08:00] Bug: Neon DB Backup Not Triggered on Article Create/Update
 - **Error**: Neon DB backup branch was not updated when articles were created or modified via PayloadCMS admin. The backup only ran on code push to `main`.
 - **Root Cause**:
