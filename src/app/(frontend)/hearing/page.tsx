@@ -92,7 +92,8 @@ export default function HearingPage() {
       const q = questions.find(q => q.id === qId);
       const option = q?.options.find(o => o.value === val);
       if (!option?.hasInput) {
-        setTimeout(() => changeStep(1), 400);
+        // Pass the latest data to changeStep to avoid stale closure issue
+        setTimeout(() => changeStep(1, newData), 400);
       }
     } else {
       if (!newData[qId]) newData[qId] = [];
@@ -114,7 +115,7 @@ export default function HearingPage() {
     saveToLocal(savedData, newSubData);
   };
 
-  const changeStep = (dir: number) => {
+  const changeStep = (dir: number, dataToValidate?: Record<string, string[]>) => {
     if (isEditingFromSummary) {
       setIsEditingFromSummary(false);
       setCurrentStep(questions.length);
@@ -122,9 +123,11 @@ export default function HearingPage() {
       return;
     }
 
+    const currentData = dataToValidate || savedData;
+
     if (dir === 1 && currentStep < questions.length) {
       const qId = questions[currentStep].id;
-      if (!savedData[qId] || savedData[qId].length === 0) {
+      if (!currentData[qId] || currentData[qId].length === 0) {
         alert("選択肢を選んでから次に進んでください。");
         return;
       }
@@ -318,15 +321,21 @@ export default function HearingPage() {
                 <div className="w-[88px]" />
               </div>
 
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col gap-4">
                 <button
                   onClick={submitFinal}
                   className="w-full bg-[#E2FF3D] hover:bg-[#c9e62f] text-[#08080A] py-5 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(226,255,61,0.3)] hover:shadow-[0_0_30px_rgba(226,255,61,0.5)] transition-all hover:-translate-y-1"
                 >
                   この整理内容で無料相談する
                 </button>
-                <p className="text-center text-xs text-[#8A8A93] mt-4">
-                  ※ボタンを押すとトップペーシの相談フォームへ移動します。<br/>
+                <button
+                  onClick={() => router.push('/')}
+                  className="w-full bg-white/5 hover:bg-white/10 text-white py-4 rounded-xl font-semibold text-sm transition-all border border-white/10"
+                >
+                  この状態で保存してホームへ戻る
+                </button>
+                <p className="text-center text-xs text-[#8A8A93] mt-2">
+                  ※回答内容はブラウザに自動保存されています。<br/>
                   ※いきなり送信されることはありません。
                 </p>
               </div>

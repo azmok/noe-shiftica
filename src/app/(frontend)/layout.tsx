@@ -92,6 +92,7 @@ import { MobileMenuProvider } from "@/context/MobileMenuContext";
 import { MobileMenuButton } from "@/components/MobileMenuButton";
 
 import GoogleAnalytics from "./components/GoogleAnalytics";
+import { HearingBadge } from "./components/HearingBadge";
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
@@ -114,6 +115,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <ProgressBar />
           <JsonLd />
           <CustomCursor />
+          <HearingBadge />
           <main style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
             {children}
           </main>
