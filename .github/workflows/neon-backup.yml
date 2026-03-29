@@ -41,11 +41,15 @@ jobs:
             exit 1
           fi
           
-          # 3. Create new backup from production
+          # 3. Create new backup from production (primary) branch
+          echo "Finding primary branch..."
+          PRIMARY_BRANCH_ID=$(echo "$RESPONSE" | jq -r '.branches[] | select(.primary==true) | .id')
+          echo "Primary branch ID: $PRIMARY_BRANCH_ID"
+
           echo "Creating new backup branch $BRANCH_NAME from production..."
           CREATE_RESPONSE=$(curl -X POST -s -H "Authorization: Bearer $NEON_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"branch\": {\"name\": \"$BRANCH_NAME\"}}" \
+            -d "{\"branch\": {\"name\": \"$BRANCH_NAME\", \"parent_id\": \"$PRIMARY_BRANCH_ID\"}}" \
             "https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches")
             
           if echo "$CREATE_RESPONSE" | jq -e '.branch' > /dev/null; then
