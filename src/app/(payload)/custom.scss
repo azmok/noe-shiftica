@@ -163,8 +163,11 @@
     max-height: 75vh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    font-size: 16px !important; /* Prevents auto zoom in iOS */
+    font-size: 13px !important; /* 0.8倍の文字サイズ（16px -> 13px）にしてコード全体の視認性を上げる */
     padding: 8px !important;
+    font-family: monospace !important;
+    line-height: 1.5 !important;
   }
 }
+
 
