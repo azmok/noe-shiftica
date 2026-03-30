@@ -255,17 +255,34 @@ export default function ServicesPage() {
               </div>
             </a>
 
-            {/* Placeholder cards */}
-            {[2, 3].map((item) => (
-              <div key={item} className="neu-dark-flat aspect-[2/1] rounded-3xl flex items-center justify-center border border-white/5">
-                <div className="flex flex-col items-center text-[#919191] opacity-40">
-                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#919191] mb-6 flex items-center justify-center">
-                    <span className="text-xl font-light">?</span>
-                  </div>
-                  <p className="text-sm tracking-widest uppercase">Project {item}</p>
-                </div>
+            {/* 2. DESIGNER PORTFOLIO */}
+            <a
+              href="https://designer-portfolio-125127642738.us-west1.run.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group neu-dark-flat aspect-[2/1] rounded-xl overflow-hidden relative border border-white/5 block"
+            >
+              <img
+                src="/works/portfolio-thumb.png"
+                alt="DESIGNER PORTFOLIO — Creative Designer Portfolio"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-left">
+                <p className="text-xs tracking-widest uppercase text-[#919191] mb-1">Web Design / Portfolio</p>
+                <h3 className="text-white text-xl font-bold">DESIGNER PORTFOLIO.</h3>
+                <p className="text-[#919191] text-sm mt-1">Creative Designer Portfolio — Experiential Design</p>
               </div>
-            ))}
+            </a>
+
+            {/* 3. Placeholder */}
+            <div className="neu-dark-flat aspect-[2/1] rounded-3xl flex items-center justify-center border border-white/5">
+              <div className="flex flex-col items-center text-[#919191] opacity-40">
+                <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#919191] mb-6 flex items-center justify-center">
+                  <span className="text-xl font-light">?</span>
+                </div>
+                <p className="text-sm tracking-widest uppercase">Project 3</p>
+              </div>
+            </div>
           </div>
         </section>
 
