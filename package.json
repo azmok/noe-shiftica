@@ -16,15 +16,17 @@
     "payload": "payload",
     "db:create-migration": "payload migrate:create",
     "db:migrate": "payload migrate",
-    "db:migrate:status": "payload migrate:status"
+    "db:migrate:status": "payload migrate:status",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@neondatabase/serverless": "^0.10.4",
     "@lexical/headless": "0.41.0",
     "@lexical/html": "0.41.0",
     "@lexical/markdown": "0.41.0",
     "@lexical/react": "0.41.0",
+    "@neondatabase/serverless": "^0.10.4",
     "@payloadcms/db-postgres": "3.79.0",
     "@payloadcms/live-preview-react": "^3.79.0",
     "@payloadcms/next": "3.79.0",
@@ -58,15 +60,17 @@
     "@tailwindcss/postcss": "^4",
     "@types/js-beautify": "^1.14.3",
     "@types/node": "^20",
+    "@types/pg": "^8.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/pg": "^8.18.0",
     "eslint": "^9",
-    "pg": "^8.18.0",
     "eslint-config-next": "16.1.6",
     "neonctl": "^2.21.2",
+    "pg": "^8.18.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.2"
   }
 }
