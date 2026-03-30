@@ -93,6 +93,7 @@ import { MobileMenuButton } from "@/components/MobileMenuButton";
 
 import GoogleAnalytics from "./components/GoogleAnalytics";
 import { MobileMenuOverlay } from "@/components/MobileMenuOverlay";
+import { HearingResumeWidget } from "@/components/HearingResumeWidget";
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
@@ -121,6 +122,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </main>
           <MobileBottomNav />
           <MobileMenuButton />
+          <HearingResumeWidget />
         </MobileMenuProvider>
 
       </body>
