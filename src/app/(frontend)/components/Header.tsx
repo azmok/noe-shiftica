@@ -174,56 +174,6 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           </div>
         </div>
       </header>
-
-      {/* Mobile Menu Overlay & Content */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-10000">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: "linear" }}
-              className="absolute inset-0"
-              style={{
-                backgroundColor: 'rgba(5, 5, 5, 0.75)',
-                backdropFilter: 'blur(20px) saturate(180%) brightness(1.1) contrast(1.1)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%) brightness(1.1) contrast(1.1)',
-                transform: 'translateZ(0)',
-                WebkitTransform: 'translateZ(0)',
-              }}
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 flex flex-col items-center justify-center p-6 pointer-events-none"
-            >
-              <div className="w-full max-w-sm flex flex-col items-center space-y-8 pointer-events-auto">
-                {navLinks.map((link, i) => (
-                  <motion.div
-                    key={link.name}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.04 + 0.1 }}
-                  >
-                    <Link
-                      href={link.href}
-                      className="text-3xl font-serif text-white! font-medium tracking-tight transition-all hover:opacity-80 active:scale-95"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {link.name}
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </>
   );
 }
