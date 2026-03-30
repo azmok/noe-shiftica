@@ -65,7 +65,7 @@ export default function HearingPage() {
   useEffect(() => {
     setIsMounted(true);
     let initialStep = 0;
-    
+
     try {
       const itemStr = localStorage.getItem(STORAGE_KEY);
       if (itemStr) {
@@ -94,7 +94,7 @@ export default function HearingPage() {
     } catch (e) {
       console.error(e);
     }
-    
+
     // URLパラメータの優先順位
     const urlStep = getStepFromUrl();
     const params = new URLSearchParams(window.location.search);
@@ -207,7 +207,7 @@ export default function HearingPage() {
 
     const nextStep = Math.min(Math.max(currentStep + dir, 0), questions.length);
     const stepParam = nextStep === questions.length ? 'summary' : (nextStep + 1).toString();
-    
+
     window.history.pushState({ step: nextStep, isEditingFromSummary: false }, "", `?step=${stepParam}`);
     setCurrentStep(nextStep);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -289,7 +289,7 @@ export default function HearingPage() {
                           {opt.label}
                         </span>
                       </div>
-                      
+
                       {/* Sub-input field */}
                       <AnimatePresence>
                         {isSelected && opt.hasInput && (
@@ -324,7 +324,7 @@ export default function HearingPage() {
                     ← BACK
                   </button>
                 ) : <div />}
-                
+
                 <div className="absolute left-1/2 -translate-x-1/2 text-[12px] text-[#8A8A93] tracking-widest font-semibold pointer-events-none">
                   Q{currentStep + 1} / {questions.length}
                 </div>
@@ -333,8 +333,16 @@ export default function HearingPage() {
                   onClick={() => changeStep(1)}
                   className="px-6 py-3 rounded-full text-sm font-semibold text-[#08080A] bg-white hover:bg-[#E2FF3D] hover:-translate-y-0.5 transition-all z-10"
                 >
-                  NEXT →
+                  {currentStep === questions.length - 1 ? 'FINISH' : 'NEXT →'}
                 </button>
+
+                {/* ボタン */}
+                <Link
+                  href="/"
+                  className="md:rounded-full md:px-4 md:py-[75x] absolute -bottom-10 left-1/2 -translate-x-1/2 text-[11px] font-medium text-[#8A8A93] hover:text-white transition-colors tracking-widest"
+                >
+                  ホームへ戻る
+                </Link>
               </div>
             </motion.div>
           ) : (
@@ -351,7 +359,7 @@ export default function HearingPage() {
               <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-snug">
                 自分の整理内容を確認する
               </h2>
-              
+
               <div className="bg-[#121216] border border-white/10 rounded-xl p-6 mb-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 {questions.map((q, idx) => {
                   const ans = savedData[q.id] || [];
@@ -359,7 +367,7 @@ export default function HearingPage() {
                     const subText = subData[q.id]?.[a];
                     return `・${a}${subText ? ` (${subText})` : ''}`;
                   }) : ['未回答'];
-                  
+
                   return (
                     <div key={q.id} className="py-4 border-b border-white/5 last:border-0 flex justify-between items-start gap-4">
                       <div>
@@ -414,7 +422,7 @@ export default function HearingPage() {
                   この状態で保存してホームへ戻る
                 </button>
                 <p className="text-center text-xs text-[#8A8A93] mt-2">
-                  ※回答内容はブラウザに自動保存されています。<br/>
+                  ※回答内容はブラウザに自動保存されています。<br />
                   ※いきなり送信されることはありません。
                 </p>
               </div>
