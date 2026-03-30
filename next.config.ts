@@ -2,6 +2,7 @@ import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   images: {
     // WebP only: ~10x faster to encode than AVIF on first request (sub-0.5s target)
     formats: ["image/webp"],

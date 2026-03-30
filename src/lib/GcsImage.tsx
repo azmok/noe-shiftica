@@ -37,8 +37,6 @@ interface GcsImageProps {
      *   preOptimized: GCS CDN → browser (1 hop, always fast)
      */
     preOptimized?: boolean
-    /** Show premium shimmer effect while loading */
-    showShimmer?: boolean
 }
 
 /**
@@ -117,8 +115,10 @@ export function GcsImage({
     quality = 75,
     sizes,
     preOptimized = false,
-    showShimmer = false,
 }: GcsImageProps) {
+    const isInitCached = React.useMemo(() => isUrlCached(src), [src]);
+    const [isLoaded, setIsLoaded] = React.useState(isInitCached);
+    
     // Determine the environment once, consistently. Use public env vars for client-side visibility.
     const isProduction = process.env.NODE_ENV === 'production';
     const isFirebase = !!process.env.NEXT_PUBLIC_GCS_BUCKET; 
@@ -139,39 +139,13 @@ export function GcsImage({
         }
     }
 
-    // Initialize state. Check both memory cache and sessionStorage so back/forward
-    // navigation on force-dynamic pages (which reload the JS module) still skips shimmer.
-    const [isLoaded, setIsLoaded] = React.useState(() => isUrlCached(finalSrc));
-    
-    const imgRef = React.useRef<HTMLImageElement>(null);
-
-    // 1. Ensure we mark it as loaded if it's already complete on mount (common for cache/back navigation)
+    // Mark URL as loaded on mount if already in cache (for SPA navigation tracking)
     React.useEffect(() => {
-        if (!finalSrc) return;
-        
-        const checkImage = () => {
-            if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
-                markUrlAsLoaded(finalSrc);
-                setIsLoaded(true);
-            }
-        };
-
-        checkImage();
-        // Fallback for tricky hydration cases
-        const timer = setTimeout(checkImage, 100); 
-        return () => clearTimeout(timer);
-    }, [finalSrc]);
-
-    // 2. Handle BFCache (back-forward cache) specifically
-    React.useEffect(() => {
-        const handlePageShow = (event: PageTransitionEvent) => {
-            if (event.persisted) {
-                setIsLoaded(true);
-            }
-        };
-        window.addEventListener('pageshow', handlePageShow);
-        return () => window.removeEventListener('pageshow', handlePageShow);
-    }, []);
+        if (finalSrc && isInitCached) {
+            markUrlAsLoaded(finalSrc);
+            setIsLoaded(true);
+        }
+    }, [finalSrc, isInitCached]);
 
     if (!src) return null;
 
@@ -186,7 +160,6 @@ export function GcsImage({
 
     return (
         <Image
-            ref={imgRef}
             src={finalSrc}
             alt={alt}
             fill
@@ -198,17 +171,14 @@ export function GcsImage({
             unoptimized={shouldDisableOptimization}
             {...(priority ? { fetchPriority: 'high' } : {})}
             onLoad={() => {
-                markUrlAsLoaded(finalSrc);
                 setIsLoaded(true);
+                markUrlAsLoaded(finalSrc);
             }}
-            onError={() => {
-                setIsLoaded(true); // Don't block UI if image fails
-            }}
-            style={{ 
-                objectFit: 'cover', 
+            style={{
+                objectFit: 'cover',
                 objectPosition: 'center',
-                opacity: isLoaded ? 1 : 0, // Simplified opacity logic
-                transition: 'opacity 0.1s ease-in-out',
+                transition: 'opacity 0.4s ease-out',
+                opacity: isLoaded ? 1 : 0,
             }}
             className={className}
         />
