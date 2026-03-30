@@ -48,7 +48,7 @@ export const PostArticle: React.FC<{
                                             alt={post.title}
                                             priority
                                             preOptimized={!!img.sizes?.medium}
-                                            showShimmer={true}
+
                                             className="w-full h-full object-cover"
                                         />
                                     );
@@ -235,7 +235,7 @@ export const PostArticle: React.FC<{
                                                         alt={post.title}
                                                         priority
                                                         preOptimized={!!img.sizes?.medium}
-                                                        showShimmer={true}
+
                                                         className="group-hover:scale-105"
                                                     />
                                                 </>

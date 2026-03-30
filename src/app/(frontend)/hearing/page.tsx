@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -51,6 +51,7 @@ export default function HearingPage() {
   const [subData, setSubData] = useState<Record<string, Record<string, string>>>({});
   const [isEditingFromSummary, setIsEditingFromSummary] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const isRestoredRef = useRef(false);
 
   const getStepFromUrl = () => {
     if (typeof window === 'undefined') return 0;
@@ -76,10 +77,17 @@ export default function HearingPage() {
           setSavedData(data);
           setSubData(item.subData || {});
 
-          // すべての質問に回答済みの場合は、サマリー画面（最後のステップ）から開始する
+          // すべての質問に回答済みの場合は確認画面、それ以外は保存されていたステップまたは最後に回答した次の質問から再開する
           const allAnswered = questions.every(q => data[q.id] && data[q.id].length > 0);
           if (allAnswered) {
             initialStep = questions.length;
+          } else if (typeof item.step === 'number') {
+            initialStep = Math.max(0, Math.min(item.step, questions.length));
+          } else {
+            const firstUnansweredIdx = questions.findIndex(q => !data[q.id] || data[q.id].length === 0);
+            if (firstUnansweredIdx > 0) {
+              initialStep = firstUnansweredIdx;
+            }
           }
         }
       }
@@ -95,6 +103,7 @@ export default function HearingPage() {
     }
 
     setCurrentStep(initialStep);
+    isRestoredRef.current = true;
 
     // Initial state setup to handle the first back button
     const stepParam = initialStep === questions.length ? 'summary' : (initialStep + 1).toString();
@@ -117,17 +126,25 @@ export default function HearingPage() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const saveToLocal = (dataToSave: Record<string, string[]>, subsToSave: Record<string, Record<string, string>>) => {
+  const saveToLocal = (dataToSave: Record<string, string[]>, subsToSave: Record<string, Record<string, string>>, stepToSave?: number) => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         data: dataToSave,
         subData: subsToSave,
+        step: typeof stepToSave === 'number' ? stepToSave : currentStep,
         timestamp: Date.now()
       }));
     } catch (e) {
       console.error(e);
     }
   };
+
+  // ステップが変更されたらローカルストレージを更新する
+  useEffect(() => {
+    if (isMounted && isRestoredRef.current) {
+      saveToLocal(savedData, subData, currentStep);
+    }
+  }, [currentStep, isMounted, savedData, subData]);
 
   const handleOptionClick = (qId: string, val: string, type: QuestionType) => {
     let newData = { ...savedData };
