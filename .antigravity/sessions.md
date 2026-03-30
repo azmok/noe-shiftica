@@ -121,3 +121,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - **AVIF vs WebP**: Changed `formats` to `["image/webp"]` only. AVIF encodes ~10x slower than WebP on first request, causing >1s waits. For the 0.5s target, WebP is the better default.
 - **Preferences**: Sub-0.5s image loading requires both format selection (WebP over AVIF) AND avoiding proxy hops (preOptimized direct CDN).
 - **Plan Impact**: Future image optimization: always use `preOptimized: true` for Payload-generated variants (medium/large/thumbnail) for direct CDN serving.
+
+### [2026-03-31] Session Summary
+- **Learned/Decided**:
+    - **Vitest setup for Next.js App Router (ESM)**: Use `vitest` + `vite-tsconfig-paths`. Config: `environment: 'node'`, `globals: true`. No `@vitejs/plugin-react` needed for non-JSX unit/API tests.
+    - **Mocking Next.js classes**: `vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))` works fine. `NextRequest`/`NextResponse` work in Node 20+ without mocking — Web API `Request`/`Response` are available globally.
+    - **Mocking constructable classes (e.g. Resend)**: Arrow functions cannot be used as constructors. Use `vi.hoisted(() => vi.fn())` for the mock fn + a `class` in the `vi.mock` factory that references the hoisted fn. This is required when the class is instantiated at module load time (top-level `new Resend(...)`).
+    - **Test scope**: Pure utility functions (`calculateReadingTime`, `slugify`, `containsCJK`) and API route logic (`/api/revalidate` auth, `/api/contact` validation + Resend error paths) covered by 38 tests in 4 files.
+- **Preferences**: Azuma wants tests added to the existing project; not a separate test project. Keep test files under `src/__tests__/`.
+- **Plan Impact**: Future API routes should be structured to be testable: avoid module-level side effects that are hard to mock (e.g., top-level class instantiation). Consider lazy initialization patterns for external SDK clients.
