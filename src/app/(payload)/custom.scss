@@ -144,3 +144,84 @@
   }
 }
 
+/* 
+  Bulk Actions layout for all collections.
+  Repositioning the floating bar below the search bar and styling buttons.
+*/
+.list-controls {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  position: relative !important;
+
+  /* Adjust the search bar to occupy full width if needed */
+  &__search {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* The Bulk Actions bar */
+  .bulk-actions {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    left: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 12px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    margin-top: 0 !important; /* Spacing handled by .list-controls gap */
+    width: auto !important;
+    border: none !important;
+
+    &__count {
+       display: inline-flex;
+       align-items: center;
+       font-weight: 600;
+       margin-right: 8px;
+       font-size: 0.9rem;
+       color: var(--theme-elevation-600);
+    }
+
+    /* Target all buttons inside bulk actions */
+    .btn {
+      padding: 8px 16px !important;
+      font-size: 12px !important;
+      height: auto !important;
+      border-radius: 6px !important;
+
+      /* Edit (Success) Style */
+      &:not(.bulk-actions__action--delete):not([class*="delete"]):not([class*="remove"]) {
+        background-color: var(--theme-success-500) !important;
+        color: #ffffff !important;
+        border: 1px solid var(--theme-success-600) !important;
+        
+        &:hover {
+          background-color: var(--theme-success-600) !important;
+          transform: translateY(-1px);
+        }
+      }
+
+      /* Delete/Remove (Danger) Style */
+      &.bulk-actions__action--delete,
+      &[class*="delete"],
+      &[class*="remove"] {
+        background-color: var(--theme-error-500) !important;
+        color: #ffffff !important;
+        border: 1px solid var(--theme-error-600) !important;
+
+        &:hover {
+          background-color: var(--theme-error-600) !important;
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+}
+
