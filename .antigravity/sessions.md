@@ -130,3 +130,54 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - **Test scope**: Pure utility functions (`calculateReadingTime`, `slugify`, `containsCJK`) and API route logic (`/api/revalidate` auth, `/api/contact` validation + Resend error paths) covered by 38 tests in 4 files.
 - **Preferences**: Azuma wants tests added to the existing project; not a separate test project. Keep test files under `src/__tests__/`.
 - **Plan Impact**: Future API routes should be structured to be testable: avoid module-level side effects that are hard to mock (e.g., top-level class instantiation). Consider lazy initialization patterns for external SDK clients.
+
+### [2026-03-31 18:48] Session Summary
+- **Learned/Decided**:
+    - **Mobile Menu UX**: Shifting the close button to the bottom-left on mobile improves reachability for one-handed use on modern large screens.
+    - **Responsive Height**: Using `min-h-dvh` (Dynamic Viewport Height) is the most robust way to handle the browser's dynamic chrome (address bar) and prevent layout jumping in full-screen overlays.
+    - **Resume/Reset Integration**: Centralizing these functions within the navigation menu outside the specific tool flow (Hearing Sheet) creates a consistent experience across the entire site.
+- **Preferences**:
+    - User confirmed a strong preference for high-impact, premium typography (`font-black`, uppercase) in navigation.
+    - Confirmed requirement for explicit confirmation before destructive data resets.
+- **Plan Impact**:
+    - All future mobile overlays should consider the bottom-left/right placement of close buttons for better ergonomic usability.
+    - Use `min-h-dvh` for all full-screen immersive layouts going forward.
+
+### [2026-03-31 19:07] Session Summary
+- **Learned/Decided**:
+    - **Visual Consistency**: High-end brand feel is best maintained by using 10% opacity accent backgrounds (`#E2FF3D/10`) for resting states, and 100% solid opacity with inverted text (`black`) for hover.
+    - **Interactive Feedback**: Combining `scale-110` with color-shifting makes the secondary navigation (SNS) feel alive and polished.
+- **Preferences**:
+    - User confirmed the new `#E2FF3D` lime as the primary accent color across all interactive components (menu, footer icons).
+- **Plan Impact**:
+    - Apply this "Accent-Tinted" pattern to all future social/utility icon groups.
+
+### [2026-03-31 19:19] Session Summary
+- **Learned/Decided**:
+    - **ProgressBar Positioning**: Relocating the progress bar to the **bottom** on mobile devices is a great way to avoid visual conflicts with mobile top-navigation and provide a native feel.
+    - **Gradient Branding**: Using `NProgress` to implement brand-specific gradients requires an `!important` background override on `#nprogress .bar`.
+- **Preferences**:
+    - User preferred a specific `hsla`-based pink-to-blue gradient for the global loader.
+    - Thickened the loader to `5px` for higher contrast.
+- **Plan Impact**:
+    - Future global UI loaders should consider bottom-positioning on mobile to match this established pattern.
+
+### [2026-03-31 19:27] Session Summary
+- **Learned/Decided**:
+    - **Bulk Actions Customization**: To reposition Payload v3's floating bulk actions bar, you must use `position: relative !important`, `top: auto`, `right: auto`, and `transform: none` on the `.bulk-actions` class.
+    - **Global Theme Variables**: Targeting `.btn:not(.bulk-actions__action--delete)` and `.bulk-actions__action--delete` with `var(--theme-success-500)` and `var(--theme-error-500)` respectively creates a high-contrast, user-friendly interface.
+- **Preferences**:
+    - User wants to apply these "Success Green" and "Error Red" UX patterns globally across all Admin Panel collections.
+- **Plan Impact**:
+    - Continue adding collection-independent Admin UI improvements to `src/app/(payload)/custom.scss`.
+
+### [2026-03-31 20:00] Session Summary
+- **Learned/Decided**:
+    - **`force-dynamic` is ABSOLUTELY BANNED**: `export const dynamic = 'force-dynamic'` must never be used in this project. It kills CDN caching, disables BFCache, and destroys the CMS performance goals.
+    - Removed from 4 files: `src/app/sitemap.ts`, `src/app/(frontend)/blog/page.tsx`, `src/app/(frontend)/blog/[slug]/page.tsx`, `src/app/(frontend)/blog/[slug]/preview/page.tsx`.
+    - Correct pattern: use on-demand ISR via `revalidatePath()` (already wired in `/api/revalidate`). For preview/draft pages, Payload's auth cookie lookup automatically opts Next.js out of static rendering — no `force-dynamic` needed.
+- **Preferences**:
+    - Azuma explicitly mandated: if `force-dynamic` is found anywhere in the codebase, delete it immediately. Never add it in future.
+- **Plan Impact**:
+    - All future blog/CMS route implementations must NOT use `force-dynamic`. Rely on SSG + on-demand revalidation for published content, and trust Next.js cookie detection for auth-gated pages.
+    - Knowledge documented at: `.antigravity/knowledge/frontend/logic/nextjs-rendering-strategy.md`

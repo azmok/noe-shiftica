@@ -6,9 +6,6 @@ import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
 import { LivePreview } from "../LivePreview";
 
-// Preview pages are always rendered fresh — never cached
-export const dynamic = 'force-dynamic';
-
 export default async function BlogPostPreviewPage({
     params,
 }: {

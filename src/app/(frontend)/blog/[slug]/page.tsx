@@ -11,11 +11,6 @@ import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
 import { Metadata } from "next";
 
-// Dynamic rendering: always fetch fresh data from Payload on every request.
-// Previously force-static caused a stale-cache window (up to 5 min) when hero images
-// were added to posts after initial publish, resulting in blank hero images.
-export const dynamic = 'force-dynamic';
-
 export async function generateMetadata({
     params,
 }: {
