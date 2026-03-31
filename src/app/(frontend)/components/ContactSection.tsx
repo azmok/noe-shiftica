@@ -79,7 +79,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
             className="inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold text-lg transition-all group border"
           >
             <Sparkles size={20} className="group-hover:animate-pulse" />
-            まずはヒアリングシートを試してみる
+            ヒアリングシートを試す
           </Link>
         </motion.div>
 
@@ -95,7 +95,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
             e.preventDefault();
             setIsSubmitting(true);
             const formData = new FormData(e.currentTarget);
-            
+
             let finalHearingData = null;
             if (hasHearingData && includeHearingData) {
               try {
@@ -103,7 +103,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                 if (itemStr) {
                   finalHearingData = JSON.parse(itemStr);
                 }
-              } catch(e) {}
+              } catch (e) { }
             }
 
             const data = {
@@ -210,7 +210,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                 />
               </div>
             </div>
-            
+
             {hasHearingData && (
               <div className="pt-2 text-left">
                 <label className="flex items-center gap-4 cursor-pointer p-4 bg-[#E2FF3D]/5 border border-[#E2FF3D]/20 rounded-xl hover:border-[#E2FF3D]/50 transition-colors select-none group">
