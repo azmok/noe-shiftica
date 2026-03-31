@@ -15,7 +15,7 @@ interface Option {
   inputPlaceholder?: string;
 }
 
-interface Question {
+export interface Question {
   id: string;
   cat: string;
   title: string;
@@ -24,7 +24,7 @@ interface Question {
   options: Option[];
 }
 
-const questions: Question[] = [
+export const questions: Question[] = [
   { id: 'q1', cat: 'Category 1', title: 'あなたのビジネスジャンルは？', type: 'radio', options: [{ label: '個人クリエイター / フリーランス', value: '個人クリエイター / フリーランス' }, { label: '実店舗', value: '実店舗' }, { label: '小規模事業', value: '小規模事業' }, { label: '中小企業', value: '中小企業' }, { label: 'NPO / コミュニティ', value: 'NPO / コミュニティ' }, { label: 'その他', value: 'その他', hasInput: true, inputPlaceholder: '業種・ビジネス内容を入力' }] },
   { id: 'q2', cat: 'Category 1', title: 'Webサイトを作る一番の目的は？', type: 'radio', options: [{ label: '問い合わせ増加', value: '問い合わせ増加' }, { label: 'EC・販売', value: 'EC・販売' }, { label: '採用', value: '採用' }, { label: '信頼感向上', value: '信頼感向上（名刺代わり）' }, { label: '世界観・ポートフォリオ', value: '世界観・ポートフォリオ' }, { label: 'リニューアル', value: 'リニューアル' }] },
   { id: 'q3', cat: 'Category 2', title: '主なターゲットは？', desc: '※複数選択可', type: 'checkbox', options: [{ label: '一般消費者（BtoC）', value: 'BtoC' }, { label: '企業・法人（BtoB）', value: 'BtoB' }] },
@@ -41,7 +41,7 @@ const questions: Question[] = [
   { id: 'q14', cat: 'Category 5', title: '今、素材（ロゴ・写真・文章）は揃っている？', type: 'radio', options: [{ label: '揃っている', value: '揃っている' }, { label: 'ロゴのみ', value: 'ロゴのみ' }, { label: '一緒に作りたい', value: '一緒に作りたい' }, { label: '全部おまかせ', value: '全部おまかせ' }] }
 ];
 
-const STORAGE_KEY = 'noeShiftica_Hearing_Data';
+export const STORAGE_KEY = 'noeShiftica_Hearing_Data';
 const EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000;
 
 export default function HearingPage() {
@@ -215,7 +215,7 @@ export default function HearingPage() {
 
   const submitFinal = () => {
     // 最終的にcontactページへリダイレクト
-    router.push('/#contact');
+    router.push('/?from=hearing#contact-form');
   };
 
   if (!isMounted) return null;
@@ -413,7 +413,7 @@ export default function HearingPage() {
                   onClick={submitFinal}
                   className="w-full bg-[#E2FF3D] hover:bg-[#c9e62f] text-[#08080A] py-5 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(226,255,61,0.3)] hover:shadow-[0_0_30px_rgba(226,255,61,0.5)] transition-all hover:-translate-y-1"
                 >
-                  この整理内容で無料相談する
+                  この内容で無料相談する
                 </button>
                 <button
                   onClick={() => router.push('/')}

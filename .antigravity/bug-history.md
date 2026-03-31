@@ -199,3 +199,21 @@
   - For any `position: fixed` overlay inside a **Payload CMS drawer** with a scrollable child on iOS: (1) lock body scroll on open, (2) use `overflow-y: scroll` (not `auto`) on the inner scroll target, (3) add `overscroll-behavior: contain`, (4) attach `touchmove` listener with `stopPropagation` on the scrollable element (`{ passive: false }` required).
   - The scroll lock pattern must restore `window.scrollY` on close to avoid position jump.
   - `stopPropagation` vs `preventDefault`: never call `preventDefault` on the textarea's own touchmove — that kills its scroll. Only `stopPropagation` to block parent interference.
+### [2026-03-31 22:15] Bug: Mobile Menu Close Button Flickering on Page Load
+- **Error**: When the page loads, the menu close (X) button briefly flickers/appears for a split second on mobile devices, even when the menu is closed.
+- **Root Cause**:
+  1. **Redundant Components**: Both \MobileMenuButton.tsx\ and \MobileMenuOverlay.tsx\ rendered their own close buttons.
+  2. **Hydration Mismatch**: \AnimatePresence\ and conditional rendering based on \isMobileMenuOpen\ (from context) was triggering briefly before the client-side state was fully synchronized (hydration).
+  3. **Z-Index/Position Conflict**: The two buttons had different positions (\ottom-6\ vs \ottom-8\) and sizes (\w-10\ vs \w-14\), making the flicker more jarring as they occupied different spaces.
+- **File(s) Modified**:
+  - \src/components/MobileMenuButton.tsx\
+  - \src/components/MobileMenuOverlay.tsx\
+- **Fix Summary**:
+  - **Unification**: Removed the close button from \MobileMenuOverlay.tsx\ and moved all visual state (Menu/X) to \MobileMenuButton.tsx\.
+  - **Alignment**: Standardized the button size to \w-14 h-14\ and position to \ottom-8 left-8\ for both states.
+  - **Hydration Gate**: Added \isMounted\ check to both components to prevent rendering any UI before the client is ready.
+  - **Stacking**: Increased \MobileMenuButton\ zIndex to \10001\ to float over the overlay.
+- **Prevention Note**:
+  - Always use \isMounted\ guards for floating mobile UI and overlays to prevent hydration-induced flickering.
+  - Avoid redundant 
+Close buttons in separate components; let the primary toggle component own the visual transition.
