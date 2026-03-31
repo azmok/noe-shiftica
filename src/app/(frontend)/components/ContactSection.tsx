@@ -1,22 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { motion, Variants } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "./ui/Button";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { questions, STORAGE_KEY } from "../hearing/page";
 
 interface ContactSectionProps {
   fadeIn: Variants;
   selectedBudget?: string;
 }
 
-export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) {
+function ContactSectionInner({ fadeIn, selectedBudget }: ContactSectionProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isFromHearing = searchParams.get('from') === 'hearing';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [budget, setBudget] = useState("");
   const [hasHearingData, setHasHearingData] = useState(false);
+  const [hearingData, setHearingData] = useState<any>(null);
   const [includeHearingData, setIncludeHearingData] = useState(true);
 
   // プラン選択時に予算を更新
@@ -29,13 +33,14 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
   // ヒアリングデータの有無を確認
   React.useEffect(() => {
     try {
-      const itemStr = localStorage.getItem('noeShiftica_Hearing_Data');
+      const itemStr = localStorage.getItem(STORAGE_KEY);
       if (itemStr) {
         const item = JSON.parse(itemStr);
         if (Date.now() - item.timestamp <= 7 * 24 * 60 * 60 * 1000) {
           setHasHearingData(true);
+          setHearingData(item);
         } else {
-          localStorage.removeItem('noeShiftica_Hearing_Data');
+          localStorage.removeItem(STORAGE_KEY);
         }
       }
     } catch (e) {
@@ -91,7 +96,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
           className="bg-[#111111]/30 border border-[#888888]/30 p-8 md:p-12 rounded-3xl"
         >
           {/* コンタクトフォーム */}
-          <form className="space-y-6" onSubmit={async (e) => {
+          <form id="contact-form" className="space-y-6" onSubmit={async (e) => {
             e.preventDefault();
             setIsSubmitting(true);
             const formData = new FormData(e.currentTarget);
@@ -99,7 +104,7 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
             let finalHearingData = null;
             if (hasHearingData && includeHearingData) {
               try {
-                const itemStr = localStorage.getItem('noeShiftica_Hearing_Data');
+                const itemStr = localStorage.getItem(STORAGE_KEY);
                 if (itemStr) {
                   finalHearingData = JSON.parse(itemStr);
                 }
@@ -177,43 +182,89 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
                 className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors resize-none"
               ></textarea>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="budget" className="text-xs text-white/70">
-                  ご予算感（任意）
-                </label>
-                <select
-                  id="budget"
-                  name="budget"
-                  value={budget}
-                  onChange={(e) => setBudget(e.target.value)}
-                  disabled={isSubmitting}
-                  className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
-                >
-                  <option value="">選択してください</option>
-                  <option value="15">15万円から</option>
-                  <option value="35">35万円から</option>
-                  <option value="unknown">要相談</option>
-                </select>
+            {!isFromHearing && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="budget" className="text-xs text-white/70">
+                    ご予算感（任意）
+                  </label>
+                  <select
+                    id="budget"
+                    name="budget"
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                    disabled={isSubmitting}
+                    className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors appearance-none"
+                  >
+                    <option value="">選択してください</option>
+                    <option value="15">15万円から</option>
+                    <option value="35">35万円から</option>
+                    <option value="unknown">要相談</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="timeline" className="text-xs text-white/70">
+                    公開希望時期（任意）
+                  </label>
+                  <input
+                    type="text"
+                    id="timeline"
+                    name="timeline"
+                    disabled={isSubmitting}
+                    placeholder="例：3ヶ月以内"
+                    className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label htmlFor="timeline" className="text-xs text-white/70">
-                  公開希望時期（任意）
-                </label>
-                <input
-                  type="text"
-                  id="timeline"
-                  name="timeline"
-                  disabled={isSubmitting}
-                  placeholder="例：3ヶ月以内"
-                  className="w-full bg-background-void border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#FFFFFF] disabled:opacity-50 transition-colors"
-                />
-              </div>
-            </div>
+            )}
 
-            {hasHearingData && (
+            {hasHearingData && isFromHearing && (
+              <div className="pt-4 pb-2">
+                <div className="overflow-hidden rounded-2xl border border-[#E2FF3D]/20 bg-[#E2FF3D]/5">
+                  <div className="bg-[#E2FF3D]/10 px-4 py-3 border-b border-[#E2FF3D]/20">
+                    <h3 className="text-sm font-bold text-[#E2FF3D] flex items-center gap-2">
+                      <Sparkles size={14} /> ヒアリングシート回答内容の確認
+                    </h3>
+                  </div>
+                  <div className="p-0 overflow-x-auto max-h-[300px] overflow-y-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse">
+                      <tbody>
+                        {questions.map((q) => {
+                          const ansGroup = hearingData?.data?.[q.id] || [];
+                          if (ansGroup.length === 0) return null;
+                          const text = ansGroup.map((a: string) => {
+                            const subText = hearingData?.subData?.[q.id]?.[a];
+                            return `${a}${subText ? ` (${subText})` : ''}`;
+                          }).join('、');
+
+                          return (
+                            <tr key={q.id} className="border-b border-[#E2FF3D]/10 last:border-0 hover:bg-[#E2FF3D]/5 transition-colors">
+                              <th className="py-3 px-4 text-[12px] text-white/50 font-medium w-1/3 align-top">
+                                {q.title}
+                              </th>
+                              <td className="py-3 px-4 text-[13px] text-white font-semibold">
+                                {text}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <p className="mt-3 text-[11px] text-white/40 flex items-center gap-1.5 px-1 truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF3D]"></span>
+                  これらの内容はメッセージと一緒に送信されます。
+                </p>
+              </div>
+            )}
+
+            {hasHearingData && !isFromHearing && (
               <div className="pt-2 text-left">
-                <label className="flex items-center gap-4 cursor-pointer p-4 bg-[#E2FF3D]/5 border border-[#E2FF3D]/20 rounded-xl hover:border-[#E2FF3D]/50 transition-colors select-none group">
+                <label
+                  onClick={() => setIncludeHearingData(!includeHearingData)}
+                  className="flex items-center gap-4 cursor-pointer p-4 bg-[#E2FF3D]/5 border border-[#E2FF3D]/20 rounded-xl hover:border-[#E2FF3D]/50 transition-colors select-none group"
+                >
                   <div className={`w-5 h-5 flex items-center justify-center border-2 rounded-md ${includeHearingData ? 'border-[#E2FF3D] bg-[#E2FF3D]' : 'border-[#8A8A93] bg-[#121216]'} transition-all shrink-0 group-hover:border-[#E2FF3D]`}>
                     {includeHearingData && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#08080A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                   </div>
@@ -243,5 +294,13 @@ export function ContactSection({ fadeIn, selectedBudget }: ContactSectionProps) 
         </motion.div>
       </div>
     </section>
+  );
+}
+
+export function ContactSection(props: ContactSectionProps) {
+  return (
+    <Suspense fallback={null}>
+      <ContactSectionInner {...props} />
+    </Suspense>
   );
 }
