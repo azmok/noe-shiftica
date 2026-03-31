@@ -7,6 +7,19 @@ export const Media: CollectionConfig = {
   },
   fields: [
     {
+      // Override the auto-generated filename field's Cell component to use
+      // AdminThumbnailCell, which implements the same dual-layer cache as GcsImage.
+      // This eliminates the ShimmerEffect flash that Payload's default Thumbnail
+      // component always shows — even for browser-cached images.
+      name: 'filename',
+      type: 'text',
+      admin: {
+        components: {
+          Cell: '@/components/AdminThumbnailCell#AdminThumbnailCell',
+        },
+      },
+    },
+    {
       name: 'alt',
       type: 'text',
       required: true,
