@@ -109,12 +109,12 @@ export function Footer({ variant = "landing" }: FooterProps) {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`size-9 rounded-full flex items-center justify-center transition-all ${isBlog
-                    ? "bg-(--color-neu-primary) text-white hover:opacity-90"
-                    : "bg-white/5 hover:bg-white/10 text-white/40 hover:text-white"
+                  className={`size-10 rounded-full flex items-center justify-center transition-all border border-white/10 ${isBlog
+                    ? "bg-[#E2FF3D]/10 text-[#E2FF3D] hover:bg-[#E2FF3D] hover:text-black hover:scale-110 shadow-lg"
+                    : "bg-[#E2FF3D]/10 text-[#E2FF3D] hover:bg-[#E2FF3D] hover:text-black hover:scale-110 shadow-lg"
                     }`}
                 >
-                  <social.icon size={16} />
+                  <social.icon size={18} />
                 </a>
               ))}
             </div>
