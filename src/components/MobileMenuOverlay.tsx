@@ -15,6 +15,11 @@ export function MobileMenuOverlay() {
   const router = useRouter();
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleClose = () => {
     setIsMobileMenuOpen(false);
@@ -43,6 +48,8 @@ export function MobileMenuOverlay() {
   ];
 
   const inHearing = pathname?.startsWith("/hearing") || false;
+
+  if (!isMounted) return null;
 
   return (
     <AnimatePresence>
@@ -136,18 +143,6 @@ export function MobileMenuOverlay() {
               )}
             </div>
           </motion.div>
-
-          {/* Close Button Bottom Left */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-            onClick={handleClose}
-            className="absolute bottom-8 left-8 w-14 h-14 rounded-full bg-[#121216] border border-white/20 flex items-center justify-center text-white hover:bg-[#E2FF3D] hover:text-black hover:scale-110 active:scale-95 transition-all z-50 shadow-[0_4px_20px_rgba(0,0,0,0.5)] cursor-pointer pointer-events-auto"
-          >
-            <CloseIcon size={24} strokeWidth={2} />
-          </motion.button>
 
           {/* Reset Confirmation Modal */}
           <AnimatePresence>
