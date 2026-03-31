@@ -782,3 +782,20 @@ footer li {
 footer li a{
   color: #818181;
 }
+/* Custom Page Load ProgressBar */
+#nprogress .bar {
+  background: hsla(312, 66%, 76%, 1) !important;
+  background: linear-gradient(90deg, hsla(312, 66%, 76%, 1) 0%, hsla(234, 93%, 67%, 1) 100%) !important;
+  height: 5px !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px hsla(312, 66%, 76%, 1), 0 0 5px hsla(234, 93%, 67%, 1) !important;
+}
+
+@media (max-width: 768px) {
+  #nprogress .bar {
+    top: auto !important;
+    bottom: 0 !important;
+  }
+}
