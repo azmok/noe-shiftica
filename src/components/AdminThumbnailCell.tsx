@@ -23,6 +23,17 @@ import React from 'react'
 const SESSION_KEY = 'gcs_loaded_urls'
 const memoryCache = new Set<string>()
 
+/**
+ * Converts a Firebase Storage URL to a Next.js image optimizer URL.
+ * - WebP conversion (next.config.ts: formats: ["image/webp"])
+ * - Resizes to 96px (matches imageSizes: [96] in next.config.ts)
+ * - 1-year server-side cache (minimumCacheTTL: 31536000)
+ * Also handles full-size fallback URLs (old uploads without adminList variant).
+ */
+function toOptimizedUrl(url: string): string {
+  return `/_next/image?url=${encodeURIComponent(url)}&w=96&q=75`
+}
+
 function isUrlCached(url: string): boolean {
   if (typeof window === 'undefined') return false
   if (memoryCache.has(url)) return true
@@ -59,23 +70,29 @@ export const AdminThumbnailCell: React.FC<{
   const thumbUrl: string | undefined =
     sizes?.adminList?.url ?? (rowData?.url as string | undefined)
 
+  // Route through Next.js image optimizer: WebP conversion + 96px resize + 1yr cache.
+  const optimizedUrl = React.useMemo(
+    () => (thumbUrl ? toOptimizedUrl(thumbUrl) : undefined),
+    [thumbUrl],
+  )
+
   // Initialize from cache so cached images start at opacity:1 on the first render.
   const initCached = React.useMemo(
-    () => (thumbUrl ? isUrlCached(thumbUrl) : false),
-    [thumbUrl],
+    () => (optimizedUrl ? isUrlCached(optimizedUrl) : false),
+    [optimizedUrl],
   )
   const [loaded, setLoaded] = React.useState(initCached)
 
-  // Sync in case thumbUrl changes after mount (e.g. SSR → client hydration).
+  // Sync in case optimizedUrl changes after mount (e.g. SSR → client hydration).
   React.useEffect(() => {
-    if (thumbUrl && isUrlCached(thumbUrl)) {
+    if (optimizedUrl && isUrlCached(optimizedUrl)) {
       setLoaded(true)
     }
-  }, [thumbUrl])
+  }, [optimizedUrl])
 
   if (!filename) return null
 
-  if (!thumbUrl) {
+  if (!optimizedUrl) {
     return <span style={{ fontSize: '13px' }}>{filename}</span>
   }
 
@@ -93,7 +110,7 @@ export const AdminThumbnailCell: React.FC<{
         }}
       >
         <img
-          src={thumbUrl}
+          src={optimizedUrl}
           alt={filename}
           style={{
             width: '100%',
@@ -104,7 +121,7 @@ export const AdminThumbnailCell: React.FC<{
             transition: 'opacity 0.2s ease-out',
           }}
           onLoad={() => {
-            markUrlAsLoaded(thumbUrl)
+            markUrlAsLoaded(optimizedUrl)
             setLoaded(true)
           }}
         />
