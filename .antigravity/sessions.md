@@ -181,3 +181,11 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
     - All future blog/CMS route implementations must NOT use `force-dynamic`. Rely on SSG + on-demand revalidation for published content, and trust Next.js cookie detection for auth-gated pages.
     - Knowledge documented at: `.antigravity/knowledge/frontend/logic/nextjs-rendering-strategy.md`
+### [2026-03-31 22:00] Session Summary
+- **Learned/Decided**:
+    - **Mobile Menu Unification**: Split menu button logic (MobileMenuButton and MobileMenuOverlay) causes visual flickering and alignment issues. Unifying the toggle icon (Menu/X) into a single component with higher zIndex (z-10001) is the most robust approach.
+    - **Hydration Safety**: Use an isMounted state in client components that render conditional UI based on shared context to prevent SSR/CSR mismatch flashes on page load.
+- **Preferences**:
+    - User preferred a larger, more premium button size (w-14) for the menu mobile toggle.
+- **Plan Impact**:
+    - Always use isMounted gates for mobile overlays and floating buttons to ensure a flicker-free load experience.
