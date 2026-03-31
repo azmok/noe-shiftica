@@ -289,6 +289,7 @@ export interface Post {
  */
 export interface HtmlFile {
   id: number;
+  linkedPostTitle?: string | null;
   alt?: string | null;
   /**
    * HTMLファイルから自動抽出された body コンテンツ（手動編集不可避な場合はここを修正）
@@ -535,6 +536,7 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "html-files_select".
  */
 export interface HtmlFilesSelect<T extends boolean = true> {
+  linkedPostTitle?: T;
   alt?: T;
   bodyHtml?: T;
   embedCss?: T;

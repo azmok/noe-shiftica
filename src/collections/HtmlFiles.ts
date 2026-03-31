@@ -78,6 +78,9 @@ export const HtmlFiles: CollectionConfig = {
     singular: '埋め込みHTMLファイル',
     plural: '埋め込みHTMLファイル',
   },
+  admin: {
+    defaultColumns: ['filename', 'linkedPostTitle', 'updatedAt'],
+  },
   access: {
     read: () => true,
   },
@@ -108,16 +111,45 @@ export const HtmlFiles: CollectionConfig = {
       },
     ],
     afterRead: [
-      ({ doc }) => {
+      async ({ doc, req }) => {
         const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app'
         if (doc.filename) {
           doc.url = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(doc.filename)}?alt=media`
+        }
+        // Reverse-lookup: find the post that references this html-file.
+        // Only runs for authenticated admin users to avoid overhead on public reads.
+        if (req.user) {
+          try {
+            const result = await req.payload.find({
+              collection: 'posts',
+              where: { htmlEmbed: { equals: doc.id } },
+              limit: 1,
+              depth: 0,
+              overrideAccess: true,
+            })
+            doc.linkedPostTitle = result.docs[0]?.title ?? null
+          } catch {
+            // ignore
+          }
         }
         return doc
       },
     ],
   },
   fields: [
+    {
+      name: 'linkedPostTitle',
+      type: 'text',
+      virtual: true,
+      label: '紐付き記事',
+      admin: {
+        readOnly: true,
+        disableBulkEdit: true,
+        components: {
+          Cell: '@/components/LinkedPostCell#LinkedPostCell',
+        },
+      },
+    },
     {
       name: 'alt',
       type: 'text',
