@@ -36,7 +36,7 @@ const questions: Question[] = [
   { id: 'q9', cat: 'Category 4', title: '自分でコンテンツを更新したい？', type: 'radio', options: [{ label: '定期更新', value: '定期更新' }, { label: 'たまに更新', value: 'たまに更新' }, { label: '更新しない', value: '更新しない' }] },
   { id: 'q10', cat: 'Category 4', title: 'サイトに必要な機能は？', desc: '※複数選択可', type: 'checkbox', options: [{ label: 'フォーム', value: 'フォーム' }, { label: '予約システム', value: '予約システム' }, { label: 'EC決済', value: 'EC決済' }, { label: '会員ページ', value: '会員ページ' }, { label: '動画埋め込み', value: '動画埋め込み' }, { label: 'SNS連携', value: 'SNS連携' }, { label: '多言語', value: '多言語' }, { label: 'なし・不明', value: 'なし・不明' }] },
   { id: 'q11', cat: 'Category 4', title: 'ドメイン・サーバーの準備は？', type: 'radio', options: [{ label: '既存あり', value: '既存あり' }, { label: '自分で手配可', value: '自分で手配可' }, { label: 'おまかせ', value: 'おまかせ' }] },
-  { id: 'q12', cat: 'Category 5', title: '制作予算のイメージは？', type: 'radio', options: [{ label: '〜15万', value: '〜15万' }, { label: '15〜35万', value: '15〜35万' }, { label: '35万〜', value: '35万〜' }, { label: '未定', value: '未定' }] },
+  { id: 'q12', cat: 'Category 5', title: '制作予算のイメージは？', type: 'radio', options: [{ label: '15万～', value: '15万～' }, { label: '35万〜', value: '35万〜' }, { label: '未定', value: '未定' }] },
   { id: 'q13', cat: 'Category 5', title: '公開希望の時期は？', type: 'radio', options: [{ label: '1ヶ月以内', value: '1ヶ月以内' }, { label: '2〜3ヶ月以内', value: '2〜3ヶ月以内' }, { label: '半年以内', value: '半年以内' }, { label: '未定', value: '未定' }] },
   { id: 'q14', cat: 'Category 5', title: '今、素材（ロゴ・写真・文章）は揃っている？', type: 'radio', options: [{ label: '揃っている', value: '揃っている' }, { label: 'ロゴのみ', value: 'ロゴのみ' }, { label: '一緒に作りたい', value: '一緒に作りたい' }, { label: '全部おまかせ', value: '全部おまかせ' }] }
 ];
