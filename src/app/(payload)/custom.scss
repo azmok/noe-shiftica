@@ -145,83 +145,141 @@
 }
 
 /* 
-  Bulk Actions layout for all collections.
-  Repositioning the floating bar below the search bar and styling buttons.
+  Bulk Actions layout for all collections (Payload 3.0).
+  Repositioning the .list-selection bar below the search bar and styling buttons.
 */
-.list-controls {
+
+/* 
+  We use display: flex on the main wrap and contents on the header/actions
+  to flatten the hierarchy and allow reordering.
+*/
+.collection-list__wrap {
   display: flex !important;
   flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  position: relative !important;
+}
 
-  /* Adjust the search bar to occupy full width if needed */
-  &__search {
-    width: 100% !important;
-    max-width: none !important;
+/* Flatten these to make children direct flex items of .collection-list__wrap */
+.list-header,
+.list-header__content,
+.list-header__actions {
+  display: contents !important;
+}
+
+/* 1. Header Title and main actions at the top */
+.list-header__title-and-actions {
+  order: 1 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 24px 0 16px !important;
+}
+
+/* 2. Search bar and list controls below header */
+.list-controls {
+  order: 2 !important;
+  margin-bottom: 12px !important;
+  width: 100% !important;
+}
+
+/* 3. Selection Actions (Bulk) bar below search bar, LEFT ALIGNED */
+.list-selection {
+  order: 3 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  align-self: flex-start !important;
+  position: static !important; /* Force static to follow flex order: 3 instead of default fixed */
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  gap: 12px !important;
+  margin-bottom: 20px !important;
+  padding: 10px 16px !important;
+  background-color: var(--theme-elevation-50) !important;
+  border: 1px solid var(--theme-elevation-150) !important;
+  border-radius: 8px !important;
+  width: fit-content !important;
+  z-index: 10 !important;
+
+  /* Hide the Select All button as requested */
+  #select-all-across-pages {
+    display: none !important;
   }
 
-  /* The Bulk Actions bar */
-  .bulk-actions {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    left: 0 !important;
-    transform: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 12px !important;
-    padding: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    margin-top: 0 !important; /* Spacing handled by .list-controls gap */
-    width: auto !important;
-    border: none !important;
+  /* Hide the separator dashes from default Payload UI */
+  > span:not(:first-of-type) {
+    display: none !important;
+  }
 
-    &__count {
-       display: inline-flex;
-       align-items: center;
-       font-weight: 600;
-       margin-right: 8px;
-       font-size: 0.9rem;
-       color: var(--theme-elevation-600);
+  /* Target buttons directly */
+  .list-selection__button {
+    padding: 6px 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+
+    /* Edit Button (Green) */
+    &:not(.delete-documents__toggle) {
+      background-color: #22c55e !important;
+      color: #ffffff !important;
+      border: 1px solid #16a34a !important;
+
+      &:hover {
+        background-color: #16a34a !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+      }
     }
 
-    /* Target all buttons inside bulk actions */
-    .btn {
-      padding: 8px 16px !important;
-      font-size: 12px !important;
-      height: auto !important;
-      border-radius: 6px !important;
+    /* Delete Button (Red) */
+    &.delete-documents__toggle {
+      background-color: #ef4444 !important;
+      color: #ffffff !important;
+      border: 1px solid #dc2626 !important;
 
-      /* Edit (Success) Style */
-      &:not(.bulk-actions__action--delete):not([class*="delete"]):not([class*="remove"]) {
-        background-color: var(--theme-success-500) !important;
-        color: #ffffff !important;
-        border: 1px solid var(--theme-success-600) !important;
-        
-        &:hover {
-          background-color: var(--theme-success-600) !important;
-          transform: translateY(-1px);
-        }
-      }
-
-      /* Delete/Remove (Danger) Style */
-      &.bulk-actions__action--delete,
-      &[class*="delete"],
-      &[class*="remove"] {
-        background-color: var(--theme-error-500) !important;
-        color: #ffffff !important;
-        border: 1px solid var(--theme-error-600) !important;
-
-        &:hover {
-          background-color: var(--theme-error-600) !important;
-          transform: translateY(-1px);
-        }
+      &:hover {
+        background-color: #dc2626 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
       }
     }
   }
 }
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .list-selection {
+    padding: 8px 12px !important;
+    margin-bottom: 16px !important;
+    gap: 8px !important;
+    width: 100% !important;
+
+    .list-selection__button {
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+      flex: 1 !important;
+      text-align: center !important;
+      justify-content: center !important;
+    }
+    
+    > span:first-child {
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      margin-right: 4px !important;
+    }
+  }
+}
+
+
+/* 4. Ensure the tables/list container is below the selection bar */
+.collection-list__tables,
+.table-wrap,
+.collection-list__pagination {
+  order: 4 !important;
+}
+
+
 
