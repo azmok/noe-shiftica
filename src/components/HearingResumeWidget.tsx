@@ -36,7 +36,7 @@ export function HearingResumeWidget() {
   };
 
   const handleResume = () => {
-    router.push(isCompleted ? "/hearing?view=summary" : "/hearing");
+    router.push(isCompleted ? "/hearing?step=summary" : "/hearing");
     setIsOpen(false);
   };
 

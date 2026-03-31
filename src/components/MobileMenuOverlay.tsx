@@ -30,7 +30,7 @@ export function MobileMenuOverlay() {
 
   const handleResume = () => {
     handleClose();
-    router.push(isCompleted ? "/hearing?view=summary" : "/hearing");
+    router.push(isCompleted ? "/hearing?step=summary" : "/hearing");
   };
 
   const navLinks = [
