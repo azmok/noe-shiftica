@@ -339,7 +339,7 @@ export default function HearingPage() {
                 {/* ボタン */}
                 <Link
                   href="/"
-                  className="md:rounded-full md:px-4 md:py-[75x] absolute -bottom-10 left-1/2 -translate-x-1/2 text-[11px] font-medium text-[#8A8A93] hover:text-white transition-colors tracking-widest"
+                  className="hidden md:block absolute -bottom-10 left-1/2 -translate-x-1/2 text-[11px] font-medium text-[#8A8A93] hover:text-white transition-colors tracking-widest md:rounded-full md:px-4 md:py-2"
                 >
                   ホームへ戻る
                 </Link>
