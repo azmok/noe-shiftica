@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { gcsStorage } from '@payloadcms/storage-gcs'
+import { resendAdapter } from '@payloadcms/email-resend'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -37,7 +38,17 @@ const config = buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      // Client-side image compression before upload + progress bar overlay
+      providers: ['@/components/admin/ImageCompressionProvider#ImageCompressionProvider'],
+    },
   },
+  // Email transport via Resend — required for "Forgot Password" to actually send
+  email: resendAdapter({
+    defaultFromAddress: 'noreply@noe-shiftica.com',
+    defaultFromName: 'Noe Shiftica',
+    apiKey: process.env.RESEND_API_KEY || '',
+  }),
   collections: [Users, Media, Categories, Posts, HtmlFiles],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
