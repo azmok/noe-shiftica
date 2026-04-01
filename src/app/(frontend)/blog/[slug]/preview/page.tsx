@@ -5,12 +5,17 @@ import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
 import { LivePreview } from "../LivePreview";
+import { unstable_noStore as noStore } from "next/cache";
 
 export default async function BlogPostPreviewPage({
     params,
 }: {
     params: Promise<{ slug: string }>;
 }) {
+    // Opt out of all Next.js caching so every preview request fetches the
+    // latest draft data directly from the DB (bypasses Data Cache & Full Route Cache).
+    noStore();
+
     const { slug } = await params;
     const payload = await getPayload({ config: configPromise });
 
@@ -21,7 +26,7 @@ export default async function BlogPostPreviewPage({
                 equals: decodeURIComponent(slug),
             },
         },
-        depth: 1,
+        depth: 2,
         limit: 1,
         draft: true,
         overrideAccess: true,

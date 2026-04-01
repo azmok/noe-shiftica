@@ -73,6 +73,11 @@ export const PostArticle: React.FC<{
                             <div className="flex items-center gap-3 text-white/60 text-xs">
                                 <div className="flex flex-col">
                                     <span>{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
+                                    {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
+                                        <span className="text-white/40 mt-0.5">
+                                            更新: {new Date(post.updatedAt).toISOString().split('T')[0].replace(/-/g, '.')}
+                                        </span>
+                                    )}
                                     {readingTime > 0 && (
                                         <span className="text-(--color-neu-primary) font-bold mt-1">
                                             読了目安: {readingTime}分
@@ -98,7 +103,7 @@ export const PostArticle: React.FC<{
                         </div>
 
                         {/* Content Body */}
-                        <div className="prose prose-sm prose-invert post-content-body max-w-none font-sans leading-relaxed 
+                        <div className="prose prose-sm prose-invert post-content-body max-w-none font-sans leading-relaxed
                             prose-headings:font-serif
                             prose-headings:text-(--mobile-text-primary)
                             prose-p:text-(--mobile-text-secondary)
@@ -113,6 +118,7 @@ export const PostArticle: React.FC<{
                             prose-blockquote:py-2
                             prose-img:rounded-(--mobile-radius-sm)
                             prose-img:shadow-lg
+                            prose-img:object-contain
                         ">
                             {(() => {
                                 try {
@@ -197,21 +203,28 @@ export const PostArticle: React.FC<{
                                 <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-(--color-neu-primary) bg-(--color-neu-primary)/5 px-3 py-1 rounded-sm">
                                     Journal
                                 </span>
-                                {post.publishedAt && (
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
-                                            {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                <div className="flex flex-col gap-1">
+                                    {post.publishedAt && (
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
+                                                {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                            </span>
+                                            {readingTime > 0 && (
+                                                <>
+                                                    <span className="text-slate-200">|</span>
+                                                    <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
+                                                        読了目安: {readingTime}分
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                    {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
+                                        <span className="text-slate-400 text-[12px] font-normal">
+                                            最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
                                         </span>
-                                        {readingTime > 0 && (
-                                            <>
-                                                <span className="text-slate-200">|</span>
-                                                <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
-                                                    読了目安: {readingTime}分
-                                                </span>
-                                            </>
-                                        )}
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
 
                             <h1 className="post-title">
@@ -250,23 +263,24 @@ export const PostArticle: React.FC<{
                         </div>
 
                         {/* Content Body */}
-                        <div className="prose prose-lg post-content-body max-w-none font-sans leading-relaxed 
-                            marker:text-(--color-neu-primary) 
-                            prose-headings:text-slate-800 
-                            prose-strong:text-slate-900 
-                            prose-blockquote:border-l-4 prose-blockquote:border-(--color-neu-primary) 
-                            prose-blockquote:bg-slate-50/50 prose-blockquote:neu-pressed 
-                            prose-blockquote:rounded-xl prose-blockquote:p-6 prose-blockquote:not-italic 
-                            prose-blockquote:text-slate-600 
-                            prose-code:text-(--color-neu-primary) prose-code:bg-slate-100 
-                            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md 
+                        <div className="prose prose-lg post-content-body max-w-none font-sans leading-relaxed
+                            marker:text-(--color-neu-primary)
+                            prose-headings:text-slate-800
+                            prose-strong:text-slate-900
+                            prose-blockquote:border-l-4 prose-blockquote:border-(--color-neu-primary)
+                            prose-blockquote:bg-slate-50/50 prose-blockquote:neu-pressed
+                            prose-blockquote:rounded-xl prose-blockquote:p-6 prose-blockquote:not-italic
+                            prose-blockquote:text-slate-600
+                            prose-code:text-(--color-neu-primary) prose-code:bg-slate-100
+                            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
                             prose-code:before:content-[''] prose-code:after:content-['']
-                            prose-a:text-(--color-neu-primary) 
-                            prose-a:no-underline 
+                            prose-a:text-(--color-neu-primary)
+                            prose-a:no-underline
                             prose-a:font-bold
-                            prose-a:relative 
+                            prose-a:relative
                             prose-a:transition-all
                             hover:prose-a:text-(--color-neu-primary)/80
+                            prose-img:object-contain
                         ">
                         {(() => {
                             try {
