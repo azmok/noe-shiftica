@@ -144,18 +144,56 @@ If a modification to Neon DB or Firebase Cloud Storage logic is identified as ne
 3. Present the proposal in a clearly marked `⛔ REQUIRES APPROVAL` block.
 4. Wait for explicit "approved" confirmation before touching a single line.
 
-## 8. Auto-Commit Protocol
+## 8. Integration Test Protocol
+
+> ⚠️ **Integration tests MUST NEVER run against the production database.**
+
+### 8-A. Test Database (Neon test/integration branch)
+- Integration tests use the dedicated Neon branch **`test/integration`** (branched from `production`).
+- This branch is a snapshot of production schema/data and is safe to mutate during tests.
+- The connection string is stored in `.env.test` as `TEST_DATABASE_URL` (never committed).
+
+### 8-B. How to run integration tests
+
+```bash
+# Terminal 1: Start dev server pointing at the TEST database
+pnpm dev:test
+
+# Terminal 2: Create test user on the test DB (first time or after lockout)
+pnpm test:setup
+
+# Terminal 2: Run the integration tests
+pnpm test:integration
+```
+
+**Never use `pnpm dev` (production DB) when running `pnpm test:integration`.**
+
+### 8-C. If the Neon test branch needs to be recreated
+```bash
+neonctl branches delete test/integration
+neonctl branches create --name test/integration --parent production
+# Copy the new connection string into .env.test as TEST_DATABASE_URL
+# Re-run: pnpm test:setup
+```
+
+### 8-D. Test isolation rules
+- All test data (articles, media) must be created with unique slugs (`vitest-test-${Date.now()}`) to avoid collisions.
+- Every `describe` block that creates data must have an `afterAll` that deletes it.
+- Tests run sequentially (`fileParallelism: false`) to prevent account lockout race conditions.
+- Run `pnpm test:setup` before each test session to reset `loginAttempts` and unlock the test user.
+
+## 9. Auto-Commit Protocol
 1. `git add .` → 2. `git diff --cached` → 3. Summarize in Japanese → 4. `git commit -m "[summary with Claude Code] <Japanese summary>"` → 5. report summary
 <!-- → 5. `git push` and report summary and git push action with green colored text to the user. -->
 
 
-## 9. Reusable Prompt Templates
+## 10. Reusable Prompt Templates
 - Always check `.antigravity/notouch.md` for standard scope-lock templates before starting any UI task.
 
-## 10. `components/Footer.tsx`
+## 11. `components/Footer.tsx`
 - NEVER modify `components/Footer.tsx` unless explicitly specified.
 
-## 11. Clarify Ambiguity Before Acting
+## 12. Clarify Ambiguity Before Acting
 - **Never assume. Always ask first.** If an instruction is ambiguous in any way, stop and ask for clarification before starting any work.
 - **Identify the ambiguity explicitly.** State what is unclear and why it matters (e.g., "This could mean X or Y — which do you intend?").
 - **Ask targeted questions only.** Do not ask for information you don't actually need. One or two focused questions is enough.

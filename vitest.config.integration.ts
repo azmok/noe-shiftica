@@ -26,7 +26,6 @@ export default defineConfig({
     hookTimeout: 30_000,
     // Run sequentially: tests share DB state, concurrent runs would corrupt data
     sequence: { concurrent: false },
-    pool: 'forks',
-    poolOptions: { forks: { singleFork: true } },
+    fileParallelism: false,
   },
 })
