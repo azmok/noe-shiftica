@@ -189,3 +189,17 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - User preferred a larger, more premium button size (w-14) for the menu mobile toggle.
 - **Plan Impact**:
     - Always use isMounted gates for mobile overlays and floating buttons to ensure a flicker-free load experience.
+
+### [2026-04-01] Session Summary
+- **Learned/Decided**:
+    - **Preview Mode cache bypass**: `unstable_noStore()` from `next/cache` is the correct way to opt out of Next.js Full Route Cache without using the banned `force-dynamic`. Added to `preview/page.tsx`. Also increased `depth: 1 → 2` to match `LivePreview.tsx` and fully resolve body images.
+    - **Client-side image compression via fetch interceptor**: Patching `window.fetch` in a Payload admin provider component (`admin.components.providers`) is the correct architecture for intercepting uploads before they reach the server. The FormData is mutable — `fd.delete('file'); fd.set('file', compressed)` works reliably.
+    - **Payload email (Forgot Password)**: Without `email:` config in `buildConfig`, Payload logs emails but never sends them. `resendAdapter` from `@payloadcms/email-resend@3.79.0` (version must match `payload` version) with `RESEND_API_KEY` is the correct fix. `RESEND_API_KEY` was already in `apphosting.yaml` as a secret.
+    - **iPad/iPhone touch fix**: Core issue is missing `touch-action: manipulation` on Payload's interactive elements. Also need min 44px touch targets for checkboxes and close buttons per Apple HIG. Fixes go in `custom.scss`.
+    - **Protected file unlock protocol**: `src/payload.config.ts` can be modified when the user's instruction explicitly requests backend configuration changes. The protection is a safety rail against accidental changes, not an absolute prohibition.
+- **Preferences**:
+    - User groups multiple tasks by Q-number (e.g. Q3, Q5) referencing a separate task list document. Always ask for clarification when Qn references are ambiguous.
+- **Plan Impact**:
+    - All future admin providers should be registered in `admin.components.providers` in `payload.config.ts`.
+    - `@payloadcms/email-*` version must match `payload` version exactly to avoid peer dep issues.
+    - For preview pages: always use `noStore()` + `depth: 2` to ensure draft data is fresh and fully resolved.

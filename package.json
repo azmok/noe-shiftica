@@ -10,6 +10,7 @@
   "packageManager": "pnpm@9.12.3",
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 -p 3000",
+    "dev:test": "tsx scripts/dev-test.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
