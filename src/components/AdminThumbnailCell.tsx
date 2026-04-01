@@ -76,12 +76,9 @@ export const AdminThumbnailCell: React.FC<{
     [thumbUrl],
   )
 
-  // Initialize from cache so cached images start at opacity:1 on the first render.
-  const initCached = React.useMemo(
-    () => (optimizedUrl ? isUrlCached(optimizedUrl) : false),
-    [optimizedUrl],
-  )
-  const [loaded, setLoaded] = React.useState(initCached)
+  // Always start as false to match SSR (window is undefined on server).
+  // useEffect below promotes to true after mount if the URL is already cached.
+  const [loaded, setLoaded] = React.useState(false)
 
   // Sync in case optimizedUrl changes after mount (e.g. SSR → client hydration).
   React.useEffect(() => {

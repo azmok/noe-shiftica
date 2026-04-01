@@ -74,6 +74,7 @@ All image components that manage loading state MUST implement a **dual-layer cac
 - Cap sessionStorage array at 200 entries to prevent quota bloat.
 - Wrap all sessionStorage calls in try/catch (private mode / quota exceeded).
 - Keep the `pageshow` event handler for genuine BFCache restores (`event.persisted === true`).
+- **onLoad is NOT reliable for cached images**: The browser fires the native `load` event before React attaches `onLoad` for memory-cached images. Always implement an `img.complete` fallback in `useEffect` alongside `onLoad`. See `GcsImage.tsx` for the canonical pattern.
 
 ## 5. Deployment & Debugging Protocol (Auto-Diagnostic)
 - **Execution Steps**: Log Retrieval → Root Cause Analysis → Strict Lockfile Sync (`pnpm i`) → Vulnerability Checks → Verification (`pnpm run build`).
@@ -204,7 +205,7 @@ neonctl branches create --name test/integration --parent production
   - Behavior not defined (e.g., "make it animate" → what trigger? what effect?)
 - **Do not proceed with a best-guess and ask for feedback after.** Clarify first, act second — always.
 
-## 12. Knowledge Base Protocol
+## 13. Knowledge Base Protocol
 
 ### When referencing knowledge
 1. Read `.antigravity/knowledge/PayloadCMS/README.md`
