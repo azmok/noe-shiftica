@@ -76,15 +76,53 @@ export const AdminThumbnailCell: React.FC<{
     [thumbUrl],
   )
 
-  // Always start as false to match SSR (window is undefined on server).
-  // useEffect below promotes to true after mount if the URL is already cached.
+  // Start as true if complete (optimistic)
   const [loaded, setLoaded] = React.useState(false)
+  const imgRef = React.useRef<HTMLImageElement>(null)
 
-  // Sync in case optimizedUrl changes after mount (e.g. SSR → client hydration).
-  React.useEffect(() => {
-    if (optimizedUrl && isUrlCached(optimizedUrl)) {
-      setLoaded(true)
+  React.useLayoutEffect(() => {
+    const img = imgRef.current;
+    if (img?.complete) {
+      setLoaded(true);
+      if (optimizedUrl) markUrlAsLoaded(optimizedUrl);
     }
+  }, [optimizedUrl]);
+
+  React.useEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+
+    let isMounted = true;
+    const markLoaded = () => {
+      if (isMounted) {
+        requestAnimationFrame(() => {
+          const el = imgRef.current;
+          if (el) {
+            el.style.opacity = '1';
+            el.classList.add('is-loaded');
+          }
+          setLoaded(true);
+          if (optimizedUrl) markUrlAsLoaded(optimizedUrl);
+        });
+      }
+    };
+
+    const markError = () => {
+      if (isMounted) setLoaded(false);
+    };
+
+    if (img.complete) {
+      img.decode().then(markLoaded).catch(markError);
+    } else {
+      img.addEventListener('load', markLoaded);
+      img.addEventListener('error', markError);
+    }
+
+    return () => {
+      isMounted = false;
+      img.removeEventListener('load', markLoaded);
+      img.removeEventListener('error', markError);
+    };
   }, [optimizedUrl])
 
   if (!filename) return null
@@ -107,6 +145,7 @@ export const AdminThumbnailCell: React.FC<{
         }}
       >
         <img
+          ref={imgRef}
           src={optimizedUrl}
           alt={filename}
           style={{

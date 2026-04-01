@@ -29,7 +29,7 @@ export const Media: CollectionConfig = {
     afterRead: [
       ({ doc }) => {
         const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app'
-        const getDirectUrl = (filename: string) => 
+        const getDirectUrl = (filename: string) =>
           `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`
 
         if (doc.filename) {
@@ -62,36 +62,26 @@ export const Media: CollectionConfig = {
       {
         name: 'adminPreview',
         width: 480,
-        height: 360,
-        position: 'centre',
       },
       {
         // Blog list grid cards (4:3 aspect), small screens
         name: 'thumbnail',
         width: 400,
-        height: 300,
-        position: 'centre',
       },
       {
         // Blog list view / sidebar images
         name: 'medium',
         width: 800,
-        height: 600,
-        position: 'centre',
       },
       {
         // Featured posts, hero images (16:9-ish)
         name: 'large',
         width: 1920,
-        height: 1080,
-        position: 'centre',
       },
       {
         // OG image for social media (Twitter/X, Facebook, LINE) — recommended 1200×630
         name: 'og',
         width: 1200,
-        height: 630,
-        position: 'centre',
       },
     ],
     // Allow Next.js Image optimization to work with GCS URLs
