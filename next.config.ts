@@ -3,6 +3,24 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Prevent Firebase App Hosting CDN from caching blog HTML pages.
+  // revalidatePath() purges Next.js's internal ISR cache but cannot purge the CDN
+  // layer sitting in front of Cloud Run. Setting no-store on blog routes forces
+  // every HTML request to pass through to the origin (Next.js), which always
+  // serves either the cached ISR page or a freshly revalidated one.
+  // Static assets (JS, CSS, images) are unaffected — they have their own cache headers.
+  async headers() {
+    return [
+      {
+        source: '/blog',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
+      {
+        source: '/blog/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
+    ];
+  },
   images: {
     // WebP only: ~10x faster to encode than AVIF on first request (sub-0.5s target)
     formats: ["image/webp"],

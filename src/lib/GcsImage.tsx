@@ -37,6 +37,11 @@ interface GcsImageProps {
      *   preOptimized: GCS CDN → browser (1 hop, always fast)
      */
     preOptimized?: boolean
+    /**
+     * CSS object-fit value for the image (default: 'cover').
+     * Use 'contain' to show the full image without cropping.
+     */
+    objectFit?: 'cover' | 'contain'
 }
 
 /**
@@ -115,18 +120,16 @@ export function GcsImage({
     quality = 75,
     sizes,
     preOptimized = false,
+    objectFit = 'cover',
 }: GcsImageProps) {
-    const isInitCached = React.useMemo(() => isUrlCached(src), [src]);
-    const [isLoaded, setIsLoaded] = React.useState(isInitCached);
-    
     // Determine the environment once, consistently. Use public env vars for client-side visibility.
     const isProduction = process.env.NODE_ENV === 'production';
-    const isFirebase = !!process.env.NEXT_PUBLIC_GCS_BUCKET; 
+    const isFirebase = !!process.env.NEXT_PUBLIC_GCS_BUCKET;
 
-    // Calculate finalSrc at the top to be consistent across renders
+    // Calculate finalSrc FIRST (before hooks) so the cache key is consistent with markUrlAsLoaded
     let finalSrc = src;
     const isLocalPayload = src?.startsWith('/api/');
-    
+
     if (isLocalPayload && (isProduction || isFirebase)) {
         try {
             const filename = src?.replace('/api/media/file/', '') || '';
@@ -139,6 +142,13 @@ export function GcsImage({
         }
     }
 
+    // Use finalSrc (not src) as the cache key — consistent with markUrlAsLoaded calls
+    const isInitCached = React.useMemo(() => isUrlCached(finalSrc), [finalSrc]);
+    const [isLoaded, setIsLoaded] = React.useState(isInitCached);
+
+    // Ref to the underlying <img> element for browser-cached image detection
+    const imgRef = React.useRef<HTMLImageElement>(null);
+
     // Mark URL as loaded on mount if already in cache (for SPA navigation tracking)
     React.useEffect(() => {
         if (finalSrc && isInitCached) {
@@ -146,6 +156,21 @@ export function GcsImage({
             setIsLoaded(true);
         }
     }, [finalSrc, isInitCached]);
+
+    // Fallback for browser HTTP-cached images:
+    // When the browser already has the image cached, the native `load` event fires
+    // synchronously during DOM insertion — before React attaches the onLoad handler.
+    // Result: onLoad never fires → isLoaded stays false → image permanently invisible.
+    // Fix: check img.complete after mount and force isLoaded=true if already done.
+    React.useEffect(() => {
+        if (imgRef.current?.complete && !isLoaded) {
+            setIsLoaded(true);
+            markUrlAsLoaded(finalSrc);
+        }
+    // Intentionally empty deps: run once on mount only.
+    // finalSrc and isLoaded are intentionally captured at mount time.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     if (!src) return null;
 
@@ -160,6 +185,7 @@ export function GcsImage({
 
     return (
         <Image
+            ref={imgRef}
             src={finalSrc}
             alt={alt}
             fill
@@ -175,7 +201,7 @@ export function GcsImage({
                 markUrlAsLoaded(finalSrc);
             }}
             style={{
-                objectFit: 'cover',
+                objectFit: objectFit,
                 objectPosition: 'center',
                 transition: 'opacity 0.4s ease-out',
                 opacity: isLoaded ? 1 : 0,
