@@ -1,0 +1,20 @@
+
+> web@0.1.0 test:e2e C:\Users\genta\projects\noe-shiftica.dev
+> playwright test
+
+[dotenv@17.3.1] injecting env (3) from .env.test -- tip: ≡ƒ¢á∩╕Å  run anywhere with `dotenvx run -- yourcommand`
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22m> web@0.1.0 dev C:\Users\genta\projects\noe-shiftica.dev
+[2m[WebServer] [22m> next dev --hostname 0.0.0.0 -p 3000
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m[1m[38;2;173;127;168mΓû▓ Next.js 16.1.6[39m[22m (Turbopack)
+
+[1A[2K[2m[WebServer] [22m- Local:         http://localhost:3000
+[2m[WebServer] [22m- Network:       http://0.0.0.0:3000
+
+[1A[2K[2m[WebServer] [22m- Environments: .env.local, .env
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m[32m[1mΓ£ô[22m[39m Starting...
+

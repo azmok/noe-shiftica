@@ -1,0 +1,12 @@
+[dotenv@17.3.1] injecting env (3) from .env.test -- tip: ≡ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+Running 1 test using 1 worker
+
+[1A[2K[dotenv@17.3.1] injecting env (0) from .env.test -- tip: ΓÜí∩╕Å secrets for agents: https://dotenvx.com/as2
+
+[1A[2K[1/1] [chromium] ΓÇ║ tests\auth.spec.ts:7:1 ΓÇ║ admin login flow redirects to dashboard
+[1A[2K[chromium] ΓÇ║ tests\auth.spec.ts:7:1 ΓÇ║ admin login flow redirects to dashboard
+Using Email: indexlove0815@icloud.com
+
+[1A[2KPassword length: [33m9[39m
+
