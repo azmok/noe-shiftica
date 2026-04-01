@@ -100,6 +100,73 @@ describe('POST /api/contact — successful submission', () => {
   })
 })
 
+describe('POST /api/contact — email recipients and content', () => {
+  it('sends admin notification to info@noe-shiftica.com', async () => {
+    await POST(
+      makeRequest({
+        name: 'Azuma',
+        email: 'azuma@example.com',
+        message: 'I want a website',
+      })
+    )
+    // Second call is the admin notification
+    const adminCall = mockSend.mock.calls[1][0]
+    expect(adminCall.to).toContain('info@noe-shiftica.com')
+  })
+
+  it('admin email subject contains the sender name', async () => {
+    await POST(
+      makeRequest({
+        name: 'Azuma Okumura',
+        email: 'azuma@example.com',
+        message: 'I want a website',
+      })
+    )
+    const adminCall = mockSend.mock.calls[1][0]
+    expect(adminCall.subject).toContain('Azuma Okumura')
+  })
+
+  it('customer email subject contains the receipt confirmation phrase', async () => {
+    await POST(
+      makeRequest({
+        name: 'Azuma',
+        email: 'azuma@example.com',
+        message: 'Hello',
+      })
+    )
+    const customerCall = mockSend.mock.calls[0][0]
+    expect(customerCall.subject).toContain('お問い合わせを受け付けました')
+  })
+
+  it('includes optional budget and timeline in customer email body', async () => {
+    await POST(
+      makeRequest({
+        name: 'Azuma',
+        email: 'azuma@example.com',
+        message: 'Hello',
+        budget: '100万円',
+        timeline: '6ヶ月',
+      })
+    )
+    const customerCall = mockSend.mock.calls[0][0]
+    expect(customerCall.html).toContain('100万円')
+    expect(customerCall.html).toContain('6ヶ月')
+  })
+
+  it('shows 未定 for budget and timeline when omitted', async () => {
+    await POST(
+      makeRequest({
+        name: 'Azuma',
+        email: 'azuma@example.com',
+        message: 'Hello',
+        // budget and timeline intentionally omitted
+      })
+    )
+    const customerCall = mockSend.mock.calls[0][0]
+    expect(customerCall.html).toContain('未定')
+  })
+})
+
 describe('POST /api/contact — Resend error handling', () => {
   it('returns 500 when customer email send fails', async () => {
     mockSend.mockResolvedValueOnce({
