@@ -18,7 +18,9 @@
     "db:migrate": "payload migrate",
     "db:migrate:status": "payload migrate:status",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.config.integration.ts",
+    "test:setup": "tsx scripts/setup-test-user.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
