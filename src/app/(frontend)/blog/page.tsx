@@ -1,5 +1,6 @@
-import React from "react";
-import { Header } from "../components/Header";
+import React from "react"
+import Script from "next/script"
+import { Header } from "../components/Header"
 import { Footer } from "../components/Footer";
 import { BlogFallbackHero } from "../components/BlogFallbackHero";
 import { BlogRecentStoriesClient } from "../components/BlogRecentStoriesClient";
@@ -115,7 +116,7 @@ export default async function BlogPage() {
                               alt={featuredPost.title}
                               priority
 
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                             />
                           );
                         }
@@ -180,6 +181,37 @@ export default async function BlogPage() {
       </main>
 
       <Footer variant="blog" />
+
+      {/* GLOBAL FAILSAFE: Force visibility for any images stuck at opacity: 0 */}
+      <Script
+        id="force-image-visibility"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              const forceImages = () => {
+                document.querySelectorAll('img').forEach(img => {
+                  try {
+                    if (img.closest('.hidden')) return;
+                    const inlineStyle = img.style.opacity;
+                    const computedStyle = window.getComputedStyle(img);
+                    if (inlineStyle === '0' || computedStyle.opacity === '0') {
+                      img.style.setProperty('opacity', '1', 'important');
+                      img.style.setProperty('visibility', 'visible', 'important');
+                      img.classList.add('is-forced-loaded');
+                    }
+                  } catch (e) {}
+                });
+              };
+              forceImages();
+              window.addEventListener('load', forceImages);
+              window.addEventListener('pageshow', forceImages);
+              const interval = setInterval(forceImages, 1000);
+              setTimeout(() => clearInterval(interval), 8000);
+            })();
+          `
+        }}
+      />
     </div>
   );
 }

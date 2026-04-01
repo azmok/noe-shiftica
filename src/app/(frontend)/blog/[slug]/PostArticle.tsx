@@ -14,7 +14,7 @@ export const PostArticle: React.FC<{
     nextPost?: Post | null
 }> = ({ post, isPreview, prevPost, nextPost }) => {
     // console.log(`[DEBUG] Rendering PostArticle for ${post.slug}...`);
-    
+
     const htmlBodyHtml: string = (post as any).htmlEmbed?.bodyHtml || ''
     const readingTime =
         (post as any).readingTime ||
@@ -34,7 +34,7 @@ export const PostArticle: React.FC<{
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
 
                 {/* Mobile Article View */}
-                <article className="md:hidden flex flex-col pt-0">
+                <article className="selection:bg-fuchsia-300 selection:text-fuchsia-900 md:hidden flex flex-col pt-0">
                     {/* Immersive Hero */}
                     <div className="relative w-full aspect-square sm:aspect-video rounded-b-[40px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
                         {(() => {
@@ -49,7 +49,7 @@ export const PostArticle: React.FC<{
                                             priority
                                             preOptimized={!!img.sizes?.medium}
 
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-contain"
                                         />
                                     );
                                 }
@@ -282,18 +282,18 @@ export const PostArticle: React.FC<{
                             hover:prose-a:text-(--color-neu-primary)/80
                             prose-img:object-contain
                         ">
-                        {(() => {
-                            try {
-                                if (post.content && typeof post.content === 'object' && 'root' in post.content) {
-                                    return <RichText data={post.content as any} />;
-                                } else if (post.content) {
-                                    return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
+                            {(() => {
+                                try {
+                                    if (post.content && typeof post.content === 'object' && 'root' in post.content) {
+                                        return <RichText data={post.content as any} />;
+                                    } else if (post.content) {
+                                        return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
+                                    }
+                                } catch (e) {
+                                    // console.error(`[DEBUG ERROR] Desktop RichText render failed for ${post.slug}:`, e);
                                 }
-                            } catch (e) {
-                                // console.error(`[DEBUG ERROR] Desktop RichText render failed for ${post.slug}:`, e);
-                            }
-                            return null;
-                        })()}
+                                return null;
+                            })()}
                         </div>
 
                         {/* HTML Embed */}

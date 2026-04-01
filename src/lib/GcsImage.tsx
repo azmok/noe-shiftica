@@ -120,7 +120,7 @@ export function GcsImage({
     quality = 75,
     sizes,
     preOptimized = false,
-    objectFit = 'cover',
+    objectFit = 'contain',
 }: GcsImageProps) {
     // Determine the environment once, consistently. Use public env vars for client-side visibility.
     const isProduction = process.env.NODE_ENV === 'production';
@@ -142,41 +142,59 @@ export function GcsImage({
         }
     }
 
-    // Use finalSrc (not src) as the cache key — consistent with markUrlAsLoaded calls
-    const isInitCached = React.useMemo(() => isUrlCached(finalSrc), [finalSrc]);
-    const [isLoaded, setIsLoaded] = React.useState(isInitCached);
-
-    // Ref to the underlying <img> element for browser-cached image detection
+    // Start as true if priority (LCP image), otherwise false and wait for load.
+    const [isLoaded, setIsLoaded] = React.useState(priority);
     const imgRef = React.useRef<HTMLImageElement>(null);
 
-    // Mark URL as loaded on mount if already in cache (for SPA navigation tracking)
     React.useEffect(() => {
-        if (finalSrc && isInitCached) {
-            markUrlAsLoaded(finalSrc);
-            setIsLoaded(true);
-        }
-    }, [finalSrc, isInitCached]);
+        // Priority images skip the custom visibility logic to avoid hydration lock
+        if (priority) return;
 
-    // Fallback for browser HTTP-cached images:
-    // When the browser already has the image cached, the native `load` event fires
-    // synchronously during DOM insertion — before React attaches the onLoad handler.
-    // Result: onLoad never fires → isLoaded stays false → image permanently invisible.
-    // Fix: check img.complete after mount and force isLoaded=true if already done.
-    React.useEffect(() => {
-        if (imgRef.current?.complete && !isLoaded) {
-            setIsLoaded(true);
-            markUrlAsLoaded(finalSrc);
+        const img = imgRef.current;
+        if (!img) return;
+
+        let isMounted = true;
+        const markLoaded = () => {
+            if (isMounted) {
+                requestAnimationFrame(() => {
+                    const el = imgRef.current;
+                    if (el) {
+                        el.style.opacity = '1';
+                        el.classList.add('is-loaded');
+                    }
+                    setIsLoaded(true);
+                    if (finalSrc) markUrlAsLoaded(finalSrc);
+                });
+            }
+        };
+
+        const markError = () => {
+            if (isMounted) setIsLoaded(false);
+        };
+
+        if (img.complete) {
+            img.decode().then(markLoaded).catch(markError);
+        } else {
+            img.addEventListener('load', markLoaded);
+            img.addEventListener('error', markError);
         }
-    // Intentionally empty deps: run once on mount only.
-    // finalSrc and isLoaded are intentionally captured at mount time.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+
+        const onPageShow = (event: PageTransitionEvent) => {
+            if (event.persisted && imgRef.current?.complete) {
+                imgRef.current.decode().then(markLoaded).catch(markError);
+            }
+        };
+        window.addEventListener('pageshow', onPageShow);
+
+        return () => {
+            isMounted = false;
+            img.removeEventListener('load', markLoaded);
+            img.removeEventListener('error', markError);
+            window.removeEventListener('pageshow', onPageShow);
+        };
+    }, [finalSrc, priority]);
 
     if (!src) return null;
-
-    // IMPORTANT: For 0.5s speed, serve preOptimized variants (medium/large/thumbnail)
-    // directly from GCS CDN (1 hop) instead of routing through Next.js image proxy (2 hops).
-    const shouldDisableOptimization = preOptimized;
 
     // Default sizes for common blog/app layouts
     const defaultSizes = priority
@@ -194,17 +212,20 @@ export function GcsImage({
             priority={priority}
             placeholder="blur"
             blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
-            unoptimized={shouldDisableOptimization}
-            {...(priority ? { fetchPriority: 'high' } : {})}
+            unoptimized={preOptimized}
             onLoad={() => {
-                setIsLoaded(true);
-                markUrlAsLoaded(finalSrc);
+                if (!priority) {
+                    setIsLoaded(true);
+                    markUrlAsLoaded(finalSrc);
+                }
             }}
+            suppressHydrationWarning
             style={{
                 objectFit: objectFit,
                 objectPosition: 'center',
-                transition: 'opacity 0.4s ease-out',
-                opacity: isLoaded ? 1 : 0,
+                // If priority, NO transition/opacity control. If not, smooth fade.
+                transition: priority ? 'none' : 'opacity 0.4s ease-out',
+                opacity: priority ? 1 : (isLoaded ? 1 : 0),
             }}
             className={className}
         />
