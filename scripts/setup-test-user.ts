@@ -14,9 +14,17 @@ import 'dotenv/config'
 import { config } from 'dotenv'
 import path from 'path'
 
-// Load .env.local first (DB connection string), then .env.test (test password)
+// Load .env.local first (fallback DB), then .env.test (test password + TEST_DATABASE_URL)
 config({ path: path.resolve(process.cwd(), '.env.local') })
 config({ path: path.resolve(process.cwd(), '.env.test'), override: false })
+
+// Point to the test branch DB, not production
+if (process.env.TEST_DATABASE_URL) {
+  process.env.DATABASE_URL = process.env.TEST_DATABASE_URL
+  console.log('🧪  Using test database branch')
+} else {
+  console.warn('⚠️   TEST_DATABASE_URL not set — using DATABASE_URL (production!)')
+}
 
 const TEST_EMAIL = 'indexlove0815@icloud.com'
 
@@ -43,7 +51,20 @@ async function main() {
   })
 
   if (existing.docs.length > 0) {
-    console.log(`✓ Test user already exists: ${TEST_EMAIL}`)
+    // User exists — update password AND unlock account (clears loginAttempts / lockUntil)
+    const userId = existing.docs[0].id
+    await payload.update({
+      collection: 'users',
+      id: userId,
+      data: {
+        password,
+        loginAttempts: 0,
+        lockUntil: null,
+      } as any,
+      overrideAccess: true,
+    })
+    console.log(`✓ Test user password updated and account unlocked: ${TEST_EMAIL}`)
+    console.log('  You can now run: pnpm test:integration')
     process.exit(0)
   }
 
