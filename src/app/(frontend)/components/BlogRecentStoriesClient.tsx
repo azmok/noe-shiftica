@@ -61,7 +61,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                                     alt={post.title}
                                                     preOptimized={true}
                                                     sizes="80px"
-
+                                                    objectFit="contain"
                                                     className="w-full h-full object-cover"
                                                 />
                                             );
@@ -109,7 +109,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                                     alt={post.title}
                                                     preOptimized={!!preGenUrl}
                                                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-
+                                                    objectFit="contain"
                                                     className="group-hover:scale-110"
                                                 />
                                             );
@@ -149,7 +149,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                                                     alt={post.title}
                                                     preOptimized={!!preGenUrl}
                                                     sizes="96px"
-
+                                                    objectFit="contain"
                                                     className="group-hover:scale-110"
                                                 />
                                             );
