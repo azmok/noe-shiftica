@@ -2,7 +2,7 @@ import React from "react"
 import { Post } from "@/payload-types"
 import { RichText } from "@payloadcms/richtext-lexical/react"
 import Link from "next/link"
-import { BlogFallbackHero } from "../../components/BlogFallbackHero"
+import { BlogFallbackHero } from "@/app/(frontend)/components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 
 export const PostArticle: React.FC<{
