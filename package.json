@@ -21,6 +21,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.config.integration.ts",
+    "test:live": "vitest run --config vitest.config.live.ts",
+    "test:all": "vitest run && vitest run --config vitest.config.live.ts",
     "test:setup": "tsx scripts/setup-test-user.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",

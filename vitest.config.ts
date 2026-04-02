@@ -6,8 +6,18 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    // Only pick up our own unit tests — exclude integration tests and node_modules
-    include: ['src/__tests__/api/**/*.test.ts', 'src/__tests__/lib/**/*.test.ts'],
-    exclude: ['src/__tests__/integration/**', 'node_modules/**', '.next/**'],
+    include: [
+      // Shared unit tests (lib, api routes)
+      'tests/unit/**/*.test.ts',
+      // Plugin-specific unit tests (mock-based, no live APIs)
+      'src/plugins/**/__tests__/unit.test.ts',
+    ],
+    exclude: [
+      // Live API tests are excluded from the default run
+      'src/plugins/**/__tests__/live-api.test.ts',
+      'tests/integration/**',
+      'node_modules/**',
+      '.next/**',
+    ],
   },
 })

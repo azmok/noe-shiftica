@@ -1,10 +1,23 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-if (!process.env.GEMINI_API_KEY) {
-    console.warn('[GEMINI] WARNING: GEMINI_API_KEY is not set. AI features will fail.')
-}
+// CRITICAL: We move the client initialization inside a helper function.
+// This ensures that process.env.GEMINI_API_KEY is read WHEN needed, 
+// avoiding race conditions during module imports.
+let cachedGenAI: GoogleGenerativeAI | null = null
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
+function getGenAI(): GoogleGenerativeAI {
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+        console.error('[GEMINI] CRITICAL: GEMINI_API_KEY is not set in environment variables.')
+        throw new Error('GEMINI_API_KEY is not set. Please check your .env files.')
+    }
+
+    if (!cachedGenAI) {
+        console.log('[GEMINI] Initializing GoogleGenerativeAI client with key (length: ' + apiKey.length + ')')
+        cachedGenAI = new GoogleGenerativeAI(apiKey)
+    }
+    return cachedGenAI
+}
 
 export interface EnrichedContent {
     title?: string
@@ -25,12 +38,12 @@ export interface EnrichedContent {
 
 export async function enrichPostContent(title: string, content: string): Promise<EnrichedContent> {
     console.log(`[AI-ENRICH] Starting enrichment for: "${title}"`)
+    
     // Available models (2026-03):
-    //  Stable: gemini-2.5-pro, gemini-2.5-flash, gemini-2.5-flash-lite
-    //  Preview: gemini-3.1-pro-preview, gemini-3-flash-preview
+    // Stable: gemini-2.5-flash
     const modelName = 'gemini-2.5-flash'
-    console.log(`[AI-ENRICH] Using model: ${modelName}`)
-    console.log(`[AI-ENRICH] GEMINI_API_KEY present: ${!!process.env.GEMINI_API_KEY} | Length: ${process.env.GEMINI_API_KEY?.length ?? 0}`)
+    
+    const genAI = getGenAI()
     const model = genAI.getGenerativeModel({ model: modelName })
 
     const prompt = `
@@ -71,19 +84,15 @@ export async function enrichPostContent(title: string, content: string): Promise
   `
 
     try {
-        console.log('[AI-ENRICH] Sending prompt to Gemini (gemini-2.5-flash)...')
-        console.log('[AI-ENRICH] Prompt Context Length:', prompt.length)
+        console.log(`[AI-ENRICH] Sending prompt to Gemini (${modelName})...`)
         const result = await model.generateContent(prompt)
         const response = await result.response
         const text = response.text()
-        console.log('[AI-ENRICH] Raw response received from Gemini.')
+        console.log('[AI-ENRICH] Raw response received.')
 
         // Attempt to parse JSON, cleaning up any potential markdown code blocks
         const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim()
-        console.log('[AI-ENRICH] Cleaned JSON for parsing:', cleanJson)
-
         const parsed = JSON.parse(cleanJson)
-        console.log('[AI-ENRICH] JSON parsed successfully.')
 
         const enrichedByAi = {
             ...parsed,
@@ -102,19 +111,6 @@ export async function enrichPostContent(title: string, content: string): Promise
 
         return enrichedByAi
     } catch (error) {
-        // Surface as much detail as possible for diagnosis
-        const isGoogleAiError = error && typeof error === 'object' && 'status' in error
-        if (isGoogleAiError) {
-            const e = error as any
-            console.error('[AI-ENRICH] GoogleGenerativeAI API Error:', {
-                status: e.status,
-                statusText: e.statusText,
-                message: e.message,
-                errorDetails: e.errorDetails,
-            })
-        } else {
-            console.error('[AI-ENRICH] Error in enrichPostContent:', error)
-        }
         const message = error instanceof Error ? error.message : String(error)
         throw new Error(`Failed to enrich content with AI: ${message}`)
     }
