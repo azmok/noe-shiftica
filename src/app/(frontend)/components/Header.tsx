@@ -138,7 +138,11 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
             <div className="md:hidden flex-1">
               <Link
                 href="/blog"
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-primary)"
+                className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
+                  isBlogPage 
+                    ? "bg-[#111111] text-white/80 border border-white/10 shadow-lg" 
+                    : "bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-primary) border border-black/5"
+                }`}
               >
                 <ChevronLeft size={24} />
               </Link>
