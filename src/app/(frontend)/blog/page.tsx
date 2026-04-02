@@ -34,7 +34,7 @@ export default async function BlogPage() {
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-neu-primary)/10 blur-[120px] animate-pulse" />
         <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-(--color-neu-primary)/5 blur-[100px]" />
         <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
-        
+
         {/* SVG Noise Texture Overlay */}
         <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilter)' }}></div>
       </div>
@@ -119,7 +119,7 @@ export default async function BlogPage() {
               {featuredPost && (
                 <section className="md:hidden blog-posts">
                   <Link href={`/blog/${featuredPost.slug}`} className="block">
-                  <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-2xl bg-black">
+                    <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-2xl bg-black">
                       {(() => {
                         const imgUrl = featuredPost.heroUrl || featuredPost.coverUrl;
                         if (imgUrl) {
@@ -135,18 +135,18 @@ export default async function BlogPage() {
                         }
                         return <BlogFallbackHero />;
                       })()}
-                      <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/90" />
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <span className="px-3 py-1 rounded-full bg-(--color-neu-primary) text-[10px] font-bold text-black uppercase tracking-widest mb-3 inline-block">
-                          Featured
-                        </span>
-                        <h2 className="text-2xl font-serif text-white leading-tight mb-2">
+                      <div className="absolute inset-x-0 bottom-0 h-full bg-linear-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                        <h2 className="text-lg font-sans text-white leading-tight mb-2 drop-shadow-[0_2px_1px_rgba(0,0,0,1)]">
                           {featuredPost.title}
                         </h2>
-                        <div className="flex items-center gap-2 text-white/60 text-xs font-sans">
+                        <div className="flex items-center gap-2 text-white/60 text-xs font-sans drop-shadow-md">
                           <span>{featuredPost.publishedAt ? new Date(featuredPost.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
                         </div>
                       </div>
+                      <span className="absolute bottom-[10px] right-[10px] px-3 py-1 rounded-full bg-(--color-neu-primary) text-[10px] font-bold text-black uppercase tracking-widest z-30 shadow-lg">
+                        Featured
+                      </span>
                     </div>
                   </Link>
                 </section>
@@ -157,7 +157,7 @@ export default async function BlogPage() {
                 <div className="md:hidden -mx-4 overflow-x-auto flex items-center gap-3 px-4 no-scrollbar">
                   <Link
                     href="/blog"
-                    className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-white/5 border border-white/10 text-white"
+                    className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-white/10 border border-white/20 text-white shadow-lg"
                   >
                     All
                   </Link>
@@ -165,7 +165,7 @@ export default async function BlogPage() {
                     <Link
                       key={tag}
                       href={`/blog/tag/${encodeURIComponent(tag)}`}
-                      className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-(--mobile-surface) shadow-(--mobile-shadow-soft) text-(--mobile-text-secondary)"
+                      className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white active:bg-white/10"
                     >
                       {tag}
                     </Link>

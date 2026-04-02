@@ -18,7 +18,7 @@ export function MobileMenuButton() {
     setIsMounted(true);
   }, []);
 
-  const isDarkTheme = pathname === "/" || pathname === "/about" || pathname === "/services" || pathname === "/hearing";
+  const isDarkTheme = pathname === "/" || pathname === "/about" || pathname === "/services" || pathname === "/hearing" || pathname?.startsWith("/blog");
 
   // スクロール検知
   useEffect(() => {
@@ -64,7 +64,7 @@ export function MobileMenuButton() {
         } ${isMobileMenuOpen
           ? "bg-[#121216] border border-white/20 text-white shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
           : isDarkTheme
-            ? "shadow-[4px_4px_10px_#0a0a0a,-4px_-4px_10px_#181818] bg-[#111111] text-white/80 border border-[oklch(27.4%_0.006_286.033)]"
+            ? "shadow-[4px_4px_10px_#0a0a0a,-4px_-4px_10px_#181818] bg-[#111111] text-white/80 border border-zinc-800"
             : "shadow-[4px_4px_10px_#D8D5CF,-4px_-4px_10px_#FFFFFF] bg-(--mobile-surface) text-(--mobile-text-primary) border border-black/5"
         }`}
       aria-label="Toggle Menu"
@@ -76,4 +76,3 @@ export function MobileMenuButton() {
     </button>
   );
 }
-
