@@ -57,38 +57,40 @@ export const PostArticle: React.FC<{
                             return <BlogFallbackHero />;
                         })()}
                         {/* Dark Gradient Overlay for Readability */}
-                        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/90 via-black/40 to-transparent z-10 pointer-events-none" />
+                        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/70 to-transparent z-10 pointer-events-none" />
 
-                        <div className="absolute top-16 left-6 right-6">
-                            <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2 px-1">
-                                <span className="bg-(--color-neu-primary) text-black px-2 py-0.5 rounded-sm">Journal</span>
-                            </div>
+                        <div className="absolute bottom-[10px] right-[10px] z-30">
+                            <span className="bg-(--color-neu-primary) text-black px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-widest">Journal</span>
                         </div>
 
-                        <div className="absolute bottom-10 left-6 right-6 z-20">
-                            <h1 className="text-3xl font-sans text-white leading-tight mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                        <div className="absolute bottom-[1rem] left-6 right-6 z-20">
+                            <h1 className="text-3xl font-sans text-white leading-none drop-shadow-[1px_1px_1px_rgba(0,0,0,1)]">
                                 {post.title}
                             </h1>
-                            <div className="flex items-center gap-3 text-white/60 text-xs drop-shadow-md">
-                                <div className="flex flex-col">
-                                    <span>{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
-                                    {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
-                                        <span className="text-white/40 mt-0.5">
-                                            更新: {new Date(post.updatedAt).toISOString().split('T')[0].replace(/-/g, '.')}
-                                        </span>
-                                    )}
-                                    {readingTime > 0 && (
-                                        <span className="text-(--color-neu-primary) font-bold mt-1">
-                                            読了目安: {readingTime}分
-                                        </span>
-                                    )}
-                                </div>
-                                <span className="w-1 h-1 rounded-full bg-white/40" />
-                                <span>Noe Shiftica Editorial</span>
-                            </div>
+
                         </div>
                     </div>
 
+                    {/* Mobile meta data */}
+                    <div className="px-6 pt-6 -mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-(--color-neu-primary)">Published</span>
+                            <span className="text-white/80">{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
+                        </div>
+
+                        {readingTime > 0 && (
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-(--color-neu-primary)">読了目安</span>
+                                <span className="text-white/80">{readingTime}分</span>
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-(--color-neu-primary)">Author</span>
+                            <span className="text-white/80">Noe Shiftica</span>
+                        </div>
+                    </div>
+                    {/* Mobile Article Content */}
                     <div className="px-6 py-10 space-y-10">
                         {/* Key Points / Intro Card */}
                         <div className="p-6 rounded-(--mobile-radius) bg-white/5 backdrop-blur-sm border border-white/10">
@@ -227,23 +229,23 @@ export const PostArticle: React.FC<{
                                             <div className="flex flex-col gap-1">
                                                 {post.publishedAt && (
                                                     <div className="flex items-center gap-3">
-                                                         <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
-                                                             {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                                         </span>
-                                                         {readingTime > 0 && (
-                                                             <>
-                                                                 <span className="text-white/30">|</span>
-                                                                 <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
-                                                                     読了目安: {readingTime}分
-                                                                 </span>
-                                                             </>
-                                                         )}
+                                                        <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
+                                                            {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                        </span>
+                                                        {readingTime > 0 && (
+                                                            <>
+                                                                <span className="text-white/30">|</span>
+                                                                <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
+                                                                    読了目安: {readingTime}分
+                                                                </span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 )}
                                                 {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
-                                                     <span className="text-white/50 text-[12px] font-normal">
-                                                         最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                                     </span>
+                                                    <span className="text-white/50 text-[12px] font-normal">
+                                                        最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
