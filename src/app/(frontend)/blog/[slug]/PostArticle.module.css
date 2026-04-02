@@ -1,0 +1,162 @@
+/* Airbnb-Style Typography for Blog Articles */
+
+.postContent {
+  /* Scope the styles to only direct children and descendants of this wrapper */
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  line-height: normal; /* Reset default */
+
+  /* Paragraphs & Core Text */
+  & p {
+    font-size: 1rem; /* 18px on 16px base */
+    font-weight: 300;
+    line-height: 1.75;
+    margin-bottom: 1.75rem; /* Standard Airbnb breathability */
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
+    color: rgba(255, 255, 255, 0.9); /* text-white/90 for dark theme */
+    letter-spacing: 0.033em;
+  }
+
+  /* Lead Paragraph (Automatically bold first paragraph) */
+  & > p:first-of-type {
+    font-weight: 500;
+  }
+
+  /* Headings (Using Airbnb targets: 46px, 32px, 18px) */
+  & h1, & h2, & h3, & h4, & h5, & h6 {
+    font-family: var(--font-sans);
+    color: #ffffff;
+    font-weight: 500;
+    line-height: 1.13;
+    margin-top: 0;
+  }
+
+  & h1 {
+    font-size: 2.75rem; /* 46px precisely */
+    margin-bottom: 2rem;
+  }
+
+  & h2 {
+    font-size: 1.875rem; /* 32px precisely */
+    margin-top: 3.5rem; /* 56px - High impact top margin */
+    margin-bottom: 1.5rem;
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
+    line-height: 1.125;
+  }
+
+  & h3 {
+    font-size: 1.125rem; /* 18px - Sits elegantly between sections */
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.22;
+  }
+
+  /* Lists */
+  & ul, & ol {
+    padding: 0 0 0.5rem 2rem;
+    margin: 1.5rem 0 1.5rem 0.5rem;
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
+    
+    & li {
+      margin-bottom: 0;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      font-weight: 300;
+      padding-left: 0rem;
+      letter-spacing: 0.07em;
+    }
+
+    & li::marker {
+      color: color-mix(in srgb, var(--color-neu-primary), transparent 20%);
+    }
+  }
+
+  /* Links with Premium Animation Shadow (Tailwind handled mostly, but scoped here) */
+  & a {
+    color: var(--color-neu-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+  }
+
+  /* Strong/Bold tags */
+  & strong {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  /* Media & Tables */
+  & img {
+    border-radius: 1rem;
+    margin: 2rem 0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  }
+
+  & table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    overflow: hidden;
+    margin: 3rem 0;
+    background-color: rgba(255, 255, 255, 0.03);
+
+    & th {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      padding: 1.25rem 2rem;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    & td {
+      padding: 1.25rem 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  /* Responsive Overrides (Mobile) */
+  @media (max-width: 768px) {
+    & p {
+      font-size: 1rem; /* 16px */
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    & h1, & h2 {
+      font-size: 1.625rem; /* 26px */
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+
+    & h2 {
+      margin-top: 2rem;
+    }
+
+    & h3 {
+      font-size: 1.125rem;
+      margin-top: 1.5rem;
+    }
+
+    & ul, & ol {
+      padding-left: 1.5rem;
+    }
+    
+    & table {
+      & th, & td {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}

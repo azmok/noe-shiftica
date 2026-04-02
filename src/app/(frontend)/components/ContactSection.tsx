@@ -62,7 +62,7 @@ function ContactSectionInner({ fadeIn, selectedBudget }: ContactSectionProps) {
             Let's Work Together.
           </h2>
           <p className="font-medium text-xl text-[#FFFFFF] mb-6">まず話しましょう。</p>
-          <p className="font-thin text-[0.9375rem] leading-[1.5rem] text-white/70 test-center">
+          <p className="font-thin text-[0.9375rem] leading-6 text-white/70 test-center">
             「うちに合うのかな？」と思ったら、そのまま相談してください。
             <br />
             現状のヒアリングと方向性の確認だけでも大歓迎です。
