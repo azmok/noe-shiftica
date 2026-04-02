@@ -35,7 +35,7 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const config = buildConfig({
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'https://noe-shiftica.com' : 'http://localhost:3000'),
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'https://noe-shiftica.com' : 'http://localhost:3000'),
   admin: {
     user: Users.slug,
     importMap: {

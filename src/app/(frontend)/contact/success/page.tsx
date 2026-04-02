@@ -29,9 +29,12 @@ export default function ContactSuccessPage() {
             Noe Shifticaからのメールが近日中に届きます。<br className="hidden md:block"/>
             今しばらくお待ちください。
           </p>
-          <div className="pt-8">
-            <Button href="/" variant="primary" size="lg">
+          <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button href="/" variant="secondary" size="lg" className="w-full sm:w-auto">
               トップページに戻る
+            </Button>
+            <Button href="/hearing" variant="primary" size="lg" className="w-full sm:w-auto">
+              新しく入力する
             </Button>
           </div>
         </div>
