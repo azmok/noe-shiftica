@@ -23,6 +23,8 @@ import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
+import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
+import { autosavePlugin } from './plugins/autosave'
 
 import { neonBackupPlugin } from './plugins/neon-backup'
 
@@ -85,6 +87,8 @@ const config = buildConfig({
       },
     }),
     markdownImportPlugin(),
+    aiContentOptimizerPlugin(),
+    autosavePlugin(),
 
     neonBackupPlugin({
       collections: ['posts'],

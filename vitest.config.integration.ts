@@ -9,7 +9,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
  *   2. Run the test-user setup script once:
  *        pnpm test:setup
  *   3. Start the dev server in a separate terminal:
- *        pnpm dev
+ *        pnpm dev:test
  *   4. Run integration tests:
  *        pnpm test:integration
  */
@@ -18,9 +18,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    include: ['src/__tests__/integration/**/*.test.ts'],
+    include: ['tests/integration/**/*.test.ts'],
     // Load .env.test for TEST_ADMIN_PASSWORD etc.
-    setupFiles: ['src/__tests__/integration/setup.ts'],
+    setupFiles: ['tests/integration/setup.ts'],
     // Integration tests hit real network — give them room
     testTimeout: 30_000,
     hookTimeout: 30_000,
