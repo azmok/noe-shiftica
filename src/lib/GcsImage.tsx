@@ -224,7 +224,9 @@ export function GcsImage({
                 objectFit: objectFit,
                 objectPosition: 'center',
                 // If priority, NO transition/opacity control. If not, smooth fade.
-                transition: priority ? 'none' : 'opacity 0.4s ease-out',
+                transitionProperty: priority ? 'none' : 'opacity',
+                transitionDuration: priority ? '0s' : '0.4s',
+                transitionTimingFunction: 'ease-out',
                 opacity: priority ? 1 : (isLoaded ? 1 : 0),
             }}
             className={className}

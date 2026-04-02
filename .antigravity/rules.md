@@ -44,7 +44,11 @@ CRITICAL: Before any action, you MUST read and strictly adhere to the global pro
 - **Post-edit Verification**: After making changes, confirm: "Only [specific target] was modified. No other changes were made."
 
 ### 4-B. Protected Files (Read-Only unless explicitly unlocked)
-- `src/collections/*`, `src/payload.config.ts`, `src/access/*`, `src/lib/db.ts`
+- `src/collections/*`
+- `src/payload.config.ts`
+- `src/access/*`
+- `src/lib/db.ts`
+- `components/Footer.tsx` — NEVER modify unless explicitly specified by Azuma.
 
 ### 4-C. UI/UX Consistency
 - Adhere strictly to existing Tailwind CSS and Shadcn UI patterns.
@@ -81,19 +85,24 @@ All image components that manage loading state MUST implement a **dual-layer cac
 
 ## 6. Session Context Protocol
 
-### A. Context Retrieval (Start of Session)
-- **Action**: Before any task, read the following files if they exist:
-  1. `.antigravity/sessions.md` — session context, preferences, past decisions
-  2. `.antigravity/bug-history.md` — past bug fixes, root causes, and prevention notes
-  3. `.antigravity/notouch.md` — protected files and scope-lock templates
-  4. `.antigravity/potential-risks.md` — known risks and failure patterns
-  5. `.antigravity/knowledge/PayloadCMS/README.md` — knowledge base index
-- **Integration**: If relevant context exists in any file, explicitly reflect it in the current task's `plan.md`.
+### 6-A. Context Retrieval (Start of Session)
+Before any task, read the following files **in order** if they exist:
 
-### B. Pre-task Snapshot (Interruptions)
+| Priority | File | Purpose |
+|----------|------|---------|
+| 1 | `.antigravity/rules.md` | This file — global constraints |
+| 2 | `.antigravity/sessions.md` | Session context, preferences, past decisions |
+| 3 | `.antigravity/bug-history.md` | Past bug fixes, root causes, prevention notes |
+| 4 | `.antigravity/notouch.md` | Protected files and scope-lock templates — always check before any UI task |
+| 5 | `.antigravity/potential-risks.md` | Known risks and failure patterns |
+| 6 | `.antigravity/knowledge/README.md` | Knowledge base index — see Section 14 for full protocol |
+
+**Integration**: If relevant context exists in any file, explicitly reflect it in the current task's `plan.md`.
+
+### 6-B. Pre-task Snapshot (Interruptions)
 - **Action**: If interrupted or a new urgent task is injected, summarize the current state and learnings into `.antigravity/sessions.md` before switching context.
 
-### C. Memory Archiving (End of Session)
+### 6-C. Memory Archiving (End of Session)
 - **Action**: Upon task completion or session end, extract unique learnings and append them to `.antigravity/sessions.md` in the following format:
   > ### [YYYY-MM-DD HH:mm] Session Summary
   > - **Learned/Decided**: (Technical insights or decisions)
@@ -101,7 +110,7 @@ All image components that manage loading state MUST implement a **dual-layer cac
   > - **Plan Impact**: (How this affects future implementation steps)
 - **Cleanup**: Periodically merge redundant entries and remove outdated information (more than 3 months old) to prevent context bloat.
 
-### D. Bug Fix Memory Archiving
+### 6-D. Bug Fix Memory Archiving
 - **Trigger**: Whenever a bug is identified AND fixed (regardless of size), immediately append a record to `.antigravity/bug-history.md`.
 - **Do NOT skip this step** even for minor or "obvious" fixes. Every fix is a future prevention.
 - **Format**:
@@ -188,14 +197,7 @@ neonctl branches create --name test/integration --parent production
 - **Workflow**: 1. `git add .` → 2. 簡潔なコミットメッセージを生成 → 3. `git commit --no-verify -m "[summary with Claude Code] <Japanese summary>"` → 4. `git push`
 - **SPEED GOAL**: 簡潔なコミットメッセージを取れるところから取って、即座にコミット、そして即座にプッシュしてください。終わったらそのまますぐにレスポンスすること。
 
-
-## 10. Reusable Prompt Templates
-- Always check `.antigravity/notouch.md` for standard scope-lock templates before starting any UI task.
-
-## 11. `components/Footer.tsx`
-- NEVER modify `components/Footer.tsx` unless explicitly specified.
-
-## 12. Clarify Ambiguity Before Acting
+## 10. Clarify Ambiguity Before Acting
 - **Never assume. Always ask first.** If an instruction is ambiguous in any way, stop and ask for clarification before starting any work.
 - **Identify the ambiguity explicitly.** State what is unclear and why it matters (e.g., "This could mean X or Y — which do you intend?").
 - **Ask targeted questions only.** Do not ask for information you don't actually need. One or two focused questions is enough.
@@ -206,16 +208,44 @@ neonctl branches create --name test/integration --parent production
   - Behavior not defined (e.g., "make it animate" → what trigger? what effect?)
 - **Do not proceed with a best-guess and ask for feedback after.** Clarify first, act second — always.
 
-## 13. Knowledge Base Protocol
+## 11. Knowledge Base Protocol
 
-### When referencing knowledge
-1. Read `.antigravity/knowledge/PayloadCMS/README.md`
-2. Search and reference relevant files based on the directory structure in README
-3. If no relevant file is found, report to Azuma before starting the task
+> The knowledge base is the long-term memory of this project. Every agent MUST consult it before starting a task and update it upon completion.
 
-### When saving knowledge (required upon task completion)
-1. Read `.antigravity/knowledge/PayloadCMS/README.md`
-2. Create a new file or append to an existing one in the appropriate subdirectory
-3. File name: English kebab-case describing the feature (e.g., `user-avatar-upload.md`)
-4. Follow the format specified in README
-5. Start the very first heading as an H1 (using a single hash #)
+### 11-A. Directory Structure
+
+```
+.antigravity/knowledge/
+├── README.md          ← Index file. Always read this first.
+├── backend/
+│   ├── admin-ui/      ← PayloadCMS admin panel customizations, field configs, hooks
+│   └── logic/         ← API routes, server actions, data processing, auth logic
+└── frontend/
+    ├── ui/            ← Component patterns, Tailwind/Shadcn usage, animations
+    └── logic/         ← Client-side state, hooks, data fetching, routing patterns
+```
+
+### 11-B. Referencing Knowledge (Before Starting a Task)
+
+1. Read `.antigravity/knowledge/README.md` to get the current index.
+2. Based on the task domain, identify the relevant subdirectory:
+   - PayloadCMS collections, hooks, admin config → `backend/admin-ui/`
+   - API routes, server logic, DB access patterns → `backend/logic/`
+   - UI components, Tailwind patterns, animations → `frontend/ui/`
+   - Client hooks, state management, routing → `frontend/logic/`
+3. Read any files in the matched subdirectory that are relevant to the task.
+4. If no relevant file is found, **report to Azuma before starting the task** — do not proceed on assumption.
+
+### 11-C. Saving Knowledge (After Task Completion — MANDATORY)
+
+1. Read `.antigravity/knowledge/README.md` to confirm the current index.
+2. Determine the appropriate subdirectory using the mapping in 11-B above.
+3. Either append to an existing file or create a new one:
+   - **File naming**: English kebab-case describing the feature (e.g., `user-avatar-upload.md`)
+   - **First heading**: Must be H1 (single `#`)
+   - **Format**: Follow the structure defined in `README.md`
+4. After writing the file, update the index entry in `README.md` if a new file was created.
+
+### 11-D. When in Doubt About Placement
+- A feature that touches both backend and frontend → place the file in the layer where the **core logic resides**, and add a cross-reference note at the top of the file pointing to the other layer.
+- If truly ambiguous, ask Azuma before writing.

@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/Button";
 
 export default function ContactSuccessPage() {
   return (
-    <div className="min-h-screen text-white overflow-hidden relative selection:bg-[#FFFFFF] selection:text-[#050505]">
+    <div className="min-h-screen text-white overflow-hidden relative selection:bg-(--color-neu-primary) selection:text-background-void">
       <div
         className="fixed inset-0 w-full h-full opacity-[0.07] pointer-events-none z-20"
         style={{ background: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
