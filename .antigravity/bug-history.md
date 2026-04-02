@@ -217,3 +217,14 @@
   - Always use \isMounted\ guards for floating mobile UI and overlays to prevent hydration-induced flickering.
   - Avoid redundant 
 Close buttons in separate components; let the primary toggle component own the visual transition.
+
+### [2026-04-02 18:00] Bug: Admin relationship/upload fields return 401 in production build (`pnpm start`)
+- **Error**: `ERROR: There was an error building form state` / `Unauthorized, you must be logged in to make this request.` (status 401). Triggered by clicking any relationship or upload field (e.g., heroImage "Create New", author selector) in the Payload admin panel.
+- **Root Cause**: `payload.config.ts` used `process.env.PAYLOAD_PUBLIC_SERVER_URL` as the primary source for `serverURL`, but `.env.local` only defines `NEXT_PUBLIC_SERVER_URL`. When running `pnpm start`, `NODE_ENV=production`, so the fallback resolved to `'https://noe-shiftica.com'`. Payload's admin UI client-side components then sent API requests (`/api/users`, `/api/media`, etc.) to the production domain instead of `localhost:3000`. Since the browser's auth cookies are scoped to `localhost`, they were not sent to `noe-shiftica.com`, causing 401.
+- **File(s) Modified**: `src/payload.config.ts`
+- **Fix Summary**: Added `process.env.NEXT_PUBLIC_SERVER_URL` as a fallback between `PAYLOAD_PUBLIC_SERVER_URL` and the NODE_ENV-based hardcoded URL. The `serverURL` priority chain is now: `PAYLOAD_PUBLIC_SERVER_URL` → `NEXT_PUBLIC_SERVER_URL` → hardcoded fallback.
+- **Prevention Note**:
+  - `pnpm dev` sets `NODE_ENV=development`, so the fallback was always `http://localhost:3000` — this masked the bug entirely during normal development.
+  - `pnpm start` sets `NODE_ENV=production`, so the fallback was `https://noe-shiftica.com` — any relationship/upload field in admin would 401.
+  - Always ensure `payload.config.ts` `serverURL` reads from the same env variable defined in `.env.local`. The canonical variable for this project is `NEXT_PUBLIC_SERVER_URL`.
+  - This bug is silent in production (Firebase App Hosting) because `apphosting.yaml` defines `NEXT_PUBLIC_SERVER_URL` pointing to the correct domain.

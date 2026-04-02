@@ -345,12 +345,24 @@ select,
   min-height: 44px !important;
 }
 
-/* 5. Prevent iOS text selection ghost on long-press for table rows */
+/* 5. Prevent iOS text selection ghost on long-press for table rows,
+   but ensure inputs and textareas ALWAYS allow selection. */
 .table tr,
 .table-cell,
 .nav__link {
   -webkit-user-select: none;
   user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"],
+.rich-text-editor,
+.lexical-editor {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  touch-action: auto !important;
 }
 
 /* 6. Fix Payload's dropdown / select menus for touch */

@@ -128,6 +128,18 @@ function ContactSectionInner({ fadeIn, selectedBudget }: ContactSectionProps) {
               });
 
               if (res.ok) {
+                // ヒアリングシートのデータを初期化
+                try {
+                  localStorage.removeItem(STORAGE_KEY);
+                  // セッションストレージからも関連データを削除（指定があれば全削除も検討）
+                  sessionStorage.removeItem(STORAGE_KEY);
+                  // 画像キャッシュ以外のヒアリング関連データがあればここで個別に消すが、
+                  // 今回は念の為 sessionStorage 全体をクリアする（要件に基づき）
+                  // sessionStorage.clear(); // 画像キャッシュも消えるので今回は個別に removeItem を優先
+                } catch (e) {
+                  console.error("Storage clear error:", e);
+                }
+
                 router.push('/contact/success');
               } else {
                 const errorData = await res.json();
