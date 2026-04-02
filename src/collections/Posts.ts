@@ -2,7 +2,7 @@ import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { translateToSlug } from '../lib/translateToSlug'
 
 const FALLBACK_OG_IMAGE =
-    'https://firebasestorage.googleapis.com/v0/b/noe-shiftica.firebasestorage.app/o/og-images%2FScreenshot%202026-03-20%20033637.png?alt=media&token=85010d4b-7b48-4a64-9288-b19e7e43c2c4'
+    'https://firebasestorage.googleapis.com/v0/b/noe-shiftica.firebasestorage.app/o/fallback-image.png?alt=media&token=731d39a7-d242-4ba5-b5c3-5fdf6695eb90'
 
 const populateOgImage: CollectionBeforeChangeHook = async ({ data, req }) => {
     // Check if status is becoming "published"

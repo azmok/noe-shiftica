@@ -46,6 +46,7 @@
     "node_modules",
     "functions",
     "NS_v3.1",
-    "test-*.ts"
+    "test-*.ts",
+    "temp_*.tsx"
   ]
 }
