@@ -13,14 +13,11 @@ export const PostArticle: React.FC<{
     prevPost?: Post | null
     nextPost?: Post | null
 }> = ({ post, isPreview, prevPost, nextPost }) => {
-    // console.log(`[DEBUG] Rendering PostArticle for ${post.slug}...`);
-
     const htmlBodyHtml: string = (post as any).htmlEmbed?.bodyHtml || ''
     const readingTime =
         (post as any).readingTime ||
         calculateReadingTime(post.content) + calculateReadingTime(htmlBodyHtml) ||
-        1 // Minimum 1 minute for any published post
-
+        1
 
     return (
         <main className="post-main grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
@@ -36,7 +33,7 @@ export const PostArticle: React.FC<{
                 {/* Mobile Article View */}
                 <article className="selection:bg-fuchsia-300 selection:text-fuchsia-900 md:hidden flex flex-col pt-0">
                     {/* Immersive Hero */}
-                    <div className="relative w-full aspect-square sm:aspect-video rounded-b-[40px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
+                    <div className="relative w-full aspect-video rounded-b-[40px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
                         {(() => {
                             try {
                                 const img = (post.heroImage || post.coverImage);
@@ -48,7 +45,7 @@ export const PostArticle: React.FC<{
                                             alt={post.title}
                                             priority
                                             preOptimized={!!img.sizes?.medium}
-
+                                            objectFit="contain"
                                             className="w-full h-full object-contain"
                                         />
                                     );
@@ -58,7 +55,8 @@ export const PostArticle: React.FC<{
                             }
                             return <BlogFallbackHero />;
                         })()}
-                        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-transparent to-black/90" />
+                        {/* Dark Gradient Overlay for Readability */}
+                        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/90 via-black/40 to-transparent z-10 pointer-events-none" />
 
                         <div className="absolute top-16 left-6 right-6">
                             <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2 px-1">
@@ -66,11 +64,11 @@ export const PostArticle: React.FC<{
                             </div>
                         </div>
 
-                        <div className="absolute bottom-10 left-6 right-6">
-                            <h1 className="text-3xl font-serif text-white leading-tight mb-4 drop-shadow-lg">
+                        <div className="absolute bottom-10 left-6 right-6 z-20">
+                            <h1 className="text-3xl font-serif text-white leading-tight mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                                 {post.title}
                             </h1>
-                            <div className="flex items-center gap-3 text-white/60 text-xs">
+                            <div className="flex items-center gap-3 text-white/60 text-xs drop-shadow-md">
                                 <div className="flex flex-col">
                                     <span>{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
                                     {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
@@ -128,7 +126,6 @@ export const PostArticle: React.FC<{
                                         return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
                                     }
                                 } catch (e) {
-                                    // Soft failure for content rendering
                                     return <div className="p-4 bg-red-50 text-red-500 rounded">Content failed to load.</div>;
                                 }
                                 return null;
@@ -174,7 +171,7 @@ export const PostArticle: React.FC<{
                             {prevPost && (
                                 <Link href={`/blog/${prevPost.slug}`} className="block">
                                     <div className="p-5 rounded-(--mobile-radius) bg-(--mobile-surface) shadow-(--mobile-shadow-soft) opacity-80 flex flex-col gap-2 border border-black/5">
-                                        <span className="text-[10px] font-bold text-(--mobile-text-muted) uppercase tracking-widest">Previous</span>
+                                        <span className="text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Previous</span>
                                         <h5 className="text-sm font-bold text-(--mobile-text-secondary) line-clamp-1">{prevPost.title}</h5>
                                     </div>
                                 </Link>
@@ -184,146 +181,153 @@ export const PostArticle: React.FC<{
                 </article>
 
                 {/* Desktop Article Column */}
-                <article className="hidden md:flex lg:col-span-12 xl:col-span-10 xl:col-start-2 flex-col gap-12 mt-8">
-                    {/* Breadcrumbs */}
-                    <div className="flex items-center gap-2 text-sm font-medium pl-2">
-                        <Link className="text-slate-500 hover:text-(--color-neu-primary) transition-colors" href="/">Home</Link>
-                        <span className="text-slate-500">/</span>
-                        <Link className="text-slate-500 hover:text-(--color-neu-primary) transition-colors" href="/blog">Blog</Link>
-                        <span className="text-slate-500">/</span>
-                        <span className="text-(--color-neu-primary) truncate max-w-[200px] sm:max-w-xs">{post.title}</span>
-                    </div>
-
-                    {/* Main Article Card */}
-                    <div className="bg-white border border-slate-100 p-6 md:p-12 lg:p-16 relative overflow-hidden rounded-3xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)]">
-
-                        {/* Title Section */}
-                        <div className="mb-10">
-                            <div className="flex items-center gap-4 mb-8">
-                                <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-(--color-neu-primary) bg-(--color-neu-primary)/5 px-3 py-1 rounded-sm">
-                                    Journal
-                                </span>
-                                <div className="flex flex-col gap-1">
-                                    {post.publishedAt && (
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
-                                                {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                            </span>
-                                            {readingTime > 0 && (
-                                                <>
-                                                    <span className="text-slate-200">|</span>
-                                                    <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
-                                                        読了目安: {readingTime}分
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
-                                    {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
-                                        <span className="text-slate-400 text-[12px] font-normal">
-                                            最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            <h1 className="post-title">
-                                {post.title}
-                            </h1>
+                <article className="selection:bg-(--color-neu-primary)/30 hidden md:flex lg:col-span-12 xl:col-span-12 flex-col gap-12 mt-8">
+                    <div className="relative w-full">
+                        {/* Vertical Breadcrumbs */}
+                        <div className="absolute -left-16 top-10 origin-top-left rotate-90 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest pointer-events-none whitespace-nowrap">
+                            <Link className="text-slate-400 hover:text-(--color-neu-primary) transition-colors pointer-events-auto" href="/">Home</Link>
+                            <span className="text-slate-300">/</span>
+                            <Link className="text-slate-400 hover:text-(--color-neu-primary) transition-colors pointer-events-auto" href="/blog">Blog</Link>
+                            <span className="text-slate-300">/</span>
+                            <span className="text-(--color-neu-primary) truncate max-w-[200px]">{post.title}</span>
                         </div>
 
-                        {/* Hero Image */}
-                        <div className="w-full aspect-video rounded-2xl overflow-hidden mb-12 shadow-inner p-2 bg-slate-100">
-                            <div className="w-full h-full rounded-xl overflow-hidden relative group">
-                                {(() => {
-                                    try {
-                                        const img = (post.heroImage || post.coverImage);
-                                        if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                            const finalUrl = img.sizes?.medium?.url || img.url;
-                                            return (
-                                                <>
-                                                    <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none"></div>
+                        {/* Main Card */}
+                        <div className="bg-zinc-50 border border-slate-100 overflow-hidden rounded-[2.5rem] shadow-[0_45px_120px_-20px_rgba(0,0,0,0.07)]">
+                            <div className="flex flex-col">
+                                {/* Hero Image Section with Title Overlay */}
+                                <div className="w-full aspect-video relative group overflow-hidden bg-slate-50 border-b border-slate-100">
+                                    {(() => {
+                                        try {
+                                            const img = (post.heroImage || post.coverImage);
+                                            if (img && typeof img === 'object' && 'url' in img && img.url) {
+                                                const finalUrl = img.sizes?.medium?.url || img.url;
+                                                return (
                                                     <GcsImage
                                                         src={finalUrl}
                                                         alt={post.title}
                                                         priority
                                                         preOptimized={!!img.sizes?.medium}
-
-                                                        className="group-hover:scale-105"
+                                                        objectFit="contain"
+                                                        className="group-hover:scale-105 transition-transform duration-300 ease-in-out"
                                                     />
-                                                </>
-                                            );
+                                                );
+                                            }
+                                        } catch (e) {
+                                            console.error(`[DEBUG ERROR] Hero render failed:`, e);
                                         }
-                                    } catch (e) {
-                                        console.error(`[DEBUG ERROR] Desktop Hero render failed for ${post.slug}:`, e);
-                                    }
-                                    return <BlogFallbackHero />;
-                                })()}
+                                        return <BlogFallbackHero />;
+                                    })()}
+
+                                    {/* Dark Gradient Overlay */}
+                                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
+
+                                    {/* Title Overlay: White text + White glow shadow */}
+                                    <div className="absolute inset-x-12 bottom-12 lg:inset-x-20 lg:bottom-20 z-20">
+                                        <h1 className="text-white text-4xl lg:text-5xl xl:text-7xl font-serif font-bold leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
+                                            {post.title}
+                                        </h1>
+                                    </div>
+                                </div>
+
+                                {/* Metadata Section (Below Hero) */}
+                                <div className="p-8 lg:px-20 lg:py-10 border-b border-slate-50 bg-zinc-100">
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-(--color-neu-primary) bg-(--color-neu-primary)/5 px-3 py-1 rounded-sm">
+                                                Journal
+                                            </span>
+                                            <div className="flex flex-col gap-1">
+                                                {post.publishedAt && (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
+                                                            {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                        </span>
+                                                        {readingTime > 0 && (
+                                                            <>
+                                                                <span className="text-slate-200">|</span>
+                                                                <span className="text-slate-400 text-[14px] font-normal flex items-center gap-1.5">
+                                                                    読了目安: {readingTime}分
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
+                                                    <span className="text-slate-400 text-[12px] font-normal">
+                                                        最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Content Body */}
+                                <div className="max-w-4xl mx-auto w-full px-6 lg:px-12 py-16 lg:py-12 lg:pb-24">
+                                    <div className="prose prose-lg post-content-body max-w-none font-sans leading-relaxed
+                                        marker:text-(--color-neu-primary)
+                                        prose-headings:text-slate-800
+                                        prose-strong:text-slate-900
+                                        prose-blockquote:border-l-4 prose-blockquote:border-(--color-neu-primary)
+                                        prose-blockquote:bg-slate-50/50 prose-blockquote:neu-pressed
+                                        prose-blockquote:rounded-xl prose-blockquote:p-6 prose-blockquote:not-italic
+                                        prose-blockquote:text-slate-600
+                                        prose-code:text-(--color-neu-primary) prose-code:bg-slate-100
+                                        prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
+                                        prose-code:before:content-[''] prose-code:after:content-['']
+                                        prose-a:text-(--color-neu-primary)
+                                        prose-a:no-underline
+                                        prose-a:font-bold
+                                        prose-a:relative
+                                        prose-a:transition-all
+                                        hover:prose-a:text-(--color-neu-primary)/80
+                                        prose-img:object-contain
+                                    ">
+                                        {(() => {
+                                            try {
+                                                if (post.content && typeof post.content === 'object' && 'root' in post.content) {
+                                                    return <RichText data={post.content as any} />;
+                                                } else if (post.content) {
+                                                    return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
+                                                }
+                                            } catch (e) {
+                                                // fail
+                                            }
+                                            return null;
+                                        })()}
+                                    </div>
+
+                                    {(post as any).htmlEmbed?.bodyHtml && (
+                                        <HtmlEmbedBlock
+                                            bodyHtml={(post as any).htmlEmbed.bodyHtml}
+                                            embedCss={(post as any).htmlEmbed.embedCss ?? ''}
+                                            title={post.title}
+                                        />
+                                    )}
+
+                                    {/* Desktop Tags */}
+                                    {(() => {
+                                        const cmd = (post.customMetaData as Record<string, any>) || {};
+                                        const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
+                                        if (tags.length === 0) return null;
+                                        return (
+                                            <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-slate-100">
+                                                {tags.map((tag, index) => (
+                                                    <Link
+                                                        key={index}
+                                                        href={`/blog/tag/${tag}`}
+                                                        className="px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[13px] font-medium text-slate-500 hover:text-(--color-neu-primary) hover:border-(--color-neu-primary)/30 transition-all"
+                                                    >
+                                                        #{tag}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         </div>
-
-                        {/* Content Body */}
-                        <div className="prose prose-lg post-content-body max-w-none font-sans leading-relaxed
-                            marker:text-(--color-neu-primary)
-                            prose-headings:text-slate-800
-                            prose-strong:text-slate-900
-                            prose-blockquote:border-l-4 prose-blockquote:border-(--color-neu-primary)
-                            prose-blockquote:bg-slate-50/50 prose-blockquote:neu-pressed
-                            prose-blockquote:rounded-xl prose-blockquote:p-6 prose-blockquote:not-italic
-                            prose-blockquote:text-slate-600
-                            prose-code:text-(--color-neu-primary) prose-code:bg-slate-100
-                            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
-                            prose-code:before:content-[''] prose-code:after:content-['']
-                            prose-a:text-(--color-neu-primary)
-                            prose-a:no-underline
-                            prose-a:font-bold
-                            prose-a:relative
-                            prose-a:transition-all
-                            hover:prose-a:text-(--color-neu-primary)/80
-                            prose-img:object-contain
-                        ">
-                            {(() => {
-                                try {
-                                    if (post.content && typeof post.content === 'object' && 'root' in post.content) {
-                                        return <RichText data={post.content as any} />;
-                                    } else if (post.content) {
-                                        return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
-                                    }
-                                } catch (e) {
-                                    // console.error(`[DEBUG ERROR] Desktop RichText render failed for ${post.slug}:`, e);
-                                }
-                                return null;
-                            })()}
-                        </div>
-
-                        {/* HTML Embed */}
-                        {(post as any).htmlEmbed?.bodyHtml && (
-                            <HtmlEmbedBlock
-                                bodyHtml={(post as any).htmlEmbed.bodyHtml}
-                                embedCss={(post as any).htmlEmbed.embedCss ?? ''}
-                                title={post.title}
-                            />
-                        )}
-
-                        {/* Tags */}
-                        {(() => {
-                            const cmd = (post.customMetaData as Record<string, any>) || {};
-                            const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
-                            if (tags.length === 0) return null;
-                            return (
-                                <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-slate-100">
-                                    {tags.map((tag, index) => (
-                                        <Link
-                                            key={index}
-                                            href={`/blog/tag/${tag}`}
-                                            className="px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[13px] font-medium text-slate-500 hover:text-(--color-neu-primary) hover:border-(--color-neu-primary)/30 transition-all"
-                                        >
-                                            #{tag}
-                                        </Link>
-                                    ))}
-                                </div>
-                            );
-                        })()}
                     </div>
 
                     {/* Navigation */}

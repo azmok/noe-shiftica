@@ -30,8 +30,8 @@ export default async function BlogPage() {
     <div className="md:bg-(--color-neu-bg-light) bg-(--mobile-bg) md:text-slate-900 text-(--mobile-text-primary) min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary)/30">
       <Header />
 
-      <main className="grow px-4 sm:px-6 lg:px-40 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10 transition-colors duration-500">
-        <div className="max-w-[960px] mx-auto flex flex-col gap-8 md:gap-10 mt-2 md:mt-8">
+      <main className="grow px-4 sm:px-6 lg:px-12 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto flex flex-col gap-8 md:gap-10 mt-2 md:mt-8">
 
           {posts.length === 0 ? (
             <div className="text-center p-12 neu-flat rounded-2xl w-full">
@@ -68,8 +68,8 @@ export default async function BlogPage() {
                                   alt={featuredPost.title}
                                   priority
                                   preOptimized={!!preGenUrl}
-
-                                  className="group-hover:scale-110"
+                                  objectFit="contain"
+                                  className="group-hover:scale-110 transition-transform duration-300 ease-in-out"
                                 />
                               </>
                             );
@@ -106,7 +106,7 @@ export default async function BlogPage() {
               {featuredPost && (
                 <section className="md:hidden">
                   <Link href={`/blog/${featuredPost.slug}`} className="block">
-                    <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
+                  <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
                       {(() => {
                         const imgUrl = featuredPost.heroUrl || featuredPost.coverUrl;
                         if (imgUrl) {

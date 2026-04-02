@@ -110,7 +110,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <link rel="preconnect" href="https://storage.googleapis.com" />
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
       </head>
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className="selection:bg-(--color-neu-primary)/30">
         <GoogleAnalytics />
         <MobileMenuProvider>
           <ProgressBar />

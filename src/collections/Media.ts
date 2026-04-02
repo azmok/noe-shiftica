@@ -26,6 +26,11 @@ export const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
       required: true,
+      admin: {
+        components: {
+          Field: '@/components/AltField#AltField',
+        },
+      },
     },
   ],
   hooks: {

@@ -147,6 +147,9 @@ export const Posts: CollectionConfig = {
             hasMany: true,
             admin: {
                 position: 'sidebar',
+                components: {
+                    Field: '@/components/TagField#TagField',
+                },
             },
         },
         {
