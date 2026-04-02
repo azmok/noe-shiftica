@@ -6,43 +6,207 @@
 │       │   ├── LICENSE.txt
 │       │   └── SKILL.md
 │       ├── vercel-react-best-practices
-│       │   ├── rules
 │       │   ├── AGENTS.md
 │       │   ├── README.md
+│       │   ├── rules
 │       │   └── SKILL.md
 │       └── web-design-guidelines
 │           └── SKILL.md
-├── scripts
-├── public
-│   ├── assets
-│   │   ├── NS_logo_Black.png
-│   │   ├── NS_logo_White.jpg
-│   │   └── profile-icon.PNG
-│   ├── images
-│   │   └── azuma.png
-│   ├── apple-touch-icon-precomposed.png
-│   ├── apple-touch-icon.png
-│   ├── favicon.ico
-│   ├── file.svg
-│   ├── globe.svg
-│   ├── next.svg
-│   ├── vercel.svg
-│   └── window.svg
-├── legal
-│   ├── privacy-policy.md
-│   └── tokusho.md
+├── .agents
+│   ├── knowledge
+│   ├── skills
+│   │   ├── find-skills
+│   │   │   └── SKILL.md
+│   │   ├── frontend-design
+│   │   │   ├── LICENSE.txt
+│   │   │   └── SKILL.md
+│   │   ├── vercel-react-best-practices
+│   │   │   ├── AGENTS.md
+│   │   │   ├── README.md
+│   │   │   ├── rules
+│   │   │   └── SKILL.md
+│   │   └── web-design-guidelines
+│   │       └── SKILL.md
+│   └── workflows
+│       └── start-dev.md
+├── .antigravity
+│   ├── bug-history.md
+│   ├── bug-report-scroll-lock.md
+│   ├── error-log-scroll-lock.txt
+│   ├── knowledge
+│   │   ├── backend
+│   │   │   ├── admin-ui
+│   │   │   └── logic
+│   │   ├── frontend
+│   │   │   ├── logic
+│   │   │   └── ui
+│   │   └── README.md
+│   ├── notouch.md
+│   ├── potential-risks.md
+│   ├── rules.md
+│   └── sessions.md
+├── .claude
+│   └── settings.local.json
+├── .env
+├── .env.example
+├── .env.local
+├── .env.test
+├── .env.test.example
+├── .firebaserc
+├── .gemini
+│   └── antigravity
+│       └── 9b3def14-0e7f-4cf0-80a7-38400e0952db
+├── .github
+│   └── workflows
+│       ├── deploy-notification.yml
+│       └── neon-backup.yml
+├── .gitignore
+├── .neon
+├── .npmrc
+├── .vscode
+│   └── settings.json
+├── ~
+│   └── Library
+│       └── CloudStorage
+│           └── GoogleDrive-indexlove0815@icloud.com
+├── apphosting_backends.json
+├── apphosting_rollouts.json
+├── apphosting.yaml
+├── auth_test_result.txt
+├── backends.json
+├── build_error_v2.txt
+├── build_error_v3.txt
+├── build_error_v4_raw.json
+├── build_local_v2.log
+├── build_local.log
+├── build_output.txt
+├── build_ts.log
+├── bun.lock
+├── CLAUDE.md
+├── demo
+│   ├── demo.dynamic
+│   │   ├── a.html
+│   │   ├── concept_reproduction.html
+│   │   └── concept.JPG
+│   └── demo.static.mirai-foundry
+│       └── promtp-demo-mirai-foundry.md
+├── docker-compose.yml
+├── docs
+│   ├── design_system.md
+│   ├── doc_concept.txt
+│   ├── doc_lp.txt
+│   ├── doc1.txt
+│   ├── doc2.txt
+│   ├── extract.py
+│   ├── NS_ConceptSheet_v3_Final.docx
+│   ├── NS_LP,About,SiteMap.docx
+│   └── vitasovic.md
+├── eslint.config.mjs
+├── ext
+│   ├── marcodelia.antigravity-auto-run-pro-1.5.7.vsix
+│   └── pesosz.antigravity-auto-accept-1.1.0.vsix
+├── fallback-images
+│   ├── fallback-image-neumorphism-1.html
+│   └── noe-shiftica.code-workspace
+├── firebase.json
+├── firestore.indexes.json
+├── firestore.rules
+├── folder_structure.txt
 ├── functions
-│   ├── src
-│   │   └── index.ts
 │   ├── .eslintrc.js
 │   ├── .gitignore
 │   ├── package-lock.json
 │   ├── package.json
+│   ├── src
+│   │   └── index.ts
 │   ├── tsconfig.dev.json
 │   └── tsconfig.json
-├── fallback-images
-│   ├── fallback-image-neumorphism-1.html
-│   └── noe-shiftica.code-workspace
+├── history-prompt.txt
+├── IMG_2513.PNG
+├── implementation_plan.resolved.md
+├── lexical-test.json
+├── logs.json
+├── next-env.d.ts
+├── next.config.ts
+├── noe-shiftica-3eae1ca2dae7.json
+├── notouch-prompt.md
+├── Out-File
+├── output-trees.ps1
+├── package-lock.json
+├── package.json
+├── payload_output.txt
+├── playwright-report
+│   ├── data
+│   │   ├── 27ba41d42a81d88163d5197cb986a3c547c68104.png
+│   │   ├── b907efa297e4867dc452280425411da139470804.md
+│   │   └── dfa854a55466b8b3874f92680a816a80c5e34ba6.md
+│   └── index.html
+├── playwright.config.ts
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── public
+│   ├── apple-touch-icon-precomposed.png
+│   ├── apple-touch-icon.png
+│   ├── assets
+│   │   ├── NS_logo_Black.png
+│   │   ├── NS_logo_White.jpg
+│   │   └── profile-icon.PNG
+│   ├── favicon.ico
+│   ├── file.svg
+│   ├── fonts
+│   │   └── noto-sans-jp
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.woff
+│   │       └── noto-sans-jp-v56-japanese_latin-regular.woff2
+│   ├── globe.svg
+│   ├── images
+│   │   └── azuma.png
+│   ├── next.svg
+│   ├── vercel.svg
+│   ├── window.svg
+│   └── works
+│       ├── mirai-foundry-thumb.png
+│       └── portfolio-thumb.png
+├── re-deploy.md
+├── README.md
+├── rollouts.json
+├── scripts
+│   ├── dev-test.ts
+│   └── setup-test-user.ts
+├── skills-lock.json
+├── sns_links.md
 ├── src
 │   ├── app
 │   │   ├── (frontend)
@@ -50,26 +214,47 @@
 │   │   │   ├── blog
 │   │   │   ├── components
 │   │   │   ├── contact
-│   │   │   ├── privacy
-│   │   │   ├── terms
+│   │   │   ├── hearing
 │   │   │   ├── layout.tsx
 │   │   │   ├── page.tsx
-│   │   │   └── styles.css
+│   │   │   ├── privacy
+│   │   │   ├── services
+│   │   │   ├── styles.css
+│   │   │   ├── terms
+│   │   │   └── tokusho
 │   │   ├── (payload)
 │   │   │   ├── admin
 │   │   │   ├── api
 │   │   │   ├── custom.scss
 │   │   │   └── layout.tsx
-│   │   └── api
-│   │       ├── contact
-│   │       ├── fix-posts
-│   │       ├── github-models
-│   │       └── revalidate
+│   │   ├── api
+│   │   │   ├── contact
+│   │   │   ├── fix-posts
+│   │   │   ├── github-models
+│   │   │   └── revalidate
+│   │   ├── robots.ts
+│   │   └── sitemap.ts
 │   ├── collections
 │   │   ├── Categories.ts
+│   │   ├── HtmlFiles.ts
 │   │   ├── Media.ts
 │   │   ├── Posts.ts
 │   │   └── Users.ts
+│   ├── components
+│   │   ├── admin
+│   │   │   └── ImageCompressionProvider.tsx
+│   │   ├── AdminThumbnailCell.tsx
+│   │   ├── AltField.tsx
+│   │   ├── HearingResumeWidget.tsx
+│   │   ├── HtmlEmbedBlock.tsx
+│   │   ├── LinkedPostCell.tsx
+│   │   ├── MobileFullscreenEditor
+│   │   │   └── index.tsx
+│   │   ├── MobileMenuButton.tsx
+│   │   ├── MobileMenuOverlay.tsx
+│   │   └── TagField.tsx
+│   ├── context
+│   │   └── MobileMenuContext.tsx
 │   ├── features
 │   │   ├── htmlSource
 │   │   │   ├── conversion.ts
@@ -79,6 +264,8 @@
 │   │   └── markdownPaste
 │   │       ├── client.tsx
 │   │       └── server.ts
+│   ├── hooks
+│   │   └── useHearingData.ts
 │   ├── lib
 │   │   ├── calculateReadingTime.ts
 │   │   ├── db.ts
@@ -97,107 +284,79 @@
 │   │   ├── 20260310_153133_add_description_field.ts
 │   │   ├── 20260315_add_media_admin_sizes.ts
 │   │   └── index.ts
-│   ├── plugins
-│   │   └── markdownImport
-│   │       ├── BlogContentActions.tsx
-│   │       └── index.ts
-│   ├── scripts
-│   │   ├── sync-data.ts
-│   │   └── sync.py
 │   ├── payload-types.ts
-│   └── payload.config.ts
-├── docs
-│   ├── design_system.md
-│   ├── doc_concept.txt
-│   ├── doc_lp.txt
-│   ├── doc1.txt
-│   ├── doc2.txt
-│   ├── extract.py
-│   ├── NS_ConceptSheet_v3_Final.docx
-│   ├── NS_LP,About,SiteMap.docx
-│   └── vitasovic.md
-├── ~
-│   └── Library
-│       └── CloudStorage
-│           └── GoogleDrive-indexlove0815@icloud.com
-├── .github
-│   └── workflows
-│       ├── deploy-notification.yml
-│       └── neon-backup.yml
-├── .claude
-│   └── settings.local.json
-├── .agents
-│   ├── skills
-│   │   ├── find-skills
-│   │   │   └── SKILL.md
-│   │   ├── frontend-design
-│   │   │   ├── LICENSE.txt
-│   │   │   └── SKILL.md
-│   │   ├── vercel-react-best-practices
-│   │   │   ├── rules
-│   │   │   ├── AGENTS.md
+│   ├── payload.config.ts
+│   ├── plugins
+│   │   ├── aiContentOptimizer
+│   │   │   ├── __tests__
+│   │   │   ├── components
+│   │   │   ├── endpoints
+│   │   │   ├── index.ts
 │   │   │   ├── README.md
-│   │   │   └── SKILL.md
-│   │   └── web-design-guidelines
-│   │       └── SKILL.md
-│   └── workflows
-│       └── start-dev.md
-├── ext
-│   ├── marcodelia.antigravity-auto-run-pro-1.5.7.vsix
-│   └── pesosz.antigravity-auto-accept-1.1.0.vsix
-├── payload_output.txt
-├── package.json
-├── package-lock.json
-├── output-trees.ps1
-├── Out-File
-├── noe-shiftica-d216ff091a9d.json
-├── noe-shiftica.dev.code-workspace
-├── next.config.ts
-├── next-env.d.ts
-├── pnpm-lock.yaml
-├── notouch-prompt.md
-├── postcss.config.mjs
-├── test-all.mjs
-├── README.md
-├── rollouts.json
-├── skills-lock.json
+│   │   │   ├── types.ts
+│   │   │   └── WALKTHROUGH.md
+│   │   ├── autosave
+│   │   │   ├── AutosaveUI.tsx
+│   │   │   └── index.ts
+│   │   ├── markdownImport
+│   │   │   ├── __tests__
+│   │   │   ├── index.ts
+│   │   │   ├── MarkdownImporterUI.tsx
+│   │   │   └── README.md
+│   │   ├── neon-backup
+│   │   │   └── index.ts
+│   │   └── shared
+│   │       └── draftStorage.ts
+│   └── scripts
+│       ├── check-sql-data.ts
+│       ├── reset-admin-password.ts
+│       ├── sync-data.ts
+│       └── sync.py
 ├── storage.rules
+├── task-202603030.md
+├── task-202603031.md
 ├── task.md.resolved
-├── logs.json
+├── temp_PostArticle_first.tsx
+├── temp_PostArticle_old.tsx
+├── temp_PostArticle.tsx
+├── test_output.txt
+├── test-all.mjs
 ├── test-api.js
 ├── test-fetch.mjs
 ├── test-markdown.ts
 ├── test-pg.ts
+├── test-results
+│   ├── .last-run.json
+│   ├── article-Article-Integratio-51b24-te-an-article-via-Local-API-chromium
+│   │   └── error-context.md
+│   └── auth-admin-login-flow-redirects-to-dashboard-chromium
+│       ├── error-context.md
+│       └── test-failed-1.png
+├── tests
+│   ├── article.spec.ts
+│   ├── auth.spec.ts
+│   ├── contact.spec.ts
+│   ├── helpers.ts
+│   ├── integration
+│   │   ├── aiContentOptimizer.test.ts
+│   │   ├── auth.test.ts
+│   │   ├── helpers.ts
+│   │   ├── markdownImport.test.ts
+│   │   ├── media.test.ts
+│   │   ├── posts.test.ts
+│   │   └── setup.ts
+│   └── unit
+│       ├── api
+│       │   ├── contact.test.ts
+│       │   └── revalidate.test.ts
+│       └── lib
+│           ├── calculateReadingTime.test.ts
+│           └── translateToSlug.test.ts
 ├── tree_structure.txt
 ├── tsc_error.txt
-├── re-deploy.md
-├── lexical-test.json
-├── firebase.json
-├── history-prompt.txt
-├── .env
-├── .env.local
-├── .firebaserc
-├── .gitignore
-├── .neon
-├── .npmrc
-├── apphosting_backends.json
-├── apphosting_rollouts.json
-├── apphosting.yaml
-├── backends.json
-├── build_error_v2.txt
-├── build_error_v3.txt
-├── build_error_v4_raw.json
-├── build_local_v2.log
-├── build_local.log
-├── build_output.txt
-├── build_ts.log
-├── bun.lock
-├── CLAUDE.md
-├── docker-compose.yml
-├── eslint.config.mjs
 ├── tsconfig.json
-├── firestore.indexes.json
-├── firestore.rules
-├── folder_structure.txt
-├── implementation_plan.resolved.md
-└── tsconfig.tsbuildinfo
+├── tsconfig.tsbuildinfo
+├── vitest.config.integration.ts
+├── vitest.config.live.ts
+├── vitest.config.ts
+└── 利用契約に関する証明書.pdf

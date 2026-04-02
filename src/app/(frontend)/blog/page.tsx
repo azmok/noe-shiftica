@@ -27,23 +27,34 @@ export default async function BlogPage() {
   const recentPosts = posts.slice(1);
 
   return (
-    <div className="md:bg-(--color-neu-bg-light) bg-(--mobile-bg) md:text-slate-900 text-(--mobile-text-primary) min-h-screen flex flex-col font-sans antialiased relative selection:bg-(--color-neu-primary)/30">
+    <div className="min-h-screen bg-background-void font-sans antialiased relative selection:bg-(--color-neu-primary)/40 overflow-hidden">
+      {/* Premium Depth Background Elements */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Mesh Gradient Blobs */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-neu-primary)/10 blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-(--color-neu-primary)/5 blur-[100px]" />
+        <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
+        
+        {/* SVG Noise Texture Overlay */}
+        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilter)' }}></div>
+      </div>
+
       <Header />
 
       <main className="grow px-4 sm:px-6 lg:px-12 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10 transition-colors duration-500">
         <div className="max-w-7xl mx-auto flex flex-col gap-8 md:gap-10 mt-2 md:mt-8">
 
           {posts.length === 0 ? (
-            <div className="text-center p-12 neu-flat rounded-2xl w-full">
-              <h3 className="text-2xl font-bold mb-4 md:text-slate-800 text-(--mobile-text-primary)">
+            <div className="text-center p-12 bg-white/5 border border-white/10 rounded-2xl w-full backdrop-blur-sm">
+              <h3 className="text-2xl font-bold mb-4 text-white">
                 No articles yet
               </h3>
-              <p className="md:text-slate-500 text-(--mobile-text-secondary) mb-8 max-w-md mx-auto">
+              <p className="text-slate-400 mb-8 max-w-md mx-auto">
                 Payload CMSの「Posts」コレクションから記事が投稿されると、ここに表示されます。現在準備中です。
               </p>
               <Link
                 href="/admin"
-                className="text-[var(--color-neu-primary)] font-bold hover:underline transition-colors"
+                className="text-(--color-neu-primary) font-bold hover:underline transition-colors"
               >
                 Adminパネルへログインする
               </Link>
@@ -54,23 +65,25 @@ export default async function BlogPage() {
               {featuredPost && (
                 <section className="hidden md:block">
                   <Link href={`/blog/${featuredPost.slug}`} className="block posts featured group">
-                    <div className="border border-solid border-slate-400 bg-white p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all hover:shadow-xl duration-300 hover:-translate-y-0.5">
-                      <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-inner relative bg-slate-200">
+                    <div className="border border-white/10 bg-white/5 backdrop-blur-md p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row gap-10 items-center cursor-pointer transition-all hover:border-white/20 duration-300 hover:-translate-y-1 shadow-2xl">
+                      <div className="w-full lg:w-1/2 aspect-video rounded-2xl overflow-hidden shadow-2xl relative bg-black/40">
                         {(() => {
                           const preGenUrl = featuredPost.heroMediumUrl || featuredPost.coverMediumUrl;
                           const imgUrl = preGenUrl || featuredPost.heroUrl || featuredPost.coverUrl;
                           if (imgUrl) {
                             return (
                               <>
-                                <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/10 to-transparent mix-blend-overlay z-10 pointer-events-none" />
-                                <GcsImage
-                                  src={imgUrl}
-                                  alt={featuredPost.title}
-                                  priority
-                                  preOptimized={!!preGenUrl}
-                                  objectFit="contain"
-                                  className="group-hover:scale-110 transition-transform duration-300 ease-in-out"
-                                />
+                                <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/20 to-transparent mix-blend-overlay z-10 pointer-events-none" />
+                                <div className="w-full h-full transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
+                                  <GcsImage
+                                    src={imgUrl}
+                                    alt={featuredPost.title}
+                                    priority
+                                    preOptimized={!!preGenUrl}
+                                    objectFit="cover"
+                                    className="w-full h-full"
+                                  />
+                                </div>
                               </>
                             );
                           }
@@ -79,19 +92,19 @@ export default async function BlogPage() {
                       </div>
                       <div className="flex flex-col gap-5 w-full lg:w-1/2 lg:pr-6">
                         <div className="flex items-center gap-3">
-                          <span className="px-3 py-1 rounded-full bg-(--color-neu-primary)/10 text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest">Featured</span>
+                          <span className="px-3 py-1 rounded-full bg-(--color-neu-primary)/20 text-[10px] font-bold text-(--color-neu-primary) uppercase tracking-widest border border-(--color-neu-primary)/30">Featured</span>
                           {featuredPost.publishedAt && (
                             <span className="text-slate-400 text-sm font-medium">
                               {featuredPost.publishedAt ? new Date(featuredPost.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}
                             </span>
                           )}
                         </div>
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-800 leading-tight">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tighter">
                           {featuredPost.title}
                         </h1>
 
                         <div className="pt-2">
-                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-secondary text-[#1d1a2e] text-sm font-bold transition-all group-hover:bg-secondary/90">
+                          <div className="h-10 px-6 rounded-lg inline-flex items-center justify-center gap-2 bg-(--color-neu-primary) text-black text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(var(--color-neu-primary-rgb),0.3)]">
                             Read Article
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
                           </div>
@@ -104,9 +117,9 @@ export default async function BlogPage() {
 
               {/* Mobile Featured Post Section */}
               {featuredPost && (
-                <section className="md:hidden">
+                <section className="md:hidden blog-posts">
                   <Link href={`/blog/${featuredPost.slug}`} className="block">
-                  <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-(--mobile-shadow-out) bg-(--mobile-surface)">
+                  <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-2xl bg-black">
                       {(() => {
                         const imgUrl = featuredPost.heroUrl || featuredPost.coverUrl;
                         if (imgUrl) {
@@ -115,14 +128,14 @@ export default async function BlogPage() {
                               src={imgUrl}
                               alt={featuredPost.title}
                               priority
-
-                              className="w-full h-full object-contain"
+                              objectFit="cover"
+                              className="w-full h-full"
                             />
                           );
                         }
                         return <BlogFallbackHero />;
                       })()}
-                      <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/80" />
+                      <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/90" />
                       <div className="absolute bottom-0 left-0 right-0 p-6">
                         <span className="px-3 py-1 rounded-full bg-(--color-neu-primary) text-[10px] font-bold text-black uppercase tracking-widest mb-3 inline-block">
                           Featured
@@ -144,7 +157,7 @@ export default async function BlogPage() {
                 <div className="md:hidden -mx-4 overflow-x-auto flex items-center gap-3 px-4 no-scrollbar">
                   <Link
                     href="/blog"
-                    className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-(--mobile-surface) shadow-(--mobile-shadow-inset) text-(--mobile-text-primary)"
+                    className="px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all bg-white/5 border border-white/10 text-white"
                   >
                     All
                   </Link>
