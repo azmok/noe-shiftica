@@ -62,3 +62,4 @@ npm run dev
 
 ## 📜 ライセンス (License)
 This project is specifically built for Noe Shiftica. All rights reserved.
+
