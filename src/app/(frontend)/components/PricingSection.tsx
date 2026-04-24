@@ -89,7 +89,7 @@ export function PricingSection({ fadeIn, onPlanSelect }: PricingSectionProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     onPlanSelect?.(budgetMapping[plan.name]);
-                    
+
                     // 確実にスクロールさせるための処理（Linkのデフォルト動作をキャンセルして手動実行）
                     setTimeout(() => {
                       document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
@@ -119,10 +119,6 @@ export function PricingSection({ fadeIn, onPlanSelect }: PricingSectionProps) {
             (オプション)<br />
             月額保守：¥5,000〜¥10,000 /
             月（サーバー維持・軽微な修正・運用サポート込）
-            <span className="text-white/50 text-xs leading-relaxed inline-block mt-2">
-              ＊
-              別途、年間約6,000円のランニングコスト（サーバー＋ドメイン費用）がかかります。<span className="inline text-[#c2cf2d] text-xs leading-relaxed mt-2">各サービス会社への直接のお支払いです。</span>
-            </span>
           </p>
 
         </motion.div>
