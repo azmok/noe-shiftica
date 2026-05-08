@@ -106,33 +106,34 @@ export default async function BlogPostPage({
     const { slug } = await params;
     const payload = await getPayload({ config: configPromise });
 
-    // Fetch the post matching the slug
+    // Fetch the post matching the slug.
     // overrideAccess: true — ISR background workers have no auth context; without this,
     // Payload v3 applies access control and may return 0 results, causing false 404s.
     // draft: false — explicit to prevent any draft version interference.
-    // try/catch — DB errors (Neon cold start, timeout) throw instead of calling notFound(),
-    // so the stale cached page is preserved until the next successful revalidation.
-    let posts: Awaited<ReturnType<typeof payload.find>>;
-    try {
-        posts = await payload.find({
-            collection: "posts",
-            where: {
-                slug: {
-                    equals: decodeURIComponent(slug),
+    // IIFE + try/catch — DB errors throw (preserving stale cached page) instead of calling
+    // notFound(), so the 404 is only served when the query succeeds but returns 0 docs.
+    const posts = await (async () => {
+        try {
+            return await payload.find({
+                collection: "posts",
+                where: {
+                    slug: {
+                        equals: decodeURIComponent(slug),
+                    },
+                    _status: {
+                        equals: 'published',
+                    },
                 },
-                _status: {
-                    equals: 'published',
-                },
-            },
-            depth: 1,
-            limit: 1,
-            overrideAccess: true,
-            draft: false,
-        });
-    } catch (error) {
-        console.error(`[ISR][blog/${slug}] payload.find threw an error — preserving stale cache:`, error);
-        throw error;
-    }
+                depth: 1,
+                limit: 1,
+                overrideAccess: true,
+                draft: false,
+            });
+        } catch (error) {
+            console.error(`[ISR][blog/${slug}] payload.find threw an error — preserving stale cache:`, error);
+            throw error;
+        }
+    })();
 
     if (!posts.docs || posts.docs.length === 0) {
         console.warn(`[ISR][blog/${slug}] payload.find succeeded but returned 0 docs. _status may not be 'published', or the post was deleted.`);
