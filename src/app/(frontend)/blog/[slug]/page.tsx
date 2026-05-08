@@ -29,6 +29,7 @@ export async function generateMetadata({
             },
             depth: 1,
             limit: 1,
+            overrideAccess: true,
         });
 
         if (!posts.docs || posts.docs.length === 0) {
@@ -85,6 +86,7 @@ export async function generateStaticParams() {
                     equals: 'published',
                 },
             },
+            overrideAccess: true,
         });
 
         return posts.docs.map((post) => ({
@@ -105,21 +107,35 @@ export default async function BlogPostPage({
     const payload = await getPayload({ config: configPromise });
 
     // Fetch the post matching the slug
-    const posts = await payload.find({
-        collection: "posts",
-        where: {
-            slug: {
-                equals: decodeURIComponent(slug),
+    // overrideAccess: true — ISR background workers have no auth context; without this,
+    // Payload v3 applies access control and may return 0 results, causing false 404s.
+    // draft: false — explicit to prevent any draft version interference.
+    // try/catch — DB errors (Neon cold start, timeout) throw instead of calling notFound(),
+    // so the stale cached page is preserved until the next successful revalidation.
+    let posts: Awaited<ReturnType<typeof payload.find>>;
+    try {
+        posts = await payload.find({
+            collection: "posts",
+            where: {
+                slug: {
+                    equals: decodeURIComponent(slug),
+                },
+                _status: {
+                    equals: 'published',
+                },
             },
-            _status: {
-                equals: 'published',
-            },
-        },
-        depth: 1,
-        limit: 1,
-    });
+            depth: 1,
+            limit: 1,
+            overrideAccess: true,
+            draft: false,
+        });
+    } catch (error) {
+        console.error(`[ISR][blog/${slug}] payload.find threw an error — preserving stale cache:`, error);
+        throw error;
+    }
 
     if (!posts.docs || posts.docs.length === 0) {
+        console.warn(`[ISR][blog/${slug}] payload.find succeeded but returned 0 docs. _status may not be 'published', or the post was deleted.`);
         notFound();
     }
 
@@ -143,6 +159,7 @@ export default async function BlogPostPage({
             sort: '-publishedAt',
             limit: 1,
             depth: 0,
+            overrideAccess: true,
         });
         prevPost = prevPostsRes.docs[0] || null;
 
@@ -159,6 +176,7 @@ export default async function BlogPostPage({
             sort: 'publishedAt',
             limit: 1,
             depth: 0,
+            overrideAccess: true,
         });
         nextPost = nextPostsRes.docs[0] || null;
     }
