@@ -228,3 +228,21 @@ Close buttons in separate components; let the primary toggle component own the v
   - `pnpm start` sets `NODE_ENV=production`, so the fallback was `https://noe-shiftica.com` — any relationship/upload field in admin would 401.
   - Always ensure `payload.config.ts` `serverURL` reads from the same env variable defined in `.env.local`. The canonical variable for this project is `NEXT_PUBLIC_SERVER_URL`.
   - This bug is silent in production (Firebase App Hosting) because `apphosting.yaml` defines `NEXT_PUBLIC_SERVER_URL` pointing to the correct domain.
+
+### [2026-05-08 XX:XX] Bug: Blog Post Page Returns 404 After ISR Re-generation
+- **Error**: Individual blog post pages (`/blog/[slug]`) showed correctly right after publish, but became 404 after on-demand ISR revalidation triggered by `revalidatePath`.
+- **Root Cause**:
+  1. **Missing `overrideAccess: true`**: All `payload.find()` calls in `blog/[slug]/page.tsx` lacked `overrideAccess: true`. ISR background regeneration workers have no authenticated user context. Payload v3 Local API applies collection access control based on the caller's context. Without `overrideAccess`, the query may return 0 docs even for published posts.
+  2. **No distinction between DB errors and "post not found"**: If `payload.find()` threw an error or returned empty due to Neon cold start / timeout, the code immediately called `notFound()`, caching a 404 page. All future requests then served the cached 404 until next revalidation (which would also 404, perpetuating the cycle).
+  3. **Missing `draft: false`**: Not explicitly setting `draft: false` left open the possibility of draft version interference in Payload v3's versioning system.
+  4. **Context asymmetry**: `blog/page.tsx` uses raw SQL (`getPostsByStatus`) and bypasses Payload entirely — always worked. `blog/[slug]/page.tsx` used `payload.find()` — failed during ISR.
+- **File(s) Modified**: `src/app/(frontend)/blog/[slug]/page.tsx`
+- **Fix Summary**:
+  - Added `overrideAccess: true` to ALL `payload.find()` calls in `BlogPostPage` and `generateStaticParams` and `generateMetadata`.
+  - Added `draft: false` explicitly to the main post fetch.
+  - Wrapped the main `payload.find()` in try/catch: DB errors `throw` (preserving stale cached page), while `notFound()` is only called when the query succeeds but returns 0 docs (post genuinely not published).
+  - Added `console.error` / `console.warn` for Cloud Run log diagnostics.
+- **Prevention Note**:
+  - **ALWAYS add `overrideAccess: true` to `payload.find()` calls in Server Components and ISR paths.** The Local API runs server-side and does not need user-level access control for public content reads.
+  - **Never call `notFound()` inside a bare `payload.find()` without try/catch.** DB errors and "not found" are different failure modes; conflating them causes 404 cache poisoning.
+  - The blog list page (`blog/page.tsx`) uses raw SQL as a workaround — the individual post page now correctly uses `overrideAccess: true` to achieve equivalent reliability through the Payload Local API.

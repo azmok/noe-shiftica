@@ -32,3 +32,39 @@ For preview pages that need always-fresh data: Payload's auth cookie lookup in `
 
 ### Pitfall
 A future developer might add `force-dynamic` to "fix" a stale cache issue. **Do not do this.** Instead, wire up on-demand revalidation via `revalidatePath()` called from Payload hooks or the `/api/revalidate` endpoint.
+
+## payload.find() in ISR / Server Components — MANDATORY Pattern
+
+When calling `payload.find()` (Payload Local API) in any Server Component or ISR path:
+
+### Always add `overrideAccess: true`
+ISR background regeneration workers have no authenticated user context. Without `overrideAccess: true`, Payload v3 applies collection-level access control, which can return 0 docs for public content, causing false 404s.
+
+```ts
+const posts = await payload.find({
+    collection: "posts",
+    where: { ... },
+    overrideAccess: true, // REQUIRED for ISR / Server Components
+    draft: false,         // explicit — prevents draft version interference
+});
+```
+
+### Separate DB errors from "not found"
+Never call `notFound()` inside a bare payload.find() without try/catch.
+DB errors and "post not found" are different failure modes.
+Conflating them causes 404 cache poisoning (the 404 gets cached, perpetuating the issue).
+
+```ts
+let posts;
+try {
+    posts = await payload.find({ ... });
+} catch (error) {
+    console.error(`[ISR][blog/${slug}] payload.find error:`, error);
+    throw error; // preserves stale cached page; Next.js retries on next revalidation
+}
+
+if (!posts.docs || posts.docs.length === 0) {
+    console.warn(`[ISR] No published post found for slug "${slug}"`);
+    notFound(); // only call here — query succeeded, post genuinely doesn't exist
+}
+```
