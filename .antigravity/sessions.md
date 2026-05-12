@@ -203,3 +203,13 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - All future admin providers should be registered in `admin.components.providers` in `payload.config.ts`.
     - `@payloadcms/email-*` version must match `payload` version exactly to avoid peer dep issues.
     - For preview pages: always use `noStore()` + `depth: 2` to ensure draft data is fresh and fully resolved.
+
+### [2026-05-12 00:00] Session Summary
+- **Learned/Decided**:
+  - **Blog list ISR cache poisoning**: `blog/page.tsx` was silently catching DB errors, causing an empty "No articles yet" page to be written to the Full Route Cache when Neon query failed during ISR re-render. Fixed by adding `throw error` to preserve stale cache.
+  - **Investigation finding**: No `revalidate = 600` existed in the code. The afterChange/afterDelete hooks in `Posts.ts` already correctly call `revalidatePath('/blog')` and `revalidatePath('/blog/${doc.slug}')`. The CDN bypass via `no-store` headers in `next.config.ts` was also already in place.
+  - **The one missing piece**: The blog list page was not following the ISR error-throw pattern established in `blog/[slug]/page.tsx` and the knowledge base.
+- **Preferences**: Azuma gave permission to touch `next.config.ts` if needed (it was not needed — fix was in `blog/page.tsx` only).
+- **Plan Impact**:
+  - Every ISR server component that fetches DB data must throw on error (never swallow).
+  - The knowledge base (`nextjs-rendering-strategy.md`) already documents this pattern — enforce it in all future page components.
