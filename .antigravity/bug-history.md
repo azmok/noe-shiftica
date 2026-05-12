@@ -246,3 +246,14 @@ Close buttons in separate components; let the primary toggle component own the v
   - **ALWAYS add `overrideAccess: true` to `payload.find()` calls in Server Components and ISR paths.** The Local API runs server-side and does not need user-level access control for public content reads.
   - **Never call `notFound()` inside a bare `payload.find()` without try/catch.** DB errors and "not found" are different failure modes; conflating them causes 404 cache poisoning.
   - The blog list page (`blog/page.tsx`) uses raw SQL as a workaround — the individual post page now correctly uses `overrideAccess: true` to achieve equivalent reliability through the Payload Local API.
+
+### [2026-05-12 00:00] Bug: Blog list loses new article ~10 minutes after publish
+- **Error**: Newly published article disappears from /blog list after ~10 minutes. DB status remains `published` throughout.
+- **Root Cause**: `blog/page.tsx` catches DB errors silently (no `throw`). When `getPostsByStatus('published')` throws during ISR re-render (e.g., Neon cold start after idle period), the catch block swallows the error, `posts` stays `[]`, and the "No articles yet" empty page is written to the Full Route Cache. This empty page is then served until the next successful revalidation.
+- **File(s) Modified**: `src/app/(frontend)/blog/page.tsx`
+- **Fix Summary**: Added `throw error` in the catch block. When DB fails during ISR re-render, Next.js now preserves the stale cached page (which still shows the article) instead of caching the empty result. This matches the established pattern in `blog/[slug]/page.tsx` and the knowledge base ISR error handling rules.
+- **Prevention Note**:
+  - ALL ISR server components that fetch DB data must THROW on error, never swallow silently.
+  - Silent catches cause "cache poisoning" — the bad state (empty page) gets cached and persists.
+  - Pattern: `console.error("[ISR][/route] DB failed — preserving stale cache:", error); throw error;`
+  - Reference: `.antigravity/knowledge/frontend/logic/nextjs-rendering-strategy.md` (ISR error handling section)
