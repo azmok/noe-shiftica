@@ -10,7 +10,11 @@
       "TodoWrite(*)",
       "Bash(gcloud logging:*)",
       "Skill(firecrawl)",
-      "WebSearch"
+      "WebSearch",
+      "PowerShell(Get-Command *)",
+      "PowerShell(gcloud logging read *)",
+      "PowerShell(git *)",
+      "PowerShell(frontend *)"
     ]
   }
 }
