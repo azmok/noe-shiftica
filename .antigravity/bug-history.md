@@ -257,3 +257,16 @@ Close buttons in separate components; let the primary toggle component own the v
   - Silent catches cause "cache poisoning" — the bad state (empty page) gets cached and persists.
   - Pattern: `console.error("[ISR][/route] DB failed — preserving stale cache:", error); throw error;`
   - Reference: `.antigravity/knowledge/frontend/logic/nextjs-rendering-strategy.md` (ISR error handling section)
+
+### [2026-05-15] Bug: Blog list loses articles again (~10 min after publish) — regression
+- **Error**: Same symptom as 2026-05-12: `/blog` list page shows "No articles yet" ~10 minutes after a new post is published. DB and individual post pages unaffected.
+- **Root Cause**: The `throw error` fix from commit `80b3926` was absent from the snapshot commit `76fe4b7` created during a git cleanup/reorganization. The catch block in `blog/page.tsx` reverted to silently swallowing DB errors, causing ISR cache poisoning (empty `posts = []` written to Full Route Cache on Neon cold start).
+- **Confirmed via logs**:
+  - `Error: Connection terminated unexpectedly` (2026-05-14 10:49) — DB connection drop during ISR
+  - `[ISR][blog/...] payload.find succeeded but returned 0 docs` — recurring individual post ISR issue (separate)
+- **File(s) Modified**: `src/app/(frontend)/blog/page.tsx`
+- **Fix Summary**: Re-added `throw error` (with `[ISR][/blog]`-prefixed console.error) to the catch block. Commit `12f71e2`.
+- **Prevention Note**:
+  - **This is a regression from a git reorganization.** Whenever large git restructuring (branch merges, snapshots, rebases) is done, verify that `blog/page.tsx` catch block still contains `throw error`.
+  - The correct pattern is immutable: `console.error("[ISR][/blog] DB query failed — preserving stale cache:", error); throw error;`
+  - Consider adding a lint rule or test to prevent silent catch in ISR server components.
