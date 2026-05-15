@@ -204,6 +204,14 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
     - `@payloadcms/email-*` version must match `payload` version exactly to avoid peer dep issues.
     - For preview pages: always use `noStore()` + `depth: 2` to ensure draft data is fresh and fully resolved.
 
+### [2026-05-15] Session Summary
+- **Learned/Decided**:
+  - **ISR throw error リグレッション**: git整理（スナップショットコミット `76fe4b7`）によって `blog/page.tsx` の `throw error` が消え、前回と全く同じISRキャッシュ汚染バグが再発した。修正コミット `12f71e2` で再追加。
+  - **ログ調査結果**: `Error: Connection terminated unexpectedly`（2026-05-14）がNeon DB接続エラーの直接証拠として確認。`[ISR][blog/...] payload.find succeeded but returned 0 docs` は個別記事ページの別問題（一覧には影響なし）。
+  - **デプロイリビジョン確認**: `noe-shiftica-backend-build-2026-05-12-001` が本番稼働中。
+- **Preferences**: git整理・ブランチ再構成の後は必ず `blog/page.tsx` の catch ブロックに `throw error` があるか確認する。
+- **Plan Impact**: 個別記事ページで `payload.find` が0件を返す問題（毎日複数回発生）は未解決。別途調査が必要。
+
 ### [2026-05-12 00:00] Session Summary
 - **Learned/Decided**:
   - **Blog list ISR cache poisoning**: `blog/page.tsx` was silently catching DB errors, causing an empty "No articles yet" page to be written to the Full Route Cache when Neon query failed during ISR re-render. Fixed by adding `throw error` to preserve stale cache.
