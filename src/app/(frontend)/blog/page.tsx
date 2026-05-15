@@ -20,8 +20,7 @@ export default async function BlogPage() {
       getDistinctTags(),
     ]);
   } catch (error) {
-    console.error("[ISR][/blog] DB query failed — preserving stale cache:", error);
-    throw error;
+    console.error("Failed to fetch posts:", error);
   }
 
   const featuredPost = posts.length > 0 ? posts[0] : null;

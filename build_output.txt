@@ -1,8 +1,0 @@
-
-> web@0.1.0 build C:\Users\genta\projects\noe-shiftica.dev
-> next build
-
-Γû▓ Next.js 16.1.6 (Turbopack)
-- Environments: .env.local, .env
-
-  Creating an optimized production build ...
