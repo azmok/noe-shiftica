@@ -270,3 +270,13 @@ Close buttons in separate components; let the primary toggle component own the v
   - **This is a regression from a git reorganization.** Whenever large git restructuring (branch merges, snapshots, rebases) is done, verify that `blog/page.tsx` catch block still contains `throw error`.
   - The correct pattern is immutable: `console.error("[ISR][/blog] DB query failed — preserving stale cache:", error); throw error;`
   - Consider adding a lint rule or test to prevent silent catch in ISR server components.
+
+### [2026-05-15] Bug: payload.find returns 0 docs for old/renamed slugs (daily ISR log noise + SEO risk)
+- **Error**: `[ISR][blog/why-rich-and-luxury-websites-are-obsolete] payload.find succeeded but returned 0 docs.` — appearing almost daily in Cloud Run logs.
+- **Root Cause**: Post id=19 had its slug renamed from `why-rich-and-luxury-websites-are-obsolete` to `rich-lavish-websites-outdated-reason`. The old URL remained in the Next.js ISR cache and was being re-crawled daily by Google bots. Each visit triggered an ISR background re-render → `payload.find` found no post with the old slug → `notFound()` → 404 cached. The other 3 failing slugs (`freelancer-vs-noeshiftica-web-production-guide`, `freelancer-website-total-cost`, `why-neo-shiftica-is-affordable-and-fast`) had no records in `posts` OR `_posts_v` — completely stale/deleted routes returning correct 404s.
+- **File(s) Modified**: `next.config.ts`
+- **Fix Summary**: Added a permanent (301) redirect from `/blog/why-rich-and-luxury-websites-are-obsolete` to `/blog/rich-lavish-websites-outdated-reason` in `next.config.ts`. Google will pass link equity to the canonical URL and stop crawling the old one.
+- **Prevention Note**:
+  - When a post's slug is changed in PayloadCMS admin, the old URL is NOT automatically redirected. Always add a redirect in `next.config.ts` when renaming a post that may be indexed or linked externally.
+  - `revalidatePath` only handles the NEW slug; the old slug cache persists until a visitor/bot triggers ISR re-render (which correctly 404s, but wastes crawl budget).
+  - The 3 other failing slugs (no DB records) return 404 correctly — no action needed.
