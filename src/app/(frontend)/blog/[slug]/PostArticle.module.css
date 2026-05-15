@@ -1,67 +1,87 @@
 /* Airbnb-Style Typography for Blog Articles */
 
+
+:root {
+  --white-text-100: rgb(255, 255, 255);
+  --white-text-90: rgba(243, 243, 243, 1);
+  --white-text-80: rgb(224, 224, 224);
+}
+
 .postContent {
   /* Scope the styles to only direct children and descendants of this wrapper */
   font-family: var(--font-sans);
   color: var(--foreground);
-  line-height: normal; /* Reset default */
+  line-height: normal;
+  /* Reset default */
 
   /* Paragraphs & Core Text */
   & p {
-    font-size: 1rem; /* 18px on 16px base */
+    font-size: 0.9rem;
+    /* 18px on 16px base */
     font-weight: 300;
     line-height: 1.75;
-    margin-bottom: 1.75rem; /* Standard Airbnb breathability */
+    margin-bottom: 1.75rem;
+    /* Standard Airbnb breathability */
     /* border: 1px solid rgba(255, 255, 255, 0.1); */
-    color: rgba(255, 255, 255, 0.9); /* text-white/90 for dark theme */
+    color: var(--white-text-90);
+    /* text-white/90 for dark theme */
     letter-spacing: 0.033em;
   }
 
   /* Lead Paragraph (Automatically bold first paragraph) */
-  & > p:first-of-type {
+  &>p:first-of-type {
     font-weight: 500;
   }
 
   /* Headings (Using Airbnb targets: 46px, 32px, 18px) */
-  & h1, & h2, & h3, & h4, & h5, & h6 {
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
     font-family: var(--font-sans);
-    color: #ffffff;
+    color: var(--white-text-100);
     font-weight: 500;
     line-height: 1.13;
     margin-top: 0;
   }
 
   & h1 {
-    font-size: 2.75rem; /* 46px precisely */
+    font-size: 2.75rem;
+    /* 46px precisely */
     margin-bottom: 2rem;
   }
 
   & h2 {
-    font-size: 1.875rem; /* 32px precisely */
-    margin-top: 3.5rem; /* 56px - High impact top margin */
+    font-size: 1.875rem;
+    /* 32px precisely */
+    margin-top: 3.5rem;
+    /* 56px - High impact top margin */
     margin-bottom: 1.5rem;
     /* border: 1px solid rgba(255, 255, 255, 0.1); */
     line-height: 1.125;
   }
 
   & h3 {
-    font-size: 1.125rem; /* 18px - Sits elegantly between sections */
+    font-size: 1.125rem;
+    /* 18px - Sits elegantly between sections */
     margin-top: 2.5rem;
     margin-bottom: 1.25rem;
     line-height: 1.22;
   }
 
   /* Lists */
-  & ul, & ol {
+  & ul,
+  & ol {
     padding: 0 0 0.5rem 2rem;
     margin: 1.5rem 0 1.5rem 0.5rem;
     /* border: 1px solid rgba(255, 255, 255, 0.1); */
-    
+
     & li {
       margin-bottom: 0;
       line-height: 1;
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 1rem;
+      font-size: 0.8rem;
       font-weight: 300;
       padding-left: 0rem;
       letter-spacing: 0.07em;
@@ -86,7 +106,7 @@
 
   /* Strong/Bold tags */
   & strong {
-    color: #ffffff;
+    color: var(--white-text-100);
     font-weight: 600;
   }
 
@@ -98,11 +118,9 @@
   }
 
   & table {
-    width: 100%;
+    width: auto;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
     overflow: hidden;
     margin: 3rem 0;
     background-color: rgba(255, 255, 255, 0.03);
@@ -110,31 +128,48 @@
     & th {
       background-color: rgba(255, 255, 255, 0.05);
       color: #ffffff;
-      padding: 1.25rem 2rem;
+      padding: 0.75rem 1.25rem;
       text-align: center;
       text-transform: uppercase;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       letter-spacing: 0.1em;
       font-weight: 700;
+
+      & p {
+        padding: 0;
+        margin: 0.2em 0.5em;
+        font-size: 1rem;
+        font-weight: 500;
+      }
     }
 
     & td {
-      padding: 1.25rem 2rem;
+      padding: 0rem 1.25rem;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+
+      & p {
+        padding: 0;
+        margin: 0.2em 0.5em;
+        font-size: 0.8rem;
+      }
     }
   }
 
   /* Responsive Overrides (Mobile) */
   @media (max-width: 768px) {
     & p {
-      font-size: 1rem; /* 16px */
+      font-size: 1rem;
+      /* 16px */
       line-height: 1.5;
       margin-bottom: 1.5rem;
     }
 
-    & h1, & h2 {
-      font-size: 1.625rem; /* 26px */
+    & h1,
+    & h2 {
+      font-size: 1.625rem;
+      /* 26px */
       line-height: 1.15;
       margin-bottom: 1.5rem;
     }
@@ -148,15 +183,26 @@
       margin-top: 1.5rem;
     }
 
-    & ul, & ol {
+    & ul,
+    & ol {
       padding-left: 1.5rem;
     }
-    
+
     & table {
-      & th, & td {
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
+
+      & th,
+      & td {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
       }
     }
   }
+}
+
+
+/* table 自体ではなく、中にある th と td を直接叩く */
+.postContent table th,
+.postContent table td {
+  /* インラインスタイルの #ccc をねじ伏せるために !important を付ける */
+  border: 1px solid rgb(48, 47, 47) !important;
 }
