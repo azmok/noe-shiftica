@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
   // every HTML request to pass through to the origin (Next.js), which always
   // serves either the cached ISR page or a freshly revalidated one.
   // Static assets (JS, CSS, images) are unaffected — they have their own cache headers.
+  async redirects() {
+    return [
+      {
+        source: '/blog/why-rich-and-luxury-websites-are-obsolete',
+        destination: '/blog/rich-lavish-websites-outdated-reason',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
