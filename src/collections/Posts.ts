@@ -73,13 +73,34 @@ export const Posts: CollectionConfig = {
         afterChange: [
             async ({ doc, operation }) => {
                 if (operation === 'create' || operation === 'update') {
-                    // ブログ一覧ページと各記事ページのキャッシュを破棄し、次回アクセス時に静的生成(SSG)させる
-                    if (process.env.PAYLOAD_SYNC_MODE !== 'true') {
-                        const { revalidatePath } = await import('next/cache');
-                        revalidatePath('/blog');
-                        if (doc.slug) {
-                            revalidatePath(`/blog/${doc.slug}`);
+                    // 1. ローカルサーバー(実行環境)のキャッシュ破棄
+                    const { revalidatePath } = await import('next/cache');
+                    revalidatePath('/blog');
+                    if (doc.slug) {
+                        revalidatePath(`/blog/${doc.slug}`);
+                    }
+
+                    // 2. 本番環境(App Hosting)への明示的なWebhookによるキャッシュ破棄
+                    // (ローカルで記事を編集した場合でも、本番に反映させるため)
+                    try {
+                        const targetUrl = 'https://noe-shiftica.com/api/revalidate';
+                        const secret = process.env.REVALIDATE_SECRET;
+                        if (secret) {
+                            fetch(targetUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    secret,
+                                    slug: doc.slug
+                                })
+                            }).catch(err => {
+                                console.error('[Posts Hook] 本番キャッシュ破棄に失敗しました:', err);
+                            });
                         }
+                    } catch (e) {
+                        console.error('[Posts Hook] 再生成リクエストエラー:', e);
                     }
                 }
                 return doc;
@@ -87,13 +108,29 @@ export const Posts: CollectionConfig = {
         ],
         afterDelete: [
             async ({ doc }) => {
-                if (process.env.PAYLOAD_SYNC_MODE !== 'true') {
-                    const { revalidatePath } = await import('next/cache');
-                    revalidatePath('/blog');
-                    if (doc.slug) {
-                        revalidatePath(`/blog/${doc.slug}`);
-                    }
+                const { revalidatePath } = await import('next/cache');
+                revalidatePath('/blog');
+                if (doc.slug) {
+                    revalidatePath(`/blog/${doc.slug}`);
                 }
+
+                // 本番環境のキャッシュも破棄する
+                try {
+                    const targetUrl = 'https://noe-shiftica.com/api/revalidate';
+                    const secret = process.env.REVALIDATE_SECRET;
+                    if (secret) {
+                        fetch(targetUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ secret, slug: doc.slug })
+                        }).catch(err => {
+                            console.error('[Posts Hook] 本番キャッシュ破棄に失敗しました:', err);
+                        });
+                    }
+                } catch (e) {
+                    console.error('[Posts Hook] 再生成リクエストエラー:', e);
+                }
+
                 return doc;
             }
         ]
