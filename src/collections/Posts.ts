@@ -59,7 +59,15 @@ export const Posts: CollectionConfig = {
         read: () => true,
     },
     hooks: {
-        beforeChange: [populateOgImage],
+        beforeChange: [
+            populateOgImage,
+            async ({ data }) => {
+                if ((data._status === 'published' || data.status === 'published') && !data.publishedAt) {
+                    data.publishedAt = new Date().toISOString();
+                }
+                return data;
+            }
+        ],
         beforeValidate: [
             async ({ data }) => {
                 // Auto-generate slug from title only when slug is empty
