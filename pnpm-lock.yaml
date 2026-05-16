@@ -30,11 +30,11 @@ importers:
         specifier: 3.79.0
         version: 3.79.0(@neondatabase/serverless@0.10.4)(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))
       '@payloadcms/email-resend':
-        specifier: ^3.79.0
-        version: 3.84.1(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))
+        specifier: 3.79.0
+        version: 3.79.0(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))
       '@payloadcms/live-preview-react':
-        specifier: ^3.79.0
-        version: 3.84.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: 3.79.0
+        version: 3.79.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@payloadcms/next':
         specifier: 3.79.0
         version: 3.79.0(@types/react@19.2.14)(graphql@16.14.0)(monaco-editor@0.55.1)(next@16.1.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.99.0))(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
@@ -1535,11 +1535,11 @@ packages:
     peerDependencies:
       payload: 3.79.0
 
-  '@payloadcms/email-resend@3.84.1':
-    resolution: {integrity: sha512-LFbsmcWHHu6Epz5DpA1JN9s+NxPwcluUpC0dqF6gtFpmxQJSQAplLnLuB388pnzsiOMDbWDGsksmni357633QQ==}
+  '@payloadcms/email-resend@3.79.0':
+    resolution: {integrity: sha512-6PHqzQqWJn8wGnCoXzw+GES4i4/h2Vz1lZ90hTFqn73KssFzgPTjqnLbefdYsAtLHWaJ/wLbCRwW8MznUdaf/Q==}
     engines: {node: ^18.20.2 || >=20.9.0}
     peerDependencies:
-      payload: 3.84.1
+      payload: 3.79.0
 
   '@payloadcms/graphql@3.79.0':
     resolution: {integrity: sha512-q/fMw3JnUn+dMp7F4qsvoB5KfcdGjUVpttHI8+2o3+SbwQF2d26fHrz4D5Wz5Sm3ZTQg7XsCZzFKA3a9FL/sAg==}
@@ -1548,14 +1548,14 @@ packages:
       graphql: ^16.8.1
       payload: 3.79.0
 
-  '@payloadcms/live-preview-react@3.84.1':
-    resolution: {integrity: sha512-jKG1llQh0QMwltSaZJ0fDzxj8bdllboQYBlJnv2kYs1HW4ZgIRbVtvtcvOEInooi9yUManjzr/r5GOxTNsLryg==}
+  '@payloadcms/live-preview-react@3.79.0':
+    resolution: {integrity: sha512-1JY/QzfIy6iOijpbdRdnV+TuK0B0vo8nTgH+WkfCWxayXf30FlykWW8sdBc44wn4CxmLry36cEeneqAbrasiWQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.1 || ^19.1.2 || ^19.2.1
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.1 || ^19.1.2 || ^19.2.1
 
-  '@payloadcms/live-preview@3.84.1':
-    resolution: {integrity: sha512-FiimjzLX/nBCXa00EOTm+U1I7PufcNItB023I9eu7ZpxiDNulg6kSBT9A37LJif5C9napaePu4l5vXB/5qSGYg==}
+  '@payloadcms/live-preview@3.79.0':
+    resolution: {integrity: sha512-Y2t6NACgeC4gZV/mwzD1L+OhJHematK0RQ8xK4P/m+8fhO+sgS4gtjpA/m6yqAkhruRTni5izZJK6SWTB9pXPw==}
 
   '@payloadcms/next@3.79.0':
     resolution: {integrity: sha512-I3AZrITgQ6URD0onOHpLiOQeMAQ4mtCIBkUTkoc7n0EScwr4rllprjMTfZnZWSQ0kgCbbPYzxuNFTU3wzf/rsQ==}
@@ -6734,7 +6734,7 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@payloadcms/email-resend@3.84.1(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))':
+  '@payloadcms/email-resend@3.79.0(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))':
     dependencies:
       payload: 3.79.0(graphql@16.14.0)(typescript@5.9.3)
 
@@ -6749,13 +6749,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@payloadcms/live-preview-react@3.84.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@payloadcms/live-preview-react@3.79.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
-      '@payloadcms/live-preview': 3.84.1
+      '@payloadcms/live-preview': 3.79.0
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
-  '@payloadcms/live-preview@3.84.1': {}
+  '@payloadcms/live-preview@3.79.0': {}
 
   '@payloadcms/next@3.79.0(@types/react@19.2.14)(graphql@16.14.0)(monaco-editor@0.55.1)(next@16.1.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.99.0))(payload@3.79.0(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)':
     dependencies:
