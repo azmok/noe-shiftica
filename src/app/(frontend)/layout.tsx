@@ -81,6 +81,14 @@ const notoSansJP = localFont({
   display: "swap",
 });
 
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata = {
   metadataBase: new URL("https://noe-shiftica.com"),
   title: {
