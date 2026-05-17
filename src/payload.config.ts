@@ -30,6 +30,7 @@ import { neonBackupPlugin } from './plugins/neon-backup'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceFeature } from './features/htmlSource/feature.server'
+import { MarkdownCopyFeature } from './features/markdownCopy/server'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -59,6 +60,7 @@ const config = buildConfig({
       FixedToolbarFeature(),
       EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
+      MarkdownCopyFeature(),
       HtmlSourceFeature(),
       HorizontalRuleFeature(),
     ],
