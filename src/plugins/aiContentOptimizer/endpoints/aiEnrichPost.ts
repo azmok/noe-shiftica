@@ -8,13 +8,14 @@ export const aiEnrichPostHandler: PayloadHandler = async (req) => {
         const rawBody = await (req as unknown as Request).text()
         console.log('[AI-ENRICH] Raw body length:', rawBody.length)
 
-        let title: string, content: any, htmlContent: string, testMock: boolean
+        let title: string, content: any, htmlContent: string, testMock: boolean, options: any
         try {
             const parsed: EnrichmentRequest = JSON.parse(rawBody)
             title = parsed.title
             content = parsed.content
             htmlContent = parsed.htmlContent || ''
             testMock = !!parsed.testMock
+            options = parsed.options || {}
         } catch (parseErr) {
             console.error('[AI-ENRICH] Failed to parse request body as JSON:', rawBody.substring(0, 200))
             return Response.json({ error: 'Invalid JSON body', details: String(parseErr) }, { status: 400 })
@@ -53,7 +54,7 @@ export const aiEnrichPostHandler: PayloadHandler = async (req) => {
             }
 
             console.log('[AI-ENRICH] GEMINI_API_KEY present:', !!process.env.GEMINI_API_KEY)
-            result = await enrichPostContent(title, contentStr)
+            result = await enrichPostContent(title, contentStr, options)
         }
 
         // Resolve Categories (names → IDs, create if missing)

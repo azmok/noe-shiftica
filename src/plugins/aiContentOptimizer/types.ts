@@ -15,4 +15,12 @@ export interface EnrichmentRequest {
      * Only respected in non-production environments.
      */
     testMock?: boolean
+    options?: {
+        title?: boolean
+        slug?: boolean
+        description?: boolean
+        categories?: boolean
+        tags?: boolean
+        seo?: boolean
+    }
 }

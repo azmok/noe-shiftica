@@ -36,7 +36,7 @@ export interface EnrichedContent {
     [key: string]: any // Support for unknown fields
 }
 
-export async function enrichPostContent(title: string, content: string): Promise<EnrichedContent> {
+export async function enrichPostContent(title: string, content: string, options: any = {}): Promise<EnrichedContent> {
     console.log(`[AI-ENRICH] Starting enrichment for: "${title}"`)
     
     // Available models (2026-03):
@@ -46,6 +46,58 @@ export async function enrichPostContent(title: string, content: string): Promise
     const genAI = getGenAI()
     const model = genAI.getGenerativeModel({ model: modelName })
 
+    const opts = {
+        title: false,
+        slug: true,
+        description: true,
+        categories: true,
+        tags: true,
+        seo: true,
+        ...options
+    }
+
+    const reqFields: string[] = []
+    const jsonStruct: string[] = []
+
+    let index = 1;
+
+    if (opts.title) {
+        reqFields.push(`${index++}. title: An optimized version of the title if it can be improved, otherwise return the original title.`)
+        jsonStruct.push(`"title": "..."`)
+    } else {
+        jsonStruct.push(`"title": "${title.replace(/"/g, '\\"')}"`)
+    }
+
+    if (opts.description) {
+        reqFields.push(`${index++}. description: A concise summary/description for the blog post (approx 150 characters).`)
+        jsonStruct.push(`"description": "..."`)
+    }
+
+    if (opts.seo) {
+        reqFields.push(`${index++}. seo_title: SEO Title (max 60 characters).`)
+        reqFields.push(`${index++}. seo_description: SEO Description (max 160 characters).`)
+        reqFields.push(`${index++}. og_title: OpenGraph Title.`)
+        reqFields.push(`${index++}. og_image: A suggested image description or URL-ready keyword for the OG image.`)
+        reqFields.push(`${index++}. canonical: A suggested canonical URL suffix (the slug).`)
+        reqFields.push(`${index++}. noindex: Boolean, set to false unless the content is low quality or duplicate.`)
+        jsonStruct.push(`"seo_title": "..."`, `"seo_description": "..."`, `"og_title": "..."`, `"og_image": "..."`, `"canonical": "..."`, `"noindex": false`)
+    }
+
+    if (opts.tags) {
+        reqFields.push(`${index++}. tags: A list of 5-10 relevant tags.`)
+        jsonStruct.push(`"tags": ["...", "..."]`)
+    }
+
+    if (opts.categories) {
+        reqFields.push(`${index++}. categories: A list of 1-3 relevant internal categories (e.g. Technology, Design, Business).`)
+        jsonStruct.push(`"categories": ["...", "..."]`)
+    }
+
+    if (opts.slug) {
+        reqFields.push(`${index++}. slug: An English URL-friendly slug based on the title.`)
+        jsonStruct.push(`"slug": "..."`)
+    }
+
     const prompt = `
     You are an expert SEO and content strategist. 
     Based on the following blog post title and content, generate structured metadata.
@@ -54,30 +106,11 @@ export async function enrichPostContent(title: string, content: string): Promise
     CONTENT: ${content}
     
     Please provide the following in JSON format:
-    1. description: A concise summary/description for the blog post (approx 150 characters).
-    2. seo_title: SEO Title (max 60 characters).
-    3. seo_description: SEO Description (max 160 characters).
-    4. og_title: OpenGraph Title.
-    5. og_image: A suggested image description or URL-ready keyword for the OG image.
-    6. tags: A list of 5-10 relevant tags.
-    7. categories: A list of 1-3 relevant internal categories (e.g. Technology, Design, Business).
-    8. canonical: A suggested canonical URL suffix (the slug).
-    9. noindex: Boolean, set to false unless the content is low quality or duplicate.
-    10. slug: An English URL-friendly slug based on the title.
+    ${reqFields.join('\n    ')}
     
     The response must be a valid JSON object with the following structure:
     {
-      "title": "${title}",
-      "slug": "...",
-      "description": "...",
-      "seo_title": "...",
-      "seo_description": "...",
-      "og_title": "...",
-      "og_image": "...",
-      "tags": ["...", "..."],
-      "categories": ["...", "..."],
-      "canonical": "...",
-      "noindex": false
+      ${jsonStruct.join(',\n      ')}
     }
     
     Response MUST be valid JSON only, no markdown formatting.
