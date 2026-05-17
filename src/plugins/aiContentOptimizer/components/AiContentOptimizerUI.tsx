@@ -6,6 +6,18 @@ import { DRAFT_SAVE_EVENT } from '../../shared/draftStorage'
 
 export const AiContentOptimizerUI: React.FC = () => {
     const [isOptimizing, setIsOptimizing] = useState(false)
+    const [options, setOptions] = useState({
+        title: false,
+        slug: true,
+        description: true,
+        categories: true,
+        tags: true,
+        seo: true,
+    })
+
+    const handleOptionChange = useCallback((key: keyof typeof options) => {
+        setOptions(prev => ({ ...prev, [key]: !prev[key] }))
+    }, [])
 
     const form = useForm()
     const dispatchFields = form?.dispatchFields
@@ -59,7 +71,7 @@ export const AiContentOptimizerUI: React.FC = () => {
             const response = await fetch('/api/ai-enrich-post', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, content, htmlContent }),
+                body: JSON.stringify({ title, content, htmlContent, options }),
             })
 
             if (!response.ok) {
@@ -76,6 +88,15 @@ export const AiContentOptimizerUI: React.FC = () => {
 
                 Object.entries(aiResult).forEach(([key, value]) => {
                     if (key === 'updatedAt') return
+                    
+                    // Filter based on selected options
+                    if (key === 'title' && !options.title) return;
+                    if (key === 'slug' && !options.slug) return;
+                    if (key === 'description' && !options.description) return;
+                    if (key === 'categories' && !options.categories) return;
+                    if (['seo_title', 'seo_description', 'og_title', 'canonical', 'noindex'].includes(key) && !options.seo) return;
+                    if (key === 'tags' && !options.tags) return;
+
                     if (standardFields.includes(key)) {
                         dispatchFields({ type: 'UPDATE', path: key, value })
                     } else {
@@ -102,10 +123,40 @@ export const AiContentOptimizerUI: React.FC = () => {
             setIsOptimizing(false)
             console.groupEnd()
         }
-    }, [fieldTitle?.value, fieldContent?.value, fieldCustomMetaData?.value, fieldHtmlEmbed?.value, dispatchFields, form, id])
+    }, [fieldTitle?.value, fieldContent?.value, fieldCustomMetaData?.value, fieldHtmlEmbed?.value, dispatchFields, form, id, options])
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0 0.5rem 1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <h4 style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#4b5563', margin: '0' }}>生成オプション</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={options.title} onChange={() => handleOptionChange('title')} />
+                        タイトル
+                    </label>
+                    <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={options.slug} onChange={() => handleOptionChange('slug')} />
+                        URLスラッグ
+                    </label>
+                    <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={options.description} onChange={() => handleOptionChange('description')} />
+                        概要
+                    </label>
+                    <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={options.categories} onChange={() => handleOptionChange('categories')} />
+                        カテゴリ自動分類
+                    </label>
+                    <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={options.tags} onChange={() => handleOptionChange('tags')} />
+                        関連タグ生成
+                    </label>
+                    <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={options.seo} onChange={() => handleOptionChange('seo')} />
+                        SEOメタデータ
+                    </label>
+                </div>
+            </div>
+
             <button
                 type="button"
                 onClick={(e) => { e.preventDefault(); handleAiOptimize() }}
