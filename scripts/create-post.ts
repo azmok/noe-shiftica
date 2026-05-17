@@ -7,6 +7,7 @@ async function createTestPost() {
   const payload = await getPayload({ config: configPromise })
   
   try {
+    // @ts-ignore
     const post = await payload.create({
       collection: 'posts',
       data: {
@@ -14,12 +15,14 @@ async function createTestPost() {
         content: {
           root: {
             type: 'root',
+            direction: null,
             format: '',
             indent: 0,
             version: 1,
             children: [
               {
                 type: 'paragraph',
+                direction: null,
                 format: '',
                 indent: 0,
                 version: 1,
