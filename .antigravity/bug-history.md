@@ -271,6 +271,16 @@ Close buttons in separate components; let the primary toggle component own the v
   - The correct pattern is immutable: `console.error("[ISR][/blog] DB query failed — preserving stale cache:", error); throw error;`
   - Consider adding a lint rule or test to prevent silent catch in ISR server components.
 
+### [2026-05-19] Bug: Blog list reverts to build-time snapshot after ~10 min inactivity
+- **Error**: Blog list shows old article titles and missing recent posts ~10 minutes after publish. Local dev always shows correct data.
+- **Root Cause**: `minInstances: 0` in `apphosting.yaml` causes Cloud Run to scale to zero after ~10 minutes of no traffic. New instance boots with the build-time static `.next/` artifact (old snapshot). The ISR-updated in-memory cache is ephemeral and lost on scale-to-zero. Additionally, Neon DB also cold-starts simultaneously, causing ISR background re-renders to fail, making `throw error` preserve the build-time (old) snapshot for even longer.
+- **File(s) Modified**: `src/app/(frontend)/blog/page.tsx`
+- **Fix Summary**: Added `unstable_noStore()` (imported as `noStore`) at the top of `BlogPage()`. This opts the page out of Next.js Full Route Cache entirely, forcing a live DB query on every request. This is safe because: (1) `Cache-Control: no-store` is already set in `next.config.ts` for `/blog`, so no CDN caching is introduced; (2) `getPostsByStatus` uses `@neondatabase/serverless` (HTTP-based, serverless-safe).
+- **Prevention Note**:
+  - With `minInstances: 0`, any ISR cache is ephemeral. Pages that must reflect live CMS data and already have `no-store` HTTP headers should use `unstable_noStore()` rather than relying on ISR + `revalidatePath`.
+  - `unstable_noStore()` is the project-established pattern for opting out of caching without the banned `force-dynamic` keyword (see `preview/page.tsx`).
+  - The `throw error` in the catch block is still correct — if DB fails on a dynamic request, the error propagates to the user (brief error), which is better than persistently serving 10-minute-old data.
+
 ### [2026-05-15] Bug: payload.find returns 0 docs for old/renamed slugs (daily ISR log noise + SEO risk)
 - **Error**: `[ISR][blog/why-rich-and-luxury-websites-are-obsolete] payload.find succeeded but returned 0 docs.` — appearing almost daily in Cloud Run logs.
 - **Root Cause**: Post id=19 had its slug renamed from `why-rich-and-luxury-websites-are-obsolete` to `rich-lavish-websites-outdated-reason`. The old URL remained in the Next.js ISR cache and was being re-crawled daily by Google bots. Each visit triggered an ISR background re-render → `payload.find` found no post with the old slug → `notFound()` → 404 cached. The other 3 failing slugs (`freelancer-vs-noeshiftica-web-production-guide`, `freelancer-website-total-cost`, `why-neo-shiftica-is-affordable-and-fast`) had no records in `posts` OR `_posts_v` — completely stale/deleted routes returning correct 404s.
