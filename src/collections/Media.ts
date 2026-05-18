@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { mediaSizeEndpoints } from './mediaEndpoints'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -8,6 +9,7 @@ export const Media: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => !!user,
   },
+  endpoints: mediaSizeEndpoints,
   fields: [
     {
       // Override the auto-generated filename field's Cell component to use
@@ -29,6 +31,15 @@ export const Media: CollectionConfig = {
       admin: {
         components: {
           Field: '@/components/AltField#AltField',
+        },
+      },
+    },
+    {
+      name: 'sizeManager',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/admin/MediaSizeManager#MediaSizeManager',
         },
       },
     },
