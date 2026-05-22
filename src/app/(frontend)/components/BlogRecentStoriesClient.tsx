@@ -8,9 +8,10 @@ import { GcsImage } from "@/lib/GcsImage";
 
 interface BlogRecentStoriesClientProps {
     recentPosts: any[];
+    basePath?: string;
 }
 
-export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClientProps) {
+export function BlogRecentStoriesClient({ recentPosts, basePath = '/blog' }: BlogRecentStoriesClientProps) {
     const [isMounted, setIsMounted] = useState(false);
     const [randomStyles, setRandomStyles] = useState<{ aspect: string, padL: number, padR: number }[]>([]);
 
@@ -96,7 +97,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                         return (
                             <div key={post.id} style={itemPadding} className="transition-transform duration-500">
                                 <Link
-                                    href={`/blog/${post.slug}`}
+                                    href={`${basePath}/${post.slug}`}
                                     className="group relative flex flex-col items-start gap-[10px] w-full p-6 transition-all"
                                     data-cursor-magnetic="false"
                                 >
@@ -144,7 +145,7 @@ export function BlogRecentStoriesClient({ recentPosts }: BlogRecentStoriesClient
                         return (
                             <div key={post.id} style={itemPadding} className="transition-all duration-300 hover:scale-[1.03]">
                                 <Link
-                                    href={`/blog/${post.slug}`}
+                                    href={`${basePath}/${post.slug}`}
                                     className="group relative block w-full"
                                     data-cursor-magnetic="false"
                                 >

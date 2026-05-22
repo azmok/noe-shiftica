@@ -1,5 +1,6 @@
 import { LogoutButton as LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01 } from '@/app/(frontend)/components/admin/LogoutButton'
 import { AltField as AltField_6a834bc6c814295325f1ce1e5f5525db } from '@/components/AltField'
+import { MediaSizeManager as MediaSizeManager_ab0d14650ff81a45c18f6be92c9e47b9 } from '@/components/admin/MediaSizeManager'
 import { AdminThumbnailCell as AdminThumbnailCell_3490a1c982242567ad9d512442824d85 } from '@/components/AdminThumbnailCell'
 import { AutosaveUI as AutosaveUI_63d35dfcef35fc329a559b1b5887e394 } from '../../../plugins/autosave/AutosaveUI'
 import { AiContentOptimizerUI as AiContentOptimizerUI_f2c91248e42dfb8d1f3e8791833edc72 } from '../../../plugins/aiContentOptimizer/components/AiContentOptimizerUI'
@@ -42,6 +43,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 export const importMap = {
   "@/app/(frontend)/components/admin/LogoutButton#LogoutButton": LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01,
   "@/components/AltField#AltField": AltField_6a834bc6c814295325f1ce1e5f5525db,
+  "@/components/admin/MediaSizeManager#MediaSizeManager": MediaSizeManager_ab0d14650ff81a45c18f6be92c9e47b9,
   "@/components/AdminThumbnailCell#AdminThumbnailCell": AdminThumbnailCell_3490a1c982242567ad9d512442824d85,
   "/plugins/autosave/AutosaveUI#AutosaveUI": AutosaveUI_63d35dfcef35fc329a559b1b5887e394,
   "/plugins/aiContentOptimizer/components/AiContentOptimizerUI#AiContentOptimizerUI": AiContentOptimizerUI_f2c91248e42dfb8d1f3e8791833edc72,

@@ -112,7 +112,7 @@ export const markdownImportPlugin = (): Plugin => {
 
         // Inject UI + beforeValidate hook into Posts
         config.collections = (config.collections || []).map((collection) => {
-            if (collection.slug === 'posts') {
+            if (collection.slug === 'posts' || collection.slug === 'tech-posts') {
                 collection.fields = [
                     {
                         name: 'markdownImportUI',

@@ -3,7 +3,7 @@ import { Plugin } from 'payload'
 export const autosavePlugin = (): Plugin => {
     return (config) => {
         config.collections = (config.collections || []).map((collection) => {
-            if (collection.slug === 'posts') {
+            if (collection.slug === 'posts' || collection.slug === 'tech-posts') {
                 collection.fields = [
                     {
                         name: 'autosaveUI',

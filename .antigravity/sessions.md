@@ -236,3 +236,8 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: Blog list reverted to build-time snapshot after ~10 min inactivity (third occurrence). Root cause: minInstances: 0 causes Cloud Run scale-to-zero; ISR in-memory cache is ephemeral. Fixed by adding unstable_noStore() to BlogPage() - opts out of ISR, forces live DB fetch on every request. Safe because Cache-Control: no-store is already set in next.config.ts for /blog.
 - **Preferences**: unstable_noStore() (not force-dynamic) is the confirmed approach for bypassing ISR. Pattern already used in preview/page.tsx.
 - **Plan Impact**: For minInstances: 0 deployments, never rely on ISR for pages that must reflect live CMS data. Use unstable_noStore() when Cache-Control: no-store is already set on that route.
+
+### [2026-05-22 20:57] Session Summary
+- **Learned/Decided**: Added 	ech-posts Payload collection and /dev/[slug] frontend routes. Existing posts and /blog untouched. Used (frontend) route group instead of separate (tech) to share layout. PostArticle and BlogRecentStoriesClient now accept asePath prop. DB schema applied via direct SQL scripts because payload migrate conflicts with dev-mode pushed schema.
+- **Preferences**: Azuma prefers /dev over /tech for tech blog URL prefix. Sidebar grouping (dmin.group) preferred over custom tab view for Admin UI.
+- **Plan Impact**: Future tech-specific fields (githubUrl, techStack, difficulty) can be added to TechPosts.ts later. Knowledge base entry created at .antigravity/knowledge/backend/logic/tech-blog-collection.md.

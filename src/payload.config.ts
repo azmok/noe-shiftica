@@ -21,6 +21,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
+import { TechPosts } from './collections/TechPosts'
 import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
@@ -53,7 +54,7 @@ const config = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, HtmlFiles],
+  collections: [Users, Media, Categories, Posts, TechPosts, HtmlFiles],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
@@ -89,11 +90,11 @@ const config = buildConfig({
       },
     }),
     markdownImportPlugin(),
-    aiContentOptimizerPlugin(),
+    aiContentOptimizerPlugin({ collections: ['posts', 'tech-posts'] }),
     autosavePlugin(),
 
     neonBackupPlugin({
-      collections: ['posts'],
+      collections: ['posts', 'tech-posts'],
     }),
   ],
 }).catch(e => {
