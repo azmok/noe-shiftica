@@ -281,6 +281,15 @@ export interface Post {
    * 記事公開時にHero Imageから自動生成されます。
    */
   ogImage?: string | null;
+  /**
+   * 過去に使用されていたスラッグの履歴です（自動記録）。
+   */
+  slugHistory?:
+    | {
+        slug: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -327,7 +336,7 @@ export interface TechPost {
   /**
    * URLに使用される識別子です（タイトルから自動生成されます）
    */
-  slug: string;
+  slug?: string | null;
   author?: (number | null) | User;
   publishedAt?: string | null;
   categories?: (number | Category)[] | null;
@@ -365,6 +374,15 @@ export interface TechPost {
    * 記事公開時にHero Imageから自動生成されます。
    */
   ogImage?: string | null;
+  /**
+   * 過去に使用されていたスラッグの履歴です（自動記録）。
+   */
+  slugHistory?:
+    | {
+        slug: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -589,6 +607,12 @@ export interface PostsSelect<T extends boolean = true> {
   customMetaData?: T;
   htmlEmbed?: T;
   ogImage?: T;
+  slugHistory?:
+    | T
+    | {
+        slug?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -610,6 +634,12 @@ export interface TechPostsSelect<T extends boolean = true> {
   customMetaData?: T;
   htmlEmbed?: T;
   ogImage?: T;
+  slugHistory?:
+    | T
+    | {
+        slug?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
