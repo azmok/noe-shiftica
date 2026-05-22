@@ -290,3 +290,9 @@ Close buttons in separate components; let the primary toggle component own the v
   - When a post's slug is changed in PayloadCMS admin, the old URL is NOT automatically redirected. Always add a redirect in `next.config.ts` when renaming a post that may be indexed or linked externally.
   - `revalidatePath` only handles the NEW slug; the old slug cache persists until a visitor/bot triggers ISR re-render (which correctly 404s, but wastes crawl budget).
   - The 3 other failing slugs (no DB records) return 404 correctly — no action needed.
+
+### [2026-05-22 22:05] Bug: duplicate 'post' variable declaration build error in dev/[slug]/page.tsx
+- **Error**: the name \post\ is defined multiple times
+- **Root Cause**: While introducing slug history check, \let post = posts.docs?.[0] || null;\ was defined near the top. However, the original declaration \const post = posts.docs[0];\ near the bottom of the fetch block was left behind, resulting in a duplicate local scope variable definition error during build.
+- **File(s) Modified**: \src/app/(frontend)/dev/[slug]/page.tsx\`n- **Fix Summary**: Deleted the duplicate \const post = posts.docs[0];\ line so that the rest of the component uses the properly checked \post\ variable declared above.
+- **Prevention Note**: Always double-check block-scoped variable declarations when updating fetch flow structures to ensure no stray old assignments remain.
