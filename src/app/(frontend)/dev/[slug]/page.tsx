@@ -184,8 +184,6 @@ export default async function DevPostPage({
         notFound();
     }
 
-    const post = posts.docs[0];
-
     // Fetch Previous and Next posts within tech-posts
     let prevPost = null;
     let nextPost = null;
