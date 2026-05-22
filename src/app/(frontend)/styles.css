@@ -61,8 +61,8 @@
 }
 
 :root {
-  --background: var(--color-background-void);
-  --foreground: #ffffff;
+  --background: var(--color-neu-bg-light);
+  --foreground: #1e293b;
   /* 完全なる白でコントラストを最強に */
 
   /* Colors - Neuromorphic for /blog */
@@ -87,6 +87,11 @@
   --mobile-radius-sm: 10px;
 }
 
+.dark {
+  --background: var(--color-background-void);
+  --foreground: #ffffff;
+}
+
 @theme {
   --font-dm-sans: var(--font-dm-sans);
   --font-dm-serif: var(--font-dm-serif);
@@ -102,6 +107,7 @@ html {
   background: var(--background);
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 html,
@@ -115,6 +121,8 @@ body {
   font-size: 18px;
   margin: 0;
   color: var(--foreground);
+  background: var(--background);
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   @media (max-width: 1024px) {
     font-size: 15px;

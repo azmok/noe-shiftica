@@ -138,6 +138,7 @@ import { MobileMenuButton } from "@/components/MobileMenuButton";
 import GoogleAnalytics from "./components/GoogleAnalytics";
 import { MobileMenuOverlay } from "@/components/MobileMenuOverlay";
 import { HearingResumeWidget } from "@/components/HearingResumeWidget";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
@@ -153,10 +154,28 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <link rel="preconnect" href="https://firebasestorage.googleapis.com" />
         <link rel="preconnect" href="https://storage.googleapis.com" />
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  const theme = savedTheme || 'dark';
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body suppressHydrationWarning className="selection:bg-(--color-neu-primary)/30">
         <GoogleAnalytics />
-        <MobileMenuProvider>
+        <ThemeProvider>
+          <MobileMenuProvider>
           <ProgressBar />
           <JsonLd />
           <CustomCursor />
@@ -167,7 +186,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <MobileBottomNav />
           <MobileMenuButton />
           <HearingResumeWidget />
-        </MobileMenuProvider>
+          </MobileMenuProvider>
+        </ThemeProvider>
 
         {/* 
           GLOBAL FAILSAFE: Force visibility for any images stuck at opacity: 0.

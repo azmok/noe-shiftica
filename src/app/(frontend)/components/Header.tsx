@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronLeft } from "lucide-react";
 import { Button } from "./ui/Button";
 import { useMobileMenu } from "@/context/MobileMenuContext";
+import { ThemeToggle } from "./ThemeToggle";
+import { useTheme } from "@/context/ThemeContext";
 
 interface HeaderProps {
   alwaysBackdrop?: boolean;
@@ -107,8 +109,9 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
 
   const hasBackdrop = alwaysBackdrop || isScrolled;
 
+  const { theme } = useTheme();
   // Hydration safety: use a default src during SSR and switch after mount if needed
-  const logoSrc = isMounted && isBlogPage ? "/assets/NS_logo_Black.png" : "/assets/NS_logo_White.jpg";
+  const logoSrc = isMounted && theme === "light" ? "/assets/NS_logo_Black.png" : "/assets/NS_logo_White.jpg";
 
   return (
     <>
@@ -123,7 +126,7 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
         <div
           className={`absolute inset-0 -z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
           style={{
-            backgroundColor: isBlogPage ? 'rgba(255, 255, 255, 0.05)' : 'rgba(5, 5, 5, 0.1)',
+            backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(5, 5, 5, 0.4)',
             backdropFilter: 'blur(40px) saturate(180%)',
             WebkitBackdropFilter: 'blur(40px) saturate(180%)',
             maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
@@ -150,16 +153,17 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
           )}
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8 md:order-1">
+          <nav className="hidden md:flex items-center gap-6 md:order-1">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-xs rounded-full px-5 py-[11px]"
+                className="text-xs rounded-full px-5 py-[11px] text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors"
               >
                 {link.name}
               </Link>
             ))}
+            <ThemeToggle />
           </nav>
 
           {/* Logo (Mobile & Desktop) */}

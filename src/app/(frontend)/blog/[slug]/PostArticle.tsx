@@ -76,35 +76,35 @@ export const PostArticle: React.FC<{
                     <div className="px-6 pt-6 -mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                         <div className="flex items-center gap-1.5">
                             <span className="text-(--color-neu-primary)">Published</span>
-                            <span className="text-white/80">{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
+                            <span className="text-slate-800/80 dark:text-white/80">{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
                         </div>
 
                         {readingTime > 0 && (
                             <div className="flex items-center gap-1.5">
                                 <span className="text-(--color-neu-primary)">読了目安</span>
-                                <span className="text-white/80">{readingTime}分</span>
+                                <span className="text-slate-800/80 dark:text-white/80">{readingTime}分</span>
                             </div>
                         )}
 
                         <div className="flex items-center gap-1.5">
                             <span className="text-(--color-neu-primary)">Author</span>
-                            <span className="text-white/80">Noe Shiftica</span>
+                            <span className="text-slate-800/80 dark:text-white/80">Noe Shiftica</span>
                         </div>
                     </div>
                     {/* Mobile Article Content */}
                     <div className="px-6 py-10 space-y-10">
                         {/* Key Points / Intro Card */}
-                        <div className="p-6 rounded-(--mobile-radius) bg-white/5 backdrop-blur-sm border border-white/10">
+                        <div className="p-6 rounded-(--mobile-radius) bg-black/5 dark:bg-white/5 backdrop-blur-sm border border-black/10 dark:border-white/10">
                             <h2 className="text-sm font-bold text-(--color-neu-primary) uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-(--color-neu-primary) animate-pulse" />
                                 Key Insights
                             </h2>
-                            <p className="text-sm text-slate-300 leading-relaxed italic">
+                            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic">
                                 {post.description || "この記事の主要なポイントをまとめました。詳細については以下の本文をご覧ください。"}
                             </p>
                         </div>
 
-                        <div className={`prose prose-sm prose-invert max-w-none font-sans ${styles.postContent}`}>
+                        <div className={`prose prose-sm prose-slate dark:prose-invert max-w-none font-sans ${styles.postContent}`}>
 
                             {(() => {
                                 try {
@@ -135,9 +135,9 @@ export const PostArticle: React.FC<{
                             const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
                             if (tags.length === 0) return null;
                             return (
-                                <div className="flex flex-wrap gap-2 pt-8 border-t border-white/10">
+                                <div className="flex flex-wrap gap-2 pt-8 border-t border-black/10 dark:border-white/10">
                                     {tags.map((tag, index) => (
-                                        <span key={index} className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400">
+                                        <span key={index} className="px-4 py-1.5 rounded-full bg-black/5 border border-black/10 dark:bg-white/5 dark:border-white/10 text-[10px] font-bold text-slate-600 dark:text-slate-400">
                                             #{tag}
                                         </span>
                                     ))}
@@ -221,7 +221,7 @@ export const PostArticle: React.FC<{
                                 </div>
 
                                 {/* Metadata Section (Below Hero) */}
-                                <div className="p-8 lg:px-20 lg:py-10 border-b border-white/5 bg-white/5">
+                                <div className="p-8 lg:px-20 lg:py-10 border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center gap-4">
                                             <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-(--color-neu-primary) bg-(--color-neu-primary)/5 px-3 py-1 rounded-sm">
@@ -230,13 +230,13 @@ export const PostArticle: React.FC<{
                                             <div className="flex flex-col gap-1">
                                                 {post.publishedAt && (
                                                     <div className="flex items-center gap-3">
-                                                        <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
+                                                        <span className="text-slate-700 dark:text-white/70 text-[14px] font-normal flex items-center gap-1.5">
                                                             {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                         </span>
                                                         {readingTime > 0 && (
                                                             <>
-                                                                <span className="text-white/30">|</span>
-                                                                <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
+                                                                <span className="text-slate-300 dark:text-white/30">|</span>
+                                                                <span className="text-slate-700 dark:text-white/70 text-[14px] font-normal flex items-center gap-1.5">
                                                                     読了目安: {readingTime}分
                                                                 </span>
                                                             </>
@@ -244,7 +244,7 @@ export const PostArticle: React.FC<{
                                                     </div>
                                                 )}
                                                 {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
-                                                    <span className="text-white/50 text-[12px] font-normal">
+                                                    <span className="text-slate-500 dark:text-white/50 text-[12px] font-normal">
                                                         最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                     </span>
                                                 )}
@@ -253,8 +253,8 @@ export const PostArticle: React.FC<{
                                     </div>
                                 </div>
 
-                                <div className="max-w-[872px] mx-auto w-full px-6 lg:px-12 py-16 lg:py-12 lg:pb-24 text-white">
-                                    <div className={`prose prose-lg prose-invert max-w-none font-sans ${styles.postContent}`}>
+                                <div className="max-w-[872px] mx-auto w-full px-6 lg:px-12 py-16 lg:py-12 lg:pb-24 text-slate-800 dark:text-white">
+                                    <div className={`prose prose-lg prose-slate dark:prose-invert max-w-none font-sans ${styles.postContent}`}>
 
                                         {(() => {
                                             try {
@@ -284,12 +284,12 @@ export const PostArticle: React.FC<{
                                         const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
                                         if (tags.length === 0) return null;
                                         return (
-                                            <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-white/10">
+                                            <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-black/10 dark:border-white/10">
                                                 {tags.map((tag, index) => (
                                                     <Link
                                                         key={index}
                                                         href={`${basePath}/tag/${tag}`}
-                                                        className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[13px] font-medium text-slate-400 hover:text-(--color-neu-primary) hover:border-(--color-neu-primary)/30 transition-all"
+                                                        className="px-4 py-1.5 rounded-full bg-black/5 border border-black/10 dark:bg-white/5 dark:border-white/10 text-[13px] font-medium text-slate-500 dark:text-slate-400 hover:text-(--color-neu-primary) hover:border-(--color-neu-primary)/30 transition-all"
                                                     >
                                                         #{tag}
                                                     </Link>
@@ -305,38 +305,38 @@ export const PostArticle: React.FC<{
                     {/* Navigation */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
                         {prevPost ? (
-                            <Link href={`${basePath}/${prevPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                            <Link href={`${basePath}/${prevPost.slug}`} className="bg-black/5 border border-black/10 dark:bg-white/5 dark:border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                                     Previous
                                 </span>
-                                <h4 className="text-lg font-bold text-white leading-snug line-clamp-2 text-left group-hover:text-(--color-neu-primary) transition-colors">{prevPost.title}</h4>
+                                <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 text-left group-hover:text-(--color-neu-primary) transition-colors">{prevPost.title}</h4>
                             </Link>
                         ) : (
-                            <Link href={basePath} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                            <Link href={basePath} className="bg-black/5 border border-black/10 dark:bg-white/5 dark:border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                                     Back to Journal
                                 </span>
-                                <h4 className="text-lg font-bold text-white leading-snug text-left group-hover:text-(--color-neu-primary) transition-colors">一覧をチェック</h4>
+                                <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug text-left group-hover:text-(--color-neu-primary) transition-colors">一覧をチェック</h4>
                             </Link>
                         )}
 
                         {nextPost ? (
-                            <Link href={`${basePath}/${nextPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                            <Link href={`${basePath}/${nextPost.slug}`} className="bg-black/5 border border-black/10 dark:bg-white/5 dark:border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     Next
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                                 </span>
-                                <h4 className="text-lg font-bold text-white leading-snug line-clamp-2 text-right group-hover:text-(--color-neu-primary) transition-colors">{nextPost.title}</h4>
+                                <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 text-right group-hover:text-(--color-neu-primary) transition-colors">{nextPost.title}</h4>
                             </Link>
                         ) : (
-                            <Link href={basePath} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
+                            <Link href={basePath} className="bg-black/5 border border-black/10 dark:bg-white/5 dark:border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     Back to Journal
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                                 </span>
-                                <h4 className="text-lg font-bold text-white leading-snug text-right group-hover:text-(--color-neu-primary) transition-colors">一覧をチェック</h4>
+                                <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug text-right group-hover:text-(--color-neu-primary) transition-colors">一覧をチェック</h4>
                             </Link>
                         )}
                     </div>

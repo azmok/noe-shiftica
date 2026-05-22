@@ -68,7 +68,7 @@ export default async function DevPostPreviewPage({
     }
 
     return (
-        <div className="md:bg-(--color-neu-bg-light) bg-(--mobile-bg) md:text-slate-900 text-(--mobile-text-primary) min-h-screen flex flex-col font-sans antialiased relative overflow-x-hidden transition-colors duration-500">
+        <div className="min-h-screen flex flex-col font-sans antialiased relative overflow-x-hidden transition-colors duration-500">
             <Header />
             <LivePreview initialPost={post as any} isPreview={true} prevPost={prevPost as any} nextPost={nextPost as any} />
             <Footer variant="blog" />
