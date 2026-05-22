@@ -6,6 +6,7 @@ import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
 import { LivePreview } from "../../../blog/[slug]/LivePreview";
 import { unstable_noStore as noStore } from "next/cache";
+import Script from "next/script";
 
 export default async function DevPostPreviewPage({
     params,
@@ -68,10 +69,60 @@ export default async function DevPostPreviewPage({
     }
 
     return (
-        <div className="md:bg-(--color-neu-bg-light) bg-(--mobile-bg) md:text-slate-900 text-(--mobile-text-primary) min-h-screen flex flex-col font-sans antialiased relative overflow-x-hidden transition-colors duration-500">
+        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-hidden">
+            {/* Premium Depth Background Elements */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                {/* Mesh Gradient Blobs */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-neu-primary/10 blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-neu-primary/5 blur-[100px]" />
+                <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
+                
+                {/* SVG Noise Texture Overlay */}
+                <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
+            </div>
+
             <Header />
             <LivePreview initialPost={post as any} isPreview={true} prevPost={prevPost as any} nextPost={nextPost as any} />
             <Footer variant="blog" />
+
+            {/* SVG Global Filters */}
+            <svg className="hidden">
+                <filter id="noiseFilterDetail">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+                    <feColorMatrix type="saturate" values="0" />
+                </filter>
+            </svg>
+
+            {/* GLOBAL FAILSAFE: Force visibility for any images stuck at opacity: 0 */}
+            <Script
+                id="force-image-visibility-preview-dev"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        (function() {
+                        const forceImages = () => {
+                            document.querySelectorAll('img').forEach(img => {
+                            try {
+                                if (img.closest('.hidden')) return;
+                                const inlineStyle = img.style.opacity;
+                                const computedStyle = window.getComputedStyle(img);
+                                if (inlineStyle === '0' || computedStyle.opacity === '0') {
+                                img.style.setProperty('opacity', '1', 'important');
+                                img.style.setProperty('visibility', 'visible', 'important');
+                                img.classList.add('is-forced-loaded');
+                                }
+                            } catch (e) {}
+                            });
+                        };
+                        forceImages();
+                        window.addEventListener('load', forceImages);
+                        window.addEventListener('pageshow', forceImages);
+                        const interval = setInterval(forceImages, 1000);
+                        setTimeout(() => clearInterval(interval), 8000);
+                        })();
+                    `
+                }}
+            />
         </div>
     );
 }
