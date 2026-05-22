@@ -82,7 +82,7 @@ const MarkdownCopyPlugin = () => {
         editor.getEditorState().read(() => {
           const selection = $getSelection()
           if ($isRangeSelection(selection) && !selection.isCollapsed()) {
-            // Lexicalの標準機能で選択範囲のHTMLを生成
+            // Lexicalの標準機能で選択範囲 of HTMLを生成
             const htmlString = $generateHtmlFromNodes(editor, selection)
             // HTMLをMarkdownに変換
             markdown = simpleHtmlToMarkdown(htmlString)

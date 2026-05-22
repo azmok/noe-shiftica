@@ -27,12 +27,12 @@ import { markdownImportPlugin } from './plugins/markdownImport'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
+import { markdownCopyPlugin } from './plugins/markdownCopyPlugin'
 
 import { neonBackupPlugin } from './plugins/neon-backup'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceFeature } from './features/htmlSource/feature.server'
-import { MarkdownCopyFeature } from './features/markdownCopy/server'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -62,7 +62,6 @@ const config = buildConfig({
       FixedToolbarFeature(),
       EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
-      MarkdownCopyFeature(),
       HtmlSourceFeature(),
       HorizontalRuleFeature(),
     ],
@@ -94,6 +93,7 @@ const config = buildConfig({
     aiContentOptimizerPlugin({ collections: ['posts', 'tech-posts'] }),
     autosavePlugin(),
     slugTrackerPlugin({ collections: ['posts', 'tech-posts'] }),
+    markdownCopyPlugin({ collections: ['posts', 'tech-posts'] }),
 
     neonBackupPlugin({
       collections: ['posts', 'tech-posts'],
