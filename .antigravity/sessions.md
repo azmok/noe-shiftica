@@ -241,3 +241,13 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Learned/Decided**: Added 	ech-posts Payload collection and /dev/[slug] frontend routes. Existing posts and /blog untouched. Used (frontend) route group instead of separate (tech) to share layout. PostArticle and BlogRecentStoriesClient now accept asePath prop. DB schema applied via direct SQL scripts because payload migrate conflicts with dev-mode pushed schema.
 - **Preferences**: Azuma prefers /dev over /tech for tech blog URL prefix. Sidebar grouping (dmin.group) preferred over custom tab view for Admin UI.
 - **Plan Impact**: Future tech-specific fields (githubUrl, techStack, difficulty) can be added to TechPosts.ts later. Knowledge base entry created at .antigravity/knowledge/backend/logic/tech-blog-collection.md.
+
+### [2026-05-22 22:04] Session Summary
+- **Learned/Decided**:
+  - **Slug tracking system (slugTrackerPlugin)**: Created a reusable PayloadCMS plugin at `src/plugins/slugTracker/index.ts` to automatically inject `slugHistory` array field and hook `beforeChange` to capture slug changes.
+  - **301 Redirection**: Implemented 301 redirection logic in dynamic routing pages (`blog/[slug]/page.tsx` and `dev/[slug]/page.tsx`) by querying `slugHistory` when direct slug search yields zero results.
+  - **Type Safety**: Verified that the running dev server successfully regenerated `payload-types.ts` with the new array field.
+- **Preferences**:
+  - The plugin-based approach is preferred for cross-collection functionality.
+- **Plan Impact**:
+  - Standardized the redirect-checking pattern in both dynamic `page.tsx` and `generateMetadata`. Any future post collections should reuse this plugin.
