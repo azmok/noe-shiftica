@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     categories: Category;
     posts: Post;
+    'tech-posts': TechPost;
     'html-files': HtmlFile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -83,6 +84,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'tech-posts': TechPostsSelect<false> | TechPostsSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -313,6 +315,62 @@ export interface HtmlFile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tech-posts".
+ */
+export interface TechPost {
+  id: number;
+  title: string;
+  /**
+   * 記事の概要文。AIによって自動生成することも可能です。
+   */
+  description?: string | null;
+  /**
+   * URLに使用される識別子です（タイトルから自動生成されます）
+   */
+  slug: string;
+  author?: (number | null) | User;
+  publishedAt?: string | null;
+  categories?: (number | Category)[] | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  coverImage?: (number | null) | Media;
+  heroImage?: (number | null) | Media;
+  /**
+   * MarkdownのFrontmatterに含まれる未知のメタデータがここに格納されます
+   */
+  customMetaData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  htmlEmbed?: (number | null) | HtmlFile;
+  /**
+   * 記事公開時にHero Imageから自動生成されます。
+   */
+  ogImage?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -350,6 +408,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'tech-posts';
+        value: number | TechPost;
       } | null)
     | ({
         relationTo: 'html-files';
@@ -515,6 +577,27 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  slug?: T;
+  author?: T;
+  publishedAt?: T;
+  categories?: T;
+  content?: T;
+  coverImage?: T;
+  heroImage?: T;
+  customMetaData?: T;
+  htmlEmbed?: T;
+  ogImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tech-posts_select".
+ */
+export interface TechPostsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   slug?: T;

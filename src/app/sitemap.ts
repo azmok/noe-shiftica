@@ -23,6 +23,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   })
 
+  // Fetch all published tech posts
+  const techPosts = await payload.find({
+    collection: 'tech-posts',
+    where: {
+      _status: {
+        equals: 'published',
+      },
+    },
+    limit: 1000,
+    depth: 0,
+    select: {
+      slug: true,
+      updatedAt: true,
+    },
+  })
+
   const baseUrl = 'https://noe-shiftica.com'
 
   // Static routes
@@ -30,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '',
     '/about',
     '/blog',
+    '/dev',
     '/services',
     '/contact',
     '/privacy',
@@ -50,5 +67,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticRoutes, ...postRoutes]
+  // Dynamic tech post routes
+  const techPostRoutes = techPosts.docs.map((post) => ({
+    url: `${baseUrl}/dev/${post.slug}`,
+    lastModified: new Date(post.updatedAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticRoutes, ...postRoutes, ...techPostRoutes]
 }
+

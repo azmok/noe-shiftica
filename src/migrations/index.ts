@@ -4,6 +4,7 @@ import * as migration_20260307_171744_sync_local_to_prod_schema from './20260307
 import * as migration_20260310_145217_add_customMetaData_field from './20260310_145217_add_customMetaData_field';
 import * as migration_20260310_153133_add_description_field from './20260310_153133_add_description_field';
 import * as migration_20260315_add_media_admin_sizes from './20260315_add_media_admin_sizes';
+import * as migration_20260522_115238_add_tech_posts_collection from './20260522_115238_add_tech_posts_collection';
 
 export const migrations = [
   {
@@ -29,12 +30,16 @@ export const migrations = [
   {
     up: migration_20260310_153133_add_description_field.up,
     down: migration_20260310_153133_add_description_field.down,
-    name: '20260310_153133_add_description_field'
+    name: '20260310_153133_add_description_field',
   },
   {
     up: migration_20260315_add_media_admin_sizes.up,
     down: migration_20260315_add_media_admin_sizes.down,
     name: '20260315_add_media_admin_sizes',
   },
+  {
+    up: migration_20260522_115238_add_tech_posts_collection.up,
+    down: migration_20260522_115238_add_tech_posts_collection.down,
+    name: '20260522_115238_add_tech_posts_collection'
+  },
 ];
-
