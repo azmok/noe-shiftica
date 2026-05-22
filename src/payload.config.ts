@@ -26,6 +26,7 @@ import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
+import { slugTrackerPlugin } from './plugins/slugTracker'
 
 import { neonBackupPlugin } from './plugins/neon-backup'
 
@@ -92,6 +93,7 @@ const config = buildConfig({
     markdownImportPlugin(),
     aiContentOptimizerPlugin({ collections: ['posts', 'tech-posts'] }),
     autosavePlugin(),
+    slugTrackerPlugin({ collections: ['posts', 'tech-posts'] }),
 
     neonBackupPlugin({
       collections: ['posts', 'tech-posts'],

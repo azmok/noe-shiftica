@@ -4,7 +4,7 @@ import Script from "next/script"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PostArticle } from "../../blog/[slug]/PostArticle";
 import { Metadata } from "next";
 
@@ -14,6 +14,7 @@ export async function generateMetadata({
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
     try {
         const payload = await getPayload({ config: configPromise });
 
@@ -21,7 +22,7 @@ export async function generateMetadata({
             collection: "tech-posts",
             where: {
                 slug: {
-                    equals: decodeURIComponent(slug),
+                    equals: decodedSlug,
                 },
             },
             depth: 1,
@@ -29,12 +30,35 @@ export async function generateMetadata({
             overrideAccess: true,
         });
 
-        if (!posts.docs || posts.docs.length === 0) {
+        let post = posts.docs?.[0] || null;
+
+        // Try historical slug check for redirection
+        if (!post) {
+            const redirectPosts = await payload.find({
+                collection: "tech-posts",
+                where: {
+                    'slugHistory.slug': {
+                        equals: decodedSlug,
+                    },
+                },
+                depth: 1,
+                limit: 1,
+                overrideAccess: true,
+            });
+            if (redirectPosts.docs && redirectPosts.docs.length > 0) {
+                const targetPost = redirectPosts.docs[0];
+                if (targetPost.slug) {
+                    redirect(`/dev/${targetPost.slug}`);
+                }
+            }
+        }
+
+        if (!post) {
             return {};
         }
 
-        const post = posts.docs[0];
-        const cmd = (post.customMetaData as Record<string, any>) || {};
+        const postDoc = post;
+        const cmd = (postDoc.customMetaData as Record<string, any>) || {};
 
         const title = cmd.seo_title || cmd.title || post.title;
         const description = cmd.seo_description || cmd.description || "";
@@ -97,6 +121,7 @@ export default async function DevPostPage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
     const payload = await getPayload({ config: configPromise });
 
     const posts = await (async () => {
@@ -105,7 +130,7 @@ export default async function DevPostPage({
                 collection: "tech-posts",
                 where: {
                     slug: {
-                        equals: decodeURIComponent(slug),
+                        equals: decodedSlug,
                     },
                     _status: {
                         equals: 'published',
@@ -122,7 +147,39 @@ export default async function DevPostPage({
         }
     })();
 
-    if (!posts.docs || posts.docs.length === 0) {
+    let post = posts.docs?.[0] || null;
+
+    // Try historical slug check for redirection
+    if (!post) {
+        try {
+            const redirectPosts = await payload.find({
+                collection: "tech-posts",
+                where: {
+                    'slugHistory.slug': {
+                        equals: decodedSlug,
+                    },
+                    _status: {
+                        equals: 'published',
+                    },
+                },
+                depth: 1,
+                limit: 1,
+                overrideAccess: true,
+                draft: false,
+            });
+            if (redirectPosts.docs && redirectPosts.docs.length > 0) {
+                const targetPost = redirectPosts.docs[0];
+                if (targetPost.slug) {
+                    console.log(`[ISR][dev/${slug}] Redirecting to new slug: ${targetPost.slug}`);
+                    redirect(`/dev/${targetPost.slug}`);
+                }
+            }
+        } catch (error) {
+            console.error(`[ISR][dev/${slug}] Error checking redirect history:`, error);
+        }
+    }
+
+    if (!post) {
         console.warn(`[ISR][dev/${slug}] payload.find succeeded but returned 0 docs.`);
         notFound();
     }

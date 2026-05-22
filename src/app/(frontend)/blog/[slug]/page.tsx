@@ -5,7 +5,7 @@ import { BlogFallbackHero } from "../../components/BlogFallbackHero";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { RichText } from '@payloadcms/richtext-lexical/react';
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
@@ -17,6 +17,7 @@ export async function generateMetadata({
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
     try {
         const payload = await getPayload({ config: configPromise });
 
@@ -24,7 +25,7 @@ export async function generateMetadata({
             collection: "posts",
             where: {
                 slug: {
-                    equals: decodeURIComponent(slug),
+                    equals: decodedSlug,
                 },
             },
             depth: 1,
@@ -32,11 +33,33 @@ export async function generateMetadata({
             overrideAccess: true,
         });
 
-        if (!posts.docs || posts.docs.length === 0) {
+        let post = posts.docs?.[0] || null;
+
+        // Try historical slug check for redirection
+        if (!post) {
+            const redirectPosts = await payload.find({
+                collection: "posts",
+                where: {
+                    'slugHistory.slug': {
+                        equals: decodedSlug,
+                    },
+                },
+                depth: 1,
+                limit: 1,
+                overrideAccess: true,
+            });
+            if (redirectPosts.docs && redirectPosts.docs.length > 0) {
+                const targetPost = redirectPosts.docs[0];
+                if (targetPost.slug) {
+                    redirect(`/blog/${targetPost.slug}`);
+                }
+            }
+        }
+
+        if (!post) {
             return {};
         }
 
-        const post = posts.docs[0];
         const cmd = (post.customMetaData as Record<string, any>) || {};
 
         // Prioritize customMetaData for SEO fields
@@ -104,6 +127,7 @@ export default async function BlogPostPage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
     const payload = await getPayload({ config: configPromise });
 
     // Fetch the post matching the slug.
@@ -118,7 +142,7 @@ export default async function BlogPostPage({
                 collection: "posts",
                 where: {
                     slug: {
-                        equals: decodeURIComponent(slug),
+                        equals: decodedSlug,
                     },
                     _status: {
                         equals: 'published',
@@ -135,12 +159,42 @@ export default async function BlogPostPage({
         }
     })();
 
-    if (!posts.docs || posts.docs.length === 0) {
+    let post = posts.docs?.[0] || null;
+
+    // Try historical slug check for redirection
+    if (!post) {
+        try {
+            const redirectPosts = await payload.find({
+                collection: "posts",
+                where: {
+                    'slugHistory.slug': {
+                        equals: decodedSlug,
+                    },
+                    _status: {
+                        equals: 'published',
+                    },
+                },
+                depth: 1,
+                limit: 1,
+                overrideAccess: true,
+                draft: false,
+            });
+            if (redirectPosts.docs && redirectPosts.docs.length > 0) {
+                const targetPost = redirectPosts.docs[0];
+                if (targetPost.slug) {
+                    console.log(`[ISR][blog/${slug}] Redirecting to new slug: ${targetPost.slug}`);
+                    redirect(`/blog/${targetPost.slug}`);
+                }
+            }
+        } catch (error) {
+            console.error(`[ISR][blog/${slug}] Error checking redirect history:`, error);
+        }
+    }
+
+    if (!post) {
         console.warn(`[ISR][blog/${slug}] payload.find succeeded but returned 0 docs. _status may not be 'published', or the post was deleted.`);
         notFound();
     }
-
-    const post = posts.docs[0];
 
     // Fetch Previous and Next posts
     let prevPost = null;

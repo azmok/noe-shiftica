@@ -31,6 +31,7 @@ export const TagField: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Category[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1)
+  const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Fetch all categories for autocomplete on mount
@@ -49,31 +50,38 @@ export const TagField: React.FC = () => {
       return
     }
     const resolved = ids.map((id) => {
-      const found = allCategories.find((c) => c.id === id)
+      const found = allCategories.find((c) => String(c.id) === String(id))
       return found ?? { id, name: id }
     })
     setSelectedCategories(resolved)
   }, [value, allCategories])
 
-  // Update suggestions based on current input
+  // Update suggestions based on current input and focus state
   useEffect(() => {
     const trimmed = inputValue.trim()
+    const currentIds = (value ?? []).map(toId).filter(Boolean) as string[]
+
+    // Filter out already-selected categories
+    const available = allCategories.filter(
+      (c) => !currentIds.includes(String(c.id)),
+    )
+
     if (!trimmed) {
-      setSuggestions([])
-      setShowSuggestions(false)
+      // When focused but no input: show all available categories
+      setSuggestions(available)
+      setShowSuggestions(isFocused && available.length > 0)
       setActiveSuggestionIndex(-1)
       return
     }
-    const currentIds = (value ?? []).map(toId).filter(Boolean) as string[]
-    const filtered = allCategories.filter(
-      (c) =>
-        c.name.toLowerCase().includes(trimmed.toLowerCase()) &&
-        !currentIds.includes(c.id),
+
+    // Filter by input text
+    const filtered = available.filter((c) =>
+      c.name.toLowerCase().includes(trimmed.toLowerCase()),
     )
     setSuggestions(filtered)
-    setShowSuggestions(filtered.length > 0)
+    setShowSuggestions(isFocused && filtered.length > 0)
     setActiveSuggestionIndex(-1)
-  }, [inputValue, allCategories, value])
+  }, [inputValue, allCategories, value, isFocused])
 
   const commitCategory = useCallback(
     async (name: string) => {
@@ -219,7 +227,8 @@ export const TagField: React.FC = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => { setIsFocused(false); setShowSuggestions(false) }, 150)}
           placeholder="カテゴリを入力して Enter"
         />
 
@@ -259,6 +268,57 @@ export const TagField: React.FC = () => {
                 {s.name}
               </li>
             ))}
+            {/* Show "create new" option when input doesn't exactly match any existing category */}
+            {inputValue.trim() && !allCategories.some(
+              (c) => c.name.toLowerCase() === inputValue.trim().toLowerCase()
+            ) && (
+              <li
+                onMouseDown={() => commitCategory(inputValue)}
+                style={{
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  borderTop: suggestions.length > 0 ? '1px solid var(--theme-elevation-200)' : 'none',
+                  color: 'var(--theme-success-500, #22c55e)',
+                  fontWeight: 500,
+                }}
+              >
+                + 「{inputValue.trim()}」を新規作成
+              </li>
+            )}
+          </ul>
+        )}
+
+        {/* Show hint when no suggestions and input is non-empty */}
+        {isFocused && !showSuggestions && inputValue.trim() && (
+          <ul
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: 'var(--theme-bg)',
+              border: '1px solid var(--theme-elevation-200)',
+              borderRadius: '4px',
+              listStyle: 'none',
+              margin: '2px 0 0',
+              padding: '4px 0',
+              zIndex: 100,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}
+          >
+            <li
+              onMouseDown={() => commitCategory(inputValue)}
+              style={{
+                padding: '6px 12px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                color: 'var(--theme-success-500, #22c55e)',
+                fontWeight: 500,
+              }}
+            >
+              + 「{inputValue.trim()}」を新規作成
+            </li>
           </ul>
         )}
       </div>
