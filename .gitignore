@@ -68,3 +68,9 @@ build_error*.json
 build_error*.txt
 logs.json
 lexical-test.json
+
+# Neon CLI config
+.neon
+
+# Secret text files
+secret.txt
