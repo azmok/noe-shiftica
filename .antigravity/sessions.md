@@ -251,3 +251,12 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   - The plugin-based approach is preferred for cross-collection functionality.
 - **Plan Impact**:
   - Standardized the redirect-checking pattern in both dynamic `page.tsx` and `generateMetadata`. Any future post collections should reuse this plugin.
+
+### [2026-05-22 22:16] Session Summary
+- **Learned/Decided**:
+  - Resolved dynamic preview page contrast collision by changing the outer container wrapper's styling from light (md:bg-(--color-neu-bg-light) bg-(--mobile-bg)) to premium dark void (min-h-screen bg-background-void).
+  - Added background mesh gradient blobs, SVG global noise filter, and dynamic image failsafe script to live preview pages to align with production visual quality.
+- **Preferences**:
+  - Keep the preview page design identical to the live production visual state rather than introducing complex theme toggling logic.
+- **Plan Impact**:
+  - Any future custom dynamic preview rendering routes should adopt the same premium dark background wrapper with SVG global filters.
