@@ -22,9 +22,10 @@ async function* executeAntigravityCLI(prompt: string, context: string): AsyncGen
     let exitCode: number | null = null;
 
     try {
-        // Spawn agy CLI with 'vscode-chat' subcommand.
-        // shell: true is critical on Windows to resolve batch wrappers (.cmd/.bat) and PATH alias correctly
-        const child = spawn('agy', ['vscode-chat'], { shell: true });
+        // Spawn agy CLI directly without shell: true to avoid shell process deadlocks.
+        // On Windows, global npm/pnpm commands are wrapped in '.cmd' files, so we invoke 'agy.cmd' directly.
+        const commandName = process.platform === 'win32' ? 'agy.cmd' : 'agy';
+        const child = spawn(commandName, ['vscode-chat']);
 
         child.stdout.on('data', (data) => {
             const text = data.toString();
