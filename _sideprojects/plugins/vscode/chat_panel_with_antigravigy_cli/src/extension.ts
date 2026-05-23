@@ -42,7 +42,7 @@ async function* executeAntigravityCLI(prompt: string, context: string): AsyncGen
         });
 
         child.on('error', (err: any) => {
-            if (err.code === 'ENOENT') {
+            if (err.code === 'ENOENT' || err.code === 'EINVAL') {
                 isCommandNotFound = true;
             } else {
                 error = err;
@@ -89,7 +89,7 @@ async function* executeAntigravityCLI(prompt: string, context: string): AsyncGen
         }
 
     } catch (err: any) {
-        if (err.code === 'ENOENT') {
+        if (err.code === 'ENOENT' || err.code === 'EINVAL') {
             isCommandNotFound = true;
         } else {
             throw err;
