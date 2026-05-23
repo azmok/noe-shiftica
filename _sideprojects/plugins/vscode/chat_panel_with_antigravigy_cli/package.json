@@ -1,0 +1,37 @@
+{
+  "name": "chat-panel-with-antigravity-cli",
+  "displayName": "Anti-Gravity Chat Assistant",
+  "description": "VS Code Chat Participant for the Anti-Gravity CLI",
+  "version": "0.1.0",
+  "publisher": "antigravity",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "antigravity.chatParticipant",
+        "name": "antigravity",
+        "description": "Ask @antigravity for help with your codebase.",
+        "isSticky": true
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "install-types": "pnpm install"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.5"
+  }
+}
