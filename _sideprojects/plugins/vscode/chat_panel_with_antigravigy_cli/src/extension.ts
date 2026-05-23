@@ -23,8 +23,8 @@ async function* executeAntigravityCLI(prompt: string, context: string): AsyncGen
 
     try {
         // Spawn agy CLI directly without shell: true to avoid shell process deadlocks.
-        // On Windows, global npm/pnpm commands are wrapped in '.cmd' files, so we invoke 'agy.cmd' directly.
-        const commandName = process.platform === 'win32' ? 'agy.cmd' : 'agy';
+        // We invoke 'agy' directly which resolves to 'agy.exe' on Windows and 'agy' binary on macOS/Linux.
+        const commandName = 'agy';
         const child = spawn(commandName, ['vscode-chat']);
 
         child.stdout.on('data', (data) => {
