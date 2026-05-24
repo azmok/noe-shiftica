@@ -141,8 +141,73 @@ async function* executeAntigravityCLI(prompt: string, context: string): AsyncGen
     }
 }
 
+function getOrCreateTerminal(): vscode.Terminal {
+    const name = 'Anti-Gravity';
+    const activeTerminal = vscode.window.terminals.find(t => t.name === name);
+    if (activeTerminal) {
+        return activeTerminal;
+    }
+    return vscode.window.createTerminal({ name });
+}
+
 export function activate(context: vscode.ExtensionContext) {
     console.log('Extension "chat-panel-with-antigravity-cli" is now active!');
+
+    // Register sendEditorLinesToTerminal command
+    const sendEditorLinesToTerminalCmd = vscode.commands.registerCommand(
+        'antigravity.sendEditorLinesToTerminal',
+        () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                return;
+            }
+
+            const document = activeEditor.document;
+            const relativePath = vscode.workspace.asRelativePath(document.uri);
+            const selection = activeEditor.selection;
+
+            let lineRange = '';
+            if (selection.isEmpty) {
+                // カーソルのみ（案A）：カーソルがある行番号
+                lineRange = `${selection.start.line + 1}`;
+            } else {
+                // 選択範囲あり（調整ロジック含む）
+                const startLine = selection.start.line + 1;
+                let endLine = selection.end.line + 1;
+                // 最後の行の先頭（文字位置0）まで選択されていて、かつ複数行にまたがる場合は、最後の行を除外
+                if (selection.end.character === 0 && selection.end.line > selection.start.line) {
+                    endLine = selection.end.line;
+                }
+                lineRange = startLine === endLine ? `${startLine}` : `${startLine}-${endLine}`;
+            }
+
+            const textToSend = `${relativePath}:${lineRange}`;
+            const terminal = getOrCreateTerminal();
+            terminal.sendText(textToSend, false);
+            terminal.show(true); // Preserve focus in the editor
+        }
+    );
+
+    // Register sendExplorerPathsToTerminal command
+    const sendExplorerPathsToTerminalCmd = vscode.commands.registerCommand(
+        'antigravity.sendExplorerPathsToTerminal',
+        (selectedUri?: vscode.Uri, allSelectedUris?: vscode.Uri[]) => {
+            const uris = allSelectedUris && allSelectedUris.length > 0
+                ? allSelectedUris
+                : (selectedUri ? [selectedUri] : []);
+
+            if (uris.length === 0) {
+                return;
+            }
+
+            const relativePaths = uris.map(uri => vscode.workspace.asRelativePath(uri));
+            const textToSend = relativePaths.join(' ') + ' '; // 末尾スペースを付与
+
+            const terminal = getOrCreateTerminal();
+            terminal.sendText(textToSend, false);
+            terminal.show(true); // Preserve focus in the explorer viewlet
+        }
+    );
 
     // Register the chat participant '@antigravity'
     const participant = vscode.chat.createChatParticipant(
@@ -199,7 +264,11 @@ export function activate(context: vscode.ExtensionContext) {
     // Set an icon path if available
     participant.iconPath = vscode.Uri.joinPath(context.extensionUri, 'media', 'antigravity-icon.png');
 
-    context.subscriptions.push(participant);
+    context.subscriptions.push(
+        sendEditorLinesToTerminalCmd,
+        sendExplorerPathsToTerminalCmd,
+        participant
+    );
 }
 
 export function deactivate() {}

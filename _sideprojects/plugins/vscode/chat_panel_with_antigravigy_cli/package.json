@@ -21,6 +21,30 @@
         "description": "Ask @antigravity for help with your codebase.",
         "isSticky": true
       }
+    ],
+    "commands": [
+      {
+        "command": "antigravity.sendEditorLinesToTerminal",
+        "title": "Anti-Gravity: Send Editor Lines to Terminal"
+      },
+      {
+        "command": "antigravity.sendExplorerPathsToTerminal",
+        "title": "Anti-Gravity: Send Explorer Paths to Terminal"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "antigravity.sendEditorLinesToTerminal",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "antigravity.sendExplorerPathsToTerminal",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "when": "explorerViewletFocus && !inputFocus"
+      }
     ]
   },
   "scripts": {
