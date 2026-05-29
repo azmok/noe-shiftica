@@ -11,7 +11,7 @@ import {
   $insertNodes,
   $getSelection,
   $isRangeSelection
-} from '@payloadcms/richtext-lexical/lexical'
+} from 'lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
 import { useEffect, useState } from 'react'
