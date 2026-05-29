@@ -6,15 +6,17 @@
  * 変換中のノード情報・パース結果をブラウザコンソールへ出力する。
  */
 
-// Import from Payload's proxy to avoid double-loading node modules which causes node type mismatch errors
+// Import HTML generators from Payload's proxy to avoid node type mismatch
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@payloadcms/richtext-lexical/lexical/html'
+// Import Lexical core functions from Payload's proxy to ensure identical bundle registration
 import {
   $createParagraphNode,
   $getRoot,
   $insertNodes,
+  $parseSerializedNode,
   type LexicalEditor,
   type LexicalNode,
-} from 'lexical'
+} from '@payloadcms/richtext-lexical/lexical'
 
 // ----------------------------------------------------------------
 // Helper: ノード情報をデバッグ用に整形
@@ -111,9 +113,12 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
   // )
 
   try {
+    // 1. DOMParserの型不一致バグ（Nt vs _e）を避けるため、<hr> タグをプレースホルダー段落に置換してパースをバイパス
+    const preprocessedHtml = html.replace(/<hr\b[^>]*\/?>/gi, '<p>__OJE_HR_PLACEHOLDER__</p>')
+
     // ブラウザ DOM パーサーで HTML → DOM
     const parser = new DOMParser()
-    const dom = parser.parseFromString(html, 'text/html')
+    const dom = parser.parseFromString(preprocessedHtml, 'text/html')
 
     // パースエラー検出
     const parseError = dom.querySelector('parsererror')
@@ -152,12 +157,29 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
       // $insertNodes はルート直下に追加する
       root.select()
       $insertNodes(nodes)
-    }
 
-    // 変換後の状態をログ
-    // const resultChildren = root.getChildren()
-    // console.log('[HtmlSource] root after replace, child count:', resultChildren.length)
-    // console.log('[HtmlSource] result tree:', debugNodeTree(root))
+      // 2. 挿入されたノードを走査し、プレースホルダー段落を正規の HorizontalRuleNode へ置換
+      const topNodes = root.getChildren()
+      topNodes.forEach((node) => {
+        if (node.getType() === 'paragraph') {
+          const textContent = node.getTextContent()
+          if (textContent === '__OJE_HR_PLACEHOLDER__') {
+            try {
+              // $parseSerializedNode dynamically maps the 'horizontalrule' type using Payload's active registry,
+              // avoiding any direct class loading mismatches.
+              const hrSerialized = {
+                type: 'horizontalrule',
+                version: 1,
+              }
+              const hrNode = $parseSerializedNode(hrSerialized as any)
+              node.replace(hrNode)
+            } catch (hrErr) {
+              console.error('[HtmlSource] Failed to restore HorizontalRuleNode from placeholder:', hrErr)
+            }
+          }
+        }
+      })
+    }
   } catch (err) {
     console.error('[HtmlSource] htmlToLexical ERROR:', err)
     throw err

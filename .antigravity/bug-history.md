@@ -355,13 +355,15 @@ Close buttons in separate components; let the primary toggle component own the v
 
 ### [2026-05-30 01:50] Bug: HTML Source exit throws "Create node: Type horizontalrule ... does not match registered node"
 - **Error**: Returning from HTML Source Mode to Rich Text Mode throws: `Error: Create node: Type horizontalrule in node Nt does not match registered node _e with the same type` in `htmlToLexical (conversion.ts:133)`.
-- **Root Cause**: The HTML conversion logic imported `$generateNodesFromDOM` directly from `@lexical/html`. However, due to Next.js (Turbopack/Webpack) bundler dependency resolution and multiple `node_modules` symlinks (via pnpm), a second duplicate instance of `lexical` packages got loaded. As a result, the node classes created by `$generateNodesFromDOM` from the duplicate bundle did not match the class references registered on the active editor instance, throwing a strict type mismatch error.
+- **Root Cause**: The HTML conversion logic parsed DOM nodes via Lexical's `$generateNodesFromDOM`. PayloadCMS v3 registers its own custom `HorizontalRuleNode` implementation (inside `@payloadcms/richtext-lexical`'s compilation scope) instead of using the default Lexical HorizontalRuleNode. When `$generateNodesFromDOM` encounters an `<hr>` tag, its hardcoded internal mapping rules attempt to instantiate the default standard HorizontalRuleNode. Since this standard class differs from the custom horizontal rule registered on the editor instance, Lexical throws a strict type/class mismatch error.
 - **File(s) Modified**: `src/plugins/htmlSource/conversion.ts`, `src/plugins/htmlSource/feature.client.tsx`
 - **Fix Summary**:
-  - Replaced the direct `@lexical/html` import with Payload's official proxy export `"@payloadcms/richtext-lexical/lexical/html"`. This guarantees that the exact same lexical generator module instance is shared, resolving the node class type mismatch.
+  - **DOM-level Bypass**: Implemented a regex preprocessor that replaces all `<hr>` tags with simple `<p>__OJE_HR_PLACEHOLDER__</p>` paragraphs before DOMParser runs, preventing `$generateNodesFromDOM` from ever triggering standard HorizontalRuleNode class resolution.
+  - **AST Reconstruction**: After inserting the generated nodes into the Lexical editor, the postprocessor traverses the root nodes, detects the `__OJE_HR_PLACEHOLDER__` paragraph, and dynamically replaces it with a genuine HorizontalRuleNode using the editor's active schema resolution: `$parseSerializedNode({ type: 'horizontalrule', version: 1 })`.
   - Commented out verbose console logs and console groups in `conversion.ts` and `feature.client.tsx` to clean up output noise while retaining them for future developer debugging.
 - **Prevention Note**:
-  - In Payload CMS Lexical plugin environments, **never import standard `@lexical/...` packages directly** if Payload provides a proxied export (`@payloadcms/richtext-lexical/lexical/*`). Direct imports lead to duplicate package bundles in Next.js, causing runtime node type mismatches.
-  - Proxy Mapping Reference: Use `@payloadcms/richtext-lexical/lexical/html` for html generators, and `@payloadcms/richtext-lexical/lexical` for core Lexical functions if duplicate loading issues occur.
+  - Standard Lexical HTML generator mapping rules (`$generateNodesFromDOM`) are rigid. If a CMS/framework registers a custom implementation of a default block (such as HorizontalRule), parsing DOM representations directly will trigger type mismatch errors.
+  - To solve this, **always bypass DOM-level generation of conflicting native nodes** by converting them into plain placeholders, then restore them securely via `$parseSerializedNode` using the editor's runtime schema registry.
+
 
 
