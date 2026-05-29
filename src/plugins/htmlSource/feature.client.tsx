@@ -46,19 +46,19 @@ function HtmlSourceToolbarItem() {
     const nextMode = !isSourceMode
     if (nextMode) {
       // Rich → Source
-      console.group('[HtmlSource] ══ Toolbar toggle → SOURCE ══')
+      // console.group('[HtmlSource] ══ Toolbar toggle → SOURCE ══')
       const html = lexicalToHtml(editor)
       window.dispatchEvent(
         new CustomEvent('htmlsource:enter', { detail: { html } }),
       )
-      console.log('[HtmlSource] dispatched htmlsource:enter')
-      console.groupEnd()
+      // console.log('[HtmlSource] dispatched htmlsource:enter')
+      // console.groupEnd()
     } else {
       // Source → Rich
-      console.group('[HtmlSource] ══ Toolbar toggle → RICH TEXT ══')
+      // console.group('[HtmlSource] ══ Toolbar toggle → RICH TEXT ══')
       window.dispatchEvent(new CustomEvent('htmlsource:exit'))
-      console.log('[HtmlSource] dispatched htmlsource:exit')
-      console.groupEnd()
+      // console.log('[HtmlSource] dispatched htmlsource:exit')
+      // console.groupEnd()
     }
     setIsSourceMode(nextMode)
   }, [editor, isSourceMode])
@@ -89,7 +89,7 @@ function HtmlSourceOverlayPlugin() {
     }
 
     function onExit() {
-      console.group('[HtmlSource] ══ overlayPlugin onExit ══')
+      // console.group('[HtmlSource] ══ overlayPlugin onExit ══')
       setParseError(null)
       try {
         editor.update(() => {
@@ -97,13 +97,13 @@ function HtmlSourceOverlayPlugin() {
         })
         setIsSourceMode(false)
         window.dispatchEvent(new CustomEvent('htmlsource:sync', { detail: { active: false } }))
-        console.log('[HtmlSource] editor state replaced successfully')
+        // console.log('[HtmlSource] editor state replaced successfully')
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
         console.error('[HtmlSource] re-parse failed:', err)
         setParseError(msg)
       }
-      console.groupEnd()
+      // console.groupEnd()
     }
 
     window.addEventListener('htmlsource:enter', onEnter as EventListener)

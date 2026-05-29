@@ -6,7 +6,8 @@
  * 変換中のノード情報・パース結果をブラウザコンソールへ出力する。
  */
 
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html'
+// Import from Payload's proxy to avoid double-loading node modules which causes node type mismatch errors
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@payloadcms/richtext-lexical/lexical/html'
 import {
   $createParagraphNode,
   $getRoot,
@@ -58,36 +59,36 @@ export function lexicalToHtml(editor: LexicalEditor): string {
   let html = ''
 
   editor.getEditorState().read(() => {
-    console.group('[HtmlSource] ▶ lexicalToHtml')
+    // console.group('[HtmlSource] ▶ lexicalToHtml')
 
     try {
       const root = $getRoot()
       const topNodes = root.getChildren()
 
-      console.log('[HtmlSource] root child count:', topNodes.length)
-      console.log(
-        '[HtmlSource] node tree:',
-        debugNodeTree(root),
-      )
+      // console.log('[HtmlSource] root child count:', topNodes.length)
+      // console.log(
+      //   '[HtmlSource] node tree:',
+      //   debugNodeTree(root),
+      // )
 
-      topNodes.forEach((node, i) => {
-        console.group(`[HtmlSource]   node[${i}] type="${node.getType()}"`)
-        console.log(debugNodeInfo(node))
-        console.groupEnd()
-      })
+      // topNodes.forEach((node, i) => {
+      //   console.group(`[HtmlSource]   node[${i}] type="${node.getType()}"`)
+      //   console.log(debugNodeInfo(node))
+      //   console.groupEnd()
+      // })
 
       html = $generateHtmlFromNodes(editor)
 
-      console.log('[HtmlSource] generated HTML length:', html.length)
-      console.log(
-        '[HtmlSource] HTML preview:',
-        html.length > 500 ? html.slice(0, 500) + '…' : html,
-      )
+      // console.log('[HtmlSource] generated HTML length:', html.length)
+      // console.log(
+      //   '[HtmlSource] HTML preview:',
+      //   html.length > 500 ? html.slice(0, 500) + '…' : html,
+      // )
     } catch (err) {
       console.error('[HtmlSource] lexicalToHtml ERROR:', err)
     }
 
-    console.groupEnd()
+    // console.groupEnd()
   })
 
   return html
@@ -102,12 +103,12 @@ export function lexicalToHtml(editor: LexicalEditor): string {
  * editor.update() スコープ内で呼び出すこと。
  */
 export function htmlToLexical(editor: LexicalEditor, html: string): void {
-  console.group('[HtmlSource] ▶ htmlToLexical')
-  console.log('[HtmlSource] input HTML length:', html.length)
-  console.log(
-    '[HtmlSource] HTML preview:',
-    html.length > 500 ? html.slice(0, 500) + '…' : html,
-  )
+  // console.group('[HtmlSource] ▶ htmlToLexical')
+  // console.log('[HtmlSource] input HTML length:', html.length)
+  // console.log(
+  //   '[HtmlSource] HTML preview:',
+  //   html.length > 500 ? html.slice(0, 500) + '…' : html,
+  // )
 
   try {
     // ブラウザ DOM パーサーで HTML → DOM
@@ -120,25 +121,25 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
       console.warn('[HtmlSource] DOMParser reported error:', parseError.textContent)
     }
 
-    console.group('[HtmlSource] parsed DOM body children')
-    Array.from(dom.body.childNodes).forEach((child, i) => {
-      console.log(
-        `  [${i}] nodeName="${child.nodeName}" nodeType=${child.nodeType}`,
-        child instanceof Element ? child.outerHTML.slice(0, 120) : child.textContent,
-      )
-    })
-    console.groupEnd()
+    // console.group('[HtmlSource] parsed DOM body children')
+    // Array.from(dom.body.childNodes).forEach((child, i) => {
+    //   console.log(
+    //     `  [${i}] nodeName="${child.nodeName}" nodeType=${child.nodeType}`,
+    //     child instanceof Element ? child.outerHTML.slice(0, 120) : child.textContent,
+    //   )
+    // })
+    // console.groupEnd()
 
-    // Lexical ノードへ変換
+    // Lexical ノードへ変換 (Using shared proxy generator to prevent mismatch error)
     const nodes: LexicalNode[] = $generateNodesFromDOM(editor, dom)
 
-    console.log('[HtmlSource] generated Lexical nodes count:', nodes.length)
-    nodes.forEach((node, i) => {
-      console.log(
-        `[HtmlSource]   nodes[${i}]:`,
-        debugNodeInfo(node),
-      )
-    })
+    // console.log('[HtmlSource] generated Lexical nodes count:', nodes.length)
+    // nodes.forEach((node, i) => {
+    //   console.log(
+    //     `[HtmlSource]   nodes[${i}]:`,
+    //     debugNodeInfo(node),
+    //   )
+    // })
 
     // ルートをクリアして新しいノードを挿入
     const root = $getRoot()
@@ -154,13 +155,13 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
     }
 
     // 変換後の状態をログ
-    const resultChildren = root.getChildren()
-    console.log('[HtmlSource] root after replace, child count:', resultChildren.length)
-    console.log('[HtmlSource] result tree:', debugNodeTree(root))
+    // const resultChildren = root.getChildren()
+    // console.log('[HtmlSource] root after replace, child count:', resultChildren.length)
+    // console.log('[HtmlSource] result tree:', debugNodeTree(root))
   } catch (err) {
     console.error('[HtmlSource] htmlToLexical ERROR:', err)
     throw err
   }
 
-  console.groupEnd()
+  // console.groupEnd()
 }

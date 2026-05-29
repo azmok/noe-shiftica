@@ -353,3 +353,15 @@ Close buttons in separate components; let the primary toggle component own the v
   - Always register custom toolbar buttons using the official `toolbarFixed` or `toolbarInline` schemas to avoid layout/overflow issues with direct DOM portals.
   - When programmatically inserting custom Blocks from toolbar buttons or plugins, **do NOT manually parse serialized JSON block nodes**. Always dispatch `INSERT_BLOCK_COMMAND` (specifically, `const INSERT_BLOCK_COMMAND = createCommand<any>('INSERT_BLOCK_COMMAND')`) with `{ blockType, ...fields }` to leverage Payload's native block insertion orchestration.
 
+### [2026-05-30 01:50] Bug: HTML Source exit throws "Create node: Type horizontalrule ... does not match registered node"
+- **Error**: Returning from HTML Source Mode to Rich Text Mode throws: `Error: Create node: Type horizontalrule in node Nt does not match registered node _e with the same type` in `htmlToLexical (conversion.ts:133)`.
+- **Root Cause**: The HTML conversion logic imported `$generateNodesFromDOM` directly from `@lexical/html`. However, due to Next.js (Turbopack/Webpack) bundler dependency resolution and multiple `node_modules` symlinks (via pnpm), a second duplicate instance of `lexical` packages got loaded. As a result, the node classes created by `$generateNodesFromDOM` from the duplicate bundle did not match the class references registered on the active editor instance, throwing a strict type mismatch error.
+- **File(s) Modified**: `src/plugins/htmlSource/conversion.ts`, `src/plugins/htmlSource/feature.client.tsx`
+- **Fix Summary**:
+  - Replaced the direct `@lexical/html` import with Payload's official proxy export `"@payloadcms/richtext-lexical/lexical/html"`. This guarantees that the exact same lexical generator module instance is shared, resolving the node class type mismatch.
+  - Commented out verbose console logs and console groups in `conversion.ts` and `feature.client.tsx` to clean up output noise while retaining them for future developer debugging.
+- **Prevention Note**:
+  - In Payload CMS Lexical plugin environments, **never import standard `@lexical/...` packages directly** if Payload provides a proxied export (`@payloadcms/richtext-lexical/lexical/*`). Direct imports lead to duplicate package bundles in Next.js, causing runtime node type mismatches.
+  - Proxy Mapping Reference: Use `@payloadcms/richtext-lexical/lexical/html` for html generators, and `@payloadcms/richtext-lexical/lexical` for core Lexical functions if duplicate loading issues occur.
+
+
