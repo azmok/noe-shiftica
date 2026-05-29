@@ -8,9 +8,10 @@ import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { createHeadlessEditor } from '@lexical/headless'
-import { $getRoot, $parseSerializedNode, $insertNodes } from 'lexical'
+import { $getRoot, $parseSerializedNode, $insertNodes, $getSelection, $isRangeSelection } from 'lexical'
 
 const DEBUG = false // ★ DEBUG FLAG — set to false when done debugging
+
 
 /**
  * Sanitize clipboard text for reliable markdown table parsing.
@@ -260,6 +261,17 @@ function MonacoCodeToolbarItem() {
 
     const handleInsertMonacoCode = () => {
         console.warn("[MarkdownPaste Debug] Toolbar Monaco insertion button CLICKED!");
+        
+        // Read active and previous selection state under reader scope for diagnostics
+        editor.getEditorState().read(() => {
+            const selection = $getSelection();
+            console.warn('[MarkdownPaste Debug] Selection inside click handler:', selection ? {
+                type: selection.constructor.name,
+                isRange: $isRangeSelection(selection),
+                nodesCount: (selection as any).getNodes ? (selection as any).getNodes().length : 0
+            } : 'null');
+        });
+
         const uniqueId = `code-block-id-${Math.random().toString(36).substr(2, 9)}`;
         try {
             editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
@@ -278,6 +290,10 @@ function MonacoCodeToolbarItem() {
         <button
             type="button"
             onClick={handleInsertMonacoCode}
+            onMouseDown={(e) => {
+                // Prevent focus moving from editor to the button, preserving Lexical selection state
+                e.preventDefault();
+            }}
             className="toolbar-popup__button"
             style={{
                 display: 'inline-flex',
