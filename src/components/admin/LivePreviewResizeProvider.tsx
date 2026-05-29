@@ -45,7 +45,7 @@ export function LivePreviewResizeProvider({ children }: { children: React.ReactN
         let splitParent: HTMLElement | null = null
 
         while (current && current !== document.body) {
-          const parent = current.parentElement
+          const parent: HTMLElement | null = current.parentElement
           if (!parent) break
 
           const siblings = Array.from(parent.children) as HTMLElement[]
