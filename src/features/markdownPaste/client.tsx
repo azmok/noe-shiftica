@@ -276,7 +276,7 @@ function MonacoCodeToolbarItem() {
             } : 'null');
         });
 
-        // Insert custom code-block Lexical node securely using proxied $parseSerializedNode
+        // Insert custom code-block Lexical node securely using dynamic Klass lookup
         editor.update(() => {
             const uniqueId = `code-block-id-${Math.random().toString(36).substr(2, 9)}`;
             const blockNode = {
@@ -291,12 +291,27 @@ function MonacoCodeToolbarItem() {
                 }
             };
             try {
-                // By using the identical proxied Lexical bundle from Payload, this 'block' type will now safely resolve!
-                const parsedNode = $parseSerializedNode(blockNode as any);
+                // Dynamic lookup of registered 'block' node to bypass module registry duplication mismatch
+                const nodesMap = (editor as any)._nodes;
+                const blockConfig = nodesMap ? nodesMap.get('block') : null;
+                
+                if (!blockConfig || !blockConfig.klass) {
+                    throw new Error("Registered 'block' node configuration not found in editor context.");
+                }
+                
+                const BlockKlass = blockConfig.klass;
+                // Safely create node instance under the editor's own registry context
+                const parsedNode = BlockKlass.importJSON(blockNode as any);
+                
                 $insertNodes([parsedNode]);
-                console.warn('[MarkdownPaste Debug] Successfully inserted Monaco Code Block node into Lexical AST');
+                console.warn('[MarkdownPaste Debug] Successfully inserted Monaco Code Block node into Lexical AST via dynamic lookup');
             } catch (err) {
                 console.error('[MarkdownPaste Debug] Failed to insert Monaco Code Block node:', err);
+                
+                // Fallback diagnostics trace
+                console.warn('[MarkdownPaste Debug] Registered editor nodes map keys:', 
+                    (editor as any)._nodes ? Array.from((editor as any)._nodes.keys()) : 'undefined'
+                );
             }
         });
     };
