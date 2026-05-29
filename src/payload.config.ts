@@ -7,7 +7,8 @@ import {
   ItalicFeature,
   ParagraphFeature,
   EXPERIMENTAL_TableFeature,
-  HorizontalRuleFeature
+  HorizontalRuleFeature,
+  BlocksFeature,
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -33,6 +34,7 @@ import { neonBackupPlugin } from './plugins/neon-backup'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceFeature } from './features/htmlSource/feature.server'
+import { CustomCodeBlock } from '@/features/customCodeBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -46,7 +48,10 @@ const config = buildConfig({
     },
     components: {
       // Client-side image compression before upload + progress bar overlay
-      providers: ['@/components/admin/ImageCompressionProvider#ImageCompressionProvider'],
+      providers: [
+        '@/components/admin/ImageCompressionProvider#ImageCompressionProvider',
+        '@/components/admin/LivePreviewResizeProvider#LivePreviewResizeProvider',
+      ],
     },
   },
   // Email transport via Resend — required for "Forgot Password" to actually send
@@ -64,6 +69,9 @@ const config = buildConfig({
       MarkdownPasteFeature(),
       HtmlSourceFeature(),
       HorizontalRuleFeature(),
+      BlocksFeature({
+        blocks: [CustomCodeBlock],
+      }),
     ],
   }),
   secret: process.env.PAYLOAD_SECRET || 'dummy-secret-key-for-build-bypass-only-xxx',
