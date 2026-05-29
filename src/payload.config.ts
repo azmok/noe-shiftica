@@ -33,25 +33,29 @@ import { markdownCopyPlugin } from './plugins/markdownCopyPlugin'
 import { neonBackupPlugin } from './plugins/neon-backup'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
-import { HtmlSourceFeature } from './features/htmlSource/feature.server'
+import { HtmlSourceFeature } from './plugins/htmlSource/feature.server'
 import { CustomCodeBlock } from '@/features/customCodeBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const config = buildConfig({
+const configPromise = buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'https://noe-shiftica.com' : 'http://localhost:3000'),
   admin: {
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+      // BlocksFeature's ClientFeature is not auto-detected by generate:importmap (Payload v3 limitation).
+      // Self-deleting: adds BlocksFeatureClient, then sets generators=[] so HMR reload requests
+      // see an empty (serializable) array instead of a function.
+      generators: [({ addToImportMap, config: cfg }: { addToImportMap: (c: string) => void; config: any }) => {
+        addToImportMap('@payloadcms/richtext-lexical/client#BlocksFeatureClient')
+        if (cfg?.admin?.importMap) cfg.admin.importMap.generators = []
+      }],
     },
     components: {
       // Client-side image compression before upload + progress bar overlay
-      providers: [
-        '@/components/admin/ImageCompressionProvider#ImageCompressionProvider',
-        '@/components/admin/LivePreviewResizeProvider#LivePreviewResizeProvider',
-      ],
+      providers: ['@/components/admin/ImageCompressionProvider#ImageCompressionProvider'],
     },
   },
   // Email transport via Resend — required for "Forgot Password" to actually send
@@ -83,6 +87,16 @@ const config = buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
+  // Payload v3.79.0 bug workaround: createClientConfig passes admin.importMap (including generators
+  // functions) to RootProvider (Client Component), causing a serialization error on initial page load.
+  // generateImportMap runs in reload() (HMR) but NOT in init() (initial startup). So on initial
+  // startup, generators are never self-deleted. This onInit hook deletes them before any request
+  // reaches createClientConfig. Self-deletion in the generator handles the HMR reload case.
+  onInit: async (payload) => {
+    if (payload.config?.admin?.importMap) {
+      delete (payload.config.admin.importMap as any).generators
+    }
+  },
   sharp,
   plugins: [
     gcsStorage({
@@ -107,6 +121,15 @@ const config = buildConfig({
       collections: ['posts', 'tech-posts'],
     }),
   ],
+});
+
+// Safely delete non-serializable generators function from the resolved config
+// to prevent Next.js React Server Component serialization errors during HMR/runtime.
+const config = configPromise.then((resolvedConfig) => {
+  if (resolvedConfig.admin?.importMap) {
+    delete (resolvedConfig.admin.importMap as any).generators;
+  }
+  return resolvedConfig;
 }).catch(e => {
   console.error("PAYLOAD CONFIG ERROR:", e);
   throw e;

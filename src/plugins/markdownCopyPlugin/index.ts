@@ -6,7 +6,7 @@ import {
   HorizontalRuleFeature
 } from '@payloadcms/richtext-lexical'
 import { MarkdownPasteFeature } from '../../features/markdownPaste/server'
-import { HtmlSourceFeature } from '../../features/htmlSource/feature.server'
+import { HtmlSourceFeature } from '../htmlSource/feature.server'
 import { MarkdownCopyFeature } from './feature.server'
 
 export const markdownCopyPlugin = (options?: { collections?: string[] }): Plugin => {

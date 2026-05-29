@@ -10,7 +10,7 @@ import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { HtmlSourceFeatureClient as HtmlSourceFeatureClient_3dea9242708522dac28f27ffe65a1915 } from '@/features/htmlSource/feature.client'
+import { HtmlSourceFeatureClient as HtmlSourceFeatureClient_8e2fe0c1a0025f8dbaff7f3d20552155 } from '@/plugins/htmlSource/feature.client'
 import { MarkdownCopyClientFeature as MarkdownCopyClientFeature_fa5475dee06233db757e2756eee93991 } from '@/plugins/markdownCopyPlugin/client'
 import { MarkdownPasteClientFeature as MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226 } from '@/features/markdownPaste/client'
 import { TableFeatureClient as TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -53,7 +53,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@/features/htmlSource/feature.client#HtmlSourceFeatureClient": HtmlSourceFeatureClient_3dea9242708522dac28f27ffe65a1915,
+  "@/plugins/htmlSource/feature.client#HtmlSourceFeatureClient": HtmlSourceFeatureClient_8e2fe0c1a0025f8dbaff7f3d20552155,
   "@/plugins/markdownCopyPlugin/client#MarkdownCopyClientFeature": MarkdownCopyClientFeature_fa5475dee06233db757e2756eee93991,
   "@/features/markdownPaste/client#MarkdownPasteClientFeature": MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226,
   "@payloadcms/richtext-lexical/client#TableFeatureClient": TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
