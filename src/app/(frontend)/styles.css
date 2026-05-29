@@ -357,5 +357,13 @@ footer li a{
 }
 
 ul.list-bullet {
-  line-height: 1;
+  line-height: 2;
+}
+
+/* Custom Inline Code resets to prevent backslash escapes (Turbopack + Tailwind Typography clash) */
+code::before,
+code::after,
+.prose code::before,
+.prose code::after {
+  content: "" !important;
 }

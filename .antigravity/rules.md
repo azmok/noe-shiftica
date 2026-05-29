@@ -249,3 +249,12 @@ neonctl branches create --name test/integration --parent production
 ### 11-D. When in Doubt About Placement
 - A feature that touches both backend and frontend → place the file in the layer where the **core logic resides**, and add a cross-reference note at the top of the file pointing to the other layer.
 - If truly ambiguous, ask Azuma before writing.
+
+## 12. Nested Subproject Auto-Initialization (Safety Guard)
+
+If you (Oje) are started in a nested subdirectory (e.g., a subproject or a plugin folder under `_sideprojects/`) that does not yet have its own `.antigravity` directory:
+1. **Detect Context**: Recognize that the current workspace is a subproject and that it lacks a dedicated local `.antigravity` directory.
+2. **Auto-Initialize**: Automatically create a local `.antigravity/` directory inside that subproject.
+3. **Inherit & Slim Rules**: Initialize a new local `rules.md` inside the subproject by inheriting relevant project rules (such as Persona, primary shell, and surgical edit scope) while dropping irrelevant global rules (like Neon DB, PayloadCMS, and Firebase Storage constraints) to save token usage and prevent context contamination.
+4. **Initialize Session**: Create a blank or context-appropriate `sessions.md` to begin tracking that subproject's session history locally.
+5. **Notify User**: Proactively inform Azuma that you have automatically initialized the `.antigravity` directory for the subproject.

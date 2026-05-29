@@ -2,16 +2,23 @@
 
 import { createClientFeature } from '@payloadcms/richtext-lexical/client'
 import { $convertFromMarkdownString } from '@lexical/markdown'
-import { COMMAND_PRIORITY_LOW, PASTE_COMMAND, createCommand } from 'lexical'
+// Import Lexical functions from Payload's proxy to avoid webpack bundle duplicate registration issues
+import {
+  COMMAND_PRIORITY_LOW,
+  PASTE_COMMAND,
+  $getRoot,
+  $parseSerializedNode,
+  $insertNodes,
+  $getSelection,
+  $isRangeSelection
+} from '@payloadcms/richtext-lexical/lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { createHeadlessEditor } from '@lexical/headless'
-import { $getRoot, $parseSerializedNode, $insertNodes, $getSelection, $isRangeSelection } from 'lexical'
 
 const DEBUG = false // ★ DEBUG FLAG — set to false when done debugging
-
 
 /**
  * Sanitize clipboard text for reliable markdown table parsing.
@@ -252,10 +259,7 @@ const MarkdownPastePlugin = () => {
     return null
 }
 
-// Payload CMS richtext-lexical's internal Blocks feature registers a handler for this command
-const INSERT_BLOCK_COMMAND = createCommand<any>('INSERT_BLOCK_COMMAND');
-
-// 1. Monaco Code Block Toolbar Item component (Official Payload Lexical design)
+// Monaco Code Block Toolbar Item component (Official Payload Lexical design)
 function MonacoCodeToolbarItem() {
     const [editor] = useLexicalComposerContext()
 
@@ -272,18 +276,29 @@ function MonacoCodeToolbarItem() {
             } : 'null');
         });
 
-        const uniqueId = `code-block-id-${Math.random().toString(36).substr(2, 9)}`;
-        try {
-            editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
-                blockType: 'code-block',
-                id: uniqueId,
-                language: 'javascript',
-                code: '// ここにコードを入力してください'
-            });
-            console.warn('[MarkdownPaste Debug] Dispatched INSERT_BLOCK_COMMAND for Monaco Code Block');
-        } catch (err) {
-            console.error('[MarkdownPaste Debug] Failed to dispatch INSERT_BLOCK_COMMAND:', err);
-        }
+        // Insert custom code-block Lexical node securely using proxied $parseSerializedNode
+        editor.update(() => {
+            const uniqueId = `code-block-id-${Math.random().toString(36).substr(2, 9)}`;
+            const blockNode = {
+                format: '',
+                type: 'block',
+                version: 2,
+                fields: {
+                    blockType: 'code-block',
+                    id: uniqueId,
+                    language: 'javascript',
+                    code: '// ここにコードを入力してください'
+                }
+            };
+            try {
+                // By using the identical proxied Lexical bundle from Payload, this 'block' type will now safely resolve!
+                const parsedNode = $parseSerializedNode(blockNode as any);
+                $insertNodes([parsedNode]);
+                console.warn('[MarkdownPaste Debug] Successfully inserted Monaco Code Block node into Lexical AST');
+            } catch (err) {
+                console.error('[MarkdownPaste Debug] Failed to insert Monaco Code Block node:', err);
+            }
+        });
     };
 
     return (

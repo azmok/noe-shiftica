@@ -119,6 +119,194 @@ export function ImageCompressionProvider({ children }: { children: React.ReactNo
     }
   }, [])
 
+  // --- Live Preview drag-and-drop resize logic ---
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    let resizerInstance: HTMLDivElement | null = null
+    let activeIframe: HTMLIFrameElement | null = null
+    let lastWidth: string | null = null
+
+    const updateResizer = () => {
+      const iframe = document.querySelector('iframe')
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches
+
+      if (iframe && isLandscape) {
+        if (resizerInstance && activeIframe === iframe) return
+
+        let current: HTMLElement | null = iframe
+        let previewContainer: HTMLElement | null = null
+        let editorContainer: HTMLElement | null = null
+        let splitParent: HTMLElement | null = null
+
+        while (current && current !== document.body) {
+          const parent: HTMLElement | null = current.parentElement
+          if (!parent) break
+
+          const siblings = Array.from(parent.children) as HTMLElement[]
+          const formEl = siblings.find(
+            (el) =>
+              el.tagName === 'FORM' ||
+              el.classList.contains('form') ||
+              el.querySelector('form') !== null
+          )
+
+          if (formEl && formEl !== current) {
+            previewContainer = current
+            editorContainer = formEl
+            splitParent = parent
+            break
+          }
+          current = parent
+        }
+
+        if (splitParent && editorContainer && previewContainer) {
+          if (resizerInstance) {
+            resizerInstance.remove()
+          }
+
+          const resizer = document.createElement('div')
+          resizer.className = 'custom-live-preview-resizer'
+          
+          resizer.style.width = '10px'
+          resizer.style.cursor = 'col-resize'
+          resizer.style.backgroundColor = 'var(--theme-elevation-100, #1a1a1a)'
+          resizer.style.borderLeft = '1px solid var(--theme-elevation-200, #333)'
+          resizer.style.borderRight = '1px solid var(--theme-elevation-200, #333)'
+          resizer.style.flexShrink = '0'
+          resizer.style.zIndex = '9999'
+          resizer.style.position = 'relative'
+          resizer.style.transition = 'background-color 0.2s, width 0.1s'
+
+          const grip = document.createElement('div')
+          grip.style.position = 'absolute'
+          grip.style.top = '50%'
+          grip.style.left = '50%'
+          grip.style.transform = 'translate(-50%, -50%)'
+          grip.style.width = '2px'
+          grip.style.height = '30px'
+          grip.style.borderRadius = '1px'
+          grip.style.backgroundColor = 'var(--theme-elevation-400, #666)'
+          resizer.appendChild(grip)
+
+          splitParent.style.display = 'flex'
+          splitParent.style.flexDirection = 'row'
+          editorContainer.style.flexShrink = '0'
+          
+          const initialWidth = lastWidth || '50%'
+          editorContainer.style.width = initialWidth
+          editorContainer.style.flexBasis = initialWidth
+
+          previewContainer.style.flexGrow = '1'
+          previewContainer.style.flexShrink = '1'
+          previewContainer.style.width = 'auto'
+
+          splitParent.insertBefore(resizer, previewContainer)
+          resizerInstance = resizer
+          activeIframe = iframe
+
+          let isDragging = false
+          let startX = 0
+          let startWidth = 0
+
+          const onMouseDown = (e: MouseEvent | TouchEvent) => {
+            isDragging = true
+            startX = 'clientX' in e ? e.clientX : e.touches[0].clientX
+            startWidth = editorContainer!.getBoundingClientRect().width
+
+            iframe.style.pointerEvents = 'none'
+            resizer.style.backgroundColor = 'var(--theme-primary-500, #22c55e)'
+            grip.style.backgroundColor = 'white'
+            document.body.style.cursor = 'col-resize'
+            document.body.style.userSelect = 'none'
+
+            const onMouseMove = (moveEvent: MouseEvent | TouchEvent) => {
+              if (!isDragging) return
+              const clientX = 'clientX' in moveEvent ? moveEvent.clientX : moveEvent.touches[0].clientX
+              const deltaX = clientX - startX
+              const maxAllowedWidth = window.innerWidth - 300
+              const newWidth = Math.max(300, Math.min(maxAllowedWidth, startWidth + deltaX))
+              
+              const finalWidthStr = `${newWidth}px`
+              editorContainer!.style.width = finalWidthStr
+              editorContainer!.style.flexBasis = finalWidthStr
+              lastWidth = finalWidthStr
+            }
+
+            const onMouseUp = () => {
+              isDragging = false
+              iframe.style.pointerEvents = ''
+              resizer.style.backgroundColor = 'var(--theme-elevation-100, #1a1a1a)'
+              grip.style.backgroundColor = 'var(--theme-elevation-400, #666)'
+              document.body.style.cursor = ''
+              document.body.style.userSelect = ''
+
+              document.removeEventListener('mousemove', onMouseMove)
+              document.removeEventListener('mouseup', onMouseUp)
+              document.removeEventListener('touchmove', onMouseMove)
+              document.removeEventListener('touchend', onMouseUp)
+            }
+
+            document.addEventListener('mousemove', onMouseMove)
+            document.addEventListener('mouseup', onMouseUp)
+            document.addEventListener('touchmove', onMouseMove, { passive: false })
+            document.addEventListener('touchend', onMouseUp)
+          }
+
+          resizer.addEventListener('mousedown', onMouseDown)
+          resizer.addEventListener('touchstart', onMouseDown)
+
+          resizer.addEventListener('mouseenter', () => {
+            if (!isDragging) {
+              resizer.style.backgroundColor = 'var(--theme-primary-400, #4ade80)'
+              grip.style.backgroundColor = 'white'
+            }
+          })
+          resizer.addEventListener('mouseleave', () => {
+            if (!isDragging) {
+              resizer.style.backgroundColor = 'var(--theme-elevation-100, #1a1a1a)'
+              grip.style.backgroundColor = 'var(--theme-elevation-400, #666)'
+            }
+          })
+        }
+      } else {
+        if (resizerInstance) {
+          resizerInstance.remove()
+          resizerInstance = null
+          activeIframe = null
+        }
+
+        const forms = document.querySelectorAll('form')
+        forms.forEach((f) => {
+          const formEl = (f.closest('.form') as HTMLElement) || f
+          if (formEl) {
+            formEl.style.width = ''
+            formEl.style.flexBasis = ''
+          }
+        })
+      }
+    }
+
+    const observer = new MutationObserver(() => {
+      updateResizer()
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    window.addEventListener('resize', updateResizer)
+    window.addEventListener('orientationchange', updateResizer)
+
+    updateResizer()
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', updateResizer)
+      window.removeEventListener('orientationchange', updateResizer)
+      if (resizerInstance) {
+        resizerInstance.remove()
+      }
+    }
+  }, [])
+
   return (
     <>
       {children}

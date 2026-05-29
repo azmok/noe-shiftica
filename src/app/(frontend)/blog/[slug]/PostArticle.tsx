@@ -1,12 +1,53 @@
 import React from "react"
 import { Post } from "@/payload-types"
-import { RichText } from "@payloadcms/richtext-lexical/react"
+import { RichText, JSXConvertersFunction } from "@payloadcms/richtext-lexical/react"
 import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/components/HtmlEmbedBlock"
 import styles from './PostArticle.module.css'
+
+const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
+    ...defaultConverters,
+    // Handle standard Lexical code nodes (type: 'code') just in case
+    code: ({ node }: { node: any }) => {
+        console.warn("[PostArticle Debug] Standard Lexical 'code' node matched!", { node });
+        const codeText = node.children?.map((c: any) => c.text).join("") || "";
+        return (
+            <pre className="p-5 bg-slate-900 border border-white/10 rounded-2xl overflow-x-auto text-sm font-mono text-emerald-400 my-6 relative group">
+                <div className="absolute top-3 right-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest select-none">
+                    Standard Code
+                </div>
+                <code className="block leading-relaxed whitespace-pre">{codeText}</code>
+            </pre>
+        );
+    },
+    blocks: {
+        'code-block': ({ node }: { node: any }) => {
+            console.warn("[PostArticle Debug] Custom 'code-block' block MATCHED!", { node });
+            const fields = node.fields || {}
+            const langNames: Record<string, string> = {
+                javascript: 'JavaScript',
+                typescript: 'TypeScript',
+                html: 'HTML',
+                css: 'CSS',
+                python: 'Python',
+                bash: 'Bash',
+                json: 'JSON',
+                sql: 'SQL',
+            }
+            return (
+                <pre className="p-5 bg-slate-900 border border-white/10 rounded-2xl overflow-x-auto text-sm font-mono text-emerald-400 my-6 relative group selection:bg-emerald-500/20">
+                    <div className="absolute top-3 right-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest select-none">
+                        {langNames[fields.language] || fields.language}
+                    </div>
+                    <code className="block leading-relaxed whitespace-pre">{fields.code}</code>
+                </pre>
+            )
+        },
+    },
+})
 
 export const PostArticle: React.FC<{
     post: Post
@@ -15,6 +56,47 @@ export const PostArticle: React.FC<{
     nextPost?: Post | null
     basePath?: string
 }> = ({ post, isPreview, prevPost, nextPost, basePath = '/blog' }) => {
+    // Proactive Debugging: Scan and log the Lexical AST structure in detail
+    React.useEffect(() => {
+        if (typeof window !== "undefined") {
+            console.group("%c[PostArticle Debug] Lexical AST Structure Scanner", "background: #111; color: #E2FF3D; padding: 4px 8px; font-weight: bold;");
+            console.log("Article Title:", post.title);
+            console.log("Full Content Object:", post.content);
+            
+            if (post.content && typeof post.content === 'object' && 'root' in post.content) {
+                const scan = (node: any, depth = 0) => {
+                    if (!node) return;
+                    const indent = "  ".repeat(depth);
+                    
+                    if (node.type) {
+                        const styleInfo = node.format ? ` (format=${node.format})` : "";
+                        console.log(`%c${indent}└─ Node: type="${node.type}"${styleInfo}`, "color: #38bdf8;");
+                    }
+                    
+                    // Check for custom blocks
+                    if (node.type === 'block' && node.fields) {
+                        const blockType = node.fields.blockType || node.fields.slug || 'unknown';
+                        console.log(`%c${indent}   └─ [BLOCK] type="${blockType}"`, "color: #fb7185; font-weight: bold;", node.fields);
+                    }
+                    
+                    // Recurse children
+                    if (node.children && Array.isArray(node.children)) {
+                        node.children.forEach((child: any) => scan(child, depth + 1));
+                    }
+                };
+                
+                try {
+                    scan(post.content);
+                } catch (err) {
+                    console.error("Scanner failed:", err);
+                }
+            } else {
+                console.log("Content is not in Lexical format or is empty. Raw content type:", typeof post.content);
+            }
+            console.groupEnd();
+        }
+    }, [post]);
+
     const htmlBodyHtml: string = (post as any).htmlEmbed?.bodyHtml || ''
     const readingTime =
         (post as any).readingTime ||
@@ -109,7 +191,7 @@ export const PostArticle: React.FC<{
                             {(() => {
                                 try {
                                     if (post.content && typeof post.content === 'object' && 'root' in post.content) {
-                                        return <RichText data={post.content as any} />;
+                                        return <RichText data={post.content as any} converters={customConverters} />;
                                     } else if (post.content) {
                                         return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
                                     }
@@ -259,7 +341,7 @@ export const PostArticle: React.FC<{
                                         {(() => {
                                             try {
                                                 if (post.content && typeof post.content === 'object' && 'root' in post.content) {
-                                                    return <RichText data={post.content as any} />;
+                                                    return <RichText data={post.content as any} converters={customConverters} />;
                                                 } else if (post.content) {
                                                     return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
                                                 }
@@ -342,6 +424,34 @@ export const PostArticle: React.FC<{
                     </div>
                 </article>
             </div>
+            {/* Developer Live Debug Panel */}
+            {isPreview && (
+                <div className="mt-16 p-6 bg-slate-900/90 border border-emerald-500/30 rounded-3xl text-xs font-mono text-slate-300 backdrop-blur-xl shadow-2xl max-w-4xl mx-auto relative z-50">
+                    <h3 className="text-emerald-400 font-bold text-sm mb-3 flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                        [Oje Debug Panel] Post Data Analyzer
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-slate-400 border-b border-white/5 pb-4">
+                        <div>
+                            <p className="mb-1"><strong className="text-white">Title:</strong> {post.title}</p>
+                            <p className="mb-1"><strong className="text-white">Slug:</strong> {post.slug}</p>
+                            <p className="mb-1"><strong className="text-white">Status:</strong> {post._status || (post as any).status || "unknown"}</p>
+                        </div>
+                        <div>
+                            <p className="mb-1"><strong className="text-white">Content Type:</strong> {typeof post.content}</p>
+                            <p className="mb-1"><strong className="text-white">Content Keys:</strong> {post.content ? Object.keys(post.content).join(", ") : "null"}</p>
+                            <p className="mb-1"><strong className="text-white">Is Content Empty?</strong> {!post.content ? "YES (null)" : (Object.keys(post.content).length === 0 || (post.content.root && Object.keys(post.content.root).length === 0) ? "YES (empty/no children)" : "NO")}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <span className="text-emerald-400 font-bold">Content JSON (Lexical AST):</span>
+                        <pre className="mt-2 p-4 bg-black/60 border border-white/10 rounded-xl overflow-x-auto text-[10px] leading-normal max-h-80 text-emerald-400 select-all">
+                            {JSON.stringify(post.content, null, 2)}
+                        </pre>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }

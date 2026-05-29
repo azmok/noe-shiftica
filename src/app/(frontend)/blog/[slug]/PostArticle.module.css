@@ -80,11 +80,12 @@
 
     & li {
       margin-bottom: 0;
-      line-height: 1;
+      line-height: 1.2;
       font-size: 0.8rem;
       font-weight: 300;
       padding-left: 0rem;
       letter-spacing: 0.07em;
+      margin-top: 1em;
     }
 
     & li::marker {
@@ -108,6 +109,12 @@
   & strong {
     color: var(--white-text-100);
     font-weight: 600;
+  }
+
+  /* Inline Code cleanup to prevent backslash escapes */
+  & code::before,
+  & code::after {
+    content: "" !important;
   }
 
   /* Media & Tables */
@@ -134,7 +141,6 @@
       font-size: 0.7rem;
       letter-spacing: 0.1em;
       font-weight: 700;
-
       & p {
         padding: 0;
         margin: 0.2em 0.5em;

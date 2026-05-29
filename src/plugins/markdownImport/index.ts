@@ -4,6 +4,74 @@ import matter from 'gray-matter'
 import { sanitizeServerEditorConfig } from '@payloadcms/richtext-lexical'
 import { translateToSlug } from '../../lib/translateToSlug'
 
+// Helper to transform Markdown code blocks to Payload's CustomCodeBlock (Lexical BlockNode)
+export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: string) => any): any {
+    const codeBlocks: Array<{ language: string; code: string }> = [];
+    
+    // Regex to match markdown code blocks
+    const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)\n```/g;
+    
+    let placeholderIndex = 0;
+    const preprocessedMarkdown = markdown.replace(codeBlockRegex, (match, lang, code) => {
+        codeBlocks.push({
+            language: lang.trim().toLowerCase() || 'javascript',
+            code: code.trim()
+        });
+        return `\n\n__OJE_CODE_BLOCK_PLACEHOLDER_${placeholderIndex++}__\n\n`;
+    });
+
+    const lexicalData = convertFn(preprocessedMarkdown);
+
+    if (codeBlocks.length === 0 || !lexicalData || typeof lexicalData !== 'object') {
+        return lexicalData;
+    }
+
+    // Traverse and replace the placeholder paragraph with the actual custom code-block Lexical node
+    const replacePlaceholders = (node: any): any => {
+        if (!node) return node;
+
+        if (node.children && Array.isArray(node.children)) {
+            const newChildren: any[] = [];
+            for (const child of node.children) {
+                // If it's a paragraph containing our placeholder text
+                if (child.type === 'paragraph' && child.children && child.children.length === 1) {
+                    const textNode = child.children[0];
+                    if (textNode.type === 'text' && typeof textNode.text === 'string') {
+                        const match = textNode.text.match(/^__OJE_CODE_BLOCK_PLACEHOLDER_(\d+)__$/);
+                        if (match) {
+                            const index = parseInt(match[1], 10);
+                            const savedBlock = codeBlocks[index];
+                            if (savedBlock) {
+                                // Replace the paragraph node with the payload block node
+                                newChildren.push({
+                                    format: '',
+                                    type: 'block',
+                                    version: 2,
+                                    fields: {
+                                        blockType: 'code-block',
+                                        id: `code-block-id-${Math.random().toString(36).substr(2, 9)}`,
+                                        language: savedBlock.language,
+                                        code: savedBlock.code
+                                    }
+                                });
+                                continue;
+                            }
+                        }
+                    }
+                }
+                
+                // Otherwise recursively process
+                newChildren.push(replacePlaceholders(child));
+            }
+            node.children = newChildren;
+        }
+
+        return node;
+    };
+
+    return replacePlaceholders(lexicalData);
+}
+
 // Markdown → Lexical conversion endpoint handler
 export async function handleConvertMarkdown(req: any): Promise<Response> {
     try {
@@ -26,9 +94,11 @@ export async function handleConvertMarkdown(req: any): Promise<Response> {
             editorConfig as any,
             req.payload.config as any
         )
-        const lexicalData = convertMarkdownToLexical({
-            editorConfig: sanitizedEditorConfig,
-            markdown: markdownBody,
+        const lexicalData = convertMarkdownWithCodeBlocks(markdownBody, (md) => {
+            return convertMarkdownToLexical({
+                editorConfig: sanitizedEditorConfig,
+                markdown: md,
+            })
         })
 
         return Response.json({ frontmatter, lexical: lexicalData })
