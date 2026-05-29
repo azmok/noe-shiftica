@@ -296,3 +296,60 @@ Close buttons in separate components; let the primary toggle component own the v
 - **Root Cause**: While introducing slug history check, \let post = posts.docs?.[0] || null;\ was defined near the top. However, the original declaration \const post = posts.docs[0];\ near the bottom of the fetch block was left behind, resulting in a duplicate local scope variable definition error during build.
 - **File(s) Modified**: \src/app/(frontend)/dev/[slug]/page.tsx\`n- **Fix Summary**: Deleted the duplicate \const post = posts.docs[0];\ line so that the rest of the component uses the properly checked \post\ variable declared above.
 - **Prevention Note**: Always double-check block-scoped variable declarations when updating fetch flow structures to ensure no stray old assignments remain.
+
+### [2026-05-24 XX:XX] Bug: sessions.md に UTF-16 LE が混入して文字化け
+- **Error**: sessions.md の 2026-05-17 セッション以降が "# # # [ 2 0 2 6..." のような文字化けで表示される。null バイトが 480 個混在。
+- **Root Cause**: 何らかのタイミングで PowerShell の `Out-File` または Claude Code の書き込みが UTF-16 LE エンコーディングで sessions.md に追記した。UTF-8 ファイルの途中（byte 24574）から UTF-16 LE バイト列が混入。
+- **File(s) Modified**: `.antigravity/sessions.md`
+- **Fix Summary**: バイト解析で混入位置を特定（24574 bytes目）し、UTF-16 LE 部分（24574〜26329）を Python の `[System.Text.Encoding]::Unicode.GetString()` でデコードして UTF-8 に統合。WriteAllText で BOM なし UTF-8 として再書き込み。
+- **Prevention Note**: PowerShell プロファイルに `$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8NoBOM'` を追加して、すべての Out-File/Set-Content/Add-Content のデフォルトエンコーディングを UTF-8 NoBOM に固定すること。Claude Code global settings.json に `"env": { "PYTHONUTF8": "1" }` を追加して Python サブプロセスの encoding も UTF-8 に固定。
+
+### [2026-05-24 XX:XX] Bug: Anti-Gravity CLI (Claude Code) が Windows で途中フリーズ
+- **Error**: Claude Code が実行中に入力を受け付けなくなりフリーズする。
+- **Root Cause**: v2.1.30+ で導入された useInterval ベースのアニメーションフックが Windows Terminal の ConPTY レイヤーで急速な ANSI シーケンス書き込みを発生させ、React の再レンダリングループが ConPTY を圧倒する（GitHub issue #23211, #27360）。また、v2.1.124+ で日本語ロケール環境での PowerShell ツールのコマンドライン構築に regression が発生（issue #55727）。
+- **File(s) Modified**: `~/.claude/settings.json`（PYTHONUTF8 追加）
+- **Fix Summary**: 
+  1. `~/.claude/settings.json` に `env.PYTHONUTF8=1` を追加（Python サブプロセスの文字化け防止）
+  2. PowerShell プロファイルに `chcp 65001`、`$PSDefaultParameterValues` エンコーディング、`$env:PYTHONUTF8='1'`、`$env:TERM='xterm-256color'` を追加（→ユーザー手動適用が必要）
+  3. ConPTY フリーズ本体は Anthropic 側の upstream 修正待ち。回避策: フリーズ時は `claude --resume` で再開。セッション中は定期的に `/compact` 実行。
+- **Prevention Note**: フリーズしたら Ctrl+C → `claude --resume` で会話を継続できる。長い処理中は定期的に `/compact` を使って context を圧縮すること。
+
+### [2026-05-29 10:30] Bug: Lexical editor で Blockquote が + ボタン/スラッシュコマンドから挿入できない
+- **Error**: PayloadCMS admin の Lexical エディタで「+」ボタンやスラッシュコマンドから「ブロッククォート」を挿入できない（CodeBlock プラグイン作成中に発覚）。
+- **Root Cause**:
+  1. `payload.config.ts` の `lexicalEditor()` の `features` 引数が、推奨の関数コールバック形式 `({ defaultFeatures }) => [...defaultFeatures, ...]` から、`defaultEditorFeatures` を直接 import して spread する配列形式に切り替わっていた。
+  2. その上で `BlockquoteFeature()`, `UploadFeature({...})`, `HorizontalRuleFeature()` が `defaultEditorFeatures` に既に含まれているのに二重登録されていた。`loader.js` の dedup ロジック（"後勝ち"）により defaultFeatures 側のインスタンスが捨てられ、ユーザー定義のインスタンスに置き換わる。特に `UploadFeature({ collections: { media: { fields: [] } } })` は default の sensible なフィールド構成を空配列で上書きしており、`BlocksFeature` 含む後段の feature 解決に副作用が出ていた可能性が高い（`generate:importmap` で `BlocksFeatureClient` エントリが書き込まれない症状で確認）。
+- **File(s) Modified**: `src/payload.config.ts`, `src/app/(payload)/admin/importMap.js`
+- **Fix Summary**:
+  1. `features: ({ defaultFeatures }) => [...defaultFeatures, ...]` 形式に戻した（推奨パターン）。
+  2. 二重登録の `BlockquoteFeature()` / `UploadFeature({...})` を削除。`HorizontalRuleFeature()` は元の config に既に明示登録されていたため維持。
+  3. 未使用 import (`defaultEditorFeatures`, `UploadFeature`, `BlockquoteFeature`, `CodeBlock`) を削除。
+  4. `pnpm payload generate:importmap` を実行して `importMap.js` を再生成。
+- **Prevention Note**:
+  - Payload v3 の `lexicalEditor({ features })` は **関数コールバック形式を使うこと**。`defaultEditorFeatures` の直接 spread + 同じ feature の再呼び出しは、feature インスタンス置換による副作用（特に `UploadFeature` のような props 付き feature）を招くので避ける。
+  - `defaultFeatures` に既に含まれる feature を再追加しない（list: Bold/Italic/Underline/Strikethrough/Subscript/Superscript/InlineCode/Paragraph/Heading/Align/Indent/UnorderedList/OrderedList/Checklist/Link/Relationship/**Blockquote**/**Upload**/**HorizontalRule**/InlineToolbar）。
+  - 新規 Feature 追加時は必ず `pnpm payload generate:importmap` を実行し、`importMap.js` に対応する `*FeatureClient` エントリが追加されたことを確認する。
+### [2026-05-29 11:45] Bug: Code Block (BlocksFeature) が slash menu / + ボタンに表示されない
+- **Error**: PayloadCMS admin の Lexical エディタで「+」ボタンやスラッシュコマンドから Code Block が表示されず挿入できない。
+- **Root Cause**: Payload の `generate:importmap` スクリプトは `BlocksFeature` の `ClientFeature`（`@payloadcms/richtext-lexical/client#BlocksFeatureClient`）を自動検出できない。理由は `generate:importmap` が `buildConfig` の raw 結果を受け取り `iterateFields` を呼ぶが、`BlocksFeature` は async feature 関数で内部 `sanitizeFields` を使うため `resolvedFeatureMap` への登録が importMap 生成フェーズで反映されない。結果として `importMap.js` に `BlocksFeatureClient` エントリが書き込まれず、admin の `initLexicalFeatures` で `clientFeatureProvider` が null になり feature がスキップされる。
+- **File(s) Modified**: `src/payload.config.ts`, `src/app/(payload)/admin/importMap.js`
+- **Fix Summary**: `admin.importMap.generators` に明示ジェネレーター関数を追加し、`addToImportMap('@payloadcms/richtext-lexical/client#BlocksFeatureClient')` を強制的に呼ぶようにした。`generate:importmap` 実行時にこのジェネレーターが呼ばれ importMap に確実に登録される。
+- **Prevention Note**:
+  - `BlocksFeature` を Lexical エディタに追加する際は、`admin.importMap.generators` に `BlocksFeatureClient` 明示登録ジェネレーターを合わせて追加すること。
+  - `generate:importmap` 実行後に `grep BlocksFeatureClient src/app/(payload)/admin/importMap.js` で登録確認すること。
+
+### [2026-05-30 01:40] Bug: Custom Monaco Code Block button does not appear or fails to insert in editor toolbar
+- **Error**:
+  1. The custom toolbar button to insert the Monaco Code Block did not render.
+  2. Once rendered, clicking it threw: `Failed to insert Monaco Code Block node: Error: parseEditorState: type "block" not found`.
+- **Root Cause**:
+  1. **Visual Mismatch / DOM Injection Failure**: Attempting to force-inject button elements via React portals / DOM manipulation directly into `.fixed-toolbar` fails visually because the container has `overflow: hidden`, clipping out any injected elements.
+  2. **Insertion API Mismatch**: The button click handler used Lexical's `$parseSerializedNode` on raw `{ type: 'block' }` serialized state. In some client contexts (or toolbar scopes), the active `editor` does not have the `BlockNode` schema fully populated in its parsing registry, causing Lexical to throw a "type 'block' not found" error.
+- **File(s) Modified**: `src/features/markdownPaste/client.tsx`
+- **Fix Summary**:
+  1. **Official Integration**: Refactored the toolbar button to use Payload's official `toolbarFixed.groups` API, mimicking the working `HtmlSource` pattern, ensuring native fixed toolbar integration and perfect visual layout.
+  2. **Native Command Dispatch**: Replaced low-level `$parseSerializedNode` parsing with Lexical's native `INSERT_BLOCK_COMMAND` (dispatched on the active editor context). Payload's built-in `BlocksPlugin` catches this and uses its registered internal React classes, bypassing serialized node schema resolution.
+- **Prevention Note**:
+  - Always register custom toolbar buttons using the official `toolbarFixed` or `toolbarInline` schemas to avoid layout/overflow issues with direct DOM portals.
+  - When programmatically inserting custom Blocks from toolbar buttons or plugins, **do NOT manually parse serialized JSON block nodes**. Always dispatch `INSERT_BLOCK_COMMAND` (specifically, `const INSERT_BLOCK_COMMAND = createCommand<any>('INSERT_BLOCK_COMMAND')`) with `{ blockType, ...fields }` to leverage Payload's native block insertion orchestration.
+

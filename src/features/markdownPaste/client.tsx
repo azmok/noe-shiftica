@@ -2,10 +2,11 @@
 
 import { createClientFeature } from '@payloadcms/richtext-lexical/client'
 import { $convertFromMarkdownString } from '@lexical/markdown'
-import { COMMAND_PRIORITY_LOW, PASTE_COMMAND } from 'lexical'
+import { COMMAND_PRIORITY_LOW, PASTE_COMMAND, createCommand } from 'lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { createHeadlessEditor } from '@lexical/headless'
 import { $getRoot, $parseSerializedNode, $insertNodes } from 'lexical'
 
@@ -62,9 +63,8 @@ const MarkdownPastePlugin = () => {
                     console.log('[MarkdownPaste] 1. Data length:', rawData?.length)
                 }
 
-                // 特定の条件（例：先頭が # や -、またはテーブルの | ）の時だけMarkdownとして処理
-                // | は前後の空白を許容する
-                const markdownRegex = /^( *\||#|[-*+]|\d+\.)/m
+                // 特定の条件（例：先頭が # や -、テーブルの | 、またはコードブロックの ``` ）の時だけMarkdownとして処理
+                const markdownRegex = /^(\`\`\`| *\||#|[-*+]|\d+\.)/m
                 const regexMatch = rawData ? markdownRegex.test(rawData) : false
 
                 if (DEBUG) {
@@ -84,6 +84,19 @@ const MarkdownPastePlugin = () => {
                 if (rawData && regexMatch) {
                     // Sanitize clipboard data for reliable table detection
                     const data = sanitizeMarkdownForPaste(rawData)
+
+                    const codeBlocks: Array<{ language: string; code: string }> = []
+                    let placeholderIndex = 0
+
+                    // Preprocess code blocks to bypass Lexical markdown parser limitations
+                    const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)\n```/g
+                    const preprocessedData = data.replace(codeBlockRegex, (match, lang, code) => {
+                        codeBlocks.push({
+                            language: lang.trim().toLowerCase() || 'javascript',
+                            code: code.trim()
+                        })
+                        return `\n\n__OJE_CODE_BLOCK_PLACEHOLDER_${placeholderIndex++}__\n\n`
+                    })
 
                     if (DEBUG) {
                         console.log('[MarkdownPaste] 2b. After sanitize:', JSON.stringify(data))
@@ -119,7 +132,7 @@ const MarkdownPastePlugin = () => {
                             console.log('[MarkdownPaste] 5. Running $convertFromMarkdownString with SANITIZED data...')
                         }
                         $convertFromMarkdownString(
-                            data,  // ← sanitized, not raw
+                            preprocessedData,  // ← preprocessedData with placeholders
                             editorConfig.features.markdownTransformers,
                         )
                         if (DEBUG) {
@@ -127,23 +140,60 @@ const MarkdownPastePlugin = () => {
                             const children = root.getChildren()
                             console.log('[MarkdownPaste] 6. After conversion — root children count:', children.length)
                             children.forEach((child, i) => {
-                                console.log(`  [child ${i}] type=${child.getType()} textContent=${JSON.stringify(child.getTextContent().slice(0, 200))}`)
-                                try {
-                                    const json = child.exportJSON()
-                                    console.log(`  [child ${i}] exportJSON:`, JSON.stringify(json).slice(0, 500))
-                                } catch (e) {
-                                    console.error(`  [child ${i}] exportJSON FAILED:`, e)
-                                }
+                                  console.log(`  [child ${i}] type=${child.getType()} textContent=${JSON.stringify(child.getTextContent().slice(0, 200))}`)
+                                  try {
+                                      const json = child.exportJSON()
+                                      console.log(`  [child ${i}] exportJSON:`, JSON.stringify(json).slice(0, 500))
+                                  } catch (e) {
+                                      console.error(`  [child ${i}] exportJSON FAILED:`, e)
+                                  }
                             })
                         }
                     }, { discrete: true })
 
                     // パースされたノードをシリアライズして取得（エディタ間でのノード移送のため）
-                    // NOTE: editorState.toJSON() uses the internal exportNodeToJSON() which
-                    // recursively serializes children. Direct node.exportJSON() only returns
-                    // the node's own properties with an empty children[] array.
                     const serializedState = headlessEditor.getEditorState().toJSON()
-                    const serializedNodes = serializedState.root.children
+                    let serializedNodes = serializedState.root.children
+
+                    // Postprocess: Replace placeholder paragraph nodes with custom code-block Lexical nodes
+                    if (codeBlocks.length > 0) {
+                        const replacePlaceholders = (node: any): any => {
+                            if (!node) return node
+                            if (node.children && Array.isArray(node.children)) {
+                                const newChildren: any[] = []
+                                for (const child of node.children) {
+                                    if (child.type === 'paragraph' && child.children && child.children.length === 1) {
+                                        const textNode = child.children[0]
+                                        if (textNode.type === 'text' && typeof textNode.text === 'string') {
+                                            const match = textNode.text.match(/^__OJE_CODE_BLOCK_PLACEHOLDER_(\d+)__$/)
+                                            if (match) {
+                                                const index = parseInt(match[1], 10)
+                                                const savedBlock = codeBlocks[index]
+                                                if (savedBlock) {
+                                                    newChildren.push({
+                                                        format: '',
+                                                        type: 'block',
+                                                        version: 2,
+                                                        fields: {
+                                                            blockType: 'code-block',
+                                                            id: `code-block-id-${Math.random().toString(36).substr(2, 9)}`,
+                                                            language: savedBlock.language,
+                                                            code: savedBlock.code
+                                                        }
+                                                    })
+                                                    continue
+                                                }
+                                            }
+                                        }
+                                    }
+                                    newChildren.push(replacePlaceholders(child))
+                                }
+                                node.children = newChildren
+                            }
+                            return node
+                        }
+                        serializedNodes = serializedNodes.map(node => replacePlaceholders(node))
+                    }
 
                     if (DEBUG) {
                         console.log('[MarkdownPaste] 7. Serialized nodes count:', serializedNodes.length)
@@ -168,7 +218,6 @@ const MarkdownPastePlugin = () => {
 
                             // $insertNodesを使用することで、テーブルなどのブロックノードが
                             // 正しく（例えばパラグラフを分割して）挿入されるようになる。
-                            // これにより "Expected node TableNode of type table to have a block ancestor" エラーを防ぐ。
                             $insertNodes(nodes)
 
                             if (DEBUG) {
@@ -198,7 +247,64 @@ const MarkdownPastePlugin = () => {
             COMMAND_PRIORITY_LOW,
         )
     }, [editor, editorConfig])
+
     return null
+}
+
+// Payload CMS richtext-lexical's internal Blocks feature registers a handler for this command
+const INSERT_BLOCK_COMMAND = createCommand<any>('INSERT_BLOCK_COMMAND');
+
+// 1. Monaco Code Block Toolbar Item component (Official Payload Lexical design)
+function MonacoCodeToolbarItem() {
+    const [editor] = useLexicalComposerContext()
+
+    const handleInsertMonacoCode = () => {
+        console.warn("[MarkdownPaste Debug] Toolbar Monaco insertion button CLICKED!");
+        const uniqueId = `code-block-id-${Math.random().toString(36).substr(2, 9)}`;
+        try {
+            editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
+                blockType: 'code-block',
+                id: uniqueId,
+                language: 'javascript',
+                code: '// ここにコードを入力してください'
+            });
+            console.warn('[MarkdownPaste Debug] Dispatched INSERT_BLOCK_COMMAND for Monaco Code Block');
+        } catch (err) {
+            console.error('[MarkdownPaste Debug] Failed to dispatch INSERT_BLOCK_COMMAND:', err);
+        }
+    };
+
+    return (
+        <button
+            type="button"
+            onClick={handleInsertMonacoCode}
+            className="toolbar-popup__button"
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
+                padding: '0',
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderRadius: '4px',
+                color: '#E2FF3D',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                outline: 'none',
+            }}
+            onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+            }}
+            onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+            title="Monaco Code Blockを挿入"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        </button>
+    );
 }
 
 export const MarkdownPasteClientFeature = createClientFeature({
@@ -208,4 +314,18 @@ export const MarkdownPasteClientFeature = createClientFeature({
             position: 'normal',
         },
     ],
+    toolbarFixed: {
+        groups: [
+            {
+                key: 'monacoCodeGroup',
+                type: 'buttons',
+                items: [
+                    {
+                        Component: MonacoCodeToolbarItem,
+                        key: 'monacoCodeButton',
+                    },
+                ],
+            },
+        ],
+    },
 })
