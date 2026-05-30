@@ -14,6 +14,7 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
   const [isMobile, setIsMobile] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [localVal, setLocalVal] = useState(value || '')
+  const [isCollapsed, setIsCollapsed] = useState(true)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -70,28 +71,64 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
     return () => ta.removeEventListener('touchmove', stopProp)
   }, [isOpen])
 
-  // If desktop, just render a regular textarea
+  // If desktop, render custom toggleable accordion with sticky header
   if (!isMobile) {
     return (
-      <div className="field-type textarea" style={{ marginBottom: '1rem' }}>
-        <label className="field-label" style={{ marginBottom: '8px', display: 'block' }}>
-          {labelText as React.ReactNode}
+      <div className="field-type textarea" style={{ marginBottom: '1.5rem', position: 'relative' }}>
+        <label
+          className="field-label"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          style={{
+            position: 'sticky',
+            top: '56px', // Align right beneath Payload's standard fixed top header bar
+            zIndex: 100,
+            background: 'var(--theme-bg, #0d0f14)', // Keeps content underneath hidden
+            padding: '12px 16px',
+            margin: '0 -16px 8px -16px', // Expand background cover to align borders
+            cursor: 'pointer',
+            userSelect: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            borderBottom: isCollapsed ? '1px solid transparent' : '1px solid var(--theme-elevation-200)',
+            transition: 'border-color 0.2s',
+          }}
+        >
+          <span style={{
+            fontSize: '10px',
+            color: 'var(--theme-elevation-600)',
+            transition: 'transform 0.2s',
+            transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)',
+            display: 'inline-block'
+          }}>
+            ▶
+          </span>
+          <span>{labelText as React.ReactNode}</span>
         </label>
-        <div className="field-type__wrap">
-          <textarea
-            className="textarea-element"
-            value={value || ''}
-            onChange={(e) => setValue(e.target.value)}
-            style={{
-              width: '100%',
-              minHeight: '200px',
-              fontFamily: 'monospace',
-              padding: '8px',
-              border: '1px solid var(--theme-elevation-200)',
-              borderRadius: '4px'
-            }}
-          />
-        </div>
+
+        {!isCollapsed && (
+          <div className="field-type__wrap" style={{ marginTop: '12px' }}>
+            <textarea
+              className="textarea-element"
+              value={value || ''}
+              onChange={(e) => setValue(e.target.value)}
+              style={{
+                width: '100%',
+                minHeight: '400px', // Larger and more usable default height when opened
+                fontFamily: 'monospace',
+                padding: '12px',
+                border: '1px solid var(--theme-elevation-200)',
+                borderRadius: '8px',
+                background: 'var(--theme-elevation-50)',
+                color: 'var(--theme-text)',
+                lineHeight: '1.4',
+                fontSize: '14px',
+              }}
+            />
+          </div>
+        )}
       </div>
     )
   }

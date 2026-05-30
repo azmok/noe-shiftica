@@ -423,3 +423,23 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
   - Maintain a strict dark aesthetic even for legal/terms documentation pages rather than relying on standard light layouts.
 - **Plan Impact**:
   - All future static/legal document pages added to the frontend should inherit the same `bg-background-void` layout and glassmorphic card patterns immediately.
+
+### [2026-05-30 19:47] Session Summary
+- **Learned/Decided**:
+  - Implemented trim-aware duplicate check validation inside `src/collections/Categories.ts` rather than relying strictly on DB-level unique constraints.
+  - The validation uses `payload.find()` to search for identical category names. It safely ignores the current document ID on edit (`update`) operations and strips leading/trailing whitespaces (`.trim()`) to prevent bypasses.
+- **Preferences**:
+  - Favor code-level `validate` checks in PayloadCMS for duplications to prevent raw DB 500 crashes and provide user-friendly error alerts directly in the Admin UI.
+- **Plan Impact**:
+  - Future identifier fields that require unique values should adopt this trim-aware `validate` hook pattern for better error diagnostics and schema flexibility.
+
+### [2026-05-30 19:59] Session Summary
+- **Learned/Decided**:
+  - Solved PayloadCMS v3 custom `validate` hook strict optional parameters compilation issue by using the `(val: any, options: any)` parameter override pattern, resolving strict `noImplicitAny` and TS schema validation clashes safely.
+  - Enabled live dynamic preview support for the `html-files` collection by declaring `livePreview` in `HtmlFiles.ts` pointing to `/html-files/[id]/preview`, and created the matching server/client routes inside Next.js incorporating standard `useLivePreview`.
+  - Refined the custom `MobileFullscreenEditor` to toggle content visibility dynamically (closed by default) on desktop viewports. Implemented sticky, opaque headings (`top: 56px`, `zIndex: 100`, `background: var(--theme-bg)`) to cleanly float and mask content under Payload's standard fixed header during vertical scrolls.
+- **Preferences**:
+  - Set `top: 56px` as the default sticky offset for any elements nested under Payload CMS v3's fixed administration top headers.
+  - Ensure all toggles include explicit interactive cursors (`pointer`) and visual indicators (like rotating `▶` arrow icons).
+- **Plan Impact**:
+  - Any future administrative form extensions that carry long textual inputs should employ toggleable stickies to avoid vertical layout bloating.

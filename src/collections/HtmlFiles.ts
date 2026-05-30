@@ -80,6 +80,11 @@ export const HtmlFiles: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['filename', 'linkedPostTitle', 'updatedAt'],
+    livePreview: {
+      url: ({ data }) => {
+        return `/html-files/${data?.id || 'preview'}/preview`
+      },
+    },
   },
   access: {
     read: () => true,
