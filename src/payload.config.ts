@@ -39,6 +39,17 @@ import { CustomCodeBlock } from '@/features/customCodeBlock'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Dummy configuration to force Payload's importMap static generator to detect BlocksFeature.
+// This resolves the runtime "Cannot read properties of undefined (reading 'blockReferences')" crash
+// by ensuring BlocksFeatureClient is written into importMap.js during build/dev steps.
+const _dummyForStaticAnalysis = lexicalEditor({
+  features: [
+    BlocksFeature({
+      blocks: [CustomCodeBlock],
+    }),
+  ]
+})
+
 const configPromise = buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'https://noe-shiftica.com' : 'http://localhost:3000'),
   admin: {
@@ -55,7 +66,11 @@ const configPromise = buildConfig({
     },
     components: {
       // Client-side image compression before upload + progress bar overlay
-      providers: ['@/components/admin/ImageCompressionProvider#ImageCompressionProvider'],
+      // + 3-panel drag-and-drop resizer (nav / editor / live-preview)
+      providers: [
+        '@/components/admin/ImageCompressionProvider#ImageCompressionProvider',
+        '@/components/admin/PanelResizerProvider#PanelResizerProvider',
+      ],
     },
   },
   // Email transport via Resend — required for "Forgot Password" to actually send
@@ -65,6 +80,7 @@ const configPromise = buildConfig({
     apiKey: process.env.RESEND_API_KEY || '',
   }),
   collections: [Users, Media, Categories, Posts, TechPosts, HtmlFiles],
+  blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
@@ -93,7 +109,11 @@ const configPromise = buildConfig({
   // startup, generators are never self-deleted. This onInit hook deletes them before any request
   // reaches createClientConfig. Self-deletion in the generator handles the HMR reload case.
   onInit: async (payload) => {
-    if (payload.config?.admin?.importMap) {
+    // Preserve generators when generating the importMap via CLI/scripts to ensure all FeatureClients are written
+    const isGeneratingImportMap = process.argv.some(
+      (arg) => arg.includes('generate:importmap') || arg.includes('importmap') || arg.includes('importMap')
+    )
+    if (!isGeneratingImportMap && payload.config?.admin?.importMap) {
       delete (payload.config.admin.importMap as any).generators
     }
   },
@@ -126,7 +146,10 @@ const configPromise = buildConfig({
 // Safely delete non-serializable generators function from the resolved config
 // to prevent Next.js React Server Component serialization errors during HMR/runtime.
 const config = configPromise.then((resolvedConfig) => {
-  if (resolvedConfig.admin?.importMap) {
+  const isGeneratingImportMap = process.argv.some(
+    (arg) => arg.includes('generate:importmap') || arg.includes('importmap') || arg.includes('importMap')
+  )
+  if (!isGeneratingImportMap && resolvedConfig.admin?.importMap) {
     delete (resolvedConfig.admin.importMap as any).generators;
   }
   return resolvedConfig;
