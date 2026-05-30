@@ -3,12 +3,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
-  // Prevent Firebase App Hosting CDN from caching blog HTML pages.
-  // revalidatePath() purges Next.js's internal ISR cache but cannot purge the CDN
-  // layer sitting in front of Cloud Run. Setting no-store on blog routes forces
-  // every HTML request to pass through to the origin (Next.js), which always
-  // serves either the cached ISR page or a freshly revalidated one.
-  // Static assets (JS, CSS, images) are unaffected — they have their own cache headers.
+  // Enable Firebase App Hosting CDN caching for blog/dev routes.
+  // On-demand revalidation via revalidatePath() purges both Next.js Full Route Cache
+  // and the Firebase App Hosting CDN layer simultaneously, then pre-warms a fresh cache.
+  // s-maxage: CDN caches for up to 1 year; stale-while-revalidate: serve stale during
+  // background revalidation; must-revalidate: never serve truly stale beyond max-age.
   async redirects() {
     return [
       {
@@ -22,19 +21,19 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/blog',
-        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
       },
       {
         source: '/blog/:path*',
-        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
       },
       {
         source: '/dev',
-        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
       },
       {
         source: '/dev/:path*',
-        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
       },
     ];
   },

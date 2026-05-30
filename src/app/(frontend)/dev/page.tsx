@@ -8,10 +8,10 @@ import Link from "next/link";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { GcsImage } from "@/lib/GcsImage";
-import { unstable_noStore as noStore } from "next/cache";
 
 export default async function DevBlogPage() {
-  noStore();
+  // ISR: cached by Firebase App Hosting CDN. Cache is invalidated and pre-warmed
+  // by revalidatePath() in TechPosts.ts afterChange/afterDelete hooks via /api/revalidate.
 
   const payload = await getPayload({ config: configPromise });
 

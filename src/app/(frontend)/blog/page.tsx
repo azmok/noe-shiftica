@@ -7,15 +7,10 @@ import { BlogRecentStoriesClient } from "../components/BlogRecentStoriesClient";
 import Link from "next/link";
 import { getPostsByStatus, getDistinctTags } from "@/lib/db";
 import { GcsImage } from "@/lib/GcsImage";
-import { unstable_noStore as noStore } from "next/cache";
 
 export default async function BlogPage() {
-  // Opt out of ISR cache. With minInstances: 0, Cloud Run scales to zero after
-  // ~10 minutes of inactivity. The new instance reverts to the build-time static
-  // snapshot, losing any ISR-updated cache. noStore() forces a live DB fetch on
-  // every request, which is safe because Cache-Control: no-store is already set
-  // in next.config.ts (CDN bypass) and getPostsByStatus uses @neondatabase/serverless.
-  noStore();
+  // ISR: cached by Firebase App Hosting CDN. Cache is invalidated and pre-warmed
+  // by revalidatePath() in Posts.ts afterChange/afterDelete hooks via /api/revalidate.
   // posts テーブルの _status = 'published' の記事のみ直接クエリ
   // Payload CMS のドラフトバージョン管理を完全にバイパスする
   let posts: Awaited<ReturnType<typeof getPostsByStatus>> = [];

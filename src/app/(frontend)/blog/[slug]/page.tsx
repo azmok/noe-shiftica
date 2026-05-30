@@ -10,7 +10,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
 import { Metadata } from "next";
-import { unstable_noStore as noStore } from "next/cache";
 
 
 export async function generateMetadata({
@@ -18,7 +17,7 @@ export async function generateMetadata({
 }: {
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-    noStore();
+    // ISR: metadata is cached alongside the page; revalidated on-demand via /api/revalidate.
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     try {
@@ -129,7 +128,7 @@ export default async function BlogPostPage({
 }: {
     params: Promise<{ slug: string }>;
 }) {
-    noStore();
+    // ISR: page is cached; revalidated on-demand via revalidatePath() in Posts.ts hooks.
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     const payload = await getPayload({ config: configPromise });

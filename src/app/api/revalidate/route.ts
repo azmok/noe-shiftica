@@ -12,15 +12,16 @@ import { revalidatePath } from 'next/cache';
  *
  * - If collection is "tech-posts": revalidates /dev and /dev/[slug]
  * - Default (collection omitted or "posts"): revalidates /blog and /blog/[slug]
+ *
+ * After purging Next.js Full Route Cache, this handler pre-warms the CDN cache
+ * by issuing a HEAD request to each invalidated path. Firebase App Hosting honors
+ * Next.js revalidatePath() and purges its CDN edge cache in tandem.
  */
 export async function POST(req: NextRequest) {
     const { secret, slug, collection } = await req.json().catch(() => ({}));
 
     const trimmedSecret = secret?.trim();
     const serverSecret = process.env.REVALIDATE_SECRET?.trim();
-
-    console.log(`[Revalidate Debug] Received secret length: ${trimmedSecret?.length || 0}, slice: ${trimmedSecret?.slice(0, 4)}...`);
-    console.log(`[Revalidate Debug] Server secret length: ${serverSecret?.length || 0}, slice: ${serverSecret?.slice(0, 4)}...`);
 
     if (!trimmedSecret || trimmedSecret !== serverSecret) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
@@ -29,15 +30,45 @@ export async function POST(req: NextRequest) {
     const isTech = collection === 'tech-posts';
     const basePath = isTech ? '/dev' : '/blog';
 
+    // 1. Purge Next.js Full Route Cache (also signals Firebase App Hosting CDN to purge)
     revalidatePath(basePath);
+
+    const revalidatedPaths: string[] = [basePath];
 
     if (slug && typeof slug === 'string') {
         revalidatePath(`${basePath}/${slug}`);
+        revalidatedPaths.push(`${basePath}/${slug}`);
     }
+
+    // 2. Pre-warm: issue HEAD requests to trigger Next.js to rebuild and cache the pages
+    //    so the next real visitor gets an instantly cached response (not a cache miss).
+    const origin = process.env.NEXT_PUBLIC_SERVER_URL || 'https://noe-shiftica.com';
+    const prewarmResults: Record<string, number | string> = {};
+
+    await Promise.allSettled(
+        revalidatedPaths.map(async (path) => {
+            const url = `${origin}${path}`;
+            try {
+                const res = await fetch(url, {
+                    method: 'GET',
+                    // No-cache header ensures this request bypasses any existing cache
+                    // and forces Next.js to render a fresh page into the cache.
+                    headers: { 'Cache-Control': 'no-cache' },
+                    // Short timeout — pre-warming is best-effort; don't block the response
+                    signal: AbortSignal.timeout(10000),
+                });
+                prewarmResults[path] = res.status;
+            } catch (e: any) {
+                prewarmResults[path] = `error: ${e.message}`;
+            }
+        })
+    );
+
+    console.log(`[Revalidate] Purged and pre-warmed paths:`, revalidatedPaths, 'results:', prewarmResults);
 
     return NextResponse.json({
         revalidated: true,
-        paths: slug ? [basePath, `${basePath}/${slug}`] : [basePath],
+        paths: revalidatedPaths,
+        prewarmed: prewarmResults,
     });
 }
-
