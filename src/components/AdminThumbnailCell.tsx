@@ -77,53 +77,20 @@ export const AdminThumbnailCell: React.FC<{
     [thumbUrl],
   )
 
-  // Start as true if complete (optimistic)
-  const [loaded, setLoaded] = React.useState(false)
+  // Initialize loaded state to true immediately if the URL is already cached to prevent SPA flicker
+  const [loaded, setLoaded] = React.useState(() => {
+    return optimizedUrl ? isUrlCached(optimizedUrl) : false
+  })
+  
   const imgRef = React.useRef<HTMLImageElement>(null)
 
-  React.useLayoutEffect(() => {
-    const img = imgRef.current;
-    if (img?.complete) {
-      setLoaded(true);
-      if (optimizedUrl) markUrlAsLoaded(optimizedUrl);
-    }
-  }, [optimizedUrl]);
-
+  // Fallback for fast browser/CDN cache load where onLoad might not fire
   React.useEffect(() => {
-    const img = imgRef.current;
-    if (!img) return;
-
-    let isMounted = true;
-    const markLoaded = () => {
-      if (isMounted) {
-        requestAnimationFrame(() => {
-          const el = imgRef.current;
-          if (el) {
-            el.style.opacity = '1';
-            el.classList.add('is-loaded');
-          }
-          setLoaded(true);
-          if (optimizedUrl) markUrlAsLoaded(optimizedUrl);
-        });
-      }
-    };
-
-    const markError = () => {
-      if (isMounted) setLoaded(false);
-    };
-
-    if (img.complete) {
-      img.decode().then(markLoaded).catch(markError);
-    } else {
-      img.addEventListener('load', markLoaded);
-      img.addEventListener('error', markError);
+    const img = imgRef.current
+    if (img && img.complete) {
+      setLoaded(true)
+      if (optimizedUrl) markUrlAsLoaded(optimizedUrl)
     }
-
-    return () => {
-      isMounted = false;
-      img.removeEventListener('load', markLoaded);
-      img.removeEventListener('error', markError);
-    };
   }, [optimizedUrl])
 
   if (!filename) return null
@@ -158,7 +125,7 @@ export const AdminThumbnailCell: React.FC<{
             transition: 'opacity 0.2s ease-out',
           }}
           onLoad={() => {
-            markUrlAsLoaded(optimizedUrl)
+            if (optimizedUrl) markUrlAsLoaded(optimizedUrl)
             setLoaded(true)
           }}
         />

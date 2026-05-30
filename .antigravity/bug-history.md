@@ -1,5 +1,12 @@
 # Noe Shiftica Bug History
 
+### [2026-05-30 14:52] Bug: Admin Thumbnail Cell loading state freeze
+- **Error**: Media thumbnail images in Admin list view remained invisible (stuck at opacity 0/loading shimmer) on some newly uploaded images.
+- **Root Cause**: The component was checking for `img.complete` in `useLayoutEffect` and launching an asynchronous `img.decode()` Promise in `useEffect`. If `img.decode()` failed, timed out, or had a race condition with Fast Refresh, `loaded` remained `false` (hidden) because the transition relied on manual DOM manipulation `el.style.opacity = '1'` inside the non-fired or rejected callback.
+- **File(s) Modified**: `src/components/AdminThumbnailCell.tsx`
+- **Fix Summary**: Simplified the logic by removing manual DOM element style mutation and the fragile `img.decode()` hook. Replaced them with cache-aware React state initialization (`isUrlCached`) and standard `onLoad`/`complete` React properties, making it 100% robust against decode variations and rendering race conditions.
+- **Prevention Note**: Avoid manual DOM mutation inside `useEffect` on React components. Rely on pure React states to control layouts/opacities. Avoid complex multi-layer decoders when native img triggers (`onLoad` + `img.complete`) are highly robust.
+
 ### [2026-03-20 XX:XX] Bug: Blog shows 0 articles in production
 - **Error**: `Failed to fetch posts: Error: connect ECONNREFUSED 127.0.0.1:5432`
 - **Root Cause**:

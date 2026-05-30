@@ -358,6 +358,15 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
   - Never register custom `Cell` components on primary identification fields. Implement visual optimizations as distinct alternative UI fields or sidebar components instead.
 
+### [2026-05-30 14:52] Session Summary
+- **Learned/Decided**:
+  - Identified that using complex asynchronous callbacks like `img.decode()` inside `useEffect` in combination with manual DOM style mutations (`el.style.opacity = '1'`) can cause permanent image load state freezes (images remaining invisible at `opacity: 0`). This happens when decode promises reject or fail silently under Fast Refresh or custom optimizer environments.
+  - Simplified the `AdminThumbnailCell` component by stripping raw DOM mutation logic and replacing it with robust cache-aware React state initialization (`isUrlCached`) and stable standard `onLoad` / `img.complete` fallback properties.
+- **Preferences**:
+  - Prioritize standard React declarative rendering patterns (`style={{ opacity: loaded ? 1 : 0 }}`) over direct DOM properties mutation to avoid layout and opacity state synchronization discrepancies.
+- **Plan Impact**:
+  - Any future image rendering or optimization helpers in Admin panel custom cells should adopt this simplified declarative approach to guarantee render reliability under both cached and fresh CDN requests.
+
 
 
 
