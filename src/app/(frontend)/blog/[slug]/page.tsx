@@ -10,12 +10,15 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
 import { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
+
 
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+    noStore();
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     try {
@@ -126,6 +129,7 @@ export default async function BlogPostPage({
 }: {
     params: Promise<{ slug: string }>;
 }) {
+    noStore();
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     const payload = await getPayload({ config: configPromise });

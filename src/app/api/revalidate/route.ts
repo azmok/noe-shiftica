@@ -16,7 +16,13 @@ import { revalidatePath } from 'next/cache';
 export async function POST(req: NextRequest) {
     const { secret, slug, collection } = await req.json().catch(() => ({}));
 
-    if (!secret || secret !== process.env.REVALIDATE_SECRET) {
+    const trimmedSecret = secret?.trim();
+    const serverSecret = process.env.REVALIDATE_SECRET?.trim();
+
+    console.log(`[Revalidate Debug] Received secret length: ${trimmedSecret?.length || 0}, slice: ${trimmedSecret?.slice(0, 4)}...`);
+    console.log(`[Revalidate Debug] Server secret length: ${serverSecret?.length || 0}, slice: ${serverSecret?.slice(0, 4)}...`);
+
+    if (!trimmedSecret || trimmedSecret !== serverSecret) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -34,3 +40,4 @@ export async function POST(req: NextRequest) {
         paths: slug ? [basePath, `${basePath}/${slug}`] : [basePath],
     });
 }
+
