@@ -48,7 +48,6 @@ export const AltField: React.FC = () => {
     <div className="field-type text">
       <label className="field-label" htmlFor="field-alt">
         Alt Text
-        <span className="required">*</span>
       </label>
       <input
         id="field-alt"

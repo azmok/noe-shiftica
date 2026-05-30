@@ -136,7 +136,7 @@ export default async function DevPostPage({
                         equals: 'published',
                     },
                 },
-                depth: 1,
+                depth: 2,
                 limit: 1,
                 overrideAccess: true,
                 draft: false,
@@ -146,6 +146,7 @@ export default async function DevPostPage({
             throw error;
         }
     })();
+
 
     let post = posts.docs?.[0] || null;
 

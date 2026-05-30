@@ -1,5 +1,26 @@
 # Noe Shiftica Bug History
 
+#### [2026-05-30 15:20] Bug: Built-in Payload CMS Cropper handles clipped & action panels black-masked
+- **Error**: Drag handles (white control points) in Payload's native, built-in image cropper modal were clipped and completely hidden at margins. When first resolved via broad `overflow: visible`, ReactCrop's absolute semi-transparent dark mask bled into adjacent regions, rendering bottom action panels (Apply Changes, Crop, Focal Point) dark-filtered and visually inactive.
+- **Root Cause**: The built-in Payload Image Cropper's HTML wrappers had strict `overflow: hidden` restrictions, causing handles to clip at borders. Applying `overflow: visible` to outer layers like `.image-cropper` allowed internal absolute dark masks to overflow their bounds and cover control panels.
+- **File(s) Modified**: `src/app/(payload)/custom.scss`
+- **Fix Summary**: Refined global SCSS overrides to ONLY apply `overflow: visible !important` to the direct image wrapper `.image-cropper__cropper-wrap` and `.ReactCrop` component itself, keeping the outer `.image-cropper` constrained. Retained height limits (`50vh !important`), centered flex layouts, and custom paddings (`24px !important`) to keep all handles fully exposed within the safety margins while perfectly isolating dark overlays from action buttons.
+- **Prevention Note**: When overriding CSS for multi-layered components like image crops, limit the scope of `overflow: visible` strictly to the inner image container and ReactCrop instance. Never propagate overflow visibility to outer panels that enclose control layout siblings.
+
+### [2026-05-30 15:10] Bug: Crop drag handles hidden on initial load
+- **Error**: The ReactCrop drag handles (white square handles at the borders) were cut off and invisible in the image cropping modal on initial load when the crop area covered the whole image.
+- **Root Cause**: The container surrounding the `ReactCrop` component had `overflow: 'hidden'` applied. In the default full-image selection state, the handles sit exactly outside the image boundary, causing them to be clipped by the overflow wrapper.
+- **File(s) Modified**: `src/components/admin/MediaSizeManager.tsx`
+- **Fix Summary**: Changed the wrapper style from `overflow: 'hidden'` to `overflow: 'visible'` and added `padding: '10px'` to allocate visual space for the handles. Now they are fully visible and draggable immediately when the modal opens.
+- **Prevention Note**: Always ensure adequate container spacing or use `overflow: visible` when employing overlay-based interactive components with border-adjacent controls.
+
+### [2026-05-30 15:07] Bug: Double question mark cache-buster URL corruption
+- **Error**: Media thumbnail images and sizes list in document details displayed as broken images (404 errors) under custom `afterRead` URLs.
+- **Root Cause**: Payload CMS automatically appends a cache-buster query parameter (`?[updatedAt]`) to media URLs in Admin view. Since our custom `afterRead` hook in `Media.ts` was already generating a URL with a query parameter (`?alt=media`), the straight string append by Payload resulted in an invalid URL containing two question marks (`?alt=media?2026...`), which Firebase Storage failed to parse correctly.
+- **File(s) Modified**: `src/collections/Media.ts`
+- **Fix Summary**: Modified the `getDirectUrl` helper in `Media.ts` to end with `?alt=media&`. When Payload appends its custom `?[updatedAt]` cache-buster, it naturally formats into a valid ampersand-joined query structure (`?alt=media&2026...`), resolving the display failures immediately.
+- **Prevention Note**: Always account for automatic CMS cache-buster or query-appending logic when overriding document URLs. End the query parameters with an ampersand (`&`) to permit seamless parameter chaining.
+
 ### [2026-05-30 15:00] Bug: Missing GCS CORS Configuration causing image display failure
 - **Error**: Media thumbnail and size preview images displayed as broken icons in both Admin list view and document detail view.
 - **Root Cause**: The production Google Cloud Storage (Firebase Storage) bucket had no CORS (Cross-Origin Resource Sharing) configuration applied. When the browser attempted to load or decode GCS assets (`firebasestorage.googleapis.com`) directly from the Admin client-side domain (`noe-shiftica.com` or `localhost`), it was blocked by the browser's cross-origin security rules, resulting in rendering failure for newly uploaded GCS assets.
@@ -473,6 +494,16 @@ Close buttons in separate components; let the primary toggle component own the v
 - **Prevention Note**:
   - **Identifier Cell Protection**: Never register custom `Cell` overrides on the main identifier columns of Payload collections (such as `Media.filename`) if they will be displayed inside standard list drawers, as these cells house vital built-in React contexts and selection triggers.
   - If custom cell aesthetics (like shimmer/caching optimizations) are required, register them as **alternative UI fields** or distinct custom fields rather than overriding the primary identification text fields.
-
-
-
+### [2026-05-30 19:35] Bug: Dev Dynamic Route CDN Caching and Lexical Node Resolution Discrepancy
+- **Error**: Inline Lexical images (uploads) were not showing up in the production environment `/dev/[slug]` page, whereas they rendered correctly in local development. In addition, updates made in the Payload Admin did not immediately reflect on the production site.
+- **Root Cause**: Two-fold issue:
+  1. The Next.js dynamic routing config in `next.config.ts` was missing headers for `/dev` routes, causing Firebase App Hosting to cache the build-time HTML at the CDN layer.
+  2. The database query in `/dev/[slug]/page.tsx` was configured with `depth: 1`, which was insufficient to resolve dynamic Lexical editor upload nodes containing nested image data, resulting in empty render spaces.
+- **File(s) Modified**:
+  - `next.config.ts`
+  - `src/app/(frontend)/dev/[slug]/page.tsx`
+- **Fix Summary**:
+  1. Added `Cache-Control: no-store, must-revalidate` headers for `/dev` and `/dev/:path*` inside `next.config.ts`.
+  2. Bumped `depth` from `1` to `2` in `payload.find()` to fully parse custom upload block elements.
+  3. Cleaned up transient `[DEBUG]` logs once production verification succeeded.
+- **Prevention Note**: Always check that any newly introduced dynamic path has CDN cache-bypass headers set in `next.config.ts` if on-demand database sync is expected. Always use `depth: 2` or higher when parsing custom Lexical layout blocks on the frontend to ensure media URLs resolve.

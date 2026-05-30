@@ -28,6 +28,14 @@ const nextConfig: NextConfig = {
         source: '/blog/:path*',
         headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
       },
+      {
+        source: '/dev',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
+      {
+        source: '/dev/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
     ];
   },
   images: {

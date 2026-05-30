@@ -23,7 +23,6 @@ export const Media: CollectionConfig = {
       name: 'alt',
 
       type: 'text',
-      required: true,
       admin: {
         components: {
           Field: '@/components/AltField#AltField',
@@ -41,11 +40,19 @@ export const Media: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeChange: [
+      ({ data }) => {
+        if (data && (!data.alt || data.alt.trim() === '') && data.filename) {
+          data.alt = data.filename
+        }
+        return data
+      },
+    ],
     afterRead: [
       ({ doc }) => {
         const bucket = process.env.NEXT_PUBLIC_GCS_BUCKET || 'noe-shiftica.firebasestorage.app'
         const getDirectUrl = (filename: string) =>
-          `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media`
+          `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filename)}?alt=media&`
 
         if (doc.filename) {
           doc.url = getDirectUrl(doc.filename)

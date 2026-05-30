@@ -377,6 +377,49 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
   - None. CORS issue is permanently fixed.
 
+### [2026-05-30 15:07] Session Summary
+- **Learned/Decided**:
+  - Solved a deep layout/image-broken bug where all GCS thumbnails inside Payload CMS's core sizes sidebar were displaying as broken icons. Discovered that Payload automatically appends a cache-buster query parameter (`?[updatedAt]`) to media URLs. Since our custom `afterRead` URLs in `Media.ts` already included `?alt=media`, this caused invalid URLs with two question marks (`?alt=media?updatedAt`).
+  - Fixed it elegantly by ending our custom query strings with an ampersand (`?alt=media&`), letting Payload's automatic parameter injection naturally chain into a valid query string (`?alt=media&[updatedAt]`).
+  - Re-documented Git and build guidelines inside `rules.md` to establish that pnpm build and git commands should ONLY be executed after Azuma has manually verified and confirmed the visual resolution in the browser.
+- **Preferences**:
+  - Adopt a strict hands-off developer workflow where builds, commits, and pushes are entirely driven and approved by manual developer verification.
+- **Plan Impact**:
+  - None.
+
+### [2026-05-30 15:20] Session Summary
+- **Learned/Decided**:
+  - Realized that the image cropping modal the user actually experiences inside the administrative flow is Payload CMS's native built-in Image Cropper, not just our custom `MediaSizeManager` component.
+  - Identified that the built-in cropper's wrapper elements (e.g., `.image-cropper`, `.ReactCrop`) were restricted by strict `overflow: hidden` rules and rendered the target image at maximum physical dimensions, causing border handles to get clipped.
+  - Adding `overflow: visible` broadly to `.image-cropper` initially caused ReactCrop's absolute semi-transparent dark mask overlay to bleed out of bounds, rendering the bottom action panels (Apply Changes, Crop, Focal Point) dark-filtered and visually inactive.
+  - Resolved this beautifully by refining the CSS overrides in `src/app/(payload)/custom.scss` to ONLY apply `overflow: visible !important` to the direct image wrapper `.image-cropper__cropper-wrap` and `.ReactCrop` component itself, keeping the outer `.image-cropper` properly overflow-contained.
+  - Maintained secure `24px !important` padding on the wrapper, flex-centered alignment, and restricted image height (`50vh !important`), ensuring all control points are perfectly visible and accessible initially while keeping action buttons entirely free of overlay mask bleed.
+- **Preferences**:
+  - Proactively identify whether administrative issues belong to custom fields or standard framework layers, and leverage global stylesheet overrides (`custom.scss`) to patch built-in UI bugs seamlessly while checking for potential absolute positioning overlay collisions.
+- **Plan Impact**:
+  - None. Both our custom sizes cropper and Payload's built-in image cropper are now completely immune to handle clipping issues.
 
 
 
+
+### [2026-05-30 19:35] Session Summary
+- **Learned/Decided**:
+  - Found that Firebase App Hosting CDN cached dynamic routes like `/dev/[slug]` by default. Solved by appending `Cache-Control: no-store, must-revalidate` headers for `/dev` and `/dev/:path*` routes in `next.config.ts`, mirroring `/blog` routes to ensure live updates.
+  - Bumped PayloadCMS query `depth: 1 -> 2` inside the `dev/[slug]` page fetch to fully resolve nested custom upload nodes within the Lexical body content.
+  - Made the `alt` text field in the `media` collection optional in the Payload schema. Added a `beforeChange` hook that falls back automatically to `data.filename` (including extension) if the `alt` text is cleared or left blank upon submission.
+  - Cleaned up the custom `AltField.tsx` visual layout by removing the required asterisk (`*`) to correctly align the UI with the optional schema setting.
+- **Preferences**:
+  - Follow robust CDN-bypass patterns for dynamic articles.
+  - Implement default alt fallback logic backend-side to guarantee consistency regardless of the source (Admin UI or REST API).
+- **Plan Impact**:
+  - Any future dynamic routes with Lexical inline images must employ `depth: 2` query constraints and explicit `no-store` headers.
+
+### [2026-05-30 19:45] Session Summary
+- **Learned/Decided**:
+  - Unified the static pages (`tokusho`, `terms`, `privacy`) from light theme (`bg-white`, `neu-flat`) into the project's premium dark theme (`bg-background-void`, `bg-white/5 backdrop-blur-xl border-white/10`).
+  - Integrated the global mesh gradient blobs and SVG noise filters into static pages to maintain visual parity with dynamic routes.
+  - Standardized custom markdown renderers on static pages to output `text-slate-300` text, `border-white/10` tables, and `border-[#E2FF3D]` left-borders to keep content readable and aligned with the brand aesthetic.
+- **Preferences**:
+  - Maintain a strict dark aesthetic even for legal/terms documentation pages rather than relying on standard light layouts.
+- **Plan Impact**:
+  - All future static/legal document pages added to the frontend should inherit the same `bg-background-void` layout and glassmorphic card patterns immediately.

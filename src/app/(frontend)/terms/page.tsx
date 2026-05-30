@@ -10,18 +10,26 @@ export const metadata = {
 
 export default function TermsOfServicePage() {
     return (
-        <div className="min-h-screen bg-white text-slate-800 font-sans">
+        <div className="min-h-screen bg-background-void text-slate-300 font-sans relative overflow-hidden">
+            {/* Premium Depth Background Elements */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-neu-primary/10 blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-neu-primary/5 blur-[100px]" />
+                <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
+                <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
+            </div>
+
             <Header />
 
-            <main className="container mx-auto max-w-4xl pt-32 pb-20 px-6">
-                <div className="neu-flat rounded-3xl p-8 md:p-12 mb-12">
-                    <h1 className="text-3xl md:text-4xl mb-8 text-slate-900 font-serif font-bold">
+            <main className="container mx-auto max-w-4xl pt-32 pb-20 px-6 relative z-10">
+                <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 mb-12 shadow-2xl">
+                    <h1 className="text-3xl md:text-4xl mb-8 text-white font-sans font-bold tracking-tight">
                         利用規約
                     </h1>
 
-                    <div className="space-y-12 text-[15px] font-light leading-relaxed text-slate-600">
+                    <div className="space-y-12 text-[15px] font-light leading-relaxed text-slate-300">
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 1. 規約の適用
                             </h2>
                             <p>
@@ -30,7 +38,7 @@ export default function TermsOfServicePage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 2. サービスの内容
                             </h2>
                             <p>
@@ -39,7 +47,7 @@ export default function TermsOfServicePage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 3. 禁止事項
                             </h2>
                             <p>
@@ -55,7 +63,7 @@ export default function TermsOfServicePage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 4. 知的財産権
                             </h2>
                             <p>
@@ -64,7 +72,7 @@ export default function TermsOfServicePage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 5. 免責事項
                             </h2>
                             <p>
@@ -73,7 +81,7 @@ export default function TermsOfServicePage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 6. 規約の変更
                             </h2>
                             <p>
@@ -82,7 +90,7 @@ export default function TermsOfServicePage() {
                         </section>
 
                         <section>
-                            <h2 className="text-lg font-bold mb-4 text-slate-900 border-l-4 border-primary pl-4">
+                            <h2 className="text-lg font-bold mb-4 text-white border-l-4 border-[#E2FF3D] pl-4">
                                 7. 準拠法・裁判管轄
                             </h2>
                             <p>
@@ -93,13 +101,21 @@ export default function TermsOfServicePage() {
                 </div>
 
                 <div className="text-center">
-                    <Link href="/" className="neu-btn px-8 py-3 rounded-full text-xs font-bold inline-block text-slate-700">
+                    <Link href="/" className="relative z-10 px-8 py-3 rounded-full text-xs font-bold inline-block text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all hover:-translate-y-0.5">
                         トップページへ戻る
                     </Link>
                 </div>
             </main>
 
             <Footer />
+
+            {/* SVG Global Filters */}
+            <svg className="hidden">
+                <filter id="noiseFilterDetail">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+                    <feColorMatrix type="saturate" values="0" />
+                </filter>
+            </svg>
         </div>
     );
 }
