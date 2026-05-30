@@ -31,6 +31,7 @@ import { slugTrackerPlugin } from './plugins/slugTracker'
 import { markdownCopyPlugin } from './plugins/markdownCopyPlugin'
 
 import { neonBackupPlugin } from './plugins/neon-backup'
+import { panelResizerPlugin } from './plugins/panelResizer'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceFeature } from './plugins/htmlSource/feature.server'
@@ -66,10 +67,8 @@ const configPromise = buildConfig({
     },
     components: {
       // Client-side image compression before upload + progress bar overlay
-      // + 3-panel drag-and-drop resizer (nav / editor / live-preview)
       providers: [
         '@/components/admin/ImageCompressionProvider#ImageCompressionProvider',
-        '@/components/admin/PanelResizerProvider#PanelResizerProvider',
       ],
     },
   },
@@ -140,6 +139,7 @@ const configPromise = buildConfig({
     neonBackupPlugin({
       collections: ['posts', 'tech-posts'],
     }),
+    panelResizerPlugin(),
   ],
 });
 

@@ -65,7 +65,9 @@ export interface Config {
   auth: {
     users: UserAuthOperations;
   };
-  blocks: {};
+  blocks: {
+    'code-block': CodeBlock;
+  };
   collections: {
     users: User;
     media: Media;
@@ -124,6 +126,17 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "code-block".
+ */
+export interface CodeBlock {
+  language: 'javascript' | 'typescript' | 'html' | 'css' | 'python' | 'bash' | 'json' | 'sql' | 'plaintext';
+  code: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'code-block';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

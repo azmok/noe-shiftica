@@ -17,6 +17,7 @@ import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { createHeadlessEditor } from '@lexical/headless'
+import { BlockNode } from '@payloadcms/richtext-lexical/client'
 
 const DEBUG = false // ★ DEBUG FLAG — set to false when done debugging
 
@@ -56,6 +57,62 @@ function sanitizeMarkdownForPaste(input: string): string {
 const MarkdownPastePlugin = () => {
     const [editor] = useLexicalComposerContext()
     const { editorConfig } = useEditorConfigContext()
+
+    useEffect(() => {
+        // Dynamically attach a bubble-phase stopPropagation listener (shield) to Monaco Editor
+        // container or raw input/textarea elements when they are focused/interacted with.
+        // This ensures the element itself receives keydown and clipboard events (so Ctrl+A,
+        // copy, paste, cut work perfectly inside Monaco), but prevents these events from
+        // bubbling up to the parent Lexical editor which would otherwise intercept them.
+        const attachShortcutShield = (target: HTMLElement | null) => {
+            if (!target) return;
+
+            const monacoContainer = target.closest('.monaco-editor') as HTMLElement;
+            const shieldEl = monacoContainer || (
+                (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable === false) ? target : null
+            );
+
+            if (shieldEl && !shieldEl.dataset.hasShortcutShield) {
+                shieldEl.dataset.hasShortcutShield = 'true';
+                
+                const shieldListener = (event: Event) => {
+                    // Prevent the event from bubbling up to Lexical
+                    event.stopPropagation();
+                };
+                
+                shieldEl.addEventListener('keydown', shieldListener);
+                shieldEl.addEventListener('copy', shieldListener);
+                shieldEl.addEventListener('cut', shieldListener);
+                shieldEl.addEventListener('paste', shieldListener);
+            }
+        };
+
+        const handleShortcutInterception = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            attachShortcutShield(target);
+        };
+
+        const handleClipboardInterception = (e: ClipboardEvent) => {
+            const target = e.target as HTMLElement;
+            attachShortcutShield(target);
+        };
+
+        // Use capture phase to attach the shield listener as early as possible.
+        // Since the capture listeners themselves do NOT call stopPropagation(),
+        // the browser continues propagating the event down to the target (Monaco),
+        // and then our bubble shield catches and stops the event during the bubble phase.
+        window.addEventListener('keydown', handleShortcutInterception, true);
+        window.addEventListener('copy', handleClipboardInterception, true);
+        window.addEventListener('cut', handleClipboardInterception, true);
+        window.addEventListener('paste', handleClipboardInterception, true);
+
+        return () => {
+            window.removeEventListener('keydown', handleShortcutInterception, true);
+            window.removeEventListener('copy', handleClipboardInterception, true);
+            window.removeEventListener('cut', handleClipboardInterception, true);
+            window.removeEventListener('paste', handleClipboardInterception, true);
+        };
+    }, []);
 
     useEffect(() => {
         return editor.registerCommand(
@@ -155,7 +212,7 @@ const MarkdownPastePlugin = () => {
                                   } catch (e) {
                                       console.error(`  [child ${i}] exportJSON FAILED:`, e)
                                   }
-                            })
+                             })
                         }
                     }, { discrete: true })
 
@@ -262,20 +319,9 @@ const MarkdownPastePlugin = () => {
 // Monaco Code Block Toolbar Item component (Official Payload Lexical design)
 function MonacoCodeToolbarItem() {
     const [editor] = useLexicalComposerContext()
+    const { editorConfig } = useEditorConfigContext()
 
     const handleInsertMonacoCode = () => {
-        console.warn("[MarkdownPaste Debug] Toolbar Monaco insertion button CLICKED!");
-        
-        // Read active and previous selection state under reader scope for diagnostics
-        editor.getEditorState().read(() => {
-            const selection = $getSelection();
-            console.warn('[MarkdownPaste Debug] Selection inside click handler:', selection ? {
-                type: selection.constructor.name,
-                isRange: $isRangeSelection(selection),
-                nodesCount: (selection as any).getNodes ? (selection as any).getNodes().length : 0
-            } : 'null');
-        });
-
         // Insert custom code-block Lexical node securely using dynamic Klass lookup
         editor.update(() => {
             const uniqueId = `code-block-id-${Math.random().toString(36).substr(2, 9)}`;
@@ -300,18 +346,13 @@ function MonacoCodeToolbarItem() {
                 }
                 
                 const BlockKlass = blockConfig.klass;
+                
                 // Safely create node instance under the editor's own registry context
                 const parsedNode = BlockKlass.importJSON(blockNode as any);
                 
                 $insertNodes([parsedNode]);
-                console.warn('[MarkdownPaste Debug] Successfully inserted Monaco Code Block node into Lexical AST via dynamic lookup');
             } catch (err) {
-                console.error('[MarkdownPaste Debug] Failed to insert Monaco Code Block node:', err);
-                
-                // Fallback diagnostics trace
-                console.warn('[MarkdownPaste Debug] Registered editor nodes map keys:', 
-                    (editor as any)._nodes ? Array.from((editor as any)._nodes.keys()) : 'undefined'
-                );
+                console.error('Failed to insert Monaco Code Block:', err);
             }
         });
     };
@@ -354,6 +395,7 @@ function MonacoCodeToolbarItem() {
 }
 
 export const MarkdownPasteClientFeature = createClientFeature({
+    nodes: [BlockNode],
     plugins: [
         {
             Component: MarkdownPastePlugin,

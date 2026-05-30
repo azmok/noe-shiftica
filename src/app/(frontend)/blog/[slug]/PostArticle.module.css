@@ -5,6 +5,9 @@
   --white-text-100: rgb(255, 255, 255);
   --white-text-90: rgba(243, 243, 243, 1);
   --white-text-80: rgb(224, 224, 224);
+  --white-text-75: rgb(204, 204, 204);
+  --white-text-70: rgb(180, 180, 180);
+  --white-text-60: rgba(160, 160, 160, 1);
 }
 
 .postContent {
@@ -17,14 +20,10 @@
   /* Paragraphs & Core Text */
   & p {
     font-size: 0.9rem;
-    /* 18px on 16px base */
     font-weight: 300;
     line-height: 1.75;
     margin-bottom: 1.75rem;
-    /* Standard Airbnb breathability */
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
     color: var(--white-text-90);
-    /* text-white/90 for dark theme */
     letter-spacing: 0.033em;
   }
 
@@ -54,21 +53,19 @@
   }
 
   & h2 {
-    font-size: 1.875rem;
-    /* 32px precisely */
-    margin-top: 3.5rem;
-    /* 56px - High impact top margin */
-    margin-bottom: 1.5rem;
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
+    font-size: 2.25rem;
+    margin-top: 3.2em;
+    margin-bottom: 1.6rem;
     line-height: 1.125;
+    font-weight: 700;
   }
 
   & h3 {
-    font-size: 1.125rem;
-    /* 18px - Sits elegantly between sections */
-    margin-top: 2.5rem;
-    margin-bottom: 1.25rem;
+    font-size: 1.47rem;
+    margin-top: 2em;
+    margin-bottom: 1em;
     line-height: 1.22;
+    font-weight: 800;
   }
 
   /* Lists */
@@ -76,11 +73,10 @@
   & ol {
     padding: 0 0 0.5rem 2rem;
     margin: 1.5rem 0 1.5rem 0.5rem;
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
 
     & li {
       margin-bottom: 0;
-      line-height: 1.2;
+      line-height: 1.3;
       font-size: 0.8rem;
       font-weight: 300;
       padding-left: 0rem;
@@ -105,10 +101,10 @@
     }
   }
 
-  /* Strong/Bold tags */
   & strong {
-    color: var(--white-text-100);
-    font-weight: 600;
+    color: var(--white-text-75);
+    font-weight: 700;
+    letter-spacing: 0.03em;
   }
 
   /* Inline Code cleanup to prevent backslash escapes */
@@ -163,6 +159,65 @@
     }
   }
 
+  /* Premium Blockquote Styling */
+  & blockquote {
+    position: relative;
+    margin: 2.5rem 0;
+    padding: 1.75rem 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--color-neu-primary);
+    border-radius: 0.5rem 1.25rem 1.25rem 0.5rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: var(--white-text-60);
+    font-weight: 300;
+
+    /* Reset Tailwind prose quote marks */
+    &::before,
+    &::after {
+      content: "" !important;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+      border-left-color: var(--color-neu-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6);
+    }
+
+    & p {
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.82) !important;
+      margin: 0 !important;
+      font-style: normal;
+      letter-spacing: 0.05em;
+    }
+
+    /* Target strong elements inside blockquote for premium contrast */
+    & strong {
+      color: inherit;
+      font-weight: 900;
+    }
+
+    /* Elegant giant quotation mark watermark */
+    &::after {
+      content: "“" !important;
+      position: absolute;
+      top: -0.25rem;
+      left: 1.25rem;
+      font-size: 5rem;
+      font-family: Georgia, serif;
+      color: var(--color-neu-primary);
+      opacity: 0.08;
+      line-height: 1;
+      pointer-events: none;
+    }
+  }
+
   /* Responsive Overrides (Mobile) */
   @media (max-width: 768px) {
     & p {
@@ -200,6 +255,21 @@
       & td {
         padding: 0.5rem 0.75rem;
         font-size: 0.8rem;
+      }
+    }
+
+    & blockquote {
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+
+      & p {
+        font-size: 0.875rem;
+      }
+
+      &::after {
+        font-size: 4rem;
+        top: -0.15rem;
+        left: 0.75rem;
       }
     }
   }

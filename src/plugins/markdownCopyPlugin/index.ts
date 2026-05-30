@@ -3,11 +3,13 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import {
   FixedToolbarFeature,
   EXPERIMENTAL_TableFeature,
-  HorizontalRuleFeature
+  HorizontalRuleFeature,
+  BlocksFeature,
 } from '@payloadcms/richtext-lexical'
 import { MarkdownPasteFeature } from '../../features/markdownPaste/server'
 import { HtmlSourceFeature } from '../htmlSource/feature.server'
 import { MarkdownCopyFeature } from './feature.server'
+import { CustomCodeBlock } from '../../features/customCodeBlock'
 
 export const markdownCopyPlugin = (options?: { collections?: string[] }): Plugin => {
   const targetCollections = options?.collections || ['posts', 'tech-posts']
@@ -28,6 +30,9 @@ export const markdownCopyPlugin = (options?: { collections?: string[] }): Plugin
                   MarkdownCopyFeature(),
                   HtmlSourceFeature(),
                   HorizontalRuleFeature(),
+                  BlocksFeature({
+                    blocks: [CustomCodeBlock],
+                  }),
                 ],
               }),
             }
