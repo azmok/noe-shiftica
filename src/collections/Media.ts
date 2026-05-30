@@ -18,14 +18,10 @@ export const Media: CollectionConfig = {
       // component always shows — even for browser-cached images.
       name: 'filename',
       type: 'text',
-      admin: {
-        components: {
-          Cell: '@/components/AdminThumbnailCell#AdminThumbnailCell',
-        },
-      },
     },
     {
       name: 'alt',
+
       type: 'text',
       required: true,
       admin: {

@@ -442,4 +442,23 @@ Close buttons in separate components; let the primary toggle component own the v
   - **DOM Presence !== Visibility**: In Next.js/Payload CMS v3 single-page environments, elements (like iframes or drawers) might remain mounted in the DOM while being styled away with `display: none` or scale. Always verify visual presence using `.offsetParent` and bounding rect width/height checks.
   - **Inline Override Hygiene**: If a custom script programmatically injects flex properties (`display: flex`, `flex-direction`, explicit widths) onto framework-managed containers, ensure you cleanly wipe those styles to `''` during the teardown block to prevent layout leakage.
 
+### [2026-05-30 13:30] Bug: Relationship Drawer Item Selection Completely Freezes on All Rows
+- **Error**: Clicking images or any text rows in the Payload CMS "Choose from Existing" relationship/upload drawer did not select the item, and the drawer failed to close or load the selected asset.
+- **Root Cause**:
+  - **Click Selection Trigger Erasure**: Payload CMS v3's `ListDrawer` relies on a built-in selection trigger element (often a Radix-UI modal action wrapper or click handler) nested strictly inside the default cell renderer for the primary column (`filename` for the `media` collection).
+  - By registering a custom `Cell` component (`AdminThumbnailCell`) on the `filename` field, the standard component was completely overridden and bypassed. This wiped out Payload's built-in onClick/mousedown selection triggers for that column.
+  - Since other adjacent table columns (like `alt` or `createdAt` plain text columns) are not configured to trigger row selections on click, the entire row lost all selectable targets. As a result, clicking anywhere on the drawer rows had zero effect, freezing the entire selection UI.
+- **File(s) Modified**:
+  - `src/collections/Media.ts`
+  - `src/components/AdminThumbnailCell.tsx` (cleaned up debug codes)
+  - `.antigravity/rules.md` (added strict cell override prohibition)
+- **Fix Summary**:
+  - Unregistered `AdminThumbnailCell` from the `filename` field in `src/collections/Media.ts` by commenting out/removing the custom `Cell` setting. This instantly restored Payload's native selection triggers, bringing full functionality back.
+  - Cleaned up all diagnostic pointer events, event simulations, and logging from `AdminThumbnailCell.tsx`.
+  - Added a strict prohibition rule to `rules.md` forbidding the registration of custom Cell components on major identification fields (`Media.filename`, etc.) to prevent structural breaks in standard Payload UI.
+- **Prevention Note**:
+  - **Identifier Cell Protection**: Never register custom `Cell` overrides on the main identifier columns of Payload collections (such as `Media.filename`) if they will be displayed inside standard list drawers, as these cells house vital built-in React contexts and selection triggers.
+  - If custom cell aesthetics (like shimmer/caching optimizations) are required, register them as **alternative UI fields** or distinct custom fields rather than overriding the primary identification text fields.
+
+
 

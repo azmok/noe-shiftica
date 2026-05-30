@@ -347,5 +347,17 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
   - All future programmatic visual layout interventions must dynamically track target DOM elements and implement complete cleanups in their teardown hooks.
 
+### [2026-05-30 13:30] Session Summary
+- **Learned/Decided**:
+  - Identified that custom `Cell` overrides on primary identifier columns in Payload CMS collections (like `Media.filename` or `Posts.title`) completely wipe out standard modal/drawer row click handlers and React contexts (such as Radix UI selection bindings).
+  - This causes the entire list drawer rows to become unselectable, freezing relationship and upload selections.
+  - Decided to restore the default native Cell renderer for `Media.filename` to preserve drawer functionality, and established a permanent project rule strictly prohibiting major identifier cell overrides.
+  - Decided that iterative full builds (`pnpm run build`) are unnecessary during hot-reloading development (Fast Refresh) to save time, and only a single final build verification is required immediately before final commit/push.
+- **Preferences**:
+  - Azuma wants solid, robust default behaviors for major CMS administrative flows, prioritizing standard framework stability and avoiding structural custom component overrides that break modal selectors.
+- **Plan Impact**:
+  - Never register custom `Cell` components on primary identification fields. Implement visual optimizations as distinct alternative UI fields or sidebar components instead.
+
+
 
 

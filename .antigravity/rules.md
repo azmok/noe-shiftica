@@ -49,6 +49,8 @@ CRITICAL: Before any action, you MUST read and strictly adhere to the global pro
 - `src/access/*`
 - `src/lib/db.ts`
 - `components/Footer.tsx` — NEVER modify unless explicitly specified by Azuma.
+- **STRICT CELL OVERRIDE PROHIBITION (Media.filename)**: You are STRICTLY FORBIDDEN from registering custom Cell components on major identification fields in collections that are displayed inside Payload list drawers (specifically `Media.filename`). In Payload CMS v3, the built-in selection trigger (which manages drawer selection/closing) is nested strictly inside the default cell wrapper of the primary column. Overriding these primary identifier cells completely wipes out the Radix-UI selection handler, rendering the entire list drawer row unselectable.
+
 
 ### 4-C. UI/UX Consistency
 - Adhere strictly to existing Tailwind CSS and Shadcn UI patterns.
@@ -83,6 +85,8 @@ All image components that manage loading state MUST implement a **dual-layer cac
 ## 5. Deployment & Debugging Protocol (Auto-Diagnostic)
 - **Execution Steps**: Log Retrieval → Root Cause Analysis → Strict Lockfile Sync (`pnpm i`) → Vulnerability Checks → Verification (`pnpm run build`).
 - **CRITICAL: Debug Code Clean-up**: Any debugging logs, diagnostic statements, testing helper parameters, or verbose outputs (e.g. `console.log` / `[PreviewDebug]`) added during the debugging process MUST be completely removed or safely commented out once the bug is verified resolved. Leaving verbose logging or temporary diagnostic variables in production code is STRICTLY FORBIDDEN to prevent console pollution and performance overhead.
+- **No Unnecessary Iterative Builds**: During active debugging and development, if the local development server is already running and supporting Fast Refresh/hot reloading, do NOT execute a full production build (`pnpm run build`) for every small iterative code adjustment, as it unnecessarily wastes time and system resources. A single final production build verification (`pnpm run build`) is only required immediately prior to the final commit or production delivery to guarantee build and TypeScript compilation integrity.
+
 
 ## 6. Session Context Protocol
 

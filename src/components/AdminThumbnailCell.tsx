@@ -66,6 +66,7 @@ export const AdminThumbnailCell: React.FC<{
   cellData?: string
   rowData?: Record<string, unknown>
 }> = ({ cellData: filename, rowData }) => {
+
   const sizes = rowData?.sizes as Record<string, { url?: string }> | undefined
   const thumbUrl: string | undefined =
     sizes?.adminList?.url ?? (rowData?.url as string | undefined)
@@ -176,3 +177,5 @@ export const AdminThumbnailCell: React.FC<{
     </div>
   )
 }
+
+
