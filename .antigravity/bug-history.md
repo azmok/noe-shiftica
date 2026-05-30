@@ -1,5 +1,12 @@
 # Noe Shiftica Bug History
 
+### [2026-05-30 15:00] Bug: Missing GCS CORS Configuration causing image display failure
+- **Error**: Media thumbnail and size preview images displayed as broken icons in both Admin list view and document detail view.
+- **Root Cause**: The production Google Cloud Storage (Firebase Storage) bucket had no CORS (Cross-Origin Resource Sharing) configuration applied. When the browser attempted to load or decode GCS assets (`firebasestorage.googleapis.com`) directly from the Admin client-side domain (`noe-shiftica.com` or `localhost`), it was blocked by the browser's cross-origin security rules, resulting in rendering failure for newly uploaded GCS assets.
+- **File(s) Modified**: `gcs-cors.json` (applied to bucket), `src/components/AdminThumbnailCell.tsx` (inserted debug logs).
+- **Fix Summary**: Created a standard GCS CORS configuration file `gcs-cors.json` allowing wildcard origins (`*`) and all necessary methods/headers, and successfully applied it to the production GCS bucket using `gcloud storage`. Added robust `onLoad`/`onError` console logging to `AdminThumbnailCell.tsx` to simplify future diagnostics.
+- **Prevention Note**: Always ensure CORS rules are set up on production GCS buckets when serving assets directly to frontend clients or Admin UIs.
+
 ### [2026-05-30 14:52] Bug: Admin Thumbnail Cell loading state freeze
 - **Error**: Media thumbnail images in Admin list view remained invisible (stuck at opacity 0/loading shimmer) on some newly uploaded images.
 - **Root Cause**: The component was checking for `img.complete` in `useLayoutEffect` and launching an asynchronous `img.decode()` Promise in `useEffect`. If `img.decode()` failed, timed out, or had a race condition with Fast Refresh, `loaded` remained `false` (hidden) because the transition relied on manual DOM manipulation `el.style.opacity = '1'` inside the non-fired or rejected callback.

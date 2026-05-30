@@ -88,10 +88,11 @@ export const AdminThumbnailCell: React.FC<{
   React.useEffect(() => {
     const img = imgRef.current
     if (img && img.complete) {
+      console.log(`[AdminThumbnailCell Debug] Immediate cache load detected for: ${filename}`)
       setLoaded(true)
       if (optimizedUrl) markUrlAsLoaded(optimizedUrl)
     }
-  }, [optimizedUrl])
+  }, [optimizedUrl, filename])
 
   if (!filename) return null
 
@@ -125,8 +126,15 @@ export const AdminThumbnailCell: React.FC<{
             transition: 'opacity 0.2s ease-out',
           }}
           onLoad={() => {
+            console.log(`[AdminThumbnailCell Debug] Image loaded successfully: ${filename}`, { optimizedUrl })
             if (optimizedUrl) markUrlAsLoaded(optimizedUrl)
             setLoaded(true)
+          }}
+          onError={() => {
+            console.error(`[AdminThumbnailCell Debug] Image failed to load: ${filename}`, {
+              optimizedUrl,
+              thumbUrl,
+            })
           }}
         />
       </div>

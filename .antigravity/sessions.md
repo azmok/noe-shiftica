@@ -367,6 +367,16 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
   - Any future image rendering or optimization helpers in Admin panel custom cells should adopt this simplified declarative approach to guarantee render reliability under both cached and fresh CDN requests.
 
+### [2026-05-30 15:00] Session Summary
+- **Learned/Decided**:
+  - Found that the production GCS bucket had an empty CORS configuration. This was causing browsers to reject direct GCS asset loading and decoding due to cross-origin security blockages, resulting in broken image icons on newly uploaded images in both list views and document detail views.
+  - Successfully configured wildcard origin CORS using a custom `gcs-cors.json` policy file and updated the bucket settings via `gcloud storage`.
+  - Added robust console instrumentation (`onLoad`/`onError` logs) to `AdminThumbnailCell.tsx` to simplify future rendering diagnostics directly inside F12 DevTools.
+- **Preferences**:
+  - Keep bucket-level infrastructure configurations in clean documented files (`gcs-cors.json`) within the project but ignored from build tracking if temporary.
+- **Plan Impact**:
+  - None. CORS issue is permanently fixed.
+
 
 
 
