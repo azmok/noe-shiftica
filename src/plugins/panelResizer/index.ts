@@ -9,7 +9,6 @@ export const panelResizerPlugin = (): Plugin => {
     const providerPath = '@/plugins/panelResizer/Provider#PanelResizerProvider'
     if (!config.admin.components.providers.includes(providerPath)) {
       config.admin.components.providers.push(providerPath)
-      console.log('[PreviewDebug] Registered PanelResizerProvider to admin components providers list via plugin.')
     }
 
     return config

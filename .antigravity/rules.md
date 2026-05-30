@@ -82,6 +82,7 @@ All image components that manage loading state MUST implement a **dual-layer cac
 
 ## 5. Deployment & Debugging Protocol (Auto-Diagnostic)
 - **Execution Steps**: Log Retrieval → Root Cause Analysis → Strict Lockfile Sync (`pnpm i`) → Vulnerability Checks → Verification (`pnpm run build`).
+- **CRITICAL: Debug Code Clean-up**: Any debugging logs, diagnostic statements, testing helper parameters, or verbose outputs (e.g. `console.log` / `[PreviewDebug]`) added during the debugging process MUST be completely removed or safely commented out once the bug is verified resolved. Leaving verbose logging or temporary diagnostic variables in production code is STRICTLY FORBIDDEN to prevent console pollution and performance overhead.
 
 ## 6. Session Context Protocol
 
@@ -192,10 +193,11 @@ neonctl branches create --name test/integration --parent production
 - Tests run sequentially (`fileParallelism: false`) to prevent account lockout race conditions.
 - Run `pnpm test:setup` before each test session to reset `loginAttempts` and unlock the test user.
 
-## 9. Fast-Track Auto-Commit & Push Protocol (Speed-First)
-- **AUTONOMOUS MANDATE**: Git操作を行う際は、差分の詳細な分析は不要です。簡潔なコミットメッセージを作成し、確認なしで即座に実行してください。
-- **Workflow**: 1. `git add .` → 2. 簡潔なコミットメッセージを生成 → 3. `git commit --no-verify -m "[summary with Claude Code] <Japanese summary>"` → 4. `git push`
-- **SPEED GOAL**: 簡潔なコミットメッセージを取れるところから取って、即座にコミット、そして即座にプッシュしてください。終わったらそのまますぐにレスポンスすること。
+## 9. Git Commit & Push Protocol (STRICT — NO EXCEPTIONS)
+- **NEVER run `git commit` or `git push` autonomously.** You MUST wait for explicit instruction from Azuma before committing or pushing any changes.
+- **Do NOT assume "task complete" means "commit now."** Finishing the code work and committing are two separate steps. Always stop after the code work and wait.
+- **Correct workflow**: Complete the code changes → Report to Azuma what was done → **WAIT** for Azuma to say "commit" or "push" → Then and only then run `git add / commit / push`.
+- **No exceptions**: Even if the previous session had auto-commit behavior, this rule overrides it permanently.
 
 ## 10. Clarify Ambiguity Before Acting
 - **Never assume. Always ask first.** If an instruction is ambiguous in any way, stop and ask for clarification before starting any work.

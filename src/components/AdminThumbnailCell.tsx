@@ -132,7 +132,7 @@ export const AdminThumbnailCell: React.FC<{
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', pointerEvents: 'none' }}>
       <div
         style={{
           width: '40px',

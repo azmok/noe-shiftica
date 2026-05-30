@@ -81,6 +81,11 @@ export function getSharedBlogFields(): Field[] {
             admin: {
                 position: 'sidebar',
             },
+            filterOptions: {
+                width: {
+                    greater_than_equal: 1000,
+                },
+            },
         },
         {
             name: 'customMetaData',

@@ -301,3 +301,51 @@ This file tracks unique project learnings, specifically patterns and troubleshoo
 - **Plan Impact**:
   - Future Lexical customizations should extend the `toolbarFixed` property in `createClientFeature` to natively append interactive controls.
 
+### [2026-05-30 03:10] Session Summary
+- **Learned/Decided**:
+  - Implemented dynamic event shielding (dynamic bubble-phase event stopping) to fully resolve keyboard/clipboard shortcut conflicts inside integrated iframe-like widgets (such as Monaco Editor) inside Lexical fields.
+  - Upgraded Lexical blog `blockquote` CSS styles globally in `PostArticle.module.css` to feature custom transparent dark cards (`rgba(255, 255, 255, 0.02)`), sleek border transitions, 4px brand accent border-left (`#E2FF3D`), and giant background quotation mark watermarks (`“`) to override generic default Tailwind prose designs. Fine-tuned typography (fontsize 0.9rem to match body text, line-height 1.9, letter-spacing 0.05em, softer font color `rgba(255, 255, 255, 0.82)`, and highlighted strong contrast `rgba(255, 255, 255, 0.98)`) to dramatically optimize readability and balance visual noise inside the dark card.
+- **Preferences**:
+  - Azuma prefers sleek, dark, premium theme aesthetics with cohesive lime green accents (`#E2FF3D`) and subtle interactive scale/color animations.
+- **Plan Impact**:
+  - All future Rich Text / Block elements should follow the premium dark theme aesthetics established in the blog module CSS.
+  - Added workspace-level `.vscode` configuration to seamlessly support raw CSS Nesting highlighting and linting via PostCSS and Stylelint recommendations, ensuring standard `.css` files remain completely error-free in the development IDE.
+  - Cleaned up diagnostic components (removed `Oje Debug Panel` and redundant `console.error` logs from `PostArticle.tsx`) before production release.
+
+### [2026-05-30 04:03] Session Summary
+- **Learned/Decided**:
+  - Implemented `PanelResizerProvider` – a global Payload Admin client provider that adds drag-and-drop resize handles to the 3-panel Admin layout (nav sidebar / editor / live-preview iframe).
+  - Approach: `MutationObserver` + `requestAnimationFrame` debounce to watch for Payload's live-preview mode (`collection-edit--is-live-previewing`). Handles are injected as raw DOM elements to avoid React tree coupling.
+  - The nav panel width is controlled via the Payload CSS variable `--nav-width` (min 120px, max 540px). The editor panel width is controlled via a new CSS variable `--oje-editor-w` (min 220px, max total-220px) that overrides the hardcoded `40%` in Payload's SCSS.
+  - Only activates at `window.innerWidth >= 1024px` (PC / tablet landscape). Below that threshold all handles are removed and all inline styles restored.
+  - Uses PointerEvents API for both mouse and touch support (Apple Pencil on iPad etc.).
+  - Lime-green glow animation on hover/drag matches the project accent colour palette.
+  - Component registered as a Payload `admin.components.providers` entry; `importMap.js` was already pre-populated from a prior session.
+  - Build verified: `pnpm run build` passed with 0 errors.
+- **Preferences**:
+  - Azuma wants UI tools that only activate on wide screens and remain invisible on mobile/portrait.
+- **Plan Impact**:
+  - Future admin customisations should follow the same `provider + MutationObserver + RAF` pattern for safely injecting DOM elements without disrupting Payload's React tree.
+
+### [2026-05-30 13:00] Session Summary
+- **Learned/Decided**:
+  - Custom cell components like `AdminThumbnailCell` in PayloadCMS table views can intercept pointer/mouse events and block native row click events inside relationship or upload selector drawers. Adding `pointer-events: none` directly to the custom cell container wrapper resolves the event bubble blockages seamlessly.
+  - Adding `filterOptions` to standard relationship/upload fields allows backend-level asset list constraints (e.g. `width: { greater_than_equal: 1000 }` to select only high-resolution images for the Hero Image) right inside Payload's asset picker drawer, improving visual clarity and preventing size mismatch errors.
+- **Preferences**:
+  - Azuma prefers precise filtering constraints to eliminate redundant asset choices (like separating main hero images from small thumbnails/OG variants) and clean up the administrative flow.
+- **Plan Impact**:
+  - Always consider pointer event transparency when wrapping or injecting custom elements inside Payload CMS admin panel list view table rows.
+  - Proactively use `filterOptions` on relationship/upload fields whenever specific dimensions or asset statuses are expected.
+
+### [2026-05-30 13:15] Session Summary
+- **Learned/Decided**:
+  - In Payload CMS v3 single-page admin layout, the live preview `iframe` stays mounted in the DOM even when the preview panel is toggled OFF (hidden).
+  - To robustly check if live preview is actually active and visible, we must verify both the existence of the `iframe` and its layout size (`iframe.offsetParent !== null` and `iframe.getBoundingClientRect().width > 0`).
+  - When programmatically modifying layout-level elements (`splitParent`, editor container, preview container) by injecting flex styles, we must preserve exact DOM references in state/refs and completely clear all programmatically set inline styles (setting them to `''`) when tearing down or removing features to avoid layout pollution.
+- **Preferences**:
+  - Azuma wants the interface to completely and cleanly collapse when live preview is hidden, scaling the editor to full width with zero trailing margins or trailing spaces.
+- **Plan Impact**:
+  - All future programmatic visual layout interventions must dynamically track target DOM elements and implement complete cleanups in their teardown hooks.
+
+
+

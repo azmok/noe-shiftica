@@ -231,6 +231,11 @@ export const Posts: CollectionConfig = {
             admin: {
                 position: 'sidebar',
             },
+            filterOptions: {
+                width: {
+                    greater_than_equal: 1000,
+                },
+            },
         },
         {
             name: 'customMetaData',
