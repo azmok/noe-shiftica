@@ -21,6 +21,9 @@ environmentVariables:
   # データベース（本番用のURLが決まったらここに書くか Secret に入れる）
   - variable: DATABASE_URL
     secret: DATABASE_URL
+    availability:
+      - BUILD
+      - RUNTIME
 
   - variable: REVALIDATE_SECRET
     secret: REVALIDATE_SECRET

@@ -79,7 +79,10 @@ secret.txt
 .antigravity/*
 .claude/*
 backup-staging/
-
+.gemini/*
+.github/*
+_sideprojects/*
+.vscode/
 
 CLAUDE.md
 GEMINI.md
