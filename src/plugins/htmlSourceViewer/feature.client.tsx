@@ -13,7 +13,7 @@ import { useCallback, useState, useEffect } from 'react'
 
 import { html as beautifyHtml } from 'js-beautify'
 
-import { HtmlSourcePlugin, HtmlSourceToolbarButton } from './HtmlSourcePlugin'
+import { HtmlSourceViewer, HtmlSourceViewerToolbarButton } from './HtmlSourceViewer'
 import { htmlToLexical, lexicalToHtml } from './conversion'
 
 function formatHtml(raw: string): string {
@@ -28,7 +28,7 @@ function formatHtml(raw: string): string {
 // ツールバーボタンのラッパー
 // ----------------------------------------------------------------
 
-function HtmlSourceToolbarItem() {
+function HtmlSourceViewerToolbarItem() {
   const [editor] = useLexicalComposerContext()
   const [isSourceMode, setIsSourceMode] = useState(false)
 
@@ -38,33 +38,33 @@ function HtmlSourceToolbarItem() {
       const { active } = (e as CustomEvent).detail
       setIsSourceMode(active)
     }
-    window.addEventListener('htmlsource:sync', handleSync)
-    return () => window.removeEventListener('htmlsource:sync', handleSync)
+    window.addEventListener('htmlsourceviewer:sync', handleSync)
+    return () => window.removeEventListener('htmlsourceviewer:sync', handleSync)
   }, [])
 
   const handleToggle = useCallback(() => {
     const nextMode = !isSourceMode
     if (nextMode) {
       // Rich → Source
-      // console.group('[HtmlSource] ══ Toolbar toggle → SOURCE ══')
+      // console.group('[HtmlSourceViewer] ══ Toolbar toggle → SOURCE ══')
       const html = lexicalToHtml(editor)
       window.dispatchEvent(
-        new CustomEvent('htmlsource:enter', { detail: { html } }),
+        new CustomEvent('htmlsourceviewer:enter', { detail: { html } }),
       )
-      // console.log('[HtmlSource] dispatched htmlsource:enter')
+      // console.log('[HtmlSourceViewer] dispatched htmlsourceviewer:enter')
       // console.groupEnd()
     } else {
       // Source → Rich
-      // console.group('[HtmlSource] ══ Toolbar toggle → RICH TEXT ══')
-      window.dispatchEvent(new CustomEvent('htmlsource:exit'))
-      // console.log('[HtmlSource] dispatched htmlsource:exit')
+      // console.group('[HtmlSourceViewer] ══ Toolbar toggle → RICH TEXT ══')
+      window.dispatchEvent(new CustomEvent('htmlsourceviewer:exit'))
+      // console.log('[HtmlSourceViewer] dispatched htmlsourceviewer:exit')
       // console.groupEnd()
     }
     setIsSourceMode(nextMode)
   }, [editor, isSourceMode])
 
   return (
-    <HtmlSourceToolbarButton isSourceMode={isSourceMode} onToggle={handleToggle} />
+    <HtmlSourceViewerToolbarButton isSourceMode={isSourceMode} onToggle={handleToggle} />
   )
 }
 
@@ -72,11 +72,31 @@ function HtmlSourceToolbarItem() {
 // Feature-local Plugin (エディタ DOM に overlay する)
 // ----------------------------------------------------------------
 
-function HtmlSourceOverlayPlugin() {
+function HtmlSourceViewerOverlayPlugin() {
   const [editor] = useLexicalComposerContext()
   const [isSourceMode, setIsSourceMode] = useState(false)
   const [htmlValue, setHtmlValue] = useState('')
   const [parseError, setParseError] = useState<string | null>(null)
+
+  // Dynamically hide the visual WYSIWYG editor container when in HTML source mode,
+  // making Monaco Editor completely replace the editor view.
+  useEffect(() => {
+    const rootEl = editor.getRootElement()
+    if (!rootEl) return
+
+    const scroller = rootEl.closest('.editor-scroller') as HTMLElement
+    if (!scroller) return
+
+    if (isSourceMode) {
+      scroller.style.display = 'none'
+    } else {
+      scroller.style.display = ''
+    }
+
+    return () => {
+      scroller.style.display = ''
+    }
+  }, [editor, isSourceMode])
 
   useEffect(() => {
     function onEnter(e: Event) {
@@ -85,37 +105,37 @@ function HtmlSourceOverlayPlugin() {
       setParseError(null)
       setIsSourceMode(true)
       // ツールバーボタンと状態を同期
-      window.dispatchEvent(new CustomEvent('htmlsource:sync', { detail: { active: true } }))
+      window.dispatchEvent(new CustomEvent('htmlsourceviewer:sync', { detail: { active: true } }))
     }
 
     function onExit() {
-      // console.group('[HtmlSource] ══ overlayPlugin onExit ══')
+      // console.group('[HtmlSourceViewer] ══ overlayPlugin onExit ══')
       setParseError(null)
       try {
         editor.update(() => {
           htmlToLexical(editor, htmlValue)
         })
         setIsSourceMode(false)
-        window.dispatchEvent(new CustomEvent('htmlsource:sync', { detail: { active: false } }))
-        // console.log('[HtmlSource] editor state replaced successfully')
+        window.dispatchEvent(new CustomEvent('htmlsourceviewer:sync', { detail: { active: false } }))
+        // console.log('[HtmlSourceViewer] editor state replaced successfully')
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
-        console.error('[HtmlSource] re-parse failed:', err)
+        console.error('[HtmlSourceViewer] re-parse failed:', err)
         setParseError(msg)
       }
       // console.groupEnd()
     }
 
-    window.addEventListener('htmlsource:enter', onEnter as EventListener)
-    window.addEventListener('htmlsource:exit', onExit)
+    window.addEventListener('htmlsourceviewer:enter', onEnter as EventListener)
+    window.addEventListener('htmlsourceviewer:exit', onExit)
     return () => {
-      window.removeEventListener('htmlsource:enter', onEnter as EventListener)
-      window.removeEventListener('htmlsource:exit', onExit)
+      window.removeEventListener('htmlsourceviewer:enter', onEnter as EventListener)
+      window.removeEventListener('htmlsourceviewer:exit', onExit)
     }
   }, [editor, htmlValue])
 
   return (
-    <HtmlSourcePlugin
+    <HtmlSourceViewer
       isSourceMode={isSourceMode}
       htmlValue={htmlValue}
       onHtmlChange={setHtmlValue}
@@ -128,10 +148,10 @@ function HtmlSourceOverlayPlugin() {
 // Client Feature Export
 // ----------------------------------------------------------------
 
-export const HtmlSourceFeatureClient = createClientFeature({
+export const HtmlSourceViewerFeatureClient = createClientFeature({
   plugins: [
     {
-      Component: HtmlSourceOverlayPlugin,
+      Component: HtmlSourceViewerOverlayPlugin,
       position: 'bottom',
     },
   ],
@@ -139,12 +159,12 @@ export const HtmlSourceFeatureClient = createClientFeature({
   toolbarFixed: {
     groups: [
       {
-        key: 'htmlSourceGroup',
+        key: 'htmlSourceViewerGroup',
         type: 'buttons',
         items: [
           {
-            Component: HtmlSourceToolbarItem,
-            key: 'htmlSourceButton',
+            Component: HtmlSourceViewerToolbarItem,
+            key: 'htmlSourceViewerButton',
           },
         ],
       },

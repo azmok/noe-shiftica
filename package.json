@@ -39,6 +39,7 @@
     "@lexical/html": "0.41.0",
     "@lexical/markdown": "0.41.0",
     "@lexical/react": "0.41.0",
+    "@monaco-editor/react": "^4.7.0",
     "@neondatabase/serverless": "^0.10.4",
     "@payloadcms/db-postgres": "3.79.0",
     "@payloadcms/email-resend": "3.79.0",
