@@ -29,6 +29,7 @@ import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
 import { markdownCopyPlugin } from './plugins/markdownCopyPlugin'
+import { ogImageAutoFillPlugin } from './plugins/ogImageAutoFill'
 
 import { neonBackupPlugin } from './plugins/neon-backup'
 import { panelResizerPlugin } from './plugins/panelResizer'
@@ -135,6 +136,7 @@ const configPromise = buildConfig({
     autosavePlugin(),
     slugTrackerPlugin({ collections: ['posts', 'tech-posts'] }),
     markdownCopyPlugin({ collections: ['posts', 'tech-posts'] }),
+    ogImageAutoFillPlugin({ collections: ['posts', 'tech-posts'] }),
 
     neonBackupPlugin({
       collections: ['posts', 'tech-posts'],

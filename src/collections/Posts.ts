@@ -1,40 +1,7 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { translateToSlug } from '../lib/translateToSlug'
 
-const FALLBACK_OG_IMAGE =
-    'https://firebasestorage.googleapis.com/v0/b/noe-shiftica.firebasestorage.app/o/fallback-image.png?alt=media&token=731d39a7-d242-4ba5-b5c3-5fdf6695eb90'
 
-const populateOgImage: CollectionBeforeChangeHook = async ({ data, req }) => {
-    // Check if status is becoming "published"
-    // In beforeChange, the key is usually just data.status or data._status depending on how drafting is implemented.
-    // Based on previous code, it's doc.status.
-    if (data._status === 'published' || data.status === 'published') {
-        try {
-            const heroImageId = data.heroImage;
-            if (!heroImageId) {
-                data.ogImage = FALLBACK_OG_IMAGE;
-                return data;
-            }
-
-            // Fetch the media document to get the URL
-            const mediaDoc = await req.payload.findByID({
-                collection: 'media',
-                id: typeof heroImageId === 'object' ? heroImageId.id : heroImageId,
-                depth: 0,
-            });
-
-            if (mediaDoc) {
-                // Prefer the OG-optimized variant (1200×630); fall back to original
-                data.ogImage = (mediaDoc.sizes as any)?.og?.url || mediaDoc.url || FALLBACK_OG_IMAGE;
-            } else {
-                data.ogImage = FALLBACK_OG_IMAGE;
-            }
-        } catch (e) {
-            console.error('[populateOgImage] error:', e);
-        }
-    }
-    return data;
-}
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
@@ -60,7 +27,6 @@ export const Posts: CollectionConfig = {
     },
     hooks: {
         beforeChange: [
-            populateOgImage,
             async ({ data }) => {
                 if ((data._status === 'published' || data.status === 'published') && !data.publishedAt) {
                     data.publishedAt = new Date().toISOString();

@@ -2,35 +2,7 @@ import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { translateToSlug } from '../lib/translateToSlug'
 import { getSharedBlogFields } from './fields/sharedBlogFields'
 
-const FALLBACK_OG_IMAGE =
-    'https://firebasestorage.googleapis.com/v0/b/noe-shiftica.firebasestorage.app/o/fallback-image.png?alt=media&token=731d39a7-d242-4ba5-b5c3-5fdf6695eb90'
 
-const populateOgImage: CollectionBeforeChangeHook = async ({ data, req }) => {
-    if (data._status === 'published' || data.status === 'published') {
-        try {
-            const heroImageId = data.heroImage;
-            if (!heroImageId) {
-                data.ogImage = FALLBACK_OG_IMAGE;
-                return data;
-            }
-
-            const mediaDoc = await req.payload.findByID({
-                collection: 'media',
-                id: typeof heroImageId === 'object' ? heroImageId.id : heroImageId,
-                depth: 0,
-            });
-
-            if (mediaDoc) {
-                data.ogImage = (mediaDoc.sizes as any)?.og?.url || mediaDoc.url || FALLBACK_OG_IMAGE;
-            } else {
-                data.ogImage = FALLBACK_OG_IMAGE;
-            }
-        } catch (e) {
-            console.error('[TechPosts:populateOgImage] error:', e);
-        }
-    }
-    return data;
-}
 
 export const TechPosts: CollectionConfig = {
     slug: 'tech-posts',
@@ -54,7 +26,6 @@ export const TechPosts: CollectionConfig = {
     },
     hooks: {
         beforeChange: [
-            populateOgImage,
             async ({ data }) => {
                 if ((data._status === 'published' || data.status === 'published') && !data.publishedAt) {
                     data.publishedAt = new Date().toISOString();
