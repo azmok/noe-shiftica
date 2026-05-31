@@ -1,0 +1,6 @@
+#!/bin/sh
+# noe-shiftica-v2 auto-backup (non-blocking). Installed by scripts/install-hooks.ps1
+ROOT=$(git rev-parse --show-toplevel)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden \
+  -File "$ROOT/scripts/backup.ps1" -Trigger commit >/dev/null 2>&1 &
+exit 0

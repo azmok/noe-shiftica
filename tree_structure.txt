@@ -1,0 +1,407 @@
+├── _sideprojects
+│   ├── _websites
+│   │   ├── demo.static.mirai-foundary-2
+│   │   │   ├── .agents
+│   │   │   ├── .antigravity
+│   │   │   ├── CLAUDE.md
+│   │   │   ├── mirai-foundry
+│   │   │   ├── prompts
+│   │   │   └── README.md
+│   │   ├── demo.static.mirai-foundary-3-VisEditor
+│   │   │   └── prompts
+│   │   └── demo.static.mirai-foundry
+│   │       ├── .antigravity
+│   │       ├── .claude
+│   │       ├── .gitignore
+│   │       ├── CLAUDE.md
+│   │       ├── eslint.config.mjs
+│   │       ├── next-env.d.ts
+│   │       ├── next.config.mjs
+│   │       ├── next.config.ts
+│   │       ├── out
+│   │       ├── package-lock.json
+│   │       ├── package.json
+│   │       ├── postcss.config.mjs
+│   │       ├── promtp-demo-mirai-foundry.md
+│   │       ├── public
+│   │       ├── README.md
+│   │       ├── src
+│   │       └── tsconfig.json
+│   ├── css-effect-garelly
+│   │   └── shimmer.html
+│   ├── mentalist-ai
+│   │   ├── .antigravity
+│   │   │   ├── .claude
+│   │   │   ├── bugs
+│   │   │   ├── knowledge
+│   │   │   ├── notouch.md
+│   │   │   ├── potential-risks.md
+│   │   │   ├── rules.md
+│   │   │   └── sessions
+│   │   ├── .claude
+│   │   │   └── settings.local.json
+│   │   ├── .env
+│   │   ├── .env.local
+│   │   ├── .env.local.example
+│   │   ├── .github
+│   │   │   └── workflows
+│   │   ├── .gitignore
+│   │   ├── .vercel
+│   │   │   ├── project.json
+│   │   │   └── README.txt
+│   │   ├── AGENTS.md
+│   │   ├── CLAUDE.md
+│   │   ├── e2e
+│   │   │   └── mentalist.spec.ts
+│   │   ├── eslint.config.mjs
+│   │   ├── next-env.d.ts
+│   │   ├── next.config.ts
+│   │   ├── package-lock.json
+│   │   ├── package.json
+│   │   ├── playwright.config.ts
+│   │   ├── pnpm-lock.yaml
+│   │   ├── postcss.config.mjs
+│   │   ├── public
+│   │   │   ├── file.svg
+│   │   │   ├── globe.svg
+│   │   │   ├── next.svg
+│   │   │   ├── vercel.svg
+│   │   │   └── window.svg
+│   │   ├── README.md
+│   │   ├── src
+│   │   │   ├── app
+│   │   │   ├── lib
+│   │   │   └── test
+│   │   ├── test-results
+│   │   │   └── .last-run.json
+│   │   ├── tree_structure.txt
+│   │   ├── tsconfig.json
+│   │   ├── vercel.json
+│   │   └── vitest.config.ts
+│   ├── plugins
+│   │   └── vscode
+│   │       └── copy_filepath_lineNum
+│   └── Sequential_Palette_Generator
+│       ├── .antigravity
+│       │   ├── rules.md
+│       │   └── sessions.md
+│       ├── .antigravitycli
+│       │   └── ebc9b171-e211-45c5-ab22-01ac0ab2c0f5.json
+│       ├── .claude
+│       │   └── settings.local.json
+│       ├── .env.example
+│       ├── .gitignore
+│       ├── index.html
+│       ├── metadata.json
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── pnpm-lock.yaml
+│       ├── README.md
+│       ├── src
+│       │   ├── App.tsx
+│       │   ├── components
+│       │   ├── index.css
+│       │   ├── main.tsx
+│       │   ├── presets.ts
+│       │   ├── types.ts
+│       │   └── utils
+│       ├── tsconfig.json
+│       └── vite.config.ts
+├── .antigravity
+│   ├── .claude
+│   │   └── worktrees
+│   │       └── interesting-nobel
+│   ├── backup.ps1
+│   ├── bug-history.md
+│   ├── bug-report-scroll-lock.md
+│   ├── error-log-scroll-lock.txt
+│   ├── knowledge
+│   │   ├── backend
+│   │   │   ├── admin-ui
+│   │   │   └── logic
+│   │   ├── frontend
+│   │   │   ├── logic
+│   │   │   └── ui
+│   │   └── README.md
+│   ├── notouch.md
+│   ├── potential-risks.md
+│   ├── rules.md
+│   └── sessions.md
+├── .claude
+│   └── settings.local.json
+├── .env
+├── .env.example
+├── .env.local
+├── .env.test
+├── .env.test.example
+├── .firebaserc
+├── .github
+│   └── workflows
+│       ├── deploy-notification.yml
+│       └── neon-backup.yml
+├── .gitignore
+├── .neon
+├── .vscode
+│   ├── extensions.json
+│   └── settings.json
+├── apphosting_backends.json
+├── apphosting_rollouts.json
+├── apphosting.yaml
+├── backends.json
+├── blocks-error.log
+├── CLAUDE.md
+├── docs
+│   ├── design_system.md
+│   ├── doc_concept.txt
+│   ├── doc_lp.txt
+│   ├── doc1.txt
+│   ├── doc2.txt
+│   ├── extract.py
+│   ├── NS_ConceptSheet_v3_Final.docx
+│   ├── NS_LP,About,SiteMap.docx
+│   └── vitasovic.md
+├── eslint.config.mjs
+├── firebase.json
+├── firestore.indexes.json
+├── firestore.rules
+├── functions
+│   ├── .eslintrc.js
+│   ├── .gitignore
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │   └── index.ts
+│   ├── tsconfig.dev.json
+│   └── tsconfig.json
+├── gcs-cors.json
+├── login_screenshot.png
+├── media_list.png
+├── next-env.d.ts
+├── next.config.ts
+├── noe-shiftica-3eae1ca2dae7.json
+├── package.json
+├── playwright.config.ts
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── public
+│   ├── apple-touch-icon-precomposed.png
+│   ├── apple-touch-icon.png
+│   ├── assets
+│   │   ├── NS_logo_Black.png
+│   │   ├── NS_logo_White.jpg
+│   │   └── profile-icon.PNG
+│   ├── favicon.ico
+│   ├── file.svg
+│   ├── fonts
+│   │   └── noto-sans-jp
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-100.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-200.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-300.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-500.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-700.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.woff
+│   │       ├── noto-sans-jp-v56-japanese_latin-900.woff2
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.eot
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.svg
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.ttf
+│   │       ├── noto-sans-jp-v56-japanese_latin-regular.woff
+│   │       └── noto-sans-jp-v56-japanese_latin-regular.woff2
+│   ├── globe.svg
+│   ├── images
+│   │   └── azuma.png
+│   ├── next.svg
+│   ├── vercel.svg
+│   ├── window.svg
+│   └── works
+│       ├── mirai-foundry-thumb.png
+│       └── portfolio-thumb.png
+├── README.md
+├── rollouts.json
+├── scripts
+│   ├── check-db.ts
+│   ├── check-media.ts
+│   ├── check-prod-html.ts
+│   ├── check-specific-posts.ts
+│   ├── create-post.ts
+│   ├── dev-test.ts
+│   ├── fix-test-post.ts
+│   ├── revalidate-prod.ts
+│   ├── setup-test-user.ts
+│   └── test-webhook-full.ts
+├── skills-lock.json
+├── src
+│   ├── app
+│   │   ├── (frontend)
+│   │   │   ├── about
+│   │   │   ├── blog
+│   │   │   ├── components
+│   │   │   ├── contact
+│   │   │   ├── dev
+│   │   │   ├── hearing
+│   │   │   ├── html-files
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── privacy
+│   │   │   ├── services
+│   │   │   ├── styles.css
+│   │   │   ├── terms
+│   │   │   └── tokusho
+│   │   ├── (payload)
+│   │   │   ├── admin
+│   │   │   ├── api
+│   │   │   ├── custom.scss
+│   │   │   └── layout.tsx
+│   │   ├── api
+│   │   │   ├── contact
+│   │   │   ├── fix-posts
+│   │   │   ├── github-models
+│   │   │   └── revalidate
+│   │   ├── robots.ts
+│   │   └── sitemap.ts
+│   ├── collections
+│   │   ├── Categories.ts
+│   │   ├── fields
+│   │   │   └── sharedBlogFields.ts
+│   │   ├── HtmlFiles.ts
+│   │   ├── Media.ts
+│   │   ├── mediaEndpoints.ts
+│   │   ├── Posts.ts
+│   │   ├── TechPosts.ts
+│   │   └── Users.ts
+│   ├── components
+│   │   ├── admin
+│   │   │   ├── ImageCompressionProvider.tsx
+│   │   │   └── MediaSizeManager.tsx
+│   │   ├── AdminThumbnailCell.tsx
+│   │   ├── AltField.tsx
+│   │   ├── HearingResumeWidget.tsx
+│   │   ├── HtmlEmbedBlock.tsx
+│   │   ├── LinkedPostCell.tsx
+│   │   ├── MobileFullscreenEditor
+│   │   │   └── index.tsx
+│   │   ├── MobileMenuButton.tsx
+│   │   ├── MobileMenuOverlay.tsx
+│   │   └── TagField.tsx
+│   ├── context
+│   │   └── MobileMenuContext.tsx
+│   ├── features
+│   │   ├── customCodeBlock
+│   │   │   └── index.ts
+│   │   └── markdownPaste
+│   │       ├── client.tsx
+│   │       └── server.ts
+│   ├── hooks
+│   │   └── useHearingData.ts
+│   ├── lib
+│   │   ├── calculateReadingTime.ts
+│   │   ├── db.ts
+│   │   ├── GcsImage.tsx
+│   │   ├── gemini.ts
+│   │   └── translateToSlug.ts
+│   ├── migrations
+│   │   ├── 20260226_111056_initial_setup.json
+│   │   ├── 20260226_111056_initial_setup.ts
+│   │   ├── 20260304_050000_add_posts_drafts.ts
+│   │   ├── 20260307_171744_sync_local_to_prod_schema.json
+│   │   ├── 20260307_171744_sync_local_to_prod_schema.ts
+│   │   ├── 20260310_145217_add_customMetaData_field.json
+│   │   ├── 20260310_145217_add_customMetaData_field.ts
+│   │   ├── 20260310_153133_add_description_field.json
+│   │   ├── 20260310_153133_add_description_field.ts
+│   │   ├── 20260315_add_media_admin_sizes.ts
+│   │   ├── 20260522_115238_add_tech_posts_collection.json
+│   │   ├── 20260522_115238_add_tech_posts_collection.ts
+│   │   └── index.ts
+│   ├── payload-types.ts
+│   ├── payload.config.ts
+│   ├── plugins
+│   │   ├── aiContentOptimizer
+│   │   │   ├── __tests__
+│   │   │   ├── components
+│   │   │   ├── endpoints
+│   │   │   ├── index.ts
+│   │   │   ├── README.md
+│   │   │   ├── types.ts
+│   │   │   └── WALKTHROUGH.md
+│   │   ├── autosave
+│   │   │   ├── AutosaveUI.tsx
+│   │   │   └── index.ts
+│   │   ├── htmlSource
+│   │   │   ├── conversion.ts
+│   │   │   ├── feature.client.tsx
+│   │   │   ├── feature.server.ts
+│   │   │   └── HtmlSourcePlugin.tsx
+│   │   ├── markdownCopyPlugin
+│   │   │   ├── client.tsx
+│   │   │   ├── feature.server.ts
+│   │   │   └── index.ts
+│   │   ├── markdownImport
+│   │   │   ├── __tests__
+│   │   │   ├── index.ts
+│   │   │   ├── MarkdownImporterUI.tsx
+│   │   │   └── README.md
+│   │   ├── neon-backup
+│   │   │   └── index.ts
+│   │   ├── panelResizer
+│   │   │   ├── index.ts
+│   │   │   └── Provider.tsx
+│   │   ├── shared
+│   │   │   └── draftStorage.ts
+│   │   └── slugTracker
+│   │       └── index.ts
+│   ├── scripts
+│   │   ├── check-sql-data.ts
+│   │   ├── reset-admin-password.ts
+│   │   ├── sync-data.ts
+│   │   └── sync.py
+│   └── types
+│       └── htmlhint.d.ts
+├── storage.rules
+├── tests
+│   ├── article.spec.ts
+│   ├── auth.spec.ts
+│   ├── contact.spec.ts
+│   ├── helpers.ts
+│   ├── integration
+│   │   ├── aiContentOptimizer.test.ts
+│   │   ├── auth.test.ts
+│   │   ├── helpers.ts
+│   │   ├── markdownImport.test.ts
+│   │   ├── media.test.ts
+│   │   ├── posts.test.ts
+│   │   └── setup.ts
+│   └── unit
+│       ├── api
+│       │   ├── contact.test.ts
+│       │   └── revalidate.test.ts
+│       └── lib
+│           ├── calculateReadingTime.test.ts
+│           └── translateToSlug.test.ts
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
+├── vitest.config.integration.ts
+├── vitest.config.live.ts
+└── vitest.config.ts

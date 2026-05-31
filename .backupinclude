@@ -1,0 +1,41 @@
+# ============================================
+#  Backup Include List
+#  「# INCLUDE」配下のパターンに一致したものをバックアップ対象とし、
+#  「# EXCLUDE」配下のパターンで対象から除外する。
+#  パスはプロジェクトルートからの相対パス。
+#  末尾 / はディレクトリ配下すべて。* はワイルドカード。
+# ============================================
+
+# === INCLUDE（バックアップ対象） ===
+# --- シークレット（最重要・暗号化必須） ---
+.env
+.env.local
+.env.test
+noe-shiftica-*.json
+.firebaserc
+.neon
+
+# --- クラウド復元に必要な設定ファイル ---
+firebase.json
+firestore.rules
+firestore.indexes.json
+storage.rules
+apphosting.yaml
+apphosting_backends.json
+apphosting_rollouts.json
+backends.json
+rollouts.json
+gcs-cors.json
+skills-lock.json
+
+# --- エージェント運用知識・ローカル設定 ---
+.antigravity/
+.claude/settings.local.json
+.vscode/
+
+# === EXCLUDE（対象内でも除外） ===
+*.example
+.antigravity/.backup-pw.dat
+.antigravity/backup.log
+.antigravity/backup.ps1
+**/node_modules/
