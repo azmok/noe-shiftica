@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, CSSProperties } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { $patchStyleText, $getSelectionStyleValueForProperty } from '@lexical/selection'
-import { Trash2, ChevronDown, Check } from 'lucide-react'
+import { Trash2, ChevronDown, Check } from 'lucide-react' // ChevronDown/Check still used by gradient/color panels
 
 /**
  * NOTE: The Payload admin panel only loads Payload's own CSS + custom.scss.
@@ -52,8 +52,6 @@ const PRESET_GRADIENTS = [
   { name: 'Cyber',      css: 'linear-gradient(90deg, #FF007F 0%, #7F00FF 50%, #00F0FF 100%)' },
 ]
 
-const FONT_SIZES = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48', '64', '72']
-
 // ── Injected stylesheet (hover / scrollbar) ─────────────────────
 
 const CSS = `
@@ -68,9 +66,11 @@ const CSS = `
 .ts-scroll::-webkit-scrollbar{width:8px;}
 .ts-scroll::-webkit-scrollbar-thumb{background:var(--theme-elevation-200);border-radius:8px;border:2px solid var(--theme-elevation-50);}
 .ts-scroll::-webkit-scrollbar-track{background:transparent;}
-.ts-size-item{display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;padding:6px 12px;background:transparent;border:none;cursor:pointer;font-family:monospace;font-size:12px;color:var(--theme-text);transition:background-color .08s ease;}
-.ts-size-item:hover{background:var(--theme-elevation-100);}
-.ts-size-item[data-active="true"]{color:${ACCENT};font-weight:700;background:var(--theme-elevation-100);}
+.ts-size-wrap{display:inline-flex;align-items:center;gap:3px;height:28px;padding:0 6px;border-radius:4px;cursor:text;transition:background-color .1s ease;color:var(--theme-text);}
+.ts-size-wrap:hover{background:var(--theme-elevation-100);}
+.ts-size-wrap:focus-within{background:var(--theme-elevation-100);outline:1px solid var(--theme-elevation-200);}
+.ts-size-label{font-size:10px;opacity:.4;font-family:monospace;user-select:none;line-height:1;}
+.ts-size-input{width:30px;background:transparent;border:none;outline:none;font-family:monospace;font-weight:600;font-size:12px;color:var(--theme-text);text-align:center;padding:0;font-variant-numeric:tabular-nums;cursor:text;line-height:1;}
 .ts-swatch{box-sizing:border-box;width:26px;height:26px;border-radius:4px;border:1px solid rgba(255,255,255,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .08s ease;}
 .ts-swatch:hover{transform:scale(1.12);}
 .ts-swatch:active{transform:scale(.94);}
@@ -135,65 +135,100 @@ function isLight(hex: string): boolean {
 const wrapStyle: CSSProperties = { position: 'relative', display: 'inline-flex' }
 
 // ── 1. FontSizeToolbarItem ────────────────────────────────────────
+//
+// Figma 風インプットフィールド：
+//   - クリック → フォーカス＋全選択（すぐ上書き可能）
+//   - ホイール（フォーカス中）→ ±1px リアルタイム適用
+//   - ↑/↓ キー → ±1px
+//   - キー入力 → 有効な数値になり次第リアルタイム適用
+//   - Enter/Escape → 確定/キャンセル
+//
+// ※ React の onWheel は passive なので preventDefault できない。
+//   useEffect 内で addEventListener({ passive: false }) を直接貼る。
 
 export function FontSizeToolbarItem() {
   useInjectStyles()
   const [editor] = useLexicalComposerContext()
-  const [isOpen, setIsOpen] = useState(false)
-  const [size, setSize] = useState('16px')
-  const ref = useRef<HTMLDivElement>(null)
-  const listRef = useRef<HTMLDivElement>(null)
-  useClickOutside(ref, () => setIsOpen(false))
+  const [localValue, setLocalValue] = useState('16')
+  const inputRef = useRef<HTMLInputElement>(null)
+  // ホイールハンドラの stale closure を避けるため現在値を ref で持つ
+  const sizeRef = useRef(16)
 
+  // エディタの選択変化に追従
   useEffect(() => editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
       const sel = $getSelection()
-      if ($isRangeSelection(sel))
-        setSize($getSelectionStyleValueForProperty(sel, 'font-size', '16px'))
+      if ($isRangeSelection(sel)) {
+        const v = $getSelectionStyleValueForProperty(sel, 'font-size', '16px')
+        const num = parseInt(v) || 16
+        sizeRef.current = num
+        setLocalValue(String(num))
+      }
     })
   }), [editor])
 
-  const current = size.replace('px', '')
-
-  // Photoshop-like: scroll the active size into view when opening
+  // non-passive ホイールリスナー（React synthetic onWheel では preventDefault 不可）
   useEffect(() => {
-    if (!isOpen || !listRef.current) return
-    const active = listRef.current.querySelector('[data-active="true"]') as HTMLElement | null
-    if (active) active.scrollIntoView({ block: 'center' })
-  }, [isOpen])
+    const el = inputRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (document.activeElement !== el) return
+      e.preventDefault()
+      const delta = e.deltaY < 0 ? 1 : -1
+      const next = Math.max(1, Math.min(999, sizeRef.current + delta))
+      sizeRef.current = next
+      setLocalValue(String(next))
+      applyStyle(editor, { 'font-size': `${next}px` })
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [editor])
+
+  const commit = (val: string) => {
+    const num = parseInt(val)
+    if (!isNaN(num) && num >= 1 && num <= 999) {
+      sizeRef.current = num
+      setLocalValue(String(num))
+      applyStyle(editor, { 'font-size': `${num}px` })
+    } else {
+      setLocalValue(String(sizeRef.current))
+    }
+  }
+
+  const stepSize = (delta: 1 | -1) => {
+    const next = Math.max(1, Math.min(999, sizeRef.current + delta))
+    sizeRef.current = next
+    setLocalValue(String(next))
+    applyStyle(editor, { 'font-size': `${next}px` })
+  }
 
   return (
-    <div style={wrapStyle} ref={ref}>
-      <button
-        type="button"
-        className="ts-btn"
-        data-open={isOpen}
-        onClick={() => setIsOpen(v => !v)}
-        title="フォントサイズ"
-      >
-        <span style={{ fontSize: 10, opacity: 0.4, fontFamily: 'monospace' }}>T</span>
-        <span style={{ fontFamily: 'monospace', fontWeight: 600, minWidth: 18, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>
-          {current}
-        </span>
-        <ChevronDown className="ts-caret" size={10} />
-      </button>
-
-      {isOpen && (
-        <div className="ts-panel ts-scroll" ref={listRef} style={{ width: 66, maxHeight: 220, padding: '4px 0' }}>
-          {FONT_SIZES.map(s => (
-            <button
-              key={s}
-              type="button"
-              className="ts-size-item"
-              data-active={current === s}
-              onClick={() => { applyStyle(editor, { 'font-size': `${s}px` }); setIsOpen(false) }}
-            >
-              <span>{s}</span>
-              {current === s && <Check size={11} style={{ flexShrink: 0 }} />}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="ts-size-wrap" title="フォントサイズ (ホイール/↑↓で±1px)">
+      <span className="ts-size-label">T</span>
+      <input
+        ref={inputRef}
+        type="text"
+        inputMode="numeric"
+        className="ts-size-input"
+        value={localValue}
+        onChange={e => {
+          const raw = e.target.value.replace(/[^0-9]/g, '')
+          setLocalValue(raw)
+          const num = parseInt(raw)
+          if (!isNaN(num) && num >= 1 && num <= 999) {
+            sizeRef.current = num
+            applyStyle(editor, { 'font-size': `${num}px` })
+          }
+        }}
+        onFocus={e => e.target.select()}
+        onKeyDown={e => {
+          if (e.key === 'Enter')     { e.preventDefault(); commit(localValue); inputRef.current?.blur() }
+          if (e.key === 'Escape')    { e.preventDefault(); setLocalValue(String(sizeRef.current)); inputRef.current?.blur() }
+          if (e.key === 'ArrowUp')   { e.preventDefault(); stepSize(1) }
+          if (e.key === 'ArrowDown') { e.preventDefault(); stepSize(-1) }
+        }}
+        onBlur={() => commit(localValue)}
+      />
     </div>
   )
 }
