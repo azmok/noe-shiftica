@@ -76,12 +76,10 @@ lexical-test.json
 secret.txt
 
 # Backup system
-
-backup-staging/
-
-# dev
 .antigravity/*
 .claude/*
-.gemini/*
-.github/*
-_sideprojects/*
+backup-staging/
+
+
+CLAUDE.md
+GEMINI.md
