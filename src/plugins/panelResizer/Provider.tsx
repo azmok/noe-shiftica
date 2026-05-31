@@ -157,6 +157,34 @@ export function PanelResizerProvider({ children }: { children?: React.ReactNode 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    /* -- Inject Global Image Diagnostics --------------------- */
+    const globalImageErrorHandler = (e: ErrorEvent) => {
+      const target = e.target as HTMLElement
+      if (target && target.tagName === 'IMG') {
+        const img = target as HTMLImageElement
+        console.error('[Global Image Error Debug] Failed to load image:', {
+          src: img.src,
+          alt: img.alt,
+          complete: img.complete,
+          parentElement: img.parentElement?.outerHTML?.slice(0, 300)
+        })
+      }
+    }
+
+    const globalImageLoadHandler = (e: Event) => {
+      const target = e.target as HTMLElement
+      if (target && target.tagName === 'IMG') {
+        const img = target as HTMLImageElement
+        console.log('[Global Image Load Debug] Successfully loaded image:', {
+          src: img.src,
+          alt: img.alt
+        })
+      }
+    }
+
+    window.addEventListener('error', globalImageErrorHandler, true)
+    window.addEventListener('load', globalImageLoadHandler, true)
+
     /* -- Inject CSS ------------------------------------------ */
     if (!document.getElementById(CSS_ID)) {
       const style = document.createElement('style')
@@ -341,6 +369,8 @@ export function PanelResizerProvider({ children }: { children?: React.ReactNode 
       removeEditorHandle()
       obs.disconnect()
       window.removeEventListener('resize', scheduleReconcile)
+      window.removeEventListener('error', globalImageErrorHandler, true)
+      window.removeEventListener('load', globalImageLoadHandler, true)
       if (rafId != null) cancelAnimationFrame(rafId)
       document.getElementById(CSS_ID)?.remove()
     }

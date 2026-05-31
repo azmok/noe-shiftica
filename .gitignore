@@ -74,3 +74,7 @@ lexical-test.json
 
 # Secret text files
 secret.txt
+
+# Backup system
+.antigravity/*
+backup-staging/

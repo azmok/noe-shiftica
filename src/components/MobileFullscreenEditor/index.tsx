@@ -91,37 +91,163 @@ function checkCssErrors(css: string): SyntaxErrorDetail[] {
 }
 
 // ============================================================================
-// CodeMirror 6 Editor (browser-only — lazy loaded to prevent SSR issues)
+// CodeMirror 6 Editor with linting (browser-only — lazy loaded)
 // ============================================================================
 
 const CodeMirrorEditor = dynamic(
   async () => {
-    const [{ default: CM }, { html }, { css }, { vscodeDarkInit }] = await Promise.all([
+    const [
+      { default: CM },
+      { html },
+      { css },
+      { vscodeDarkInit },
+      { linter, lintGutter },
+      { HTMLHint },
+    ] = await Promise.all([
       import('@uiw/react-codemirror'),
       import('@codemirror/lang-html'),
       import('@codemirror/lang-css'),
       import('@uiw/codemirror-theme-vscode'),
+      import('@codemirror/lint'),
+      import('htmlhint'),
     ])
 
-    // Build the VS Code dark theme with a custom selection color (project accent #E2FF3D).
-    // Using the theme's own `settings.selection` is far more robust than a cascade override:
-    // it feeds the same code path that produces the default blue, so no specificity war.
     const editorTheme = vscodeDarkInit({
       settings: {
-        selection: '#e2ff3d3a', // E2FF3D @ ~0.23 alpha
+        selection: '#e2ff3d3a',
         selectionMatch: '#e2ff3d24',
       },
     })
 
-    function EditorCore({ language, value, onChange }: {
+    // Convert htmlhint line/col to CodeMirror character offset
+    function lineColToOffset(text: string, line: number, col: number): number {
+      const lines = text.split('\n')
+      let offset = 0
+      for (let i = 0; i < Math.min(line - 1, lines.length); i++) {
+        offset += lines[i].length + 1
+      }
+      return offset + Math.max(0, col - 1)
+    }
+
+    // Extract class names defined in a CSS string (e.g. .hero, .btn-primary)
+    function extractCssClassNames(cssText: string): Set<string> {
+      const classes = new Set<string>()
+      const re = /\.([a-zA-Z_-][a-zA-Z0-9_-]*)/g
+      let m
+      while ((m = re.exec(cssText)) !== null) classes.add(m[1])
+      return classes
+    }
+
+    function EditorCore({
+      language,
+      value,
+      onChange,
+      relatedCss,
+    }: {
       language: 'html' | 'css'
       value: string
       onChange: (val: string) => void
+      relatedCss?: string
     }) {
-      const extensions = React.useMemo(
-        () => (language === 'css' ? [css()] : [html()]),
-        [language],
-      )
+      // Ref keeps latest relatedCss accessible inside the stable linter closure
+      const relatedCssRef = React.useRef(relatedCss)
+      relatedCssRef.current = relatedCss
+
+      const extensions = React.useMemo(() => {
+        if (language === 'css') {
+          // CSS: reuse existing brace-balance checker, surface via CM lint UI
+          const cssLinter = linter(
+            (view: { state: { doc: { toString(): string } } }) => {
+              const code = view.state.doc.toString()
+              if (!code.trim()) return []
+              return checkCssErrors(code).map((err) => {
+                const from = lineColToOffset(code, err.line, 1)
+                const lineEnd = code.indexOf('\n', from)
+                return {
+                  from,
+                  to: lineEnd === -1 ? code.length : lineEnd,
+                  severity: 'error' as const,
+                  message: err.message,
+                  source: 'CSSLint',
+                }
+              })
+            },
+            { delay: 400 },
+          )
+          return [css(), cssLinter, lintGutter()]
+        }
+
+        // HTML: HTMLHint standard rules + cross-field class name check
+        const htmlLinter = linter(
+          (view: { state: { doc: { toString(): string } } }) => {
+            const code = view.state.doc.toString()
+            if (!code.trim()) return []
+
+            type Diag = {
+              from: number
+              to: number
+              severity: 'error' | 'warning'
+              message: string
+              source: string
+            }
+            const diagnostics: Diag[] = []
+
+            // 1. Standard HTML lint via HTMLHint
+            const messages = HTMLHint.verify(code, {
+              'tagname-lowercase': true,
+              'attr-lowercase': true,
+              'attr-value-double-quotes': true,
+              'tag-pair': true,
+              'spec-char-escape': true,
+              'id-unique': true,
+              'src-not-empty': true,
+              'attr-no-duplication': true,
+            })
+            for (const msg of messages) {
+              const from = lineColToOffset(code, msg.line, msg.col)
+              diagnostics.push({
+                from,
+                to: Math.min(from + (msg.evidence?.length ?? 1), code.length),
+                severity: msg.type === 'error' ? 'error' : 'warning',
+                message: msg.message,
+                source: 'HTMLHint',
+              })
+            }
+
+            // 2. Cross-field class name check against embedCss
+            const currentCss = relatedCssRef.current
+            if (currentCss) {
+              const defined = extractCssClassNames(currentCss)
+              const classAttrRe = /class="([^"]+)"/g
+              let match
+              while ((match = classAttrRe.exec(code)) !== null) {
+                const innerOffset = match.index + 'class="'.length
+                let cursor = 0
+                for (const cls of match[1].split(/\s+/).filter(Boolean)) {
+                  const clsIdx = match[1].indexOf(cls, cursor)
+                  cursor = clsIdx + cls.length
+                  if (!defined.has(cls)) {
+                    const from = innerOffset + clsIdx
+                    diagnostics.push({
+                      from,
+                      to: from + cls.length,
+                      severity: 'warning',
+                      message: `クラス "${cls}" は Embedded CSS に定義されていません`,
+                      source: 'ClassCheck',
+                    })
+                  }
+                }
+              }
+            }
+
+            return diagnostics
+          },
+          { delay: 400 },
+        )
+
+        return [html(), htmlLinter, lintGutter()]
+      }, [language])
+
       return (
         <CM
           value={value}
@@ -155,7 +281,12 @@ const CodeMirrorEditor = dynamic(
       />
     ),
   },
-) as React.ComponentType<{ language: 'html' | 'css'; value: string; onChange: (val: string) => void }>
+) as React.ComponentType<{
+  language: 'html' | 'css'
+  value: string
+  onChange: (val: string) => void
+  relatedCss?: string
+}>
 
 // ============================================================================
 // Core MobileFullscreenEditor Component
@@ -166,6 +297,7 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
   const labelText = typeof field?.label === 'string' ? field.label : path
 
   const { value, setValue } = useField<string>({ path: path || '' })
+  const { value: embedCssValue } = useField<string>({ path: 'embedCss' })
   const { submit } = useForm()
 
   const [isMobile, setIsMobile] = useState(false)
@@ -384,6 +516,7 @@ export const MobileFullscreenEditor: React.FC<TextFieldClientProps> = (props) =>
                 language={path === 'embedCss' ? 'css' : 'html'}
                 value={localVal}
                 onChange={setLocalVal}
+                relatedCss={path === 'bodyHtml' ? (embedCssValue || '') : undefined}
               />
             </div>
 

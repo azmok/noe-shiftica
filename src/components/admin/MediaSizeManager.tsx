@@ -22,6 +22,65 @@ export const MediaSizeManager: React.FC = () => {
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null)
   const imgRef = useRef<HTMLImageElement>(null)
 
+  const targetSize = cropSize ? sizes[cropSize] : null
+  const aspect = targetSize ? targetSize.width / targetSize.height : undefined
+
+  // Helper to calculate and set initial crop centered at 90% size
+  const initializeCrop = useCallback((width: number, height: number) => {
+    if (!cropSize) return
+    const target = sizes[cropSize]
+    if (!target) return
+
+    const imageAspect = width / height
+    const cropAspect = target.width / target.height
+
+    let cropWidthPercent = 90
+    let cropHeightPercent = 90
+
+    if (cropAspect > imageAspect) {
+      cropHeightPercent = 90 * (imageAspect / cropAspect)
+    } else {
+      cropWidthPercent = 90 * (cropAspect / imageAspect)
+    }
+
+    const xPercent = (100 - cropWidthPercent) / 2
+    const yPercent = (100 - cropHeightPercent) / 2
+
+    const initialPercentCrop: Crop = {
+      unit: '%',
+      width: cropWidthPercent,
+      height: cropHeightPercent,
+      x: xPercent,
+      y: yPercent,
+    }
+
+    const initialPixelCrop = {
+      unit: 'px' as const,
+      width: (width * cropWidthPercent) / 100,
+      height: (height * cropHeightPercent) / 100,
+      x: (width * xPercent) / 100,
+      y: (height * yPercent) / 100,
+    }
+
+    setCrop(initialPercentCrop)
+    setCompletedCrop(initialPixelCrop)
+  }, [cropSize, sizes])
+
+  const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = e.currentTarget
+    initializeCrop(width, height)
+  }, [initializeCrop])
+
+  // Fallback for cached images when image loaded before onLoad triggers or on re-mounts
+  React.useEffect(() => {
+    if (cropSize && imgRef.current) {
+      const img = imgRef.current
+      if (img.complete && img.naturalWidth && img.width) {
+        initializeCrop(img.width, img.height)
+      }
+    }
+  }, [cropSize, initializeCrop])
+
   const handleDelete = async (sizeName: string) => {
     if (!id || !confirm(`Are you sure you want to delete the "${sizeName}" size?`)) return
     
@@ -180,19 +239,29 @@ export const MediaSizeManager: React.FC = () => {
             <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>Crop Image for &quot;{cropSize}&quot;</h3>
             <p style={{ fontSize: '13px', marginBottom: '1rem' }}>Select the area to crop from the original image.</p>
             
-            <div style={{ maxWidth: '100%', maxHeight: '60vh', overflow: 'hidden' }}>
+            <div style={{ 
+              maxWidth: '100%', 
+              padding: '20px', 
+              overflow: 'visible',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
               <ReactCrop
                 crop={crop}
                 onChange={(_, percentCrop) => setCrop(percentCrop)}
                 onComplete={(c) => setCompletedCrop(c)}
+                aspect={aspect}
+                style={{ overflow: 'visible' }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   ref={imgRef}
                   src={originalUrl}
                   alt="Original to crop"
-                  style={{ maxWidth: '100%', maxHeight: '60vh' }}
+                  style={{ maxWidth: '100%', maxHeight: '50vh' }}
                   crossOrigin="anonymous" // needed for canvas toBlob if original is from external URL
+                  onLoad={onImageLoad}
                 />
               </ReactCrop>
             </div>

@@ -378,4 +378,38 @@ select,
 }
 
 
+/* ==========================================
+   Payload CMS Built-in Image Cropper Fixes
+   ==========================================
+   Resolves the bug where image crop drag handles (white border pointers)
+   are clipped or hidden on initial load due to strict overflow constraints
+   and large image dimension defaults.
+*/
+
+/* 1. Prevent clipping by making only the direct cropper image wrap and ReactCrop layers overflow visible */
+.image-cropper__cropper-wrap,
+.ReactCrop {
+  overflow: visible !important;
+}
+
+/* 2. Force sensible default padding to accommodate border-adjacent handles */
+.image-cropper__cropper-wrap {
+  padding: 24px !important; /* Visual safety margin */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background-color: var(--theme-elevation-50) !important;
+  border-radius: 8px !important;
+}
+
+/* 3. Scale down the cropped image slightly so all handles fit beautifully */
+.image-cropper img,
+.image-cropper__image,
+.image-cropper__cropper img {
+  max-height: 50vh !important; /* Constrain height to shrink the image slightly */
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+
 
