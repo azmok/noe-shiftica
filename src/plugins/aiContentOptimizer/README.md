@@ -1,34 +1,13 @@
-# ✨ AI Content Optimizer Plugin for Payload CMS
+# AI Content Optimizer Plugin
 
-このプラグインは、Google Gemini 2.5 Flash を活用してブログ記事の内容を高度に分析し、SEOメタデータや分類情報をインテリジェントに自動生成します。
+This plugin integrates **Google Gemini** to analyze blog post content and automatically generate high-quality SEO metadata, tags, categories, and URL slugs within Payload CMS.
 
-## 🚀 主な機能
-- **自動メタデータ生成**: 記事のタイトルと本文から、最適なSEOタイトル、説明文、OGP情報を生成します。
-- **インテリジェント・タグ付与**: 内容に基づいた関連タグを自動抽出し、`customMetaData.tags` に反映します。
-- **カテゴリ自動解決**: 記事にふさわしいカテゴリを提案し、既存のものと紐付けます（なければ自動作成）。
-- **スラッグ最適化**: 日本語タイトルからも、SEOに強いクリーンな英語スラッグを提案します。
+## Key Features
+- **Auto Metadata Generation**: Generates SEO titles, meta descriptions, and OG titles/descriptions.
+- **Intelligent Tag Suggestion**: Recommends and assigns relevant tags based on content.
+- **Automatic Category Resolution**: Suggests or matches categories (creating them if they don't exist).
+- **SEO Slug Optimization**: Suggests clean English URL slugs from Japanese titles.
+- **Manual Trigger**: Executed via a custom sidebar button to prevent unintended overwrites.
 
-## 🛠 仕組み
-1. 編集画面のサイドバーにある **「✨ AI Content Optimizer」** ボタンをクリックします。
-2. プラグインが現在の `title` と `content`（または `htmlContent`）を解析エンドポイントへ送信します。
-3. Gemini 2.5 Flash が構造化されたJSONデータを返します。
-4. 返却されたデータが Payload の編集フォームへ即座に反映されます。
-
-## 📊 データの入出力
-
-### 入力 (Inputs)
-- **Title**: 記事のメインタイトル
-- **Content**: Lexicalリッチテキスト本文
-- **HTML Content**: HTML埋め込みフィールドの内容（タグ除去済みテキスト）
-
-### 出力 (Outputs)
-- **Slug**: URLスラッグ
-- **Description**: 記事の要約（約150文字）
-- **SEO Title / Description**: 検索エンジン向けメタデータ
-- **OG Title / Image Keyword**: SNS共有用の最適化データ
-- **Tags**: 関連タグ（5〜10個）
-- **Categories**: 推奨カテゴリ（1〜3個）
-
-## ⚠️ 注意事項
-- **APIキー**: 環境変数 `GEMINI_API_KEY` が設定されている必要があります。
-- **手動実行**: 誤った上書きを防ぐため、保存ボタンの代わりにサイドバーの専用ボタンから手動で実行する設計になっています。
+## Setup Requirements
+- Requires `GEMINI_API_KEY` in environment variables.

@@ -23,8 +23,8 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { TechPosts } from './collections/TechPosts'
-import { HtmlFiles } from './collections/HtmlFiles'
 import { markdownImportPlugin } from './plugins/markdownImport'
+import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
@@ -35,7 +35,8 @@ import { neonBackupPlugin } from './plugins/neon-backup'
 import { panelResizerPlugin } from './plugins/panelResizer'
 
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
-import { HtmlSourceFeature } from './plugins/htmlSource/feature.server'
+import { HtmlSourceViewerFeature } from './plugins/htmlSourceViewer/feature.server'
+import { TextStyleFeature } from './plugins/textStyle/feature.server'
 import { CustomCodeBlock } from '@/features/customCodeBlock'
 
 const filename = fileURLToPath(import.meta.url)
@@ -49,6 +50,7 @@ const _dummyForStaticAnalysis = lexicalEditor({
     BlocksFeature({
       blocks: [CustomCodeBlock],
     }),
+    TextStyleFeature(),
   ]
 })
 
@@ -63,6 +65,7 @@ const configPromise = buildConfig({
       // see an empty (serializable) array instead of a function.
       generators: [({ addToImportMap, config: cfg }: { addToImportMap: (c: string) => void; config: any }) => {
         addToImportMap('@payloadcms/richtext-lexical/client#BlocksFeatureClient')
+        addToImportMap('@/plugins/textStyle/feature.client#TextStyleFeatureClient')
         if (cfg?.admin?.importMap) cfg.admin.importMap.generators = []
       }],
     },
@@ -79,7 +82,7 @@ const configPromise = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, TechPosts, HtmlFiles],
+  collections: [Users, Media, Categories, Posts, TechPosts],
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
@@ -87,7 +90,8 @@ const configPromise = buildConfig({
       FixedToolbarFeature(),
       EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
-      HtmlSourceFeature(),
+      HtmlSourceViewerFeature(),
+      TextStyleFeature(),
       HorizontalRuleFeature(),
       BlocksFeature({
         blocks: [CustomCodeBlock],
@@ -142,6 +146,7 @@ const configPromise = buildConfig({
       collections: ['posts', 'tech-posts'],
     }),
     panelResizerPlugin(),
+    htmlFileManagerPlugin(),
   ],
 });
 

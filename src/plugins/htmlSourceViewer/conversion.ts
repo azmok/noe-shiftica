@@ -61,33 +61,33 @@ export function lexicalToHtml(editor: LexicalEditor): string {
   let html = ''
 
   editor.getEditorState().read(() => {
-    // console.group('[HtmlSource] ▶ lexicalToHtml')
+    // console.group('[HtmlSourceViewer] ▶ lexicalToHtml')
 
     try {
       const root = $getRoot()
       const topNodes = root.getChildren()
 
-      // console.log('[HtmlSource] root child count:', topNodes.length)
+      // console.log('[HtmlSourceViewer] root child count:', topNodes.length)
       // console.log(
-      //   '[HtmlSource] node tree:',
+      //   '[HtmlSourceViewer] node tree:',
       //   debugNodeTree(root),
       // )
 
       // topNodes.forEach((node, i) => {
-      //   console.group(`[HtmlSource]   node[${i}] type="${node.getType()}"`)
+      //   console.group(`[HtmlSourceViewer]   node[${i}] type="${node.getType()}"`)
       //   console.log(debugNodeInfo(node))
       //   console.groupEnd()
       // })
 
       html = $generateHtmlFromNodes(editor)
 
-      // console.log('[HtmlSource] generated HTML length:', html.length)
+      // console.log('[HtmlSourceViewer] generated HTML length:', html.length)
       // console.log(
-      //   '[HtmlSource] HTML preview:',
+      //   '[HtmlSourceViewer] HTML preview:',
       //   html.length > 500 ? html.slice(0, 500) + '…' : html,
       // )
     } catch (err) {
-      console.error('[HtmlSource] lexicalToHtml ERROR:', err)
+      console.error('[HtmlSourceViewer] lexicalToHtml ERROR:', err)
     }
 
     // console.groupEnd()
@@ -105,10 +105,10 @@ export function lexicalToHtml(editor: LexicalEditor): string {
  * editor.update() スコープ内で呼び出すこと。
  */
 export function htmlToLexical(editor: LexicalEditor, html: string): void {
-  // console.group('[HtmlSource] ▶ htmlToLexical')
-  // console.log('[HtmlSource] input HTML length:', html.length)
+  // console.group('[HtmlSourceViewer] ▶ htmlToLexical')
+  // console.log('[HtmlSourceViewer] input HTML length:', html.length)
   // console.log(
-  //   '[HtmlSource] HTML preview:',
+  //   '[HtmlSourceViewer] HTML preview:',
   //   html.length > 500 ? html.slice(0, 500) + '…' : html,
   // )
 
@@ -123,10 +123,10 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
     // パースエラー検出
     const parseError = dom.querySelector('parsererror')
     if (parseError) {
-      console.warn('[HtmlSource] DOMParser reported error:', parseError.textContent)
+      console.warn('[HtmlSourceViewer] DOMParser reported error:', parseError.textContent)
     }
 
-    // console.group('[HtmlSource] parsed DOM body children')
+    // console.group('[HtmlSourceViewer] parsed DOM body children')
     // Array.from(dom.body.childNodes).forEach((child, i) => {
     //   console.log(
     //     `  [${i}] nodeName="${child.nodeName}" nodeType=${child.nodeType}`,
@@ -138,10 +138,10 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
     // Lexical ノードへ変換 (Using shared proxy generator to prevent mismatch error)
     const nodes: LexicalNode[] = $generateNodesFromDOM(editor, dom)
 
-    // console.log('[HtmlSource] generated Lexical nodes count:', nodes.length)
+    // console.log('[HtmlSourceViewer] generated Lexical nodes count:', nodes.length)
     // nodes.forEach((node, i) => {
     //   console.log(
-    //     `[HtmlSource]   nodes[${i}]:`,
+    //     `[HtmlSourceViewer]   nodes[${i}]:`,
     //     debugNodeInfo(node),
     //   )
     // })
@@ -151,7 +151,7 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
     root.clear()
 
     if (nodes.length === 0) {
-      console.warn('[HtmlSource] no nodes generated — inserting empty paragraph')
+      console.warn('[HtmlSourceViewer] no nodes generated — inserting empty paragraph')
       root.append($createParagraphNode())
     } else {
       // $insertNodes はルート直下に追加する
@@ -174,14 +174,14 @@ export function htmlToLexical(editor: LexicalEditor, html: string): void {
               const hrNode = $parseSerializedNode(hrSerialized as any)
               node.replace(hrNode)
             } catch (hrErr) {
-              console.error('[HtmlSource] Failed to restore HorizontalRuleNode from placeholder:', hrErr)
+              console.error('[HtmlSourceViewer] Failed to restore HorizontalRuleNode from placeholder:', hrErr)
             }
           }
         }
       })
     }
   } catch (err) {
-    console.error('[HtmlSource] htmlToLexical ERROR:', err)
+    console.error('[HtmlSourceViewer] htmlToLexical ERROR:', err)
     throw err
   }
 

@@ -7,8 +7,9 @@ import {
   BlocksFeature,
 } from '@payloadcms/richtext-lexical'
 import { MarkdownPasteFeature } from '../../features/markdownPaste/server'
-import { HtmlSourceFeature } from '../htmlSource/feature.server'
+import { HtmlSourceViewerFeature } from '../htmlSourceViewer/feature.server'
 import { MarkdownCopyFeature } from './feature.server'
+import { TextStyleFeature } from '../textStyle/feature.server'
 import { CustomCodeBlock } from '../../features/customCodeBlock'
 
 export const markdownCopyPlugin = (options?: { collections?: string[] }): Plugin => {
@@ -28,7 +29,8 @@ export const markdownCopyPlugin = (options?: { collections?: string[] }): Plugin
                   EXPERIMENTAL_TableFeature(),
                   MarkdownPasteFeature(),
                   MarkdownCopyFeature(),
-                  HtmlSourceFeature(),
+                  HtmlSourceViewerFeature(),
+                  TextStyleFeature(),
                   HorizontalRuleFeature(),
                   BlocksFeature({
                     blocks: [CustomCodeBlock],

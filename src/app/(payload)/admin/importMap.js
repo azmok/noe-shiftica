@@ -10,7 +10,8 @@ import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8c
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { HtmlSourceFeatureClient as HtmlSourceFeatureClient_8e2fe0c1a0025f8dbaff7f3d20552155 } from '@/plugins/htmlSource/feature.client'
+import { TextStyleFeatureClient as TextStyleFeatureClient_823d2e41b46233425c543b7937ef9dfd } from '@/plugins/textStyle/feature.client'
+import { HtmlSourceViewerFeatureClient as HtmlSourceViewerFeatureClient_b92fe1e1a06c59ea55f0123f71d36a25 } from '@/plugins/htmlSourceViewer/feature.client'
 import { MarkdownCopyClientFeature as MarkdownCopyClientFeature_fa5475dee06233db757e2756eee93991 } from '@/plugins/markdownCopyPlugin/client'
 import { MarkdownPasteClientFeature as MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226 } from '@/features/markdownPaste/client'
 import { TableFeatureClient as TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -35,11 +36,12 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { OgImageField as OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f } from '../../../plugins/ogImageAutoFill/components/OgImageField'
-import { LinkedPostCell as LinkedPostCell_192a4a403ed1e4fbe693133e12a580dc } from '@/components/LinkedPostCell'
-import { MobileFullscreenEditor as MobileFullscreenEditor_b1896bf3042932bb2fe22ffcced92469 } from '@/components/MobileFullscreenEditor'
+import { LinkedPostCell as LinkedPostCell_fc307546e6356b32183e083dd01c5c7f } from '@/plugins/html-file-manager/components/LinkedPostCell'
+import { MobileFullscreenEditor as MobileFullscreenEditor_94986dd0765443c6a447569bd388326c } from '@/plugins/html-file-manager/components/MobileFullscreenEditor'
 import { ImageCompressionProvider as ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc } from '@/components/admin/ImageCompressionProvider'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { PanelResizerProvider as PanelResizerProvider_e663389a985a61c76b0f3ac628630696 } from '@/plugins/panelResizer/Provider'
+import { PreviewView as PreviewView_f2bb3e5404c34e473bc1ff306c08df18 } from '@/plugins/html-file-manager/views/PreviewView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -55,7 +57,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@/plugins/htmlSource/feature.client#HtmlSourceFeatureClient": HtmlSourceFeatureClient_8e2fe0c1a0025f8dbaff7f3d20552155,
+  "@/plugins/textStyle/feature.client#TextStyleFeatureClient": TextStyleFeatureClient_823d2e41b46233425c543b7937ef9dfd,
+  "@/plugins/htmlSourceViewer/feature.client#HtmlSourceViewerFeatureClient": HtmlSourceViewerFeatureClient_b92fe1e1a06c59ea55f0123f71d36a25,
   "@/plugins/markdownCopyPlugin/client#MarkdownCopyClientFeature": MarkdownCopyClientFeature_fa5475dee06233db757e2756eee93991,
   "@/features/markdownPaste/client#MarkdownPasteClientFeature": MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226,
   "@payloadcms/richtext-lexical/client#TableFeatureClient": TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -80,10 +83,11 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/plugins/ogImageAutoFill/components/OgImageField#OgImageField": OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f,
-  "@/components/LinkedPostCell#LinkedPostCell": LinkedPostCell_192a4a403ed1e4fbe693133e12a580dc,
-  "@/components/MobileFullscreenEditor#MobileFullscreenEditor": MobileFullscreenEditor_b1896bf3042932bb2fe22ffcced92469,
+  "@/plugins/html-file-manager/components/LinkedPostCell#LinkedPostCell": LinkedPostCell_fc307546e6356b32183e083dd01c5c7f,
+  "@/plugins/html-file-manager/components/MobileFullscreenEditor#MobileFullscreenEditor": MobileFullscreenEditor_94986dd0765443c6a447569bd388326c,
   "@/components/admin/ImageCompressionProvider#ImageCompressionProvider": ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@/plugins/panelResizer/Provider#PanelResizerProvider": PanelResizerProvider_e663389a985a61c76b0f3ac628630696,
+  "@/plugins/html-file-manager/views/PreviewView#PreviewView": PreviewView_f2bb3e5404c34e473bc1ff306c08df18,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

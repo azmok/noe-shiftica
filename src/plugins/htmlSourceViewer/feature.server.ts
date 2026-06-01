@@ -1,5 +1,5 @@
 /**
- * htmlSourceFeature.server.ts
+ * feature.server.ts
  *
  * PayloadCMS v3 / Lexical Editor
  * "Source (<>)" ツールバーボタン付き HTML 双方向編集 Feature
@@ -15,20 +15,20 @@ import { createServerFeature } from '@payloadcms/richtext-lexical'
 // Feature Definition
 // ----------------------------------------------------------------
 
-export const HtmlSourceFeature = createServerFeature({
-    feature: {
-        // クライアントバンドルへ渡す Feature 設定 (Moved to plugins directory)
-        ClientFeature: '@/plugins/htmlSource/feature.client#HtmlSourceFeatureClient',
+export const HtmlSourceViewerFeature = createServerFeature({
+  feature: {
+    // クライアントバンドルへ渡す Feature 設定
+    ClientFeature: '@/plugins/htmlSourceViewer/feature.client#HtmlSourceViewerFeatureClient',
 
-        // このFeatureが追加するノード型は無い（変換のみ）
-        nodes: [],
+    // このFeatureが追加するノード型は無い（変換のみ）
+    nodes: [],
 
-        // i18n ラベル（任意）
-        i18n: {
-            en: { label: { toolbar: 'Source' } },
-            ja: { label: { toolbar: 'ソース' } },
-        },
+    // i18n ラベル（任意）
+    i18n: {
+      en: { label: { toolbar: 'Source Viewer' } },
+      ja: { label: { toolbar: 'ソース表示' } },
     },
-    // PayloadCMS が内部で使うユニークキー
-    key: 'htmlSource',
+  },
+  // PayloadCMS が内部で使うユニークキー
+  key: 'htmlSourceViewer',
 })

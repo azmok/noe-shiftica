@@ -35,7 +35,7 @@ export const TextStyleFeatureClient = createClientFeature({
       },
     ],
   },
-  toolbarHover: {
+  toolbarInline: {
     groups: [
       {
         key: 'textStyleHoverGroup',

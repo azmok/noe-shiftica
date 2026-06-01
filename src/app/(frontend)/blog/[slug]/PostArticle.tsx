@@ -5,7 +5,7 @@ import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
-import { HtmlEmbedBlock } from "@/components/HtmlEmbedBlock"
+import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
 import styles from './PostArticle.module.css'
 import Prism from "prismjs"
 

@@ -38,6 +38,12 @@ importers:
       '@lexical/react':
         specifier: 0.41.0
         version: 0.41.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(yjs@13.6.30)
+      '@lexical/selection':
+        specifier: 0.41.0
+        version: 0.41.0
+      '@lexical/utils':
+        specifier: 0.41.0
+        version: 0.41.0
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
