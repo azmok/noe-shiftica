@@ -14,6 +14,13 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
+# --- PSModulePath 修復 ---
+# git の post-commit hook は sh 経由で powershell.exe(5.1) を起動するが、親プロセス(PS7)の
+# PSModulePath を継承し、5.1 が PS7 用 Microsoft.PowerShell.Security を掴んで
+# 「module could not be loaded」で ConvertTo-SecureString が失敗する。
+# 実行中の PowerShell 自身の $PSHOME\Modules を最優先に置き、自エディションのコアモジュールを確実にロードさせる。
+$env:PSModulePath = (Join-Path $PSHOME 'Modules') + [IO.Path]::PathSeparator + $env:PSModulePath
+
 # --- パス解決（このスクリプトの1つ上をプロジェクトルートとみなす） ---
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Root      = Split-Path -Parent $ScriptDir
