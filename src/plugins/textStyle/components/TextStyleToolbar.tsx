@@ -2,9 +2,16 @@
 
 import React, { useState, useEffect, useRef, CSSProperties } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getSelection, $isRangeSelection } from 'lexical'
+import {
+  $getSelection,
+  $isRangeSelection,
+  $setSelection,
+  KEY_DOWN_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  type RangeSelection,
+} from 'lexical'
 import { $patchStyleText, $getSelectionStyleValueForProperty } from '@lexical/selection'
-import { Trash2, ChevronDown, Check } from 'lucide-react' // ChevronDown/Check still used by gradient/color panels
+import { Trash2, ChevronDown, Check } from 'lucide-react'
 
 /**
  * NOTE: The Payload admin panel only loads Payload's own CSS + custom.scss.
@@ -30,7 +37,7 @@ const ACCENT = '#E2FF3D'
 // SELECTION_BG  : 選択範囲の背景。薄いグレーで「選択中」を示す。
 // SELECTION_TEXT: 選択中の文字色。'currentColor' で本来の色を維持。
 //   （'transparent' や固定色に変えて挙動を試すことも可能）
-const SELECTION_BG = 'rgba(128, 128, 128, 0.1)' // グレー / 透過度 0.1
+const SELECTION_BG = 'rgba(128, 128, 128, 0.2)' // グレー / 透過度 0.2
 const SELECTION_TEXT = 'currentColor'
 
 // ── Data ────────────────────────────────────────────────────────
@@ -52,6 +59,8 @@ const PRESET_GRADIENTS = [
   { name: 'Cyber',      css: 'linear-gradient(90deg, #FF007F 0%, #7F00FF 50%, #00F0FF 100%)' },
 ]
 
+const FONT_SIZES = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48', '64', '72']
+
 // ── Injected stylesheet (hover / scrollbar) ─────────────────────
 
 const CSS = `
@@ -66,11 +75,17 @@ const CSS = `
 .ts-scroll::-webkit-scrollbar{width:8px;}
 .ts-scroll::-webkit-scrollbar-thumb{background:var(--theme-elevation-200);border-radius:8px;border:2px solid var(--theme-elevation-50);}
 .ts-scroll::-webkit-scrollbar-track{background:transparent;}
-.ts-size-wrap{display:inline-flex;align-items:center;gap:3px;height:28px;padding:0 6px;border-radius:4px;cursor:text;transition:background-color .1s ease;color:var(--theme-text);}
-.ts-size-wrap:hover{background:var(--theme-elevation-100);}
-.ts-size-wrap:focus-within{background:var(--theme-elevation-100);outline:1px solid var(--theme-elevation-200);}
+.ts-size-box{display:inline-flex;align-items:center;gap:3px;height:28px;padding:0 6px;border-radius:4px;cursor:text;transition:background-color .1s ease;color:var(--theme-text);user-select:none;}
+.ts-size-box:hover{background:var(--theme-elevation-100);}
+.ts-size-box[data-open="true"]{background:var(--theme-elevation-100);outline:1px solid var(--theme-elevation-200);}
 .ts-size-label{font-size:10px;opacity:.4;font-family:monospace;user-select:none;line-height:1;}
-.ts-size-input{width:30px;background:transparent;border:none;outline:none;font-family:monospace;font-weight:600;font-size:12px;color:var(--theme-text);text-align:center;padding:0;font-variant-numeric:tabular-nums;cursor:text;line-height:1;}
+.ts-size-value{min-width:18px;text-align:center;font-family:monospace;font-weight:600;font-size:12px;line-height:1;font-variant-numeric:tabular-nums;border-radius:2px;padding:2px 3px;}
+.ts-size-value[data-fresh="true"]{background:${ACCENT};color:#000;}
+.ts-size-caret{opacity:.4;transition:transform .15s ease;flex-shrink:0;}
+.ts-size-box[data-open="true"] .ts-size-caret{transform:rotate(180deg);}
+.ts-size-item{display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;padding:5px 12px;background:transparent;border:none;cursor:pointer;font-family:monospace;font-size:12px;color:var(--theme-text);line-height:1;white-space:nowrap;}
+.ts-size-item:hover{background:var(--theme-elevation-100);}
+.ts-size-item[data-active="true"]{color:${ACCENT};font-weight:700;background:var(--theme-elevation-100);}
 .ts-swatch{box-sizing:border-box;width:26px;height:26px;border-radius:4px;border:1px solid rgba(255,255,255,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .08s ease;}
 .ts-swatch:hover{transform:scale(1.12);}
 .ts-swatch:active{transform:scale(.94);}
@@ -92,15 +107,18 @@ const CSS = `
 [data-lexical-editor="true"]::-moz-selection{background-color:${SELECTION_BG} !important;color:${SELECTION_TEXT} !important;}
 `
 
-let injected = false
 function useInjectStyles() {
   useEffect(() => {
-    if (injected) return
-    injected = true
-    const el = document.createElement('style')
-    el.setAttribute('data-textstyle-toolbar', '')
-    el.textContent = CSS
-    document.head.appendChild(el)
+    // 既存タグがあれば textContent を更新（HMR/Fast Refresh で CSS 変更を反映させる）。
+    // なければ新規作成。boolean ガードだと HMR 時に古い <style> が残り続け、
+    // CSS の変更がフルリロードまで反映されない問題を防ぐ。
+    let el = document.head.querySelector<HTMLStyleElement>('style[data-textstyle-toolbar]')
+    if (!el) {
+      el = document.createElement('style')
+      el.setAttribute('data-textstyle-toolbar', '')
+      document.head.appendChild(el)
+    }
+    if (el.textContent !== CSS) el.textContent = CSS
   }, [])
 }
 
@@ -136,99 +154,175 @@ const wrapStyle: CSSProperties = { position: 'relative', display: 'inline-flex' 
 
 // ── 1. FontSizeToolbarItem ────────────────────────────────────────
 //
-// Figma 風インプットフィールド：
-//   - クリック → フォーカス＋全選択（すぐ上書き可能）
-//   - ホイール（フォーカス中）→ ±1px リアルタイム適用
-//   - ↑/↓ キー → ±1px
-//   - キー入力 → 有効な数値になり次第リアルタイム適用
-//   - Enter/Escape → 確定/キャンセル
+// Google Docs 方式 (案A): エディタのフォーカス／選択を一切手放さない。
 //
-// ※ React の onWheel は passive なので preventDefault できない。
-//   useEffect 内で addEventListener({ passive: false }) を直接貼る。
+//   仕組み:
+//   - サイズ表示(box)は <input> ではなく表示専用要素。クリックしても
+//     onMouseDown で preventDefault するため、エディタはフォーカスを保持し、
+//     テキスト選択ハイライトが消えない。
+//   - ドロップダウンを開いている間は Lexical の KEY_DOWN_COMMAND を
+//     CRITICAL 優先度で横取りし、数字キー入力をエディタ本文に挿入させず
+//     サイズ入力として処理する（"20" と打てば 20px 適用）。
+//   - 候補クリックでも即適用。いずれの操作中も選択は表示されたまま。
+//
+//   フロー:
+//   1. 本文をドラッグ選択 → 2. T をクリックで候補表示 →
+//   3a. 候補をクリックで適用 / 3b. そのまま "20" 等を打って Enter で適用
 
 export function FontSizeToolbarItem() {
   useInjectStyles()
   const [editor] = useLexicalComposerContext()
-  const [localValue, setLocalValue] = useState('16')
-  const inputRef = useRef<HTMLInputElement>(null)
-  // ホイールハンドラの stale closure を避けるため現在値を ref で持つ
-  const sizeRef = useRef(16)
+  const [display, setDisplay] = useState('16')  // box に表示する文字列
+  const [isOpen, setIsOpen]   = useState(false)
+  const [fresh, setFresh]     = useState(true)   // 「全選択風」表示（未入力状態）
+  const panelRef = useRef<HTMLDivElement>(null)
+  const wrapRef  = useRef<HTMLDivElement>(null)
+  const sizeRef  = useRef(16)                     // 確定中のサイズ（stale-closure 回避）
+  const bufRef   = useRef('')                     // タイプ中のバッファ
+  const freshRef = useRef(true)                   // freshの ref ミラー
+  const originRef = useRef(16)                    // 開いた時点のサイズ（Escape 復帰用）
+  const savedSel = useRef<RangeSelection | null>(null)
 
-  // エディタの選択変化に追従
+  // エディタの選択変化に追従 & 選択を保存
   useEffect(() => editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
       const sel = $getSelection()
       if ($isRangeSelection(sel)) {
+        savedSel.current = sel.clone() as RangeSelection
         const v = $getSelectionStyleValueForProperty(sel, 'font-size', '16px')
         const num = parseInt(v) || 16
         sizeRef.current = num
-        setLocalValue(String(num))
+        if (!isOpen) setDisplay(String(num)) // 開いている間は触らない
       }
     })
-  }), [editor])
+  }), [editor, isOpen])
 
-  // non-passive ホイールリスナー（React synthetic onWheel では preventDefault 不可）
+  // 保存済み選択を復元してからスタイルを適用（フォーカスは保持しているので通常は不要だが保険）
+  const applyNum = (num: number) => {
+    if (!num || num < 1 || num > 999) return
+    sizeRef.current = num
+    setDisplay(String(num))
+    editor.update(() => {
+      if (!$isRangeSelection($getSelection()) && savedSel.current) {
+        $setSelection(savedSel.current.clone() as RangeSelection)
+      }
+      const sel = $getSelection()
+      if ($isRangeSelection(sel)) $patchStyleText(sel, { 'font-size': `${num}px` })
+    })
+  }
+
+  const openDropdown = () => {
+    originRef.current = sizeRef.current
+    bufRef.current = ''
+    freshRef.current = true
+    setFresh(true)
+    setDisplay(String(sizeRef.current))
+    setIsOpen(true)
+  }
+  const closeDropdown = () => {
+    bufRef.current = ''
+    freshRef.current = true
+    setFresh(true)
+    setIsOpen(false)
+    setDisplay(String(sizeRef.current))
+  }
+
+  // box クリック: エディタのフォーカスを保持したまま開閉
+  const toggleBox = (e: React.MouseEvent) => {
+    e.preventDefault() // エディタのブラーを防ぐ（選択ハイライト維持）
+    if (isOpen) closeDropdown()
+    else openDropdown()
+  }
+
+  // ドロップダウン外クリックで閉じる
   useEffect(() => {
-    const el = inputRef.current
-    if (!el) return
-    const onWheel = (e: WheelEvent) => {
-      if (document.activeElement !== el) return
-      e.preventDefault()
-      const delta = e.deltaY < 0 ? 1 : -1
-      const next = Math.max(1, Math.min(999, sizeRef.current + delta))
-      sizeRef.current = next
-      setLocalValue(String(next))
-      applyStyle(editor, { 'font-size': `${next}px` })
+    if (!isOpen) return
+    const h = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) closeDropdown()
     }
-    el.addEventListener('wheel', onWheel, { passive: false })
-    return () => el.removeEventListener('wheel', onWheel)
-  }, [editor])
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [isOpen])
 
-  const commit = (val: string) => {
-    const num = parseInt(val)
-    if (!isNaN(num) && num >= 1 && num <= 999) {
-      sizeRef.current = num
-      setLocalValue(String(num))
-      applyStyle(editor, { 'font-size': `${num}px` })
-    } else {
-      setLocalValue(String(sizeRef.current))
-    }
-  }
+  // 開いている間だけ Lexical のキー入力を横取り（エディタ本文に入れずサイズ入力に回す）
+  useEffect(() => {
+    if (!isOpen) return
+    return editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      (event: KeyboardEvent) => {
+        const k = event.key
 
-  const stepSize = (delta: 1 | -1) => {
-    const next = Math.max(1, Math.min(999, sizeRef.current + delta))
-    sizeRef.current = next
-    setLocalValue(String(next))
-    applyStyle(editor, { 'font-size': `${next}px` })
-  }
+        if (/^[0-9]$/.test(k)) {
+          event.preventDefault()
+          if (freshRef.current) { bufRef.current = ''; freshRef.current = false; setFresh(false) }
+          if (bufRef.current.length < 3) bufRef.current += k
+          setDisplay(bufRef.current)
+          const n = parseInt(bufRef.current)
+          if (n >= 1 && n <= 999) applyNum(n) // リアルタイム適用
+          return true
+        }
+
+        if (k === 'Backspace') {
+          event.preventDefault()
+          bufRef.current = bufRef.current.slice(0, -1)
+          if (bufRef.current === '') { setDisplay(String(sizeRef.current)); freshRef.current = true; setFresh(true) }
+          else { setDisplay(bufRef.current); const n = parseInt(bufRef.current); if (n >= 1) applyNum(n) }
+          return true
+        }
+
+        if (k === 'Enter')  { event.preventDefault(); closeDropdown(); return true }
+        if (k === 'Escape') { event.preventDefault(); applyNum(originRef.current); closeDropdown(); return true }
+        if (k === 'ArrowUp')   { event.preventDefault(); applyNum(Math.min(999, sizeRef.current + 1)); bufRef.current=''; freshRef.current=true; setFresh(true); return true }
+        if (k === 'ArrowDown') { event.preventDefault(); applyNum(Math.max(1,   sizeRef.current - 1)); bufRef.current=''; freshRef.current=true; setFresh(true); return true }
+
+        // それ以外のキーは閉じて通常入力に戻す
+        closeDropdown()
+        return false
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    )
+  }, [isOpen, editor])
+
+  // 開いたら現在サイズの候補を中央にスクロール
+  useEffect(() => {
+    if (!isOpen || !panelRef.current) return
+    const active = panelRef.current.querySelector<HTMLElement>('[data-active="true"]')
+    if (active) active.scrollIntoView({ block: 'center' })
+  }, [isOpen])
 
   return (
-    <div className="ts-size-wrap" title="フォントサイズ (ホイール/↑↓で±1px)">
-      <span className="ts-size-label">T</span>
-      <input
-        ref={inputRef}
-        type="text"
-        inputMode="numeric"
-        className="ts-size-input"
-        value={localValue}
-        onChange={e => {
-          const raw = e.target.value.replace(/[^0-9]/g, '')
-          setLocalValue(raw)
-          const num = parseInt(raw)
-          if (!isNaN(num) && num >= 1 && num <= 999) {
-            sizeRef.current = num
-            applyStyle(editor, { 'font-size': `${num}px` })
-          }
-        }}
-        onFocus={e => e.target.select()}
-        onKeyDown={e => {
-          if (e.key === 'Enter')     { e.preventDefault(); commit(localValue); inputRef.current?.blur() }
-          if (e.key === 'Escape')    { e.preventDefault(); setLocalValue(String(sizeRef.current)); inputRef.current?.blur() }
-          if (e.key === 'ArrowUp')   { e.preventDefault(); stepSize(1) }
-          if (e.key === 'ArrowDown') { e.preventDefault(); stepSize(-1) }
-        }}
-        onBlur={() => commit(localValue)}
-      />
+    <div ref={wrapRef} style={{ position: 'relative', display: 'inline-flex' }}>
+      {/* サイズ表示 box（入力フォーカスは奪わない＝選択ハイライト維持） */}
+      <div
+        className="ts-size-box"
+        data-open={isOpen}
+        onMouseDown={toggleBox}
+        title="フォントサイズ（クリックで候補表示・数字を打って Enter で適用）"
+      >
+        <span className="ts-size-label">T</span>
+        <span className="ts-size-value" data-fresh={isOpen && fresh}>{display}</span>
+        <ChevronDown className="ts-size-caret" size={10} />
+      </div>
+
+      {/* 候補ドロップダウン */}
+      {isOpen && (
+        <div ref={panelRef} className="ts-panel ts-scroll" style={{ width: 66, maxHeight: 220, padding: '4px 0' }}>
+          {FONT_SIZES.map(s => (
+            <button
+              key={s}
+              type="button"
+              className="ts-size-item"
+              data-active={String(sizeRef.current) === s}
+              tabIndex={-1}
+              onMouseDown={e => { e.preventDefault(); e.stopPropagation() }} // フォーカス維持＋box トグル抑止
+              onClick={() => { applyNum(parseInt(s)); closeDropdown() }}
+            >
+              <span>{s}</span>
+              {String(sizeRef.current) === s && <Check size={10} style={{ flexShrink: 0 }} />}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
