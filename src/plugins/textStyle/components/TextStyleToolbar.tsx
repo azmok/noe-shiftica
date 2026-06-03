@@ -133,7 +133,10 @@ function applyStyle(editor: any, styles: Record<string, string>) {
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, onClose: () => void) {
   const cb = useRef(onClose)
-  cb.current = onClose
+  useEffect(() => {
+    cb.current = onClose
+  }, [onClose])
+
   useEffect(() => {
     const h = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) cb.current()
@@ -173,6 +176,7 @@ export function FontSizeToolbarItem() {
   useInjectStyles()
   const [editor] = useLexicalComposerContext()
   const [display, setDisplay] = useState('16')  // box に表示する文字列
+  const [activeSize, setActiveSize] = useState(16) // 確定中サイズ（render内での参照用）
   const [isOpen, setIsOpen]   = useState(false)
   const [fresh, setFresh]     = useState(true)   // 「全選択風」表示（未入力状態）
   const panelRef = useRef<HTMLDivElement>(null)
@@ -192,15 +196,17 @@ export function FontSizeToolbarItem() {
         const v = $getSelectionStyleValueForProperty(sel, 'font-size', '16px')
         const num = parseInt(v) || 16
         sizeRef.current = num
+        setActiveSize(num)
         if (!isOpen) setDisplay(String(num)) // 開いている間は触らない
       }
     })
   }), [editor, isOpen])
 
   // 保存済み選択を復元してからスタイルを適用（フォーカスは保持しているので通常は不要だが保険）
-  const applyNum = (num: number) => {
+  const applyNum = useCallback((num: number) => {
     if (!num || num < 1 || num > 999) return
     sizeRef.current = num
+    setActiveSize(num)
     setDisplay(String(num))
     editor.update(() => {
       if (!$isRangeSelection($getSelection()) && savedSel.current) {
@@ -209,7 +215,7 @@ export function FontSizeToolbarItem() {
       const sel = $getSelection()
       if ($isRangeSelection(sel)) $patchStyleText(sel, { 'font-size': `${num}px` })
     })
-  }
+  }, [editor])
 
   const openDropdown = () => {
     originRef.current = sizeRef.current
@@ -281,7 +287,7 @@ export function FontSizeToolbarItem() {
       },
       COMMAND_PRIORITY_CRITICAL,
     )
-  }, [isOpen, editor])
+  }, [isOpen, editor, applyNum])
 
   // 開いたら現在サイズの候補を中央にスクロール
   useEffect(() => {
@@ -312,13 +318,13 @@ export function FontSizeToolbarItem() {
               key={s}
               type="button"
               className="ts-size-item"
-              data-active={String(sizeRef.current) === s}
+              data-active={String(activeSize) === s}
               tabIndex={-1}
               onMouseDown={e => { e.preventDefault(); e.stopPropagation() }} // フォーカス維持＋box トグル抑止
               onClick={() => { applyNum(parseInt(s)); closeDropdown() }}
             >
               <span>{s}</span>
-              {String(sizeRef.current) === s && <Check size={10} style={{ flexShrink: 0 }} />}
+              {String(activeSize) === s && <Check size={10} style={{ flexShrink: 0 }} />}
             </button>
           ))}
         </div>
