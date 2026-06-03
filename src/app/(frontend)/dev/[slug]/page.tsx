@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { notFound, redirect } from "next/navigation";
 import { PostArticle } from "../../blog/[slug]/PostArticle";
+import { BlogPostingJsonLd } from "../../components/BlogPostingJsonLd";
 import { Metadata } from "next";
 
 export async function generateMetadata({
@@ -238,6 +239,7 @@ export default async function DevPostPage({
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
             </div>
 
+            <BlogPostingJsonLd post={post} basePath="/dev" />
             <Header />
             <PostArticle post={post as any} prevPost={prevPost as any} nextPost={nextPost as any} basePath="/dev" />
             <Footer variant="blog" />

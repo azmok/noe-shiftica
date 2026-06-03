@@ -9,6 +9,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
+import { BlogPostingJsonLd } from "../../components/BlogPostingJsonLd";
 import { Metadata } from "next";
 
 
@@ -252,6 +253,7 @@ export default async function BlogPostPage({
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
             </div>
 
+            <BlogPostingJsonLd post={post} basePath="/blog" />
             <Header />
             <PostArticle post={post} prevPost={prevPost} nextPost={nextPost} />
             <Footer variant="blog" />

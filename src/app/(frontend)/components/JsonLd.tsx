@@ -5,6 +5,18 @@ export function JsonLd() {
     '@context': 'https://schema.org',
     '@graph': [
       {
+        '@type': 'Organization',
+        '@id': 'https://noe-shiftica.com/#organization',
+        'name': 'Noe Shiftica',
+        'url': 'https://noe-shiftica.com',
+        'logo': 'https://noe-shiftica.com/assets/NS_logo_White.jpg',
+        'founder': {
+          '@type': 'Person',
+          'name': '奥村 東',
+        },
+        'sameAs': ['https://x.com/noeShiftica'],
+      },
+      {
         '@type': 'LocalBusiness',
         '@id': 'https://noe-shiftica.com/#localbusiness',
         'name': 'Noe Shiftica',
