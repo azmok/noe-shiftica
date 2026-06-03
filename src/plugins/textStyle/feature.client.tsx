@@ -35,30 +35,4 @@ export const TextStyleFeatureClient = createClientFeature({
       },
     ],
   },
-  toolbarInline: {
-    groups: [
-      {
-        key: 'textStyleHoverGroup',
-        type: 'buttons',
-        items: [
-          {
-            Component: FontSizeToolbarItem,
-            key: 'fontSizeHoverButton',
-          },
-          {
-            Component: TextColorToolbarItem,
-            key: 'textColorHoverButton',
-          },
-          {
-            Component: TextGradientToolbarItem,
-            key: 'textGradientHoverButton',
-          },
-          {
-            Component: ClearStyleToolbarItem,
-            key: 'clearStyleHoverButton',
-          },
-        ],
-      },
-    ],
-  },
 })

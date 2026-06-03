@@ -10,13 +10,13 @@ import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8c
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { SearchReplaceFeatureClient as SearchReplaceFeatureClient_de05113d1fcf9d742cf37efd80619c10 } from '@/plugins/searchReplace/feature.client'
 import { TextStyleFeatureClient as TextStyleFeatureClient_823d2e41b46233425c543b7937ef9dfd } from '@/plugins/textStyle/feature.client'
 import { HtmlSourceViewerFeatureClient as HtmlSourceViewerFeatureClient_b92fe1e1a06c59ea55f0123f71d36a25 } from '@/plugins/htmlSourceViewer/feature.client'
 import { MarkdownCopyClientFeature as MarkdownCopyClientFeature_fa5475dee06233db757e2756eee93991 } from '@/plugins/markdownCopyPlugin/client'
 import { MarkdownPasteClientFeature as MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226 } from '@/features/markdownPaste/client'
 import { TableFeatureClient as TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BlockquoteFeatureClient as BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -57,13 +57,13 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/plugins/searchReplace/feature.client#SearchReplaceFeatureClient": SearchReplaceFeatureClient_de05113d1fcf9d742cf37efd80619c10,
   "@/plugins/textStyle/feature.client#TextStyleFeatureClient": TextStyleFeatureClient_823d2e41b46233425c543b7937ef9dfd,
   "@/plugins/htmlSourceViewer/feature.client#HtmlSourceViewerFeatureClient": HtmlSourceViewerFeatureClient_b92fe1e1a06c59ea55f0123f71d36a25,
   "@/plugins/markdownCopyPlugin/client#MarkdownCopyClientFeature": MarkdownCopyClientFeature_fa5475dee06233db757e2756eee93991,
   "@/features/markdownPaste/client#MarkdownPasteClientFeature": MarkdownPasteClientFeature_f584cafbf2ed7ad00a6294ada9409226,
   "@payloadcms/richtext-lexical/client#TableFeatureClient": TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#FixedToolbarFeatureClient": FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BlockquoteFeatureClient": BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,

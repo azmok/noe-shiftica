@@ -37,6 +37,7 @@ import { panelResizerPlugin } from './plugins/panelResizer'
 import { MarkdownPasteFeature } from './features/markdownPaste/server'
 import { HtmlSourceViewerFeature } from './plugins/htmlSourceViewer/feature.server'
 import { TextStyleFeature } from './plugins/textStyle/feature.server'
+import { SearchReplaceFeature } from './plugins/searchReplace/feature.server'
 import { CustomCodeBlock } from '@/features/customCodeBlock'
 
 const filename = fileURLToPath(import.meta.url)
@@ -51,6 +52,7 @@ const _dummyForStaticAnalysis = lexicalEditor({
       blocks: [CustomCodeBlock],
     }),
     TextStyleFeature(),
+    SearchReplaceFeature(),
   ]
 })
 
@@ -66,6 +68,7 @@ const configPromise = buildConfig({
       generators: [({ addToImportMap, config: cfg }: { addToImportMap: (c: string) => void; config: any }) => {
         addToImportMap('@payloadcms/richtext-lexical/client#BlocksFeatureClient')
         addToImportMap('@/plugins/textStyle/feature.client#TextStyleFeatureClient')
+        addToImportMap('@/plugins/searchReplace/feature.client#SearchReplaceFeatureClient')
         if (cfg?.admin?.importMap) cfg.admin.importMap.generators = []
       }],
     },
@@ -86,12 +89,16 @@ const configPromise = buildConfig({
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
-      ...defaultFeatures,
+      // Disable the floating inline (hover) toolbar — it pops up over the
+      // selected text and hides it. All controls live in the always-visible
+      // fixed toolbar (FixedToolbarFeature) instead.
+      ...defaultFeatures.filter((f) => f.key !== 'toolbarInline'),
       FixedToolbarFeature(),
       EXPERIMENTAL_TableFeature(),
       MarkdownPasteFeature(),
       HtmlSourceViewerFeature(),
       TextStyleFeature(),
+      SearchReplaceFeature(),
       HorizontalRuleFeature(),
       BlocksFeature({
         blocks: [CustomCodeBlock],

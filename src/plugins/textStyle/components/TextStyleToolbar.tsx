@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, CSSProperties } from 'react'
+import React, { useState, useEffect, useRef, useCallback, CSSProperties } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
@@ -289,11 +289,18 @@ export function FontSizeToolbarItem() {
     )
   }, [isOpen, editor, applyNum])
 
-  // 開いたら現在サイズの候補を中央にスクロール
+  // 開いたら現在サイズの候補をパネル内で中央にスクロール。
+  // 注意: active.scrollIntoView() は祖先のスクロール領域(＝管理画面ページ本体)
+  // まで巻き込んでスクロールさせるため、開くたびにページがズレてフレームアウト
+  // する。パネルの scrollTop を直接操作し、パネル内部だけをスクロールさせる。
   useEffect(() => {
-    if (!isOpen || !panelRef.current) return
-    const active = panelRef.current.querySelector<HTMLElement>('[data-active="true"]')
-    if (active) active.scrollIntoView({ block: 'center' })
+    if (!isOpen) return
+    const panel = panelRef.current
+    if (!panel) return
+    const active = panel.querySelector<HTMLElement>('[data-active="true"]')
+    if (active) {
+      panel.scrollTop = active.offsetTop - (panel.clientHeight - active.clientHeight) / 2
+    }
   }, [isOpen])
 
   return (
