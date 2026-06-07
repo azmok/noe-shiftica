@@ -5,8 +5,13 @@ import { translateToSlug } from '../lib/translateToSlug'
 
 export const Posts: CollectionConfig = {
     slug: 'posts',
+    labels: {
+        singular: 'General Post',
+        plural: 'General Posts',
+    },
     admin: {
         useAsTitle: 'title',
+        group: 'Blog',
         livePreview: {
             // プレビューしたい実際のフロントエンドのURLを指定する
             url: ({ data }) => {

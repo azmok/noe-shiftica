@@ -411,5 +411,60 @@ select,
   object-fit: contain !important;
 }
 
+/* ==========================================
+   Admin Nav: Group accordion child indent
+   アコーディオンが開いた際、子リンクをインデントして
+   親グループとの階層関係を視覚的に明確にする
+   ========================================== */
 
+.nav-group {
+  /* アコーディオン全体に小さな余白 */
+  margin-bottom: 4px;
 
+  /* グループラベル（親：「Blog」「Auth」など） */
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-elevation-500);
+    padding: 8px 16px 4px !important;
+  }
+
+  /* アコーディオンが開いた時の子リンクコンテナ */
+  &__content {
+    /* 左ボーダーでグループ帰属を示す */
+    border-left: 2px solid var(--theme-elevation-150);
+    margin-left: 20px;
+    padding-left: 0;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+    }
+  }
+
+  /* 子リンク（General Posts, Tech Posts など） */
+  &__content .nav__link {
+    padding-left: 14px !important;
+    font-size: 13.5px;
+    border-radius: 0 6px 6px 0;
+    transition: background-color 0.15s ease, padding-left 0.15s ease;
+
+    &:hover {
+      padding-left: 18px !important;
+      background-color: var(--theme-elevation-100) !important;
+    }
+
+    /* アクティブ（現在のコレクション） */
+    &.active,
+    &[aria-current="page"] {
+      padding-left: 18px !important;
+      background-color: var(--theme-elevation-150) !important;
+      color: var(--theme-text) !important;
+      font-weight: 600;
+    }
+  }
+}
