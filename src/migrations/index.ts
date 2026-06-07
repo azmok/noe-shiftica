@@ -5,6 +5,7 @@ import * as migration_20260310_145217_add_customMetaData_field from './20260310_
 import * as migration_20260310_153133_add_description_field from './20260310_153133_add_description_field';
 import * as migration_20260315_add_media_admin_sizes from './20260315_add_media_admin_sizes';
 import * as migration_20260522_115238_add_tech_posts_collection from './20260522_115238_add_tech_posts_collection';
+import * as migration_20260607_071847_add_passkeys_collection from './20260607_071847_add_passkeys_collection';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20260522_115238_add_tech_posts_collection.up,
     down: migration_20260522_115238_add_tech_posts_collection.down,
-    name: '20260522_115238_add_tech_posts_collection'
+    name: '20260522_115238_add_tech_posts_collection',
+  },
+  {
+    up: migration_20260607_071847_add_passkeys_collection.up,
+    down: migration_20260607_071847_add_passkeys_collection.down,
+    name: '20260607_071847_add_passkeys_collection'
   },
 ];

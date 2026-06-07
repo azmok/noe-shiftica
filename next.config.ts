@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Allow the dev server to accept requests proxied through a Cloudflare quick
+  // tunnel (used for testing passkeys/WebAuthn over HTTPS on a phone).
+  allowedDevOrigins: ['*.trycloudflare.com'],
   // Enable Firebase App Hosting CDN caching for blog/dev routes.
   // On-demand revalidation via revalidatePath() purges both Next.js Full Route Cache
   // and the Firebase App Hosting CDN layer simultaneously, then pre-warms a fresh cache.

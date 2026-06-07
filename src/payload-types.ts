@@ -74,6 +74,7 @@ export interface Config {
     categories: Category;
     posts: Post;
     'tech-posts': TechPost;
+    passkeys: Passkey;
     'html-files': HtmlFile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -87,6 +88,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'tech-posts': TechPostsSelect<false> | TechPostsSelect<true>;
+    passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -402,6 +404,31 @@ export interface TechPost {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkeys".
+ */
+export interface Passkey {
+  id: number;
+  user: number | User;
+  credentialID: string;
+  publicKey: string;
+  counter: number;
+  transports?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  deviceLabel?: string | null;
+  deviceType?: string | null;
+  backedUp?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -443,6 +470,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tech-posts';
         value: number | TechPost;
+      } | null)
+    | ({
+        relationTo: 'passkeys';
+        value: number | Passkey;
       } | null)
     | ({
         relationTo: 'html-files';
@@ -656,6 +687,22 @@ export interface TechPostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkeys_select".
+ */
+export interface PasskeysSelect<T extends boolean = true> {
+  user?: T;
+  credentialID?: T;
+  publicKey?: T;
+  counter?: T;
+  transports?: T;
+  deviceLabel?: T;
+  deviceType?: T;
+  backedUp?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

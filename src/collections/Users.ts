@@ -19,5 +19,14 @@ export const Users: CollectionConfig = {
         },
       },
     },
+    {
+      name: 'passkeyRegister',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/admin/PasskeyRegisterButton#PasskeyRegisterButton',
+        },
+      },
+    },
   ],
 }

@@ -1,4 +1,5 @@
 import { LogoutButton as LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01 } from '@/app/(frontend)/components/admin/LogoutButton'
+import { PasskeyRegisterButton as PasskeyRegisterButton_f396d2424da1bbce880b082c7eb637c8 } from '@/components/admin/PasskeyRegisterButton'
 import { AltField as AltField_6a834bc6c814295325f1ce1e5f5525db } from '@/components/AltField'
 import { MediaSizeManager as MediaSizeManager_ab0d14650ff81a45c18f6be92c9e47b9 } from '@/components/admin/MediaSizeManager'
 import { AutosaveUI as AutosaveUI_63d35dfcef35fc329a559b1b5887e394 } from '../../../plugins/autosave/AutosaveUI'
@@ -38,6 +39,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { OgImageField as OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f } from '../../../plugins/ogImageAutoFill/components/OgImageField'
 import { LinkedPostCell as LinkedPostCell_fc307546e6356b32183e083dd01c5c7f } from '@/plugins/html-file-manager/components/LinkedPostCell'
 import { MobileFullscreenEditor as MobileFullscreenEditor_94986dd0765443c6a447569bd388326c } from '@/plugins/html-file-manager/components/MobileFullscreenEditor'
+import { PasskeyLoginButton as PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5 } from '@/components/admin/PasskeyLoginButton'
 import { ImageCompressionProvider as ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc } from '@/components/admin/ImageCompressionProvider'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { PanelResizerProvider as PanelResizerProvider_e663389a985a61c76b0f3ac628630696 } from '@/plugins/panelResizer/Provider'
@@ -46,6 +48,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 export const importMap = {
   "@/app/(frontend)/components/admin/LogoutButton#LogoutButton": LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01,
+  "@/components/admin/PasskeyRegisterButton#PasskeyRegisterButton": PasskeyRegisterButton_f396d2424da1bbce880b082c7eb637c8,
   "@/components/AltField#AltField": AltField_6a834bc6c814295325f1ce1e5f5525db,
   "@/components/admin/MediaSizeManager#MediaSizeManager": MediaSizeManager_ab0d14650ff81a45c18f6be92c9e47b9,
   "/plugins/autosave/AutosaveUI#AutosaveUI": AutosaveUI_63d35dfcef35fc329a559b1b5887e394,
@@ -85,6 +88,7 @@ export const importMap = {
   "/plugins/ogImageAutoFill/components/OgImageField#OgImageField": OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f,
   "@/plugins/html-file-manager/components/LinkedPostCell#LinkedPostCell": LinkedPostCell_fc307546e6356b32183e083dd01c5c7f,
   "@/plugins/html-file-manager/components/MobileFullscreenEditor#MobileFullscreenEditor": MobileFullscreenEditor_94986dd0765443c6a447569bd388326c,
+  "@/components/admin/PasskeyLoginButton#PasskeyLoginButton": PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5,
   "@/components/admin/ImageCompressionProvider#ImageCompressionProvider": ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@/plugins/panelResizer/Provider#PanelResizerProvider": PanelResizerProvider_e663389a985a61c76b0f3ac628630696,

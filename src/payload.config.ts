@@ -23,6 +23,7 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { TechPosts } from './collections/TechPosts'
+import { Passkeys } from './collections/Passkeys'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
@@ -77,6 +78,10 @@ const configPromise = buildConfig({
       providers: [
         '@/components/admin/ImageCompressionProvider#ImageCompressionProvider',
       ],
+      // Passwordless "Sign in with passkey" button under the login form
+      afterLogin: [
+        '@/components/admin/PasskeyLoginButton#PasskeyLoginButton',
+      ],
     },
   },
   // Email transport via Resend — required for "Forgot Password" to actually send
@@ -85,7 +90,7 @@ const configPromise = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, TechPosts],
+  collections: [Users, Media, Categories, Posts, TechPosts, Passkeys],
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
