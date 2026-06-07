@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useMobileMenu } from "@/context/MobileMenuContext";
 import { useHearingData } from "@/hooks/useHearingData";
-import { X as CloseIcon, ArrowRight, Trash2, AlertTriangle } from "lucide-react";
+import { X as CloseIcon, ArrowRight, Trash2, AlertTriangle, ChevronDown } from "lucide-react";
 
 export function MobileMenuOverlay() {
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu();
@@ -16,6 +16,7 @@ export function MobileMenuOverlay() {
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isBlogExpanded, setIsBlogExpanded] = useState(false);
 
   React.useEffect(() => {
     setIsMounted(true);
@@ -24,6 +25,7 @@ export function MobileMenuOverlay() {
   const handleClose = () => {
     setIsMobileMenuOpen(false);
     setShowResetConfirm(false);
+    setIsBlogExpanded(false);
   };
 
   const confirmReset = () => {
@@ -36,6 +38,13 @@ export function MobileMenuOverlay() {
   const handleResume = () => {
     handleClose();
     router.push(isCompleted ? "/hearing?step=summary" : "/hearing");
+  };
+
+  const handleBlogClickMobile = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isBlogExpanded) {
+      e.preventDefault();
+      setIsBlogExpanded(true);
+    }
   };
 
   const navLinks = [
@@ -74,28 +83,90 @@ export function MobileMenuOverlay() {
             className="absolute inset-0 pt-24 pb-32 px-8 sm:px-12 overflow-y-auto custom-scrollbar pointer-events-none flex flex-col min-h-dvh"
           >
             <div className="w-full max-w-lg space-y-7 pointer-events-auto mt-auto mb-auto">
-              {navLinks.map((link, i) => (
-                <motion.div
-                  key={link.name}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ delay: i * 0.05 + 0.1, duration: 0.4, ease: "easeOut" }}
-                >
-                  <Link
-                    href={link.href}
-                    className="flex items-end gap-5 group w-fit"
-                    onClick={handleClose}
+              {navLinks.map((link, i) => {
+                if (link.name === "BLOG") {
+                  return (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, x: -30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ delay: i * 0.05 + 0.1, duration: 0.4, ease: "easeOut" }}
+                      className="flex flex-col gap-2"
+                    >
+                      <Link
+                        href={link.href}
+                        className="flex items-end gap-5 group w-fit"
+                        onClick={handleBlogClickMobile}
+                      >
+                        <span className="text-sm font-bold text-[#E2FF3D] mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                          {link.number}
+                        </span>
+                        <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider group-hover:text-[#E2FF3D] transition-colors duration-300 flex items-center gap-3">
+                          {link.name}
+                          <ChevronDown
+                            size={24}
+                            className={`transition-transform duration-300 ${isBlogExpanded ? "rotate-180 text-[#E2FF3D]" : "text-white/40"
+                              }`}
+                          />
+                        </h2>
+                      </Link>
+
+                      <AnimatePresence>
+                        {isBlogExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="overflow-hidden pl-10 flex flex-col gap-3 mt-2 border-l border-[#E2FF3D]/20 pointer-events-auto"
+                          >
+                            <Link
+                              href="/blog"
+                              className="text-lg font-bold text-white/70 hover:text-[#E2FF3D] transition-colors py-1 flex items-center gap-2"
+                              onClick={handleClose}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF3D]" />
+                              General
+                            </Link>
+                            <Link
+                              href="/dev"
+                              className="text-lg font-bold text-white/70 hover:text-[#E2FF3D] transition-colors py-1 flex items-center gap-2"
+                              onClick={handleClose}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF3D]" />
+                              Developers
+                            </Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                }
+
+                return (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ delay: i * 0.05 + 0.1, duration: 0.4, ease: "easeOut" }}
                   >
-                    <span className="text-sm font-bold text-[#E2FF3D] mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                      {link.number}
-                    </span>
-                    <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider group-hover:text-[#E2FF3D] transition-colors duration-300">
-                      {link.name}
-                    </h2>
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={link.href}
+                      className="flex items-end gap-5 group w-fit"
+                      onClick={handleClose}
+                    >
+                      <span className="text-sm font-bold text-[#E2FF3D] mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                        {link.number}
+                      </span>
+                      <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider group-hover:text-[#E2FF3D] transition-colors duration-300">
+                        {link.name}
+                      </h2>
+                    </Link>
+                  </motion.div>
+                );
+              })}
 
               {/* Bottom Widget for Resume/Reset (Only outside /hearing) */}
               {!inHearing && hasHearingData && (

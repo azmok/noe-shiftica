@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronLeft } from "lucide-react";
+import { Menu, X, ChevronLeft, ChevronDown } from "lucide-react";
 import { Button } from "./ui/Button";
 import { useMobileMenu } from "@/context/MobileMenuContext";
 
@@ -20,10 +20,47 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isBlogDetail = pathname?.startsWith("/blog/") && pathname !== "/blog";
   const isBlogPage = pathname?.startsWith("/blog");
+
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".blog-menu-container")) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [isDropdownOpen]);
+
+  const handleMouseEnter = () => {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (!isTouch) {
+      setIsDropdownOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (!isTouch) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  const handleBlogClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouch) {
+      if (!isDropdownOpen) {
+        e.preventDefault();
+        setIsDropdownOpen(true);
+      }
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -151,15 +188,71 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8 md:order-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-xs rounded-full px-5 py-[11px]"
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if (link.name === "Blog") {
+                return (
+                  <div
+                    key={link.name}
+                    className="relative blog-menu-container"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <Link
+                      href={link.href}
+                      className="text-xs rounded-full px-5 py-[11px] flex items-center gap-1.5 transition-colors duration-200 hover:text-[#E2FF3D]"
+                      onClick={handleBlogClick}
+                    >
+                      {link.name}
+                      <ChevronDown
+                        size={12}
+                        className={`transition-transform duration-300 ${
+                          isDropdownOpen ? "rotate-180 text-[#E2FF3D]" : "text-white/60"
+                        }`}
+                      />
+                    </Link>
+
+                    <AnimatePresence>
+                      {isDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                          className="absolute top-[calc(100%+4px)] left-1/2 -translate-x-1/2 min-w-[160px] bg-[#0d0d11]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-[0_12px_32px_rgba(0,0,0,0.5)] z-150"
+                        >
+                          <div className="flex flex-col gap-1">
+                            <Link
+                              href="/blog"
+                              className="text-xs text-white/80 hover:text-[#E2FF3D] hover:bg-white/5 rounded-xl px-4 py-3 transition-all duration-200 text-left font-medium block whitespace-nowrap"
+                              onClick={() => setIsDropdownOpen(false)}
+                            >
+                              General
+                            </Link>
+                            <Link
+                              href="/dev"
+                              className="text-xs text-white/80 hover:text-[#E2FF3D] hover:bg-white/5 rounded-xl px-4 py-3 transition-all duration-200 text-left font-medium block whitespace-nowrap"
+                              onClick={() => setIsDropdownOpen(false)}
+                            >
+                              Developers
+                            </Link>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-xs rounded-full px-5 py-[11px]"
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Logo (Mobile & Desktop) */}
