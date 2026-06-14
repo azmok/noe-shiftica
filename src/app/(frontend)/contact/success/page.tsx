@@ -1,7 +1,14 @@
 import React from "react";
+import type { Metadata } from "next";
 import { Header } from "../../components/Header";
 import { Footer } from "../../components/Footer";
 import { Button } from "../../components/ui/Button";
+
+// Thank-you page: keep it out of the search index. There is nothing to rank
+// here, and it should never appear as a search result on its own.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function ContactSuccessPage() {
   return (

@@ -7,6 +7,11 @@ import { Footer } from '../../components/Footer';
 export const metadata: Metadata = {
   title: 'AI Workflow Integration — 事例シナリオ | Noe Shiftica',
   description: 'AIを業務フローに組み込むと何が変わるのか。実際に起こりうる2つのシナリオをご紹介します。',
+  alternates: {
+    // Self-referencing canonical. Without this, the page inherits the root
+    // layout's `canonical: "/"` and looks like a duplicate of the homepage.
+    canonical: '/services/scenarios',
+  },
 };
 
 export default function ScenariosPage() {

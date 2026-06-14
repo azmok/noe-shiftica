@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: {
       slug: true,
       updatedAt: true,
+      customMetaData: true,
     },
   })
 
@@ -36,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: {
       slug: true,
       updatedAt: true,
+      customMetaData: true,
     },
   })
 
@@ -50,7 +52,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/services',
     '/services/cms-content-operations',
     '/services/scenarios',
-    '/contact',
     '/hearing',
     '/privacy',
     '/terms',
@@ -78,6 +79,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticRoutes, ...postRoutes, ...techPostRoutes]
+  // Collect unique tags (case-insensitive) from a set of docs
+  const collectTags = (docs: { customMetaData?: unknown }[]) => {
+    const tagMap = new Map<string, string>()
+    for (const doc of docs) {
+      const meta = doc.customMetaData as Record<string, unknown> | undefined
+      if (meta && Array.isArray(meta.tags)) {
+        for (const tag of meta.tags) {
+          const value = String(tag).trim()
+          if (value) tagMap.set(value.toLowerCase(), value)
+        }
+      }
+    }
+    return [...tagMap.values()]
+  }
+
+  // Dynamic blog tag routes
+  const blogTagRoutes = collectTags(posts.docs).map((tag) => ({
+    url: `${baseUrl}/blog/tag/${encodeURIComponent(tag)}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.4,
+  }))
+
+  // Dynamic tech tag routes
+  const techTagRoutes = collectTags(techPosts.docs).map((tag) => ({
+    url: `${baseUrl}/dev/tag/${encodeURIComponent(tag)}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.4,
+  }))
+
+  return [
+    ...staticRoutes,
+    ...postRoutes,
+    ...techPostRoutes,
+    ...blogTagRoutes,
+    ...techTagRoutes,
+  ]
 }
 

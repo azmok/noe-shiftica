@@ -7,6 +7,11 @@ import { Footer } from '../../components/Footer';
 export const metadata: Metadata = {
   title: 'CMS & Content Operations | Noe Shiftica',
   description: '公開後も、自分たちで更新できるサイトへ。',
+  alternates: {
+    // Self-referencing canonical. Without this, the page inherits the root
+    // layout's `canonical: "/"` and looks like a duplicate of the homepage.
+    canonical: '/services/cms-content-operations',
+  },
 };
 
 export default function CMSContentOperationsPage() {

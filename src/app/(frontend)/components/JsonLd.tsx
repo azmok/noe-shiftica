@@ -21,7 +21,7 @@ export function JsonLd() {
         '@id': 'https://noe-shiftica.com/#localbusiness',
         'name': 'Noe Shiftica',
         'url': 'https://noe-shiftica.com',
-        'image': 'https://noe-shiftica.com/og-image.png',
+        'image': 'https://noe-shiftica.com/assets/NS_logo_White.jpg',
         'address': {
           '@type': 'PostalAddress',
           'addressLocality': '渋谷区',

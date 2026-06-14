@@ -89,6 +89,13 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+// Brand share card used as the default OG/Twitter image for pages that don't
+// supply their own (homepage, /about, /services, …). Article pages override
+// this with their own cover/hero image. This is the same asset used as the
+// published-post ogImage fallback, so it is guaranteed to exist.
+const DEFAULT_OG_IMAGE =
+  "https://firebasestorage.googleapis.com/v0/b/noe-shiftica.firebasestorage.app/o/fallback-image.png?alt=media&token=731d39a7-d242-4ba5-b5c3-5fdf6695eb90";
+
 export const metadata = {
   metadataBase: new URL("https://noe-shiftica.com"),
   title: {
@@ -112,11 +119,22 @@ export const metadata = {
     siteName: "Noe Shiftica",
     title: "Noe Shiftica | Design the Shift.",
     description: "AIとデザインでビジネスの本質を設計するスタジオ。",
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "Noe Shiftica | Design the Shift.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
+    site: "@noeShiftica",
+    creator: "@noeShiftica",
     title: "Noe Shiftica | Design the Shift.",
     description: "AIとデザインでビジネスの本質を設計するスタジオ。",
+    images: [DEFAULT_OG_IMAGE],
   },
   alternates: {
     canonical: "/",

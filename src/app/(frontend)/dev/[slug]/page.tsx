@@ -100,6 +100,11 @@ export async function generateMetadata({
         console.error(`Metadata generation failed for dev slug: ${slug}`, error);
         return {
             title: "Noe Shiftica Dev Journal",
+            alternates: {
+                // Even on the error fallback, self-reference this post's own URL
+                // so the page never inherits the root layout's `canonical: "/"`.
+                canonical: `/dev/${decodedSlug}`,
+            },
         };
     }
 }
