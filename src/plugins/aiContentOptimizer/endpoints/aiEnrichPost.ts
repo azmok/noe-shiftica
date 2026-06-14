@@ -91,9 +91,35 @@ export const aiEnrichPostHandler: PayloadHandler = async (req) => {
         const errMsg = error instanceof Error ? error.message : String(error)
         const errCause = error instanceof Error && error.cause ? String(error.cause) : undefined
         console.error('[AI-ENRICH] Error:', errMsg)
+
+        // Classify the failure into an actionable, user-facing message so the Admin UI
+        // can tell the editor WHY it failed (e.g. a deleted / billing-disabled API key)
+        // instead of a generic "failed" alert. `details` keeps the raw error for logs.
+        let code = 'ENRICH_FAILED'
+        let userMessage = 'AI最適化に失敗しました。時間をおいて再度お試しください。'
+        let status = 500
+        if (/API key not valid|API_KEY_INVALID/i.test(errMsg)) {
+            code = 'API_KEY_INVALID'
+            userMessage =
+                'Gemini APIキーが無効です。キーが削除・失効したか、請求(Billing)が無効になっている可能性があります。' +
+                '本番は Secret Manager、ローカルは .env.local の GEMINI_API_KEY を更新してください。'
+            status = 502
+        } else if (/GEMINI_API_KEY is not set/i.test(errMsg)) {
+            code = 'API_KEY_MISSING'
+            userMessage = 'GEMINI_API_KEY が設定されていません。サーバーの環境変数を確認してください。'
+        } else if (/quota|RESOURCE_EXHAUSTED|rate ?limit|\b429\b/i.test(errMsg)) {
+            code = 'QUOTA_EXCEEDED'
+            userMessage = 'Gemini API の利用上限に達しました。しばらく待ってから再度お試しください。'
+            status = 429
+        } else if (/\b404\b|not found|not supported/i.test(errMsg)) {
+            code = 'MODEL_UNAVAILABLE'
+            userMessage = 'AIモデルが利用できません（モデル名の変更・提供終了の可能性）。設定を確認してください。'
+            status = 502
+        }
+
         return Response.json(
-            { error: 'Failed to enrich content', details: errMsg, cause: errCause },
-            { status: 500 }
+            { error: 'Failed to enrich content', code, userMessage, details: errMsg, cause: errCause },
+            { status }
         )
     }
 }

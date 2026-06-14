@@ -6,6 +6,7 @@ import { DRAFT_SAVE_EVENT } from '../../shared/draftStorage'
 
 export const AiContentOptimizerUI: React.FC = () => {
     const [isOptimizing, setIsOptimizing] = useState(false)
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [options, setOptions] = useState({
         title: false,
         slug: true,
@@ -43,6 +44,7 @@ export const AiContentOptimizerUI: React.FC = () => {
         }
 
         setIsOptimizing(true)
+        setErrorMsg(null)
         console.group('[AI-OPTIMIZER] Optimizing...')
 
         try {
@@ -75,8 +77,21 @@ export const AiContentOptimizerUI: React.FC = () => {
             })
 
             if (!response.ok) {
-                const errText = await response.text().catch(() => '(unreadable)')
-                throw new Error(`AI Enrichment failed: ${response.status} ${response.statusText} — ${errText}`)
+                // Prefer the server's classified, user-facing message (e.g. invalid API key)
+                // so the editor sees an actionable reason instead of a generic failure.
+                let userMessage = ''
+                let details = ''
+                try {
+                    const errJson = await response.json()
+                    userMessage = errJson.userMessage || ''
+                    details = errJson.details || errJson.error || ''
+                } catch {
+                    details = await response.text().catch(() => '(unreadable)')
+                }
+                throw new Error(
+                    userMessage ||
+                    `AI最適化に失敗しました（${response.status} ${response.statusText}）${details ? ` — ${details}` : ''}`
+                )
             }
 
             const aiResult = await response.json()
@@ -117,8 +132,9 @@ export const AiContentOptimizerUI: React.FC = () => {
                 setTimeout(() => window.dispatchEvent(new CustomEvent(DRAFT_SAVE_EVENT)), 500)
             }
         } catch (error) {
-            console.error('[AI-OPTIMIZER] Optimization failed:', error)
-            alert('AI Optimization failed.')
+            const message = error instanceof Error ? error.message : String(error)
+            console.error('[AI-OPTIMIZER] Optimization failed:', message)
+            setErrorMsg(message)
         } finally {
             setIsOptimizing(false)
             console.groupEnd()
@@ -176,6 +192,25 @@ export const AiContentOptimizerUI: React.FC = () => {
                 <p style={{ fontSize: '0.7rem', color: '#6366f1', marginTop: '-0.25rem', fontWeight: '600' }}>
                     📎 HTMLインポートを検出 — インポートの内容を分析してメタデータを生成します
                 </p>
+            )}
+
+            {errorMsg && (
+                <div role="alert" style={{
+                    fontSize: '0.75rem',
+                    color: '#b91c1c',
+                    backgroundColor: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '8px',
+                    padding: '0.625rem 0.75rem',
+                    lineHeight: '1.5',
+                    wordBreak: 'break-word',
+                    display: 'flex',
+                    gap: '0.4rem',
+                    alignItems: 'flex-start',
+                }}>
+                    <span aria-hidden="true">⚠️</span>
+                    <span>{errorMsg}</span>
+                </div>
             )}
 
             <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.25rem' }}>

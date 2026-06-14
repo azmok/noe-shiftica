@@ -92,5 +92,38 @@ describe('aiEnrichPostHandler', () => {
         const data = await res.json()
         expect(data.error).toBe('Failed to enrich content')
         expect(data.details).toBe('Gemini API Error')
+        // Unclassified failures still expose a generic, user-facing message
+        expect(data.code).toBe('ENRICH_FAILED')
+        expect(typeof data.userMessage).toBe('string')
+    })
+
+    it('classifies an invalid/deleted API key into a user-facing message (502)', async () => {
+        mockEnrichPostContent.mockRejectedValue(
+            new Error(
+                'Failed to enrich content with AI: [GoogleGenerativeAI Error]: [400 Bad Request] ' +
+                'API key not valid. Please pass a valid API key. API_KEY_INVALID'
+            )
+        )
+
+        const req = makeReq(JSON.stringify({ title: 'Test Post', content: { root: {} } }))
+        const res = await aiEnrichPostHandler(req)
+
+        expect(res.status).toBe(502)
+        const data = await res.json()
+        expect(data.code).toBe('API_KEY_INVALID')
+        expect(data.userMessage).toMatch(/Gemini APIキーが無効/)
+        // Raw detail is preserved for server logs / debugging
+        expect(data.details).toContain('API key not valid')
+    })
+
+    it('classifies a quota/rate-limit error (429)', async () => {
+        mockEnrichPostContent.mockRejectedValue(new Error('[429] RESOURCE_EXHAUSTED: quota exceeded'))
+
+        const req = makeReq(JSON.stringify({ title: 'Test Post', content: { root: {} } }))
+        const res = await aiEnrichPostHandler(req)
+
+        expect(res.status).toBe(429)
+        const data = await res.json()
+        expect(data.code).toBe('QUOTA_EXCEEDED')
     })
 })
