@@ -146,7 +146,9 @@ export default async function BlogPostPage({
 }: {
     params: Promise<{ slug: string }>;
 }) {
-    // ISR: page is cached; revalidated on-demand via revalidatePath() in Posts.ts hooks.
+    // ISR: page is cached; revalidated on-demand via revalidatePath() in Posts.ts hooks,
+    // which (with no manual Cache-Control header — see next.config.ts) invalidates the
+    // Firebase App Hosting CDN edge in tandem with the Next.js Full Route Cache.
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     const payload = await getPayload({ config: configPromise });

@@ -17,8 +17,10 @@ export const metadata = {
 };
 
 export default async function BlogPage() {
-  // ISR: cached by Firebase App Hosting CDN. Cache is invalidated and pre-warmed
-  // by revalidatePath() in Posts.ts afterChange/afterDelete hooks via /api/revalidate.
+  // ISR: cached natively by Firebase App Hosting CDN. On-demand revalidation via
+  // revalidatePath() in Posts.ts afterChange/afterDelete hooks invalidates both the
+  // Next.js Full Route Cache and the App Hosting CDN edge (no manual Cache-Control
+  // header is set — see next.config.ts), so edits show without sacrificing BFCache/speed.
   // posts テーブルの _status = 'published' の記事のみ直接クエリ
   // Payload CMS のドラフトバージョン管理を完全にバイパスする
   let posts: Awaited<ReturnType<typeof getPostsByStatus>> = [];

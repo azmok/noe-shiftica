@@ -6,37 +6,25 @@ const nextConfig: NextConfig = {
   // Allow the dev server to accept requests proxied through a Cloudflare quick
   // tunnel (used for testing passkeys/WebAuthn over HTTPS on a phone).
   allowedDevOrigins: ['*.trycloudflare.com'],
-  // Enable Firebase App Hosting CDN caching for blog/dev routes.
-  // On-demand revalidation via revalidatePath() purges both Next.js Full Route Cache
-  // and the Firebase App Hosting CDN layer simultaneously, then pre-warms a fresh cache.
-  // s-maxage: CDN caches for up to 1 year; stale-while-revalidate: serve stale during
-  // background revalidation; must-revalidate: never serve truly stale beyond max-age.
+  // CDN caching for /blog and /dev is left to Firebase App Hosting's native management.
+  //
+  // We intentionally do NOT set a manual `Cache-Control` (no s-maxage, no no-store) for
+  // these routes. A manual long `s-maxage` (added in c7f7ff2) pinned the Google CDN edge
+  // for up to a year, and `revalidatePath()` could not purge that edge — so post edits
+  // never appeared on normal navigation / browser back-forward (only a hard reload, which
+  // sends `Cache-Control: no-cache`, briefly revalidated against origin). The reverse —
+  // forcing `no-store` — would kill BFCache and the CMS speed goals (see rules.md §4-E).
+  //
+  // By leaving the headers to the framework, App Hosting binds its CDN edge to Next.js's
+  // on-demand revalidation, so revalidatePath() in Posts.ts hooks invalidates the edge in
+  // tandem with the Full Route Cache while preserving BFCache and edge speed.
+  // (See .antigravity/bugs/isr-caching.md and rules.md §4-E.)
   async redirects() {
     return [
       {
         source: '/blog/why-rich-and-luxury-websites-are-obsolete',
         destination: '/blog/rich-lavish-websites-outdated-reason',
         permanent: true,
-      },
-    ];
-  },
-  async headers() {
-    return [
-      {
-        source: '/blog',
-        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
-      },
-      {
-        source: '/blog/:path*',
-        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
-      },
-      {
-        source: '/dev',
-        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
-      },
-      {
-        source: '/dev/:path*',
-        headers: [{ key: 'Cache-Control', value: 's-maxage=31536000, stale-while-revalidate' }],
       },
     ];
   },
