@@ -7,6 +7,11 @@ import { tokushoContent } from './content';
 export const metadata = {
     title: "特定商取引法に基づく表記 | Noe Shiftica",
     description: "Noe Shifticaの特定商取引法に基づく表記について説明します。",
+    alternates: {
+        // Self-referencing canonical. Without this, the page inherits the root
+        // layout's `canonical: "/"` and looks like a duplicate of the homepage.
+        canonical: "/tokusho",
+    },
 };
 
 export default function TokushoPage() {

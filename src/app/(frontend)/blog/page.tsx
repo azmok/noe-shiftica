@@ -8,6 +8,14 @@ import Link from "next/link";
 import { getPostsByStatus, getDistinctTags } from "@/lib/db";
 import { GcsImage } from "@/lib/GcsImage";
 
+export const metadata = {
+  alternates: {
+    // Self-referencing canonical. Without this, /blog inherits the root layout's
+    // `canonical: "/"`, which would tell Google this page duplicates the homepage.
+    canonical: "/blog",
+  },
+};
+
 export default async function BlogPage() {
   // ISR: cached by Firebase App Hosting CDN. Cache is invalidated and pre-warmed
   // by revalidatePath() in Posts.ts afterChange/afterDelete hooks via /api/revalidate.

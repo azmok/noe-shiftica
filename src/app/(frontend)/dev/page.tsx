@@ -9,6 +9,14 @@ import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { GcsImage } from "@/lib/GcsImage";
 
+export const metadata = {
+  alternates: {
+    // Self-referencing canonical. Without this, /dev inherits the root layout's
+    // `canonical: "/"`, which would tell Google this page duplicates the homepage.
+    canonical: "/dev",
+  },
+};
+
 export default async function DevBlogPage() {
   // ISR: cached by Firebase App Hosting CDN. Cache is invalidated and pre-warmed
   // by revalidatePath() in TechPosts.ts afterChange/afterDelete hooks via /api/revalidate.

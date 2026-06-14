@@ -6,6 +6,11 @@ import Link from 'next/link';
 export const metadata = {
     title: "利用規約 | Noe Shiftica",
     description: "Noe Shifticaのサービス利用規約について説明します。",
+    alternates: {
+        // Self-referencing canonical. Without this, the page inherits the root
+        // layout's `canonical: "/"` and looks like a duplicate of the homepage.
+        canonical: "/terms",
+    },
 };
 
 export default function TermsOfServicePage() {

@@ -7,6 +7,11 @@ import { privacyPolicyContent } from './content';
 export const metadata = {
     title: "プライバシーポリシー | Noe Shiftica",
     description: "Noe Shifticaの個人情報保護方針について説明します。",
+    alternates: {
+        // Self-referencing canonical. Without this, the page inherits the root
+        // layout's `canonical: "/"` and looks like a duplicate of the homepage.
+        canonical: "/privacy",
+    },
 };
 
 export default function PrivacyPolicyPage() {

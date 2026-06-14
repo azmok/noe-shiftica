@@ -7,6 +7,11 @@ import { Footer } from '../components/Footer';
 export const metadata: Metadata = {
   title: 'Services | Noe Shiftica',
   description: 'What We Do. Noe Shifticaが提供する3つのこと。',
+  alternates: {
+    // Self-referencing canonical. Without this, the page inherits the root
+    // layout's `canonical: "/"` and looks like a duplicate of the homepage.
+    canonical: '/services',
+  },
 };
 
 export default function ServicesPage() {

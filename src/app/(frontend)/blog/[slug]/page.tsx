@@ -69,6 +69,15 @@ export async function generateMetadata({
         const title = cmd.seo_title || cmd.title || post.title;
         const description = cmd.seo_description || cmd.description || "";
 
+        // Self-referencing canonical, defaulting to this post's own URL. A custom
+        // override from customMetaData.canonical wins (absolute URL or path kept
+        // as-is; a bare slug is resolved under /blog). Without this, the page
+        // inherits the root layout's `canonical: "/"`.
+        const customCanonical = typeof cmd.canonical === 'string' ? cmd.canonical.trim() : '';
+        const canonical = customCanonical
+            ? (/^https?:\/\//.test(customCanonical) || customCanonical.startsWith('/') ? customCanonical : `/blog/${customCanonical}`)
+            : `/blog/${post.slug}`;
+
         // OpenGraph images fallback logic
         // cmd.og_image must be an absolute URL; relative paths (slugs from frontmatter) are ignored
         const cmdOgImage = cmd.og_image && (cmd.og_image.startsWith('http://') || cmd.og_image.startsWith('https://')) ? cmd.og_image : null;
@@ -77,6 +86,9 @@ export async function generateMetadata({
         return {
             title: title,
             description: description,
+            alternates: {
+                canonical: canonical,
+            },
             openGraph: {
                 title: cmd.og_title || title,
                 description: cmd.og_description || description,
