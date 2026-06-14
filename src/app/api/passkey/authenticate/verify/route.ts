@@ -9,12 +9,16 @@ import {
   challengeCookieOptions,
   fromBase64Url,
   mintPayloadSessionCookie,
+  PENDING_2FA_COOKIE,
+  pending2faCookieOptions,
+  verifyPending2fa,
 } from '@/lib/webauthn'
 
 /**
- * Step 2 of passwordless login. Verifies the assertion, advances the
- * replay-protection counter, and — on success — mints the same session cookie
- * Payload's password login would, logging the user into the admin panel.
+ * Second factor of true 2FA. Verifies the passkey assertion AND requires the
+ * `pending-2fa` cookie proving the password step already passed (for the same
+ * user). Only then is a real session minted. The `DISABLE_2FA` break-glass env
+ * skips the password-proof requirement.
  */
 export async function POST(request: NextRequest) {
   const payload = await getPayload({ config })
@@ -67,6 +71,19 @@ export async function POST(request: NextRequest) {
   })
 
   const userId = typeof passkey.user === 'object' ? passkey.user.id : passkey.user
+
+  // Enforce the first factor: the password step must have passed for THIS user.
+  const disable2fa = process.env.DISABLE_2FA === 'true'
+  if (!disable2fa) {
+    const pendingUid = verifyPending2fa(payload.secret, request.cookies.get(PENDING_2FA_COOKIE)?.value)
+    if (pendingUid === null) {
+      return NextResponse.json({ error: '先にパスワードでの認証が必要です' }, { status: 401 })
+    }
+    if (String(pendingUid) !== String(userId)) {
+      return NextResponse.json({ error: '2要素認証のユーザーが一致しません' }, { status: 401 })
+    }
+  }
+
   const user = await payload.findByID({ collection: 'users', id: userId, depth: 0 })
 
   const cookie = await mintPayloadSessionCookie(payload, user)
@@ -74,5 +91,7 @@ export async function POST(request: NextRequest) {
   const res = NextResponse.json({ verified: true })
   res.cookies.set(cookie.name, cookie.value, cookie.options)
   res.cookies.set(AUTH_CHALLENGE_COOKIE, '', { ...challengeCookieOptions, maxAge: 0 })
+  // Consume the password-step proof so it can't be reused.
+  res.cookies.set(PENDING_2FA_COOKIE, '', { ...pending2faCookieOptions, maxAge: 0 })
   return res
 }

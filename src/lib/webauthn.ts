@@ -11,7 +11,7 @@
  * - The one-time challenge is stored in a short-lived httpOnly cookie instead
  *   of the DB. This is stateless and safe across Cloud Run instances.
  */
-import { randomUUID } from 'crypto'
+import crypto, { randomUUID } from 'crypto'
 import { getFieldsToSign, jwtSign, type Payload, type CollectionConfig, type PayloadRequest } from 'payload'
 import type { User } from '@/payload-types'
 
@@ -39,6 +39,54 @@ export const challengeCookieOptions = {
   sameSite: 'lax' as const,
   secure: origin.startsWith('https'),
   maxAge: CHALLENGE_TTL_SECONDS,
+}
+
+// ---------------------------------------------------------------------------
+// Two-factor (2FA) "password step passed" proof
+// ---------------------------------------------------------------------------
+// After the password (1st factor) is verified, we hand the browser a short-lived
+// signed cookie proving it. The passkey verify endpoint (2nd factor) requires
+// this cookie before it will mint a real session — so neither factor alone gets
+// you in. Signed with an HMAC of payload.secret (no extra deps).
+
+export const PENDING_2FA_COOKIE = 'pending-2fa'
+export const PENDING_2FA_TTL_SECONDS = 300
+
+export const pending2faCookieOptions = {
+  httpOnly: true,
+  path: '/',
+  sameSite: 'lax' as const,
+  secure: origin.startsWith('https'),
+  maxAge: PENDING_2FA_TTL_SECONDS,
+}
+
+const hmac = (data: string, secret: string): string =>
+  crypto.createHmac('sha256', secret).update(data).digest('base64url')
+
+/** Issue a tamper-proof, expiring token that proves the password step passed. */
+export function signPending2fa(secret: string, uid: string | number): string {
+  const body = Buffer.from(
+    JSON.stringify({ uid, exp: Date.now() + PENDING_2FA_TTL_SECONDS * 1000 }),
+  ).toString('base64url')
+  return `${body}.${hmac(body, secret)}`
+}
+
+/** Returns the uid if the password-step token is valid and unexpired, else null. */
+export function verifyPending2fa(secret: string, token: string | undefined): string | number | null {
+  if (!token) return null
+  const [body, sig] = token.split('.')
+  if (!body || !sig) return null
+  const expected = hmac(body, secret)
+  const sigBuf = Buffer.from(sig)
+  const expBuf = Buffer.from(expected)
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) return null
+  try {
+    const { uid, exp } = JSON.parse(Buffer.from(body, 'base64url').toString())
+    if (typeof exp !== 'number' || Date.now() > exp) return null
+    return (uid as string | number) ?? null
+  } catch {
+    return null
+  }
 }
 
 export const toBase64Url = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64url')
