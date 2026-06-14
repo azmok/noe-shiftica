@@ -8,6 +8,12 @@ import { LivePreview } from "../LivePreview";
 import { unstable_noStore as noStore } from "next/cache";
 import Script from "next/script";
 
+// Draft preview route: never index. It renders unpublished content and must not
+// appear in search results or compete with the published article's canonical.
+export const metadata = {
+    robots: { index: false, follow: false },
+};
+
 export default async function BlogPostPreviewPage({
     params,
 }: {

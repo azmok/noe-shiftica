@@ -86,7 +86,8 @@ import type { Viewport } from "next";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // Intentionally no maximumScale: disabling pinch-zoom is an accessibility
+  // anti-pattern (flagged by Lighthouse) and blocks users who need to zoom.
 };
 
 // Brand share card used as the default OG/Twitter image for pages that don't

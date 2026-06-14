@@ -58,8 +58,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/tokusho',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
+    // No reliable per-page modified date for static routes. Emitting `new Date()`
+    // would stamp "now" on every request, training Google to ignore our lastmod.
+    // Omitting it (lastmod is optional) is more honest than a fake timestamp.
+    changeFrequency: 'monthly' as const,
     priority: route === '' ? 1 : 0.8,
   }))
 
@@ -79,15 +81,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  // Collect unique tags (case-insensitive) from a set of docs
-  const collectTags = (docs: { customMetaData?: unknown }[]) => {
-    const tagMap = new Map<string, string>()
+  // Collect unique tags (case-insensitive) and the newest updatedAt of the posts
+  // carrying each tag, so a tag listing's lastmod reflects real content changes
+  // instead of "now" on every request.
+  const collectTags = (docs: { customMetaData?: unknown; updatedAt?: string }[]) => {
+    const tagMap = new Map<string, { label: string; lastModified: Date }>()
     for (const doc of docs) {
       const meta = doc.customMetaData as Record<string, unknown> | undefined
       if (meta && Array.isArray(meta.tags)) {
+        const docDate = doc.updatedAt ? new Date(doc.updatedAt) : new Date(0)
         for (const tag of meta.tags) {
           const value = String(tag).trim()
-          if (value) tagMap.set(value.toLowerCase(), value)
+          if (!value) continue
+          const key = value.toLowerCase()
+          const existing = tagMap.get(key)
+          if (!existing) {
+            tagMap.set(key, { label: value, lastModified: docDate })
+          } else if (docDate > existing.lastModified) {
+            existing.lastModified = docDate
+          }
         }
       }
     }
@@ -95,17 +107,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Dynamic blog tag routes
-  const blogTagRoutes = collectTags(posts.docs).map((tag) => ({
-    url: `${baseUrl}/blog/tag/${encodeURIComponent(tag)}`,
-    lastModified: new Date(),
+  const blogTagRoutes = collectTags(posts.docs).map(({ label, lastModified }) => ({
+    url: `${baseUrl}/blog/tag/${encodeURIComponent(label)}`,
+    lastModified,
     changeFrequency: 'weekly' as const,
     priority: 0.4,
   }))
 
   // Dynamic tech tag routes
-  const techTagRoutes = collectTags(techPosts.docs).map((tag) => ({
-    url: `${baseUrl}/dev/tag/${encodeURIComponent(tag)}`,
-    lastModified: new Date(),
+  const techTagRoutes = collectTags(techPosts.docs).map(({ label, lastModified }) => ({
+    url: `${baseUrl}/dev/tag/${encodeURIComponent(label)}`,
+    lastModified,
     changeFrequency: 'weekly' as const,
     priority: 0.4,
   }))
