@@ -17,8 +17,39 @@ import "prismjs/components/prism-json"
 import "prismjs/components/prism-sql"
 import "prismjs/components/prism-python"
 
+// Lexical text nodes carry inline styling (color / font-size / gradient) in a
+// `style` CSS string, written by the textStyle toolbar via $patchStyleText.
+// Payload's default text JSX converter only renders `format` flags (bold,
+// italic, …) and DROPS `node.style`, so font colors and sizes never reach the
+// published article or the live preview. Convert that CSS string into a React
+// style object so the styling survives rendering.
+const cssStringToStyleObject = (css: string): React.CSSProperties => {
+    const style: Record<string, string> = {}
+    for (const decl of css.split(';')) {
+        const idx = decl.indexOf(':')
+        if (idx === -1) continue
+        const prop = decl.slice(0, idx).trim()
+        const value = decl.slice(idx + 1).trim()
+        if (!prop || !value) continue
+        // kebab-case → camelCase, preserving vendor prefixes
+        // (e.g. -webkit-background-clip → WebkitBackgroundClip)
+        const key = prop.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())
+        style[key] = value
+    }
+    return style as React.CSSProperties
+}
+
 const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     ...defaultConverters,
+    // Re-apply inline text styling (color / font-size / gradient) that the
+    // default text converter drops. We let the default converter handle the
+    // format flags (bold/italic/…), then wrap its output in a styled <span>.
+    text: (args: any) => {
+        const rendered = (defaultConverters as any).text(args)
+        const style: string | undefined = args?.node?.style
+        if (!style || !style.trim()) return rendered
+        return <span style={cssStringToStyleObject(style)}>{rendered}</span>
+    },
     // Handle standard Lexical code nodes (type: 'code') just in case
     code: ({ node }: { node: any }) => {
         const codeText = node.children?.map((c: any) => c.text).join("") || "";
