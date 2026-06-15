@@ -4,6 +4,29 @@ import matter from 'gray-matter'
 import { sanitizeServerEditorConfig } from '@payloadcms/richtext-lexical'
 import { translateToSlug } from '../../lib/translateToSlug'
 
+/**
+ * The set of languages the CustomCodeBlock `language` select accepts
+ * (see src/features/customCodeBlock/index.ts). Unknown/absent tags fall back to
+ * 'plaintext' so the select value stays valid.
+ */
+const CODE_BLOCK_LANGUAGES = new Set([
+    'javascript', 'typescript', 'html', 'css', 'python', 'bash', 'json', 'sql', 'plaintext',
+]);
+
+const CODE_BLOCK_LANGUAGE_ALIASES: Record<string, string> = {
+    js: 'javascript', ts: 'typescript', py: 'python',
+    sh: 'bash', shell: 'bash', zsh: 'bash',
+    text: 'plaintext', plain: 'plaintext', txt: 'plaintext', none: 'plaintext',
+};
+
+/** Normalize a fenced-code-block language tag; defaults to plaintext. */
+export function normalizeCodeLanguage(raw: string): string {
+    const lang = (raw || '').trim().toLowerCase();
+    if (!lang) return 'plaintext';
+    const mapped = CODE_BLOCK_LANGUAGE_ALIASES[lang] ?? lang;
+    return CODE_BLOCK_LANGUAGES.has(mapped) ? mapped : 'plaintext';
+}
+
 // Helper to transform Markdown code blocks to Payload's CustomCodeBlock (Lexical BlockNode)
 export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: string) => any): any {
     const codeBlocks: Array<{ language: string; code: string }> = [];
@@ -14,10 +37,15 @@ export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: 
     let placeholderIndex = 0;
     const preprocessedMarkdown = markdown.replace(codeBlockRegex, (match, lang, code) => {
         codeBlocks.push({
-            language: lang.trim().toLowerCase() || 'javascript',
+            language: normalizeCodeLanguage(lang),
             code: code.trim()
         });
-        return `\n\n__OJE_CODE_BLOCK_PLACEHOLDER_${placeholderIndex++}__\n\n`;
+        // NOTE: The placeholder MUST contain no Markdown-active characters.
+        // The earlier `__…__` form was parsed as bold emphasis by the Markdown
+        // converter — the underscores were stripped and a bold text node was
+        // produced, so the postprocess regex below never matched and the code
+        // block was lost. Use an alphanumeric-only token.
+        return `\n\nOJECODEBLOCKPLACEHOLDER${placeholderIndex++}END\n\n`;
     });
 
     const lexicalData = convertFn(preprocessedMarkdown);
@@ -37,7 +65,7 @@ export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: 
                 if (child.type === 'paragraph' && child.children && child.children.length === 1) {
                     const textNode = child.children[0];
                     if (textNode.type === 'text' && typeof textNode.text === 'string') {
-                        const match = textNode.text.match(/^__OJE_CODE_BLOCK_PLACEHOLDER_(\d+)__$/);
+                        const match = textNode.text.match(/^OJECODEBLOCKPLACEHOLDER(\d+)END$/);
                         if (match) {
                             const index = parseInt(match[1], 10);
                             const savedBlock = codeBlocks[index];
@@ -69,7 +97,13 @@ export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: 
         return node;
     };
 
-    return replacePlaceholders(lexicalData);
+    // convertMarkdownToLexical returns a SerializedEditorState ({ root: {...} }),
+    // so the placeholder paragraphs live under `.root.children`, not directly under
+    // `lexicalData`. Run the replacer on the root node (in place) and return the
+    // original object. Without this, top-level code blocks are never replaced.
+    const target = lexicalData.root ?? lexicalData;
+    replacePlaceholders(target);
+    return lexicalData;
 }
 
 // Markdown → Lexical conversion endpoint handler

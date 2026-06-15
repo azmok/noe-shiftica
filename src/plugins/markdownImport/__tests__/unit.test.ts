@@ -29,6 +29,8 @@ import {
     handleTranslateSlug,
     beforeValidateMarkdown,
     markdownImportPlugin,
+    convertMarkdownWithCodeBlocks,
+    normalizeCodeLanguage,
 } from '@/plugins/markdownImport'
 
 // ---------------------------------------------------------------------------
@@ -399,5 +401,136 @@ describe('markdownImportPlugin', () => {
 
         const posts = result.collections.find((c: any) => c.slug === 'posts')
         expect(posts.hooks.beforeValidate).toHaveLength(1)
+    })
+})
+
+// ---------------------------------------------------------------------------
+// normalizeCodeLanguage
+// ---------------------------------------------------------------------------
+
+describe('normalizeCodeLanguage', () => {
+    it('defaults to plaintext when no language tag is given', () => {
+        expect(normalizeCodeLanguage('')).toBe('plaintext')
+        expect(normalizeCodeLanguage('   ')).toBe('plaintext')
+    })
+
+    it('honors a supported language tag', () => {
+        expect(normalizeCodeLanguage('python')).toBe('python')
+        expect(normalizeCodeLanguage('JSON')).toBe('json')
+    })
+
+    it('maps common aliases', () => {
+        expect(normalizeCodeLanguage('js')).toBe('javascript')
+        expect(normalizeCodeLanguage('ts')).toBe('typescript')
+        expect(normalizeCodeLanguage('sh')).toBe('bash')
+    })
+
+    it('falls back to plaintext for unsupported languages', () => {
+        expect(normalizeCodeLanguage('ruby')).toBe('plaintext')
+        expect(normalizeCodeLanguage('go')).toBe('plaintext')
+    })
+})
+
+// ---------------------------------------------------------------------------
+// convertMarkdownWithCodeBlocks
+// ---------------------------------------------------------------------------
+
+describe('convertMarkdownWithCodeBlocks', () => {
+    // Simulates Payload's markdown→lexical conversion: split the (already
+    // placeholder-substituted) markdown into blank-line-separated paragraphs.
+    const fakeConvert = (md: string) => ({
+        root: {
+            type: 'root',
+            children: md
+                .split(/\n\s*\n/)
+                .map((b) => b.trim())
+                .filter(Boolean)
+                .map((text) => ({
+                    type: 'paragraph',
+                    children: [{ type: 'text', text }],
+                })),
+        },
+    })
+
+    it('replaces a TOP-LEVEL code block placeholder with a code-block node (regression)', () => {
+        const markdown = [
+            '### ChatGPTの場合',
+            '',
+            'iPhoneアプリの場合：',
+            '',
+            '```',
+            '右下の設定（歯車アイコン） → パーソナライズ',
+            '→ カスタム指示',
+            '```',
+        ].join('\n')
+
+        const result = convertMarkdownWithCodeBlocks(markdown, fakeConvert)
+        const children = result.root.children
+
+        // The placeholder paragraph must have become a code-block block node,
+        // NOT remain as a literal OJECODEBLOCKPLACEHOLDER text paragraph.
+        const block = children.find((c: any) => c.type === 'block')
+        expect(block).toBeDefined()
+        expect(block.fields.blockType).toBe('code-block')
+        expect(block.fields.language).toBe('plaintext')
+        expect(block.fields.code).toBe('右下の設定（歯車アイコン） → パーソナライズ\n→ カスタム指示')
+
+        // No placeholder text leaks through.
+        const json = JSON.stringify(result)
+        expect(json).not.toContain('OJECODEBLOCKPLACEHOLDER')
+    })
+
+    it('honors an explicit language tag on the fence', () => {
+        const markdown = '```python\nprint("hi")\n```'
+        const result = convertMarkdownWithCodeBlocks(markdown, fakeConvert)
+        const block = result.root.children.find((c: any) => c.type === 'block')
+        expect(block.fields.language).toBe('python')
+        expect(block.fields.code).toBe('print("hi")')
+    })
+
+    it('replaces multiple code blocks preserving order and content', () => {
+        const markdown = '```\nfirst\n```\n\ntext\n\n```\nsecond\n```'
+        const result = convertMarkdownWithCodeBlocks(markdown, fakeConvert)
+        const blocks = result.root.children.filter((c: any) => c.type === 'block')
+        expect(blocks).toHaveLength(2)
+        expect(blocks[0].fields.code).toBe('first')
+        expect(blocks[1].fields.code).toBe('second')
+    })
+
+    it('replaces a code block placeholder nested inside another node', () => {
+        // convertFn that buries the placeholder paragraph inside a list item.
+        const nestedConvert = (md: string) => {
+            const token = md.match(/OJECODEBLOCKPLACEHOLDER\d+END/)![0]
+            return {
+                root: {
+                    type: 'root',
+                    children: [
+                        {
+                            type: 'list',
+                            children: [
+                                {
+                                    type: 'listitem',
+                                    children: [
+                                        { type: 'paragraph', children: [{ type: 'text', text: token }] },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }
+        }
+        const result = convertMarkdownWithCodeBlocks('```\nnested code\n```', nestedConvert)
+        const block = result.root.children[0].children[0].children[0]
+        expect(block.type).toBe('block')
+        expect(block.fields.code).toBe('nested code')
+    })
+
+    it('returns lexical data unchanged when there are no code blocks', () => {
+        const markdown = '# Just a heading\n\nNo code here.'
+        const result = convertMarkdownWithCodeBlocks(markdown, fakeConvert)
+        const json = JSON.stringify(result)
+        expect(json).not.toContain('block')
+        expect(json).not.toContain('OJECODEBLOCKPLACEHOLDER')
     })
 })

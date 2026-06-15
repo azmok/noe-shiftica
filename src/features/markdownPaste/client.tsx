@@ -54,6 +54,33 @@ function sanitizeMarkdownForPaste(input: string): string {
         .join('\n')
 }
 
+/**
+ * The set of languages the CustomCodeBlock `language` select accepts
+ * (see src/features/customCodeBlock/index.ts). A code block whose language is
+ * not in this set would produce an invalid select value, so anything unknown
+ * (or absent) falls back to 'plaintext'.
+ */
+const CODE_BLOCK_LANGUAGES = new Set([
+    'javascript', 'typescript', 'html', 'css', 'python', 'bash', 'json', 'sql', 'plaintext',
+])
+
+const CODE_BLOCK_LANGUAGE_ALIASES: Record<string, string> = {
+    js: 'javascript', ts: 'typescript', py: 'python',
+    sh: 'bash', shell: 'bash', zsh: 'bash',
+    text: 'plaintext', plain: 'plaintext', txt: 'plaintext', none: 'plaintext',
+}
+
+/**
+ * Normalize a fenced-code-block language tag to a valid CustomCodeBlock value.
+ * Honors an explicit language when supported; otherwise defaults to plaintext.
+ */
+function normalizeCodeLanguage(raw: string): string {
+    const lang = (raw || '').trim().toLowerCase()
+    if (!lang) return 'plaintext'
+    const mapped = CODE_BLOCK_LANGUAGE_ALIASES[lang] ?? lang
+    return CODE_BLOCK_LANGUAGES.has(mapped) ? mapped : 'plaintext'
+}
+
 const MarkdownPastePlugin = () => {
     const [editor] = useLexicalComposerContext()
     const { editorConfig } = useEditorConfigContext()
@@ -157,10 +184,15 @@ const MarkdownPastePlugin = () => {
                     const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)\n```/g
                     const preprocessedData = data.replace(codeBlockRegex, (match, lang, code) => {
                         codeBlocks.push({
-                            language: lang.trim().toLowerCase() || 'javascript',
+                            language: normalizeCodeLanguage(lang),
                             code: code.trim()
                         })
-                        return `\n\n__OJE_CODE_BLOCK_PLACEHOLDER_${placeholderIndex++}__\n\n`
+                        // NOTE: The placeholder MUST contain no Markdown-active characters.
+                        // The earlier `__…__` form was parsed as bold emphasis by
+                        // $convertFromMarkdownString — the underscores were stripped and a
+                        // bold text node was produced, so the postprocess regex below never
+                        // matched and the code block was lost. Use an alphanumeric-only token.
+                        return `\n\nOJECODEBLOCKPLACEHOLDER${placeholderIndex++}END\n\n`
                     })
 
                     if (DEBUG) {
@@ -230,7 +262,7 @@ const MarkdownPastePlugin = () => {
                                     if (child.type === 'paragraph' && child.children && child.children.length === 1) {
                                         const textNode = child.children[0]
                                         if (textNode.type === 'text' && typeof textNode.text === 'string') {
-                                            const match = textNode.text.match(/^__OJE_CODE_BLOCK_PLACEHOLDER_(\d+)__$/)
+                                            const match = textNode.text.match(/^OJECODEBLOCKPLACEHOLDER(\d+)END$/)
                                             if (match) {
                                                 const index = parseInt(match[1], 10)
                                                 const savedBlock = codeBlocks[index]
@@ -257,7 +289,13 @@ const MarkdownPastePlugin = () => {
                             }
                             return node
                         }
-                        serializedNodes = serializedNodes.map(node => replacePlaceholders(node))
+                        // Placeholder paragraphs sit at the TOP level (direct children of
+                        // root). Wrap them in a synthetic parent and run the replacer ONCE so
+                        // each top-level paragraph is inspected as a placeholder candidate.
+                        // Mapping replacePlaceholders over each node individually only inspected
+                        // that paragraph's text children — never the paragraph itself — so
+                        // top-level code blocks were silently dropped.
+                        serializedNodes = replacePlaceholders({ children: serializedNodes }).children
                     }
 
                     if (DEBUG) {
