@@ -24,6 +24,7 @@ import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { TechPosts } from './collections/TechPosts'
 import { Passkeys } from './collections/Passkeys'
+import { HostedApps } from './collections/HostedApps'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
@@ -90,7 +91,7 @@ const configPromise = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, TechPosts, Passkeys],
+  collections: [Users, Media, Categories, Posts, TechPosts, Passkeys, HostedApps],
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [

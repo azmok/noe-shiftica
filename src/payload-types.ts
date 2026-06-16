@@ -75,6 +75,7 @@ export interface Config {
     posts: Post;
     'tech-posts': TechPost;
     passkeys: Passkey;
+    'hosted-apps': HostedApp;
     'html-files': HtmlFile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -89,6 +90,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     'tech-posts': TechPostsSelect<false> | TechPostsSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
+    'hosted-apps': HostedAppsSelect<false> | HostedAppsSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -428,6 +430,30 @@ export interface Passkey {
   createdAt: string;
 }
 /**
+ * JavaScriptを含む1枚完結のHTML(SPA)を丸ごとホスティングします。公開後は /apps/<slug> でそのまま表示され、JSがネイティブに動作します。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hosted-apps".
+ */
+export interface HostedApp {
+  id: number;
+  title: string;
+  /**
+   * 公開URL: /apps/<slug>（小文字英数字とハイフンのみ）
+   */
+  slug: string;
+  /**
+   * 1枚完結のHTMLファイルの中身。下のボタンから .html を読み込むか、直接貼り付けます。
+   */
+  html: string;
+  /**
+   * チェックすると /apps/<slug> で一般公開されます。
+   */
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -474,6 +500,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'passkeys';
         value: number | Passkey;
+      } | null)
+    | ({
+        relationTo: 'hosted-apps';
+        value: number | HostedApp;
       } | null)
     | ({
         relationTo: 'html-files';
@@ -701,6 +731,18 @@ export interface PasskeysSelect<T extends boolean = true> {
   deviceLabel?: T;
   deviceType?: T;
   backedUp?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hosted-apps_select".
+ */
+export interface HostedAppsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  html?: T;
+  published?: T;
   updatedAt?: T;
   createdAt?: T;
 }
