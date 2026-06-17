@@ -20,6 +20,10 @@ export const Posts: CollectionConfig = {
                 return `/blog/${data?.slug || 'preview'}/preview`;
             },
         },
+        // "Open in new tab" Preview button. Rendered inside `.doc-controls__controls`
+        // (NOT `.doc-controls__content`, which custom.scss hides on mobile), so it stays
+        // visible on iPhone — including the new-article (create) view.
+        preview: (doc) => `/blog/${(doc?.slug as string) || 'preview'}/preview`,
         defaultColumns: ['title', '_status', 'publishedAt', 'updatedAt'],
     },
     versions: {

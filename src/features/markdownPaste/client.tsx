@@ -371,7 +371,7 @@ function MonacoCodeToolbarItem() {
                     blockType: 'code-block',
                     id: uniqueId,
                     language: 'javascript',
-                    code: '// ここにコードを入力してください'
+                    code: ''
                 }
             };
             try {
