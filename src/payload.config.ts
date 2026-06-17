@@ -26,6 +26,7 @@ import { TechPosts } from './collections/TechPosts'
 import { Passkeys } from './collections/Passkeys'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
+import { htmlHostingPlugin } from './plugins/html-hosting'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
@@ -159,6 +160,7 @@ const configPromise = buildConfig({
     }),
     panelResizerPlugin(),
     htmlFileManagerPlugin(),
+    htmlHostingPlugin(),
   ],
 });
 

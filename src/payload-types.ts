@@ -76,6 +76,7 @@ export interface Config {
     'tech-posts': TechPost;
     passkeys: Passkey;
     'html-files': HtmlFile;
+    'hosted-pages': HostedPage;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +91,7 @@ export interface Config {
     'tech-posts': TechPostsSelect<false> | TechPostsSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
+    'hosted-pages': HostedPagesSelect<false> | HostedPagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -428,6 +430,28 @@ export interface Passkey {
   createdAt: string;
 }
 /**
+ * CSS/JS を含む HTML をアップロード、または直接編集して /p/<slug> で公開します。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hosted-pages".
+ */
+export interface HostedPage {
+  id: number;
+  /**
+   * 管理画面の一覧表示用の名前です（公開ページの <title> にも使われます）。
+   */
+  title?: string | null;
+  /**
+   * 公開 URL の末尾。英小文字・数字・ハイフンのみ。例: my-landing-page
+   */
+  slug: string;
+  html?: string | null;
+  css?: string | null;
+  js?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -478,6 +502,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'html-files';
         value: number | HtmlFile;
+      } | null)
+    | ({
+        relationTo: 'hosted-pages';
+        value: number | HostedPage;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -724,6 +752,19 @@ export interface HtmlFilesSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hosted-pages_select".
+ */
+export interface HostedPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  html?: T;
+  css?: T;
+  js?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
