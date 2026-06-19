@@ -163,7 +163,7 @@ export default async function WhatsNewArticlePage({
             </div>
           )}
 
-          <div className="prose prose-invert prose-lg max-w-none prose-headings:tracking-tight prose-a:text-(--color-neu-primary) prose-img:rounded-2xl">
+          <div className="prose prose-invert prose-base max-w-none prose-headings:tracking-tight prose-a:text-(--color-neu-primary) prose-img:rounded-2xl">
             <RichText data={post.content} />
           </div>
         </article>
