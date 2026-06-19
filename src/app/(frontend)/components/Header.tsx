@@ -53,13 +53,20 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
   };
 
   const handleBlogClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouch) {
-      if (!isDropdownOpen) {
-        e.preventDefault();
-        setIsDropdownOpen(true);
-      }
-    }
+    // トップの「Blog」はドロップダウンを開くトリガー専用とし、クリックでは遷移させない。
+    // ブログ一覧へはメニュー内の「General」(= /blog) から遷移する。
+    // - preventDefault: ページ遷移（とそれに伴うローディング表示）を止める
+    // - stopImmediatePropagation: document 上の nextjs-toploader の click リスナーまで
+    //   イベントを伝播させない（toploader は defaultPrevented を見ないため、
+    //   preventDefault だけでは読み込み中バーが誤作動してしまう）
+    e.preventDefault();
+    e.nativeEvent.stopImmediatePropagation();
+    setIsDropdownOpen((prev) => {
+      const isTouch = window.matchMedia("(pointer: coarse)").matches;
+      // デスクトップ: ホバーで既に開いているので開いたまま維持。
+      // タッチ: タップで開閉トグル。
+      return isTouch ? !prev : true;
+    });
   };
 
   useEffect(() => {
