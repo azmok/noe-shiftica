@@ -74,6 +74,8 @@ export interface Config {
     categories: Category;
     posts: Post;
     'tech-posts': TechPost;
+    'whats-new': WhatsNew;
+    changelog: Changelog;
     passkeys: Passkey;
     'html-files': HtmlFile;
     'hosted-pages': HostedPage;
@@ -89,6 +91,8 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'tech-posts': TechPostsSelect<false> | TechPostsSelect<true>;
+    'whats-new': WhatsNewSelect<false> | WhatsNewSelect<true>;
+    changelog: ChangelogSelect<false> | ChangelogSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'hosted-pages': HostedPagesSelect<false> | HostedPagesSelect<true>;
@@ -406,6 +410,78 @@ export interface TechPost {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whats-new".
+ */
+export interface WhatsNew {
+  id: number;
+  title: string;
+  /**
+   * URLに使用される識別子です（タイトルから自動生成されます）
+   */
+  slug: string;
+  /**
+   * 一覧カードと meta description に使用される概要文。
+   */
+  excerpt?: string | null;
+  /**
+   * 一覧カードと記事ヘッダーに表示されるアイキャッチ画像。
+   */
+  featuredImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  publishedAt: string;
+  status: 'draft' | 'published';
+  /**
+   * 指定があれば <title> / meta description / OGP に優先的に使用されます。
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "changelog".
+ */
+export interface Changelog {
+  id: number;
+  /**
+   * 例: "v1.2.0"（任意）
+   */
+  version?: string | null;
+  date: string;
+  /**
+   * Keep a Changelog 準拠のカテゴリ。
+   */
+  category: 'Added' | 'Changed' | 'Fixed' | 'Removed';
+  changes?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "passkeys".
  */
 export interface Passkey {
@@ -494,6 +570,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tech-posts';
         value: number | TechPost;
+      } | null)
+    | ({
+        relationTo: 'whats-new';
+        value: number | WhatsNew;
+      } | null)
+    | ({
+        relationTo: 'changelog';
+        value: number | Changelog;
       } | null)
     | ({
         relationTo: 'passkeys';
@@ -715,6 +799,46 @@ export interface TechPostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whats-new_select".
+ */
+export interface WhatsNewSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  excerpt?: T;
+  featuredImage?: T;
+  content?: T;
+  publishedAt?: T;
+  status?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "changelog_select".
+ */
+export interface ChangelogSelect<T extends boolean = true> {
+  version?: T;
+  date?: T;
+  category?: T;
+  changes?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -23,6 +23,8 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Posts } from './collections/Posts'
 import { TechPosts } from './collections/TechPosts'
+import { WhatsNew } from './collections/WhatsNew'
+import { Changelog } from './collections/Changelog'
 import { Passkeys } from './collections/Passkeys'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
@@ -91,7 +93,7 @@ const configPromise = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, TechPosts, Passkeys],
+  collections: [Users, Media, Categories, Posts, TechPosts, WhatsNew, Changelog, Passkeys],
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [

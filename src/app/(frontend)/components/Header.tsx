@@ -235,6 +235,20 @@ export function Header({ alwaysBackdrop = false, hideTopThreshold = 0 }: HeaderP
                             >
                               Developers
                             </Link>
+                            <Link
+                              href="/whats-new"
+                              className="text-xs text-white/80 hover:text-[#E2FF3D] hover:bg-white/5 rounded-xl px-4 py-3 transition-all duration-200 text-left font-medium block whitespace-nowrap"
+                              onClick={() => setIsDropdownOpen(false)}
+                            >
+                              What&apos;s New
+                            </Link>
+                            <Link
+                              href="/changelog"
+                              className="text-xs text-white/80 hover:text-[#E2FF3D] hover:bg-white/5 rounded-xl px-4 py-3 transition-all duration-200 text-left font-medium block whitespace-nowrap"
+                              onClick={() => setIsDropdownOpen(false)}
+                            >
+                              Changelog
+                            </Link>
                           </div>
                         </motion.div>
                       )}

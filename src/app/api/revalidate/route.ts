@@ -8,9 +8,11 @@ import { revalidatePath } from 'next/cache';
  * Requires a valid secret token to prevent unauthorized cache busting.
  *
  * Request body (JSON):
- *   { "secret": "<REVALIDATE_SECRET>", "slug": "optional-post-slug", "collection": "posts" | "tech-posts" }
+ *   { "secret": "<REVALIDATE_SECRET>", "slug": "optional-post-slug", "collection": "posts" | "tech-posts" | "whats-new" | "changelog" }
  *
  * - If collection is "tech-posts": revalidates /dev and /dev/[slug]
+ * - If collection is "whats-new": revalidates /whats-new and /whats-new/[slug]
+ * - If collection is "changelog": revalidates /changelog (single-page, no slug)
  * - Default (collection omitted or "posts"): revalidates /blog and /blog/[slug]
  *
  * After purging Next.js Full Route Cache, this handler pre-warms the CDN cache
@@ -27,15 +29,21 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const isTech = collection === 'tech-posts';
-    const basePath = isTech ? '/dev' : '/blog';
+    const basePathByCollection: Record<string, string> = {
+        'tech-posts': '/dev',
+        'whats-new': '/whats-new',
+        'changelog': '/changelog',
+    };
+    const basePath = basePathByCollection[collection as string] || '/blog';
+    // Changelog is a single timeline page with no per-entry routes.
+    const hasSlugRoute = collection !== 'changelog';
 
     // 1. Purge Next.js Full Route Cache (also signals Firebase App Hosting CDN to purge)
     revalidatePath(basePath);
 
     const revalidatedPaths: string[] = [basePath];
 
-    if (slug && typeof slug === 'string') {
+    if (hasSlugRoute && slug && typeof slug === 'string') {
         revalidatePath(`${basePath}/${slug}`);
         revalidatedPaths.push(`${basePath}/${slug}`);
     }
@@ -58,8 +66,8 @@ export async function POST(req: NextRequest) {
                     signal: AbortSignal.timeout(10000),
                 });
                 prewarmResults[path] = res.status;
-            } catch (e: any) {
-                prewarmResults[path] = `error: ${e.message}`;
+            } catch (e) {
+                prewarmResults[path] = `error: ${e instanceof Error ? e.message : String(e)}`;
             }
         })
     );

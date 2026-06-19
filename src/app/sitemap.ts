@@ -41,6 +41,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   })
 
+  // Fetch all published What's New articles
+  const whatsNew = await payload.find({
+    collection: 'whats-new',
+    where: {
+      status: {
+        equals: 'published',
+      },
+    },
+    limit: 1000,
+    depth: 0,
+    select: {
+      slug: true,
+      updatedAt: true,
+    },
+  })
+
   const baseUrl = 'https://noe-shiftica.com'
 
   // Static routes
@@ -49,6 +65,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about',
     '/blog',
     '/dev',
+    '/whats-new',
+    '/changelog',
     '/services',
     '/services/cms-content-operations',
     '/services/scenarios',
@@ -76,6 +94,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic tech post routes
   const techPostRoutes = techPosts.docs.map((post) => ({
     url: `${baseUrl}/dev/${post.slug}`,
+    lastModified: new Date(post.updatedAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  // Dynamic What's New routes
+  const whatsNewRoutes = whatsNew.docs.map((post) => ({
+    url: `${baseUrl}/whats-new/${post.slug}`,
     lastModified: new Date(post.updatedAt),
     changeFrequency: 'weekly' as const,
     priority: 0.6,
@@ -126,6 +152,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...postRoutes,
     ...techPostRoutes,
+    ...whatsNewRoutes,
     ...blogTagRoutes,
     ...techTagRoutes,
   ]
