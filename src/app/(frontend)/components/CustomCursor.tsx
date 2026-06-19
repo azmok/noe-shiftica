@@ -18,9 +18,9 @@ export function CustomCursor() {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [isHoveringFeatured, setIsHoveringFeatured] = useState(false);
-  // 記事本文(.native-link-cursor)内のリンクにホバー中は、カスタムドットを隠して
-  // OS標準の指カーソルを見せる
-  const [hideDot, setHideDot] = useState(false);
+  // 記事本文(.native-link-cursor)内のリンクにホバー中は true。
+  // 通常のドットを隠し、リンク専用のカスタムカーソル(.link-cursor)を表示する。
+  const [isLinkHover, setIsLinkHover] = useState(false);
 
   // 遅延をなくすために React State を経由せず Motion Value を直接更新する
   const cursorX = useMotionValue(-100);
@@ -46,7 +46,7 @@ export function CustomCursor() {
     setHoveredElProps(null);
     hoveredElementRef.current = null;
     setIsHoveringFeatured(false);
-    setHideDot(false);
+    setIsLinkHover(false);
     stateRef.current = "normal";
     xAnimRef.current?.stop();
     yAnimRef.current?.stop();
@@ -92,7 +92,7 @@ export function CustomCursor() {
       const interactiveEl = target.closest("a, button, [role='button']") as HTMLElement;
 
       // 記事本文(.native-link-cursor)内のリンクは、マグネット（ドット吸着）を無効化し、
-      // 代わりにOS標準の指カーソルを表示する（カスタムドットは隠す）。
+      // 代わりにリンク専用のカスタムカーソル(.link-cursor)を表示する（通常ドットは隠す）。
       if (interactiveEl && interactiveEl.tagName === "A" && interactiveEl.closest(".native-link-cursor")) {
         if (relatedTarget && interactiveEl.contains(relatedTarget)) return; // 要素内部の移動は無視
         stateRef.current = "normal";
@@ -100,7 +100,7 @@ export function CustomCursor() {
         xAnimRef.current?.stop();
         yAnimRef.current?.stop();
         setHoveredElProps(null);
-        setHideDot(true);
+        setIsLinkHover(true);
         return;
       }
 
@@ -146,7 +146,7 @@ export function CustomCursor() {
       const outLink = target.closest("a");
       if (outLink && outLink.closest(".native-link-cursor")) {
         if (relatedTarget && outLink.contains(relatedTarget)) return; // 要素内部の移動は無視
-        setHideDot(false);
+        setIsLinkHover(false);
         stateRef.current = "normal";
         return;
       }
@@ -262,28 +262,61 @@ export function CustomCursor() {
   }
 
   return (
-    <motion.div
-      className={clsx(
-        "custom-cursor",
-        hoveredElProps && "active",
-        isHoveringFeatured && "featured-hover"
-      )}
-      // x, y は MotionValue を紐づけて React State から完全に切り離す
-      style={{
-        x: cursorX,
-        y: cursorY,
-        opacity: hideDot ? 0 : 1,
-      }}
-      animate={{
-        width: cursorWidth,
-        height: cursorHeight,
-        borderRadius: cursorBorderRadius,
-      }}
-      transition={{
-        width: { type: "tween", ease: [0.23, 1, 0.32, 1], duration: 0.15 },
-        height: { type: "tween", ease: [0.23, 1, 0.32, 1], duration: 0.15 },
-        borderRadius: { duration: 0.15 },
-      }}
-    />
+    <>
+      <motion.div
+        className={clsx(
+          "custom-cursor",
+          hoveredElProps && "active",
+          isHoveringFeatured && "featured-hover"
+        )}
+        // x, y は MotionValue を紐づけて React State から完全に切り離す
+        style={{
+          x: cursorX,
+          y: cursorY,
+          opacity: isLinkHover ? 0 : 1,
+        }}
+        animate={{
+          width: cursorWidth,
+          height: cursorHeight,
+          borderRadius: cursorBorderRadius,
+        }}
+        transition={{
+          width: { type: "tween", ease: [0.23, 1, 0.32, 1], duration: 0.15 },
+          height: { type: "tween", ease: [0.23, 1, 0.32, 1], duration: 0.15 },
+          borderRadius: { duration: 0.15 },
+        }}
+      />
+
+      {/* 記事本文リンク専用のカスタムカーソル（Noe-Shifticaテーマ: ネオンライム + チェーンリンク） */}
+      <motion.div
+        className="link-cursor"
+        // ドットと同じ MotionValue を共有しつつ、サイズ差ぶんを margin で中央寄せ
+        style={{
+          x: cursorX,
+          y: cursorY,
+          marginLeft: -7,
+          marginTop: -7,
+        }}
+        animate={{
+          opacity: isLinkHover ? 1 : 0,
+          scale: isLinkHover ? 1 : 0.3,
+          rotate: isLinkHover ? 0 : -35,
+        }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.25}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
+      </motion.div>
+    </>
   );
 }

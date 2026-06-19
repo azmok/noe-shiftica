@@ -151,10 +151,41 @@ svg {
   vertical-align: middle;
 }
 
-/* 記事本文(.native-link-cursor)内のリンクは、カスタムカーソル(マグネット)ではなく
-   OS標準の指カーソルを表示する。グローバルの `* { cursor: none }` を上書きする。 */
-.native-link-cursor a {
-  cursor: pointer !important;
+/* 記事本文(.native-link-cursor)内のリンクは、専用のカスタムカーソル(.link-cursor)を
+   表示する。OSカーソルはグローバルの `* { cursor: none }` で隠れたままにする
+   （子要素もまとめて none にして、指カーソルがちらつかないようにする）。 */
+.native-link-cursor a,
+.native-link-cursor a * {
+  cursor: none !important;
+}
+
+/* リンク用カスタムカーソル（Noe-Shifticaテーマ: ネオンライム + チェーンリンクアイコン） */
+.link-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 100001;
+  color: #0a0a0a;
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--color-neu-primary), white 22%), var(--color-neu-primary) 70%);
+  border: 1px solid color-mix(in srgb, var(--color-neu-primary), white 35%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.18),
+    0 0 20px 2px color-mix(in srgb, var(--color-neu-primary), transparent 45%),
+    0 8px 22px rgba(0, 0, 0, 0.4);
+  will-change: transform, opacity;
+}
+
+.link-cursor svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* カスタムカーソル要素用のスタイル (Google Design風) */
