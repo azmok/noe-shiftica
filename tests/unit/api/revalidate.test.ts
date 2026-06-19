@@ -58,6 +58,21 @@ describe('POST /api/revalidate', () => {
     expect(revalidatePath).toHaveBeenCalledTimes(2)
   })
 
+  it('revalidates only /p/[slug] for hosted-pages (no index page)', async () => {
+    const res = await POST(
+      makeRequest({
+        secret: 'test-secret-abc',
+        slug: 'my-landing',
+        collection: 'hosted-pages',
+      }) as any
+    )
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.paths).toEqual(['/p/my-landing'])
+    expect(revalidatePath).toHaveBeenCalledWith('/p/my-landing')
+    expect(revalidatePath).toHaveBeenCalledTimes(1)
+  })
+
   it('does not call revalidatePath for non-string slug', async () => {
     const res = await POST(
       makeRequest({ secret: 'test-secret-abc', slug: 42 }) as any

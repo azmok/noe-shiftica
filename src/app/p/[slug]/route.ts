@@ -11,7 +11,18 @@ import { assembleHtmlDocument } from '@/plugins/html-hosting/lib/assemble'
  * 含まないスタンドアロンな HTML として配信される。
  */
 
-export const dynamic = 'force-dynamic'
+/**
+ * ISR: 配信結果（組み立て済み HTML）をフルルートキャッシュ／App Hosting CDN に載せる。
+ * 内容は CMS でドキュメントを編集したときだけ変わるので、その瞬間に hosted-pages の
+ * afterChange / afterDelete フックが revalidatePath(`/p/${slug}`) を呼び、Next の
+ * フルルートキャッシュと App Hosting の CDN エッジを「同時に」purge する。
+ *
+ * 以前は `force-dynamic` だったため CDN が一切キャッシュせず（Cdn-Cache-Status: miss）、
+ * 毎リクエストで Payload 初期化 + DB クエリのオリジンコスト（数百 ms〜コールドスタートで数秒）を
+ * 払っていた。手動 Cache-Control は付けない（next.config.ts の教訓: 手動 s-maxage は
+ * エッジをピン留めし revalidatePath で purge できなくなる）。フレームワークに任せる。
+ */
+export const revalidate = 86400
 
 export async function GET(
   _req: Request,
@@ -47,7 +58,6 @@ export async function GET(
     status: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
     },
   })
 }

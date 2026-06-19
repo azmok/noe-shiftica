@@ -33,15 +33,21 @@ export async function POST(req: NextRequest) {
         'tech-posts': '/dev',
         'whats-new': '/whats-new',
         'changelog': '/changelog',
+        'hosted-pages': '/p',
     };
     const basePath = basePathByCollection[collection as string] || '/blog';
     // Changelog is a single timeline page with no per-entry routes.
     const hasSlugRoute = collection !== 'changelog';
+    // hosted-pages (/p) has no index page — only the per-slug route /p/<slug> exists.
+    const hasBasePage = collection !== 'hosted-pages';
+
+    const revalidatedPaths: string[] = [];
 
     // 1. Purge Next.js Full Route Cache (also signals Firebase App Hosting CDN to purge)
-    revalidatePath(basePath);
-
-    const revalidatedPaths: string[] = [basePath];
+    if (hasBasePage) {
+        revalidatePath(basePath);
+        revalidatedPaths.push(basePath);
+    }
 
     if (hasSlugRoute && slug && typeof slug === 'string') {
         revalidatePath(`${basePath}/${slug}`);

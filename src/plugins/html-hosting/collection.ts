@@ -12,6 +12,36 @@ import type { CollectionConfig } from 'payload'
  * （src/collections/* を汚さないため）。
  */
 
+/**
+ * /p/<slug> のキャッシュを on-demand purge する。
+ * 1. 実行環境（ローカル or 本番）の Next フルルートキャッシュを revalidatePath で破棄。
+ * 2. ローカル編集でも本番へ反映させるため、本番の /api/revalidate Webhook も叩く。
+ *    （本番上での実行時は self-fetch になるが、重複 purge は無害）
+ */
+async function revalidateHostedPage(slug: string): Promise<void> {
+  try {
+    const { revalidatePath } = await import('next/cache')
+    revalidatePath(`/p/${slug}`)
+  } catch (err) {
+    console.warn(
+      `[HostedPages Hook] local revalidate skipped (likely outside Next.js server): ${(err as Error).message}`,
+    )
+  }
+
+  try {
+    const secret = process.env.REVALIDATE_SECRET
+    if (!secret) return
+    const origin = process.env.NEXT_PUBLIC_SERVER_URL || 'https://noe-shiftica.com'
+    await fetch(`${origin}/api/revalidate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, slug, collection: 'hosted-pages' }),
+    })
+  } catch (e) {
+    console.error('[HostedPages Hook] revalidate webhook error:', e)
+  }
+}
+
 /** スラッグを URL セーフな形へ正規化する */
 function normalizeSlug(input: string): string {
   return String(input)
@@ -46,6 +76,23 @@ export const HostedPagesCollection: CollectionConfig = {
           data.slug = normalizeSlug(data.slug)
         }
         return data
+      },
+    ],
+    // 公開 HTML（/p/<slug>）は ISR でキャッシュ配信される（route.ts: revalidate=86400）。
+    // 編集・削除のたびに該当パスを on-demand 再検証して、Next のフルルートキャッシュと
+    // App Hosting の CDN エッジを同時に purge する（Posts.ts と同じ運用）。
+    afterChange: [
+      async ({ doc, operation }) => {
+        if (operation !== 'create' && operation !== 'update') return doc
+        if (!doc?.slug) return doc
+        await revalidateHostedPage(doc.slug as string)
+        return doc
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        if (doc?.slug) await revalidateHostedPage(doc.slug as string)
+        return doc
       },
     ],
   },
