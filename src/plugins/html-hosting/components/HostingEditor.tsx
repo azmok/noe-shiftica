@@ -215,14 +215,16 @@ export const HostingEditor: React.FC<TextFieldClientProps> = (props) => {
         {TABS.map((tab) => (
           <div
             key={tab.key}
-            style={{ height: '480px', display: active === tab.key ? 'block' : 'none' }}
+            style={{ display: active === tab.key ? 'block' : 'none' }}
           >
             <SharedCodeMirror
               language={tab.language}
               theme={theme}
               value={fields[tab.key].value || ''}
               onChange={(val) => fields[tab.key].setValue(val || '')}
-              height="100%"
+              height="auto"
+              minHeight="200px"
+              lineWrapping
             />
           </div>
         ))}

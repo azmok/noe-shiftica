@@ -16,6 +16,7 @@
 
 import React from 'react'
 import dynamic from 'next/dynamic'
+import type { Extension } from '@uiw/react-codemirror'
 
 export type CodeLanguage = 'html' | 'css' | 'javascript' | 'json'
 
@@ -25,9 +26,11 @@ export interface SharedCodeMirrorProps {
   onChange: (value: string) => void
   /** 'dark' | 'light' — Payload のテーマに合わせる */
   theme?: 'dark' | 'light'
-  /** 例: '100%'（親が高さを持つ場合）や '320px' */
+  /** 例: '100%'（親が高さを持つ場合）や '320px'。'auto' で内容に合わせて伸縮（内部スクロールなし） */
   height?: string
   minHeight?: string
+  /** 長い行を画面幅で折り返す（横スクロールを無くす）。デフォルト false */
+  lineWrapping?: boolean
   onFocus?: () => void
   onBlur?: () => void
 }
@@ -35,7 +38,7 @@ export interface SharedCodeMirrorProps {
 const Inner = dynamic(
   async () => {
     const [
-      { default: CM },
+      { default: CM, EditorView },
       { html },
       { css },
       { javascript },
@@ -79,17 +82,24 @@ const Inner = dynamic(
       theme = 'dark',
       height = '100%',
       minHeight,
+      lineWrapping = false,
       onFocus,
       onBlur,
     }) => {
-      const extensions = React.useMemo(() => [languageExtension(language)], [language])
+      const extensions = React.useMemo(() => {
+        const ext: Extension[] = [languageExtension(language)]
+        if (lineWrapping) ext.push(EditorView.lineWrapping)
+        return ext
+      }, [language, lineWrapping])
+      // height='auto' のときは固定高さを与えず、内容に合わせて伸縮させる（内部スクロールなし）
+      const autoHeight = height === 'auto'
       return (
         <CM
           value={value}
           onChange={(val) => onChange(val)}
           extensions={extensions}
           theme={theme === 'light' ? lightTheme : darkTheme}
-          height={height}
+          height={autoHeight ? undefined : height}
           minHeight={minHeight}
           onFocus={onFocus}
           onBlur={onBlur}
@@ -99,7 +109,7 @@ const Inner = dynamic(
             foldGutter: true,
             autocompletion: true,
           }}
-          style={{ fontSize: '14px', height: '100%' }}
+          style={{ fontSize: '14px', ...(autoHeight ? {} : { height: '100%' }) }}
         />
       )
     }
