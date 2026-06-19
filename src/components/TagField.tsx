@@ -22,6 +22,19 @@ function toId(item: unknown): string | null {
   return null
 }
 
+/**
+ * Coerce an ID back to the type Payload's relationship validation expects.
+ * Postgres uses numeric (serial) IDs and `isValidID(value, 'number')` only
+ * accepts `typeof value === 'number'`. `toId` stringifies everything for
+ * internal comparison, so we must convert numeric-looking IDs back to numbers
+ * before writing them into the `categories` form state — otherwise saving
+ * fails with "The following field is invalid: Categories". Non-numeric IDs
+ * (text / ObjectID collections) are passed through unchanged.
+ */
+function toRelValue(id: string): string | number {
+  return /^\d+$/.test(id) ? Number(id) : id
+}
+
 /** Canonical key for a list of category names (case/order-insensitive). */
 function canonNames(names: string[]): string {
   return JSON.stringify(
@@ -194,7 +207,7 @@ export const TagField: React.FC = () => {
       ;(async () => {
         try {
           const ids = await resolveNamesToIds(metaNames)
-          setValue(ids)
+          setValue(ids.map(toRelValue))
           lastIdsRef.current = JSON.stringify(ids)
           lastNamesRef.current = namesKey
         } finally {
@@ -245,7 +258,7 @@ export const TagField: React.FC = () => {
 
       let categoryId: string
       if (existing) {
-        categoryId = existing.id
+        categoryId = String(existing.id)
       } else {
         // Create a new category
         const res = await fetch('/api/categories', {
@@ -258,7 +271,7 @@ export const TagField: React.FC = () => {
           return
         }
         const data = await res.json()
-        categoryId = data.doc?.id ?? data.id
+        categoryId = String(data.doc?.id ?? data.id)
         const newCat: Category = { id: categoryId, name: trimmed }
         setAllCategories((prev) => [...prev, newCat])
       }
@@ -270,7 +283,7 @@ export const TagField: React.FC = () => {
         return
       }
 
-      setValue([...currentIds, categoryId])
+      setValue([...currentIds, categoryId].map(toRelValue))
       setInputValue('')
       setShowSuggestions(false)
       setActiveSuggestionIndex(-1)
@@ -281,7 +294,7 @@ export const TagField: React.FC = () => {
   const removeCategory = useCallback(
     (id: string) => {
       const currentIds = (value ?? []).map(toId).filter(Boolean) as string[]
-      setValue(currentIds.filter((v) => v !== id))
+      setValue(currentIds.filter((v) => v !== id).map(toRelValue))
     },
     [value, setValue],
   )
