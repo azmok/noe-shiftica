@@ -2,37 +2,20 @@
  * HtmlSourceViewer.tsx
  *
  * Lexical Editor に差し込む React プラグイン。
- * ツールバーの「<>」ボタンと Monaco Editor の表示制御を担う。
+ * ツールバーの「<>」ボタンと HTMLソースエディタの表示制御を担う。
+ *
+ * エディタは CodeMirror 6（SharedCodeMirror）を使用。Monaco は本管理画面で
+ * 矢印キーのカーソル移動が効かない不具合があったため、全コードエディタを
+ * CodeMirror に統一している。
  */
 
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 import { HTMLHint } from 'htmlhint'
 import { html as beautifyHtml } from 'js-beautify'
 import { Sparkles } from 'lucide-react'
-
-// Monaco Editor is dynamic-loaded to avoid SSR issues
-const MonacoEditor = dynamic(
-  async () => {
-    const { default: Editor } = await import('@monaco-editor/react')
-    return Editor
-  },
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        style={{
-          height: '500px',
-          background: 'var(--theme-elevation-50, #1a1a1a)',
-          borderRadius: '4px',
-          border: '1px solid var(--theme-elevation-150, #444)',
-        }}
-      />
-    ),
-  }
-)
+import { SharedCodeMirror } from '@/components/admin/SharedCodeMirror'
 
 // ----------------------------------------------------------------
 // CSS（インライン — Payload の CSS 変数を参照）
@@ -113,16 +96,14 @@ export function HtmlSourceViewer({
   onHtmlChange,
   parseError,
 }: HtmlSourceViewerProps) {
-  const editorRef = useRef<any>(null)
-  const monacoRef = useRef<any>(null)
-  const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [errors, setErrors] = useState<SyntaxErrorDetail[]>([])
 
   // 1. Auto Theme Switching matching Payload's current theme state
   useEffect(() => {
     const updateTheme = () => {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark'
-      setTheme(currentTheme === 'dark' ? 'vs-dark' : 'light')
+      setTheme(currentTheme === 'light' ? 'light' : 'dark')
     }
     updateTheme()
 
@@ -135,49 +116,11 @@ export function HtmlSourceViewer({
     return () => observer.disconnect()
   }, [])
 
-  // 2. Real-time Syntax Checking and Monaco Model Markers
+  // 2. Real-time Syntax Checking
   useEffect(() => {
     if (!isSourceMode) return
-
-    const validationErrors = verifyHtml(htmlValue)
-    setErrors(validationErrors)
-
-    if (editorRef.current && monacoRef.current) {
-      const model = editorRef.current.getModel()
-      if (model) {
-        const markers = validationErrors.map((err) => ({
-          startLineNumber: err.line,
-          startColumn: err.col,
-          endLineNumber: err.line,
-          endColumn: err.col + 1,
-          message: err.message,
-          severity: monacoRef.current.MarkerSeverity.Error,
-        }))
-        monacoRef.current.editor.setModelMarkers(model, 'htmlhint', markers)
-      }
-    }
+    setErrors(verifyHtml(htmlValue))
   }, [htmlValue, isSourceMode])
-
-  const handleEditorMount = (editor: any, monaco: any) => {
-    editorRef.current = editor
-    monacoRef.current = monaco
-
-    // Make sure we run initial lint markers on mount
-    const validationErrors = verifyHtml(htmlValue)
-    setErrors(validationErrors)
-    const model = editor.getModel()
-    if (model) {
-      const markers = validationErrors.map((err) => ({
-        startLineNumber: err.line,
-        startColumn: err.col,
-        endLineNumber: err.line,
-        endColumn: err.col + 1,
-        message: err.message,
-        severity: monaco.MarkerSeverity.Error,
-      }))
-      monaco.editor.setModelMarkers(model, 'htmlhint', markers)
-    }
-  }
 
   // 3. Trigger active HTML formatting using js-beautify with tag separation pre-processing
   const handleFormat = () => {
@@ -220,21 +163,12 @@ export function HtmlSourceViewer({
   return (
     <div style={STYLES.wrapper}>
       <div style={STYLES.editorContainer}>
-        <MonacoEditor
-          height="100%"
+        <SharedCodeMirror
           language="html"
           theme={theme}
           value={htmlValue}
-          onChange={(val) => onHtmlChange(val || '')}
-          onMount={handleEditorMount}
-          options={{
-            minimap: { enabled: false },
-            wordWrap: 'on',
-            lineNumbers: 'on',
-            fontSize: 14,
-            fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
-            automaticLayout: true,
-          }}
+          onChange={(val) => onHtmlChange(val)}
+          height="100%"
         />
       </div>
 
@@ -343,4 +277,3 @@ export function HtmlSourceViewerToolbarButton({
     </button>
   )
 }
-

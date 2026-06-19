@@ -15,34 +15,14 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { useField } from '@payloadcms/ui'
 import type { TextFieldClientProps } from 'payload'
-import dynamic from 'next/dynamic'
 import { Upload, Code2, Eye } from 'lucide-react'
 import { parseHtmlFile } from '../lib/parseHtml'
 import { assembleHtmlDocument } from '../lib/assemble'
-
-// Monaco は SSR 不可のため動的ロード（既存 htmlSourceViewer と同方針）
-const MonacoEditor = dynamic(
-  async () => {
-    const { default: Editor } = await import('@monaco-editor/react')
-    return Editor
-  },
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        style={{
-          height: '100%',
-          minHeight: '420px',
-          background: 'var(--theme-elevation-50, #1a1a1a)',
-        }}
-      />
-    ),
-  },
-)
+import { SharedCodeMirror, type CodeLanguage } from '@/components/admin/SharedCodeMirror'
 
 type TabKey = 'html' | 'css' | 'js'
 
-const TABS: { key: TabKey; label: string; language: string }[] = [
+const TABS: { key: TabKey; label: string; language: CodeLanguage }[] = [
   { key: 'html', label: 'HTML', language: 'html' },
   { key: 'css', label: 'CSS', language: 'css' },
   { key: 'js', label: 'JavaScript', language: 'javascript' },
@@ -62,7 +42,7 @@ export const HostingEditor: React.FC<TextFieldClientProps> = (props) => {
   }
 
   const [active, setActive] = useState<TabKey>('html')
-  const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [showPreview, setShowPreview] = useState(false)
   const [uploadMsg, setUploadMsg] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -71,7 +51,7 @@ export const HostingEditor: React.FC<TextFieldClientProps> = (props) => {
   useEffect(() => {
     const updateTheme = () => {
       const t = document.documentElement.getAttribute('data-theme') || 'dark'
-      setTheme(t === 'dark' ? 'vs-dark' : 'light')
+      setTheme(t === 'light' ? 'light' : 'dark')
     }
     updateTheme()
     const observer = new MutationObserver(updateTheme)
@@ -237,22 +217,12 @@ export const HostingEditor: React.FC<TextFieldClientProps> = (props) => {
             key={tab.key}
             style={{ height: '480px', display: active === tab.key ? 'block' : 'none' }}
           >
-            <MonacoEditor
-              height="100%"
+            <SharedCodeMirror
               language={tab.language}
               theme={theme}
               value={fields[tab.key].value || ''}
               onChange={(val) => fields[tab.key].setValue(val || '')}
-              options={{
-                minimap: { enabled: false },
-                wordWrap: 'on',
-                lineNumbers: 'on',
-                fontSize: 14,
-                fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                tabSize: 2,
-              }}
+              height="100%"
             />
           </div>
         ))}

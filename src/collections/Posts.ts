@@ -218,6 +218,9 @@ export const Posts: CollectionConfig = {
             admin: {
                 position: 'sidebar',
                 description: 'MarkdownのFrontmatterに含まれる未知のメタデータがここに格納されます',
+                components: {
+                    Field: '@/components/admin/JsonCodeField#JsonCodeField',
+                },
             },
         },
         {

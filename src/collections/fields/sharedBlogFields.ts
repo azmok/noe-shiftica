@@ -93,6 +93,9 @@ export function getSharedBlogFields(): Field[] {
             admin: {
                 position: 'sidebar',
                 description: 'MarkdownのFrontmatterに含まれる未知のメタデータがここに格納されます',
+                components: {
+                    Field: '@/components/admin/JsonCodeField#JsonCodeField',
+                },
             },
         },
         {
