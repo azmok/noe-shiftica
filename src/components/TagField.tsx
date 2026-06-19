@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useField } from '@payloadcms/ui'
 
 type Category = { id: string; name: string }
@@ -22,11 +22,23 @@ function toId(item: unknown): string | null {
   return null
 }
 
+/** Canonical key for a list of category names (case/order-insensitive). */
+function canonNames(names: string[]): string {
+  return JSON.stringify(
+    [...names].map((s) => s.trim().toLowerCase()).filter(Boolean).sort(),
+  )
+}
+
 export const TagField: React.FC = () => {
   const { value, setValue } = useField<unknown[]>({ path: 'categories' })
+  // customMetaData の `categories`（カテゴリ名の文字列配列）と双方向同期する。
+  // JSON エディタ(JsonCodeField)・タグ(TagsField)と同じフォーム状態を共有する。
+  const { value: metaValue, setValue: setMetaValue } =
+    useField<Record<string, unknown> | null>({ path: 'customMetaData' })
 
   const [inputValue, setInputValue] = useState('')
   const [allCategories, setAllCategories] = useState<Category[]>([])
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [suggestions, setSuggestions] = useState<Category[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -34,12 +46,28 @@ export const TagField: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // ---- 双方向同期用の内部状態 ----
+  // 直近で「同期済み」とみなした categories(IDs) / customMetaData.categories(names) のキー。
+  // どちら側が変化したかを判定し、片方向にだけ反映してループを防ぐ。
+  const lastIdsRef = useRef<string>('')
+  const lastNamesRef = useRef<string>('')
+  const didInitRef = useRef(false)
+  const resolvingRef = useRef(false) // JSON→ID 解決中（カテゴリ作成のため非同期）
+  const refetchingRef = useRef(false) // 未知IDの名前解決のための再取得中
+
+  const catById = useMemo(() => {
+    const m = new Map<string, Category>()
+    allCategories.forEach((c) => m.set(String(c.id), c))
+    return m
+  }, [allCategories])
+
   // Fetch all categories for autocomplete on mount
   useEffect(() => {
     fetch('/api/categories?limit=200&sort=name')
       .then((res) => res.json())
       .then((data) => setAllCategories((data.docs ?? []) as Category[]))
       .catch(console.error)
+      .finally(() => setCategoriesLoaded(true))
   }, [])
 
   // Derive selectedCategories from form value + allCategories
@@ -50,11 +78,131 @@ export const TagField: React.FC = () => {
       return
     }
     const resolved = ids.map((id) => {
-      const found = allCategories.find((c) => String(c.id) === String(id))
+      const found = catById.get(String(id))
       return found ?? { id, name: id }
     })
     setSelectedCategories(resolved)
-  }, [value, allCategories])
+  }, [value, catById])
+
+  // AI 最適化などで「allCategories にまだ無いカテゴリID」が categories に入ると、
+  // チップが ID のまま表示される。未知IDを検知したら一覧を取り直して名前解決する。
+  useEffect(() => {
+    if (!categoriesLoaded || refetchingRef.current) return
+    const ids = (value ?? []).map(toId).filter(Boolean) as string[]
+    const hasUnknown = ids.some((id) => !catById.has(String(id)))
+    if (!hasUnknown) return
+    refetchingRef.current = true
+    fetch('/api/categories?limit=200&sort=name')
+      .then((res) => res.json())
+      .then((data) => setAllCategories((data.docs ?? []) as Category[]))
+      .catch(console.error)
+      .finally(() => {
+        refetchingRef.current = false
+      })
+  }, [value, categoriesLoaded, catById])
+
+  // カテゴリ名の配列を ID 配列へ解決する（無ければ新規作成）。
+  // 作成したカテゴリは allCategories にも反映し、チップ表示で名前が出るようにする。
+  const resolveNamesToIds = useCallback(
+    async (names: string[]): Promise<string[]> => {
+      const ids: string[] = []
+      const created: Category[] = []
+      for (const raw of names) {
+        const trimmed = raw.trim()
+        if (!trimmed) continue
+        const existing = allCategories.find(
+          (c) => c.name.toLowerCase() === trimmed.toLowerCase(),
+        )
+        if (existing) {
+          ids.push(String(existing.id))
+          continue
+        }
+        const res = await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: trimmed }),
+        })
+        if (!res.ok) {
+          console.error('[TagField] failed to create category', await res.text())
+          continue
+        }
+        const data = await res.json()
+        const id = String(data.doc?.id ?? data.id)
+        ids.push(id)
+        created.push({ id, name: trimmed })
+      }
+      if (created.length > 0) {
+        setAllCategories((prev) => [...prev, ...created])
+      }
+      // 重複IDを除去
+      return Array.from(new Set(ids))
+    },
+    [allCategories],
+  )
+
+  // ===== カテゴリの双方向同期 =====
+  // ・GUI(または AI)で categories(IDs) が変わったら customMetaData.categories(names) へ反映
+  // ・customMetaData.categories(names) を JSON で編集したら categories(IDs) へ解決して反映
+  useEffect(() => {
+    if (!categoriesLoaded || resolvingRef.current) return
+
+    const currentIds = (value ?? []).map(toId).filter(Boolean) as string[]
+    const idsKey = JSON.stringify(currentIds)
+
+    const metaObj =
+      metaValue && typeof metaValue === 'object'
+        ? (metaValue as Record<string, unknown>)
+        : {}
+    const metaNames = Array.isArray(metaObj.categories)
+      ? (metaObj.categories as unknown[]).map((x) => String(x).trim()).filter(Boolean)
+      : []
+    const namesKey = JSON.stringify(metaNames)
+
+    // 初回（マウント時）は現状を記録するだけ。勝手に書き込んでフォームを
+    // dirty にしたり、意図せずカテゴリを新規作成したりしない。
+    if (!didInitRef.current) {
+      didInitRef.current = true
+      lastIdsRef.current = idsKey
+      lastNamesRef.current = namesKey
+      return
+    }
+
+    const idsChanged = idsKey !== lastIdsRef.current
+    const namesChanged = namesKey !== lastNamesRef.current
+    if (!idsChanged && !namesChanged) return
+
+    // 既に同値（大文字小文字・順序を無視）なら何もしない（収束済み）
+    const idsAsNames = currentIds
+      .map((id) => catById.get(String(id))?.name)
+      .filter(Boolean) as string[]
+    if (canonNames(idsAsNames) === canonNames(metaNames)) {
+      lastIdsRef.current = idsKey
+      lastNamesRef.current = namesKey
+      return
+    }
+
+    if (idsChanged) {
+      // GUI / AI 側が変わった → 名前を JSON へミラー（IDの真実源を優先）
+      // 未知IDが残っている間は名前解決を待つ（再取得後に再実行される）
+      if (currentIds.some((id) => !catById.has(String(id)))) return
+      setMetaValue({ ...metaObj, categories: idsAsNames })
+      lastIdsRef.current = idsKey
+      lastNamesRef.current = JSON.stringify(idsAsNames)
+    } else if (namesChanged) {
+      // JSON 側が編集された → 名前を ID へ解決して categories に反映
+      resolvingRef.current = true
+      ;(async () => {
+        try {
+          const ids = await resolveNamesToIds(metaNames)
+          setValue(ids)
+          lastIdsRef.current = JSON.stringify(ids)
+          lastNamesRef.current = namesKey
+        } finally {
+          resolvingRef.current = false
+        }
+      })()
+    }
+  }, [value, metaValue, categoriesLoaded, catById, resolveNamesToIds, setMetaValue, setValue])
 
   // Update suggestions based on current input and focus state
   useEffect(() => {
@@ -325,3 +473,4 @@ export const TagField: React.FC = () => {
     </div>
   )
 }
+
