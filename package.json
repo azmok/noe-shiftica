@@ -26,7 +26,11 @@
     "test:setup": "tsx scripts/setup-test-user.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --headed"
+    "test:e2e:debug": "playwright test --headed",
+    "db:import-changelog": "tsx scripts/import-changelog.ts",
+    "db:import-whatsnew": "tsx scripts/import-whatsnew.ts",
+    "db:import-whatsnew-plugins": "tsx scripts/import-whatsnew-plugins.ts",
+    "db:import-changelog-published": "tsx scripts/import-changelog-published.ts"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",

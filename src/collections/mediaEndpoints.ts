@@ -10,7 +10,134 @@ const getStorageInstance = () => {
   return { storage, bucketName }
 }
 
+/**
+ * Remove characters that are unsafe for object names / URLs, collapse whitespace
+ * to hyphens, and strip leading dots. Unicode letters (e.g. 日本語) are preserved.
+ */
+const sanitizeBaseName = (raw: string): string =>
+  raw
+    .normalize('NFC')
+    .replace(/[\/\\:*?"<>|\x00-\x1f]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/^\.+/, '')
+    .trim()
+
 export const mediaSizeEndpoints: Endpoint[] = [
+  {
+    // Rename a media file: moves the original AND every generated size variant in
+    // GCS (copy + delete), then updates the document's filename/sizes metadata so
+    // the derived URLs stay consistent. References from posts are by document ID,
+    // so they are unaffected by the rename.
+    path: '/:id/rename',
+    method: 'post',
+    handler: async (req) => {
+      if (!req.user) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      const { id } = req.routeParams as { id: string }
+
+      let body: { name?: string } = {}
+      try {
+        body = await (req as unknown as Request).json()
+      } catch {
+        // ignore — handled by the empty-name check below
+      }
+
+      try {
+        const doc = await req.payload.findByID({ collection: 'media', id })
+        if (!doc || !doc.filename) {
+          return Response.json({ error: 'Not found' }, { status: 404 })
+        }
+
+        const oldFilename = doc.filename as string
+        const dotIdx = oldFilename.lastIndexOf('.')
+        const ext = dotIdx >= 0 ? oldFilename.slice(dotIdx) : ''
+        const oldBase = dotIdx >= 0 ? oldFilename.slice(0, dotIdx) : oldFilename
+
+        let newBase = sanitizeBaseName(body.name ?? '')
+        // If the user typed the extension too, drop it — we always reattach the original.
+        if (ext && newBase.toLowerCase().endsWith(ext.toLowerCase())) {
+          newBase = newBase.slice(0, -ext.length)
+        }
+        if (!newBase) {
+          return Response.json({ error: 'ファイル名が空です' }, { status: 400 })
+        }
+
+        const newFilename = `${newBase}${ext}`
+        if (newFilename === oldFilename) {
+          return Response.json({ filename: oldFilename, sizes: doc.sizes, url: doc.url })
+        }
+
+        // Collision check against other media documents.
+        const existing = await req.payload.find({
+          collection: 'media',
+          where: { filename: { equals: newFilename } },
+          limit: 1,
+        })
+        if (existing.docs.some((d) => String(d.id) !== String(id))) {
+          return Response.json(
+            { error: `「${newFilename}」は既に使用されています` },
+            { status: 409 },
+          )
+        }
+
+        const { storage, bucketName } = getStorageInstance()
+        const bucket = storage.bucket(bucketName)
+
+        // Collision check against the bucket itself.
+        const [mainExists] = await bucket.file(newFilename).exists()
+        if (mainExists) {
+          return Response.json(
+            { error: `ストレージに「${newFilename}」が既に存在します` },
+            { status: 409 },
+          )
+        }
+
+        // 1. Move the original file.
+        await bucket.file(oldFilename).move(newFilename)
+
+        // 2. Move each generated size variant, deriving its new name from the new base.
+        const sizes = (doc.sizes as Record<string, any>) || {}
+        const newSizes: Record<string, any> = { ...sizes }
+        for (const [sizeName, sizeData] of Object.entries(sizes)) {
+          const sizeFilename: string | undefined = sizeData?.filename
+          if (!sizeFilename) continue
+          // Size filenames are prefixed with the base name (e.g. "photo-100x100.webp").
+          const newSizeFilename = sizeFilename.startsWith(oldBase)
+            ? `${newBase}${sizeFilename.slice(oldBase.length)}`
+            : sizeFilename
+          if (newSizeFilename !== sizeFilename) {
+            try {
+              await bucket.file(sizeFilename).move(newSizeFilename)
+            } catch (gcsErr) {
+              console.error(`Failed to move size ${sizeFilename} → ${newSizeFilename}:`, gcsErr)
+            }
+          }
+          newSizes[sizeName] = { ...sizeData, filename: newSizeFilename }
+        }
+
+        // 3. Persist the new filename + sizes metadata.
+        const updated = await req.payload.update({
+          collection: 'media',
+          id,
+          data: {
+            filename: newFilename,
+            sizes: newSizes,
+          },
+        })
+
+        return Response.json({
+          filename: newFilename,
+          sizes: updated.sizes,
+          url: updated.url,
+        })
+      } catch (err: any) {
+        console.error('Error renaming media file:', err)
+        return Response.json({ error: err.message }, { status: 500 })
+      }
+    },
+  },
   {
     path: '/:id/sizes/:sizeName',
     method: 'delete',

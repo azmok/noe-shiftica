@@ -63,17 +63,20 @@ export function ChangelogTimeline({ groups, pageSize = 8 }: ChangelogTimelinePro
               <time className="text-lg font-bold text-white tracking-tight">
                 {formatDate(group.date)}
               </time>
-              {group.entries
-                .map((e) => e.version)
-                .filter((v): v is string => !!v)
-                .map((v) => (
-                  <span
-                    key={v}
-                    className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-slate-300"
-                  >
-                    {v}
-                  </span>
-                ))}
+              {Array.from(
+                new Set(
+                  group.entries
+                    .map((e) => e.version)
+                    .filter((v): v is string => !!v)
+                )
+              ).map((v) => (
+                <span
+                  key={v}
+                  className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-slate-300"
+                >
+                  {v}
+                </span>
+              ))}
             </div>
 
             {/* Entries for this date */}

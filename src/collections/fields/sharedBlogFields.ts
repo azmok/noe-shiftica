@@ -88,6 +88,16 @@ export function getSharedBlogFields(): Field[] {
             },
         },
         {
+            name: 'tagsEditor',
+            type: 'ui',
+            admin: {
+                position: 'sidebar',
+                components: {
+                    Field: '@/components/admin/TagsField#TagsField',
+                },
+            },
+        },
+        {
             name: 'customMetaData',
             type: 'json',
             admin: {

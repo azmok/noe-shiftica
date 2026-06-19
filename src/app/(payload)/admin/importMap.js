@@ -1,5 +1,6 @@
 import { LogoutButton as LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01 } from '@/app/(frontend)/components/admin/LogoutButton'
 import { PasskeyRegisterButton as PasskeyRegisterButton_f396d2424da1bbce880b082c7eb637c8 } from '@/components/admin/PasskeyRegisterButton'
+import { MediaRenameField as MediaRenameField_0c02c71d82383a73ea62242c03751e51 } from '@/components/admin/MediaRenameField'
 import { AltField as AltField_6a834bc6c814295325f1ce1e5f5525db } from '@/components/AltField'
 import { MediaSizeManager as MediaSizeManager_ab0d14650ff81a45c18f6be92c9e47b9 } from '@/components/admin/MediaSizeManager'
 import { AutosaveUI as AutosaveUI_63d35dfcef35fc329a559b1b5887e394 } from '../../../plugins/autosave/AutosaveUI'
@@ -36,6 +37,7 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { TagsField as TagsField_f244308917f813f13f900c89daefb407 } from '@/components/admin/TagsField'
 import { JsonCodeField as JsonCodeField_48b0254b06c95d4fad24ce116bd7a684 } from '@/components/admin/JsonCodeField'
 import { OgImageField as OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f } from '../../../plugins/ogImageAutoFill/components/OgImageField'
 import { LinkedPostCell as LinkedPostCell_fc307546e6356b32183e083dd01c5c7f } from '@/plugins/html-file-manager/components/LinkedPostCell'
@@ -52,6 +54,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 export const importMap = {
   "@/app/(frontend)/components/admin/LogoutButton#LogoutButton": LogoutButton_85bdf7120c06e19fdb8ed6d31a66cd01,
   "@/components/admin/PasskeyRegisterButton#PasskeyRegisterButton": PasskeyRegisterButton_f396d2424da1bbce880b082c7eb637c8,
+  "@/components/admin/MediaRenameField#MediaRenameField": MediaRenameField_0c02c71d82383a73ea62242c03751e51,
   "@/components/AltField#AltField": AltField_6a834bc6c814295325f1ce1e5f5525db,
   "@/components/admin/MediaSizeManager#MediaSizeManager": MediaSizeManager_ab0d14650ff81a45c18f6be92c9e47b9,
   "/plugins/autosave/AutosaveUI#AutosaveUI": AutosaveUI_63d35dfcef35fc329a559b1b5887e394,
@@ -88,6 +91,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/components/admin/TagsField#TagsField": TagsField_f244308917f813f13f900c89daefb407,
   "@/components/admin/JsonCodeField#JsonCodeField": JsonCodeField_48b0254b06c95d4fad24ce116bd7a684,
   "/plugins/ogImageAutoFill/components/OgImageField#OgImageField": OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f,
   "@/plugins/html-file-manager/components/LinkedPostCell#LinkedPostCell": LinkedPostCell_fc307546e6356b32183e083dd01c5c7f,

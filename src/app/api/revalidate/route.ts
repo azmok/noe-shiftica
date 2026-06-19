@@ -34,10 +34,14 @@ export async function POST(req: NextRequest) {
         'whats-new': '/whats-new',
         'changelog': '/changelog',
         'hosted-pages': '/p',
+        // The XML sitemap (app/sitemap.ts) is served at /sitemap.xml. Content changes
+        // alter its URL set / lastmod, so it is revalidated as its own "collection".
+        'sitemap': '/sitemap.xml',
     };
     const basePath = basePathByCollection[collection as string] || '/blog';
     // Changelog is a single timeline page with no per-entry routes.
-    const hasSlugRoute = collection !== 'changelog';
+    // Sitemap is a single XML route with no per-entry routes either.
+    const hasSlugRoute = collection !== 'changelog' && collection !== 'sitemap';
     // hosted-pages (/p) has no index page — only the per-slug route /p/<slug> exists.
     const hasBasePage = collection !== 'hosted-pages';
 

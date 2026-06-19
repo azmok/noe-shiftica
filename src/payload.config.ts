@@ -34,6 +34,7 @@ import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
 import { markdownCopyPlugin } from './plugins/markdownCopyPlugin'
 import { ogImageAutoFillPlugin } from './plugins/ogImageAutoFill'
+import { sitemapRevalidatePlugin } from './plugins/sitemapRevalidate'
 
 import { neonBackupPlugin } from './plugins/neon-backup'
 import { panelResizerPlugin } from './plugins/panelResizer'
@@ -156,6 +157,8 @@ const configPromise = buildConfig({
     slugTrackerPlugin({ collections: ['posts', 'tech-posts'] }),
     markdownCopyPlugin({ collections: ['posts', 'tech-posts'] }),
     ogImageAutoFillPlugin({ collections: ['posts', 'tech-posts'] }),
+    // Auto-revalidate /sitemap.xml whenever sitemap-listed content changes.
+    sitemapRevalidatePlugin({ collections: ['posts', 'tech-posts', 'whats-new'] }),
 
     neonBackupPlugin({
       collections: ['posts', 'tech-posts'],

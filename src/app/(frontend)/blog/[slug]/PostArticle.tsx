@@ -17,6 +17,32 @@ import "prismjs/components/prism-json"
 import "prismjs/components/prism-sql"
 import "prismjs/components/prism-python"
 
+// Date+time formatting in JST. The site is Japan-facing and the hosting runtime
+// is UTC, so we pin the timezone to Asia/Tokyo to show correct local時刻.
+const fmtDateTimeJst = (value: string): string =>
+    new Date(value).toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Tokyo',
+    })
+
+// Compact variant for the mobile meta row, e.g. "2026.06.19 14:30".
+const fmtDateTimeJstCompact = (value: string): string =>
+    new Date(value)
+        .toLocaleString('ja-JP', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Tokyo',
+        })
+        .replace(/\//g, '.')
+
 // Lexical text nodes carry inline styling (color / font-size / gradient) in a
 // `style` CSS string, written by the textStyle toolbar via $patchStyleText.
 // Payload's default text JSX converter only renders `format` flags (bold,
@@ -208,7 +234,7 @@ export const PostArticle: React.FC<{
                     <div className="px-6 pt-6 -mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                         <div className="flex items-center gap-1.5">
                             <span className="text-(--color-neu-primary)">Published</span>
-                            <span className="text-white/80">{post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0].replace(/-/g, '.') : ''}</span>
+                            <span className="text-white/80">{post.publishedAt ? fmtDateTimeJstCompact(post.publishedAt) : ''}</span>
                         </div>
 
                         {readingTime > 0 && (
@@ -363,7 +389,7 @@ export const PostArticle: React.FC<{
                                                 {post.publishedAt && (
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
-                                                            {new Date(post.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                            {fmtDateTimeJst(post.publishedAt)}
                                                         </span>
                                                         {readingTime > 0 && (
                                                             <>
@@ -377,7 +403,7 @@ export const PostArticle: React.FC<{
                                                 )}
                                                 {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
                                                     <span className="text-white/50 text-[12px] font-normal">
-                                                        最終更新: {new Date(post.updatedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                        最終更新: {fmtDateTimeJst(post.updatedAt)}
                                                     </span>
                                                 )}
                                             </div>

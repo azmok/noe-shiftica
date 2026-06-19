@@ -18,6 +18,20 @@ export const Media: CollectionConfig = {
       // component always shows — even for browser-cached images.
       name: 'filename',
       type: 'text',
+      admin: {
+        // Editing this directly would NOT move the underlying GCS objects, leaving
+        // filename/URL out of sync. Use the rename UI below, which moves files too.
+        readOnly: true,
+      },
+    },
+    {
+      name: 'renameManager',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/admin/MediaRenameField#MediaRenameField',
+        },
+      },
     },
     {
       name: 'alt',
