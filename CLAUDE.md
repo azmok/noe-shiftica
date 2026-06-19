@@ -11,6 +11,16 @@
 - **`git commit` と `git push` は、Azuma が明示的に指示するまで絶対に実行しない。** 「完了した」「検証OK」等は実行の許可を意味しない。
 - デプロイ後の本番反映確認・ロールアウトの追跡は待たなくてよい（Azuma が確認する）。
 
+## Payload Admin カスタム Field の必読ナレッジ（実装前に必ず読む）
+Payload v3 の `admin.components.Field` で UI フィールドを自作するときは、先に
+`.antigravity/knowledge/backend/admin-ui/custom-field-keyboard-and-shared-json.md` を読むこと。
+気づきにくい既知の罠が2つある：
+- **罠1: `<input>` の Enter が React `onKeyDown` では効かない/ログも出ない** → 編集画面全体が `<form>` で
+  Enter を先に横取りされるため。対策＝input の DOM に **capture フェーズ**でネイティブ keydown を張り、
+  `preventDefault + stopPropagation + stopImmediatePropagation`。state は `latestRef` で最新参照（stale closure 回避）。
+- **罠2: 複数フィールド共有の `type:'json'` への `setValue` が重く反映が数秒遅れる** → 表示を楽観的ローカル
+  state で即描画し、重い `setValue` は `setTimeout(0)` で別tickへ。`setValue` は関数更新非対応（`valueRef` 経由）。
+
 ## Changelog 半自動運用（`changelog` コレクション）
 サイトの `/changelog`（Payload `changelog` コレクション）は **Git 連携の半自動**で運用する。
 完全自動で publish はしない（公開は必ず人間が確認）。
