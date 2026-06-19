@@ -137,6 +137,22 @@ export function MobileMenuOverlay() {
                               <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF3D]" />
                               Developers
                             </Link>
+                            <Link
+                              href="/whats-new"
+                              className="text-lg font-bold text-white/70 hover:text-[#E2FF3D] transition-colors py-1 flex items-center gap-2"
+                              onClick={handleClose}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF3D]" />
+                              What&apos;s New
+                            </Link>
+                            <Link
+                              href="/changelog"
+                              className="text-lg font-bold text-white/70 hover:text-[#E2FF3D] transition-colors py-1 flex items-center gap-2"
+                              onClick={handleClose}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF3D]" />
+                              Changelog
+                            </Link>
                           </motion.div>
                         )}
                       </AnimatePresence>

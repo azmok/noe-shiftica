@@ -18,7 +18,7 @@ export function MobileMenuButton() {
     setIsMounted(true);
   }, []);
 
-  const isDarkTheme = pathname === "/" || pathname === "/about" || pathname === "/services" || pathname === "/hearing" || pathname?.startsWith("/blog");
+  const isDarkTheme = pathname === "/" || pathname === "/about" || pathname === "/services" || pathname === "/hearing" || pathname?.startsWith("/blog") || pathname?.startsWith("/dev") || pathname === "/whats-new" || pathname === "/changelog" || pathname === "/privacy" || pathname === "/terms" || pathname === "/tokusho";
 
   // スクロール検知
   useEffect(() => {
