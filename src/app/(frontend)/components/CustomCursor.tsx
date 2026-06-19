@@ -18,6 +18,9 @@ export function CustomCursor() {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [isHoveringFeatured, setIsHoveringFeatured] = useState(false);
+  // 記事本文(.native-link-cursor)内のリンクにホバー中は、カスタムドットを隠して
+  // OS標準の指カーソルを見せる
+  const [hideDot, setHideDot] = useState(false);
 
   // 遅延をなくすために React State を経由せず Motion Value を直接更新する
   const cursorX = useMotionValue(-100);
@@ -43,6 +46,7 @@ export function CustomCursor() {
     setHoveredElProps(null);
     hoveredElementRef.current = null;
     setIsHoveringFeatured(false);
+    setHideDot(false);
     stateRef.current = "normal";
     xAnimRef.current?.stop();
     yAnimRef.current?.stop();
@@ -87,6 +91,19 @@ export function CustomCursor() {
 
       const interactiveEl = target.closest("a, button, [role='button']") as HTMLElement;
 
+      // 記事本文(.native-link-cursor)内のリンクは、マグネット（ドット吸着）を無効化し、
+      // 代わりにOS標準の指カーソルを表示する（カスタムドットは隠す）。
+      if (interactiveEl && interactiveEl.tagName === "A" && interactiveEl.closest(".native-link-cursor")) {
+        if (relatedTarget && interactiveEl.contains(relatedTarget)) return; // 要素内部の移動は無視
+        stateRef.current = "normal";
+        hoveredElementRef.current = null;
+        xAnimRef.current?.stop();
+        yAnimRef.current?.stop();
+        setHoveredElProps(null);
+        setHideDot(true);
+        return;
+      }
+
       if (
         interactiveEl ||
         window.getComputedStyle(target).cursor === "pointer"
@@ -123,6 +140,15 @@ export function CustomCursor() {
         if (!relatedTarget || !featured.contains(relatedTarget)) {
           setIsHoveringFeatured(false);
         }
+      }
+
+      // 記事本文リンクから離れたらカスタムドットを復帰させる
+      const outLink = target.closest("a");
+      if (outLink && outLink.closest(".native-link-cursor")) {
+        if (relatedTarget && outLink.contains(relatedTarget)) return; // 要素内部の移動は無視
+        setHideDot(false);
+        stateRef.current = "normal";
+        return;
       }
 
       // .blog-posts クラスを持つ要素（ブログカード等）や .posts.featured はホバー時の変形効果を無効化する
@@ -246,6 +272,7 @@ export function CustomCursor() {
       style={{
         x: cursorX,
         y: cursorY,
+        opacity: hideDot ? 0 : 1,
       }}
       animate={{
         width: cursorWidth,

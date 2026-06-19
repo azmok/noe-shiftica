@@ -236,7 +236,7 @@ export const PostArticle: React.FC<{
                             </p>
                         </div>
 
-                        <div className={`prose prose-sm prose-invert max-w-none font-sans ${styles.postContent}`}>
+                        <div className={`prose prose-sm prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                             {(() => {
                                 try {
@@ -386,7 +386,7 @@ export const PostArticle: React.FC<{
                                 </div>
 
                                 <div className="max-w-[872px] mx-auto w-full px-6 lg:px-12 py-16 lg:py-12 lg:pb-24 text-white">
-                                    <div className={`prose prose-lg prose-invert max-w-none font-sans ${styles.postContent}`}>
+                                    <div className={`prose prose-lg prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                                         {(() => {
                                             try {

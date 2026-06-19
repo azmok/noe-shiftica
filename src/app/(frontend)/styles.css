@@ -151,6 +151,12 @@ svg {
   vertical-align: middle;
 }
 
+/* 記事本文(.native-link-cursor)内のリンクは、カスタムカーソル(マグネット)ではなく
+   OS標準の指カーソルを表示する。グローバルの `* { cursor: none }` を上書きする。 */
+.native-link-cursor a {
+  cursor: pointer !important;
+}
+
 /* カスタムカーソル要素用のスタイル (Google Design風) */
 .custom-cursor {
   position: fixed;
