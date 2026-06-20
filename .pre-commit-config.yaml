@@ -1,0 +1,31 @@
+# Pre-commit guardrails for noe-shiftica (mechanical enforcement layer).
+#
+# WHY: turn the documentation-level rules (AGENTS.md / .antigravity/rules.md /
+#      .antigravity/GUARDRAILS.md) into hard, commit-time requirements so fast
+#      agents cannot silently (1) leak secrets or (2) edit protected core files.
+#
+# Setup is performed by a human (Azuma) — see the install steps in chat / README.
+#   uv tool install pre-commit
+#   pre-commit install
+#
+# Pin note: gitleaks rev is the latest stable tag at authoring time (v8.30.1).
+#           Bump deliberately, do not float.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        name: Detect hardcoded secrets / API keys
+
+  - repo: local
+    hooks:
+      - id: protect-files
+        name: Block edits to protected core files
+        description: >-
+          Refuses any commit that stages protected files
+          (src/collections, src/payload.config.ts, src/access,
+          src/lib/db.ts, components/Footer.tsx).
+        entry: scripts/protect-files.sh
+        language: script
+        pass_filenames: false
+        always_run: true

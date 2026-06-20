@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings so they run under bash/pre-commit on every
+# checkout, regardless of core.autocrlf. A CRLF shebang (`#!/usr/bin/env bash\r`)
+# breaks execution.
+*.sh text eol=lf

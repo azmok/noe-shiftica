@@ -5,11 +5,22 @@
 > `~/.gemini/AGENTS.md`) and project `AGENTS.md`. This file holds only Azuma's
 > standing shortcuts that override those defaults.
 
+> **Before starting any task, MUST read `.antigravity/GUARDRAILS.md`** (pre-task Signs).
+> If you hit the **same error twice**, stop trial-and-error and re-read GUARDRAILS.md
+> + the original instruction before retrying (original instruction + GUARDRAILS win over the latest failure log).
+
 ## Standing instructions (Azuma)
 - バックグラウンドコマンド（App Hosting のロールアウト、長時間ビルド等）の**出力ファイルは確認しなくてよい**。完了通知 / exit code 0 だけで十分とみなす。
 - 修正したら**毎回 `git add` まで**を作業の区切りとする（ステージングまで実行する）。
 - **`git commit` と `git push` は、Azuma が明示的に指示するまで絶対に実行しない。** 「完了した」「検証OK」等は実行の許可を意味しない。
 - デプロイ後の本番反映確認・ロールアウトの追跡は待たなくてよい（Azuma が確認する）。
+
+## ⚠️ ファイルエンコーディング（編集後に必ず検証）
+Windows 環境＋複数エージェントで作業するため、ソースに **NUL バイト混入 / UTF-16 保存**の
+“静かな文字化け事故”が起きうる（実例: `TagsField.tsx` が NUL 237個で `Bin` blob 化）。
+- ソース編集後は **UTF-8・NUL 0** を確認: `file FILE` が `UTF-8 text`／`tr -d '\000' < FILE | wc -c == wc -c < FILE`。
+- git diff で **text ファイルが `Bin …` や `0 insertions/0 deletions`** になってたら blob 破損を疑う。
+- 直すときは部分パッチでなく**全文をクリーン UTF-8 で書き直す**。詳細は `.antigravity/rules.md` 冒頭 IMPORTANT。
 
 ## Payload Admin カスタム Field の必読ナレッジ（実装前に必ず読む）
 Payload v3 の `admin.components.Field` で UI フィールドを自作するときは、先に
