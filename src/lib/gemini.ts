@@ -39,9 +39,9 @@ export interface EnrichedContent {
 export async function enrichPostContent(title: string, content: string, options: any = {}): Promise<EnrichedContent> {
     console.log(`[AI-ENRICH] Starting enrichment for: "${title}"`)
     
-    // Available models (2026-03):
-    // Stable: gemini-2.5-flash
-    const modelName = 'gemini-2.5-flash'
+    // Available models (2026-06):
+    // Stable: gemini-3.5-flash
+    const modelName = 'gemini-3.5-flash'
     
     const genAI = getGenAI()
     const model = genAI.getGenerativeModel({ model: modelName })

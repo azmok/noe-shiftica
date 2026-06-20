@@ -9,7 +9,7 @@ The root cause was identified: the Google Generative AI client was being initial
 - **After**: Implemented `getGenAI()` which retrieves the key and initializes the client **only when the enrichment function is called**.
 
 ## 📊 Model Information
-- **Model Name**: `gemini-2.5-flash` (The latest stable model in this configuration).
+- **Model Name**: `gemini-3.5-flash` (The latest stable model in this configuration).
 - **Control File**: [gemini.ts](file:///c:/Users/genta/projects/noe-shiftica.dev/src/lib/gemini.ts) (Line 31).
 
 ## ✅ Verification Results

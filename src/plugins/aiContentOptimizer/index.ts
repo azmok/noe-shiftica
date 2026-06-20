@@ -6,7 +6,7 @@ import { aiEnrichPostHandler } from './endpoints/aiEnrichPost'
  * AI Content Optimizer Plugin
  * 
  * Automatically enriches blog post metadata (SEO, OG, Tags, Categories) 
- * using Gemini 2.5 Flash analysis of the content.
+ * using Gemini 3.5 Flash analysis of the content.
  */
 export const aiContentOptimizerPlugin = (options?: AiContentOptimizerOptions): Plugin => {
     return (config) => {
