@@ -30,7 +30,7 @@ async function run() {
       collection: 'whats-new',
       id: doc.id,
       data: {
-        ...(titleChanged ? { title: newTitle } : {}),
+        ...(titleChanged && newTitle != null ? { title: newTitle } : {}),
         ...(metaChanged ? { seo: { ...doc.seo, metaTitle: newMetaTitle } } : {}),
       },
       overrideAccess: true,
