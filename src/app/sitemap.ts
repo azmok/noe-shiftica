@@ -20,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: {
       slug: true,
       updatedAt: true,
-      customMetaData: true,
     },
   })
 
@@ -37,7 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: {
       slug: true,
       updatedAt: true,
-      customMetaData: true,
     },
   })
 
@@ -107,54 +105,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  // Collect unique tags (case-insensitive) and the newest updatedAt of the posts
-  // carrying each tag, so a tag listing's lastmod reflects real content changes
-  // instead of "now" on every request.
-  const collectTags = (docs: { customMetaData?: unknown; updatedAt?: string }[]) => {
-    const tagMap = new Map<string, { label: string; lastModified: Date }>()
-    for (const doc of docs) {
-      const meta = doc.customMetaData as Record<string, unknown> | undefined
-      if (meta && Array.isArray(meta.tags)) {
-        const docDate = doc.updatedAt ? new Date(doc.updatedAt) : new Date(0)
-        for (const tag of meta.tags) {
-          const value = String(tag).trim()
-          if (!value) continue
-          const key = value.toLowerCase()
-          const existing = tagMap.get(key)
-          if (!existing) {
-            tagMap.set(key, { label: value, lastModified: docDate })
-          } else if (docDate > existing.lastModified) {
-            existing.lastModified = docDate
-          }
-        }
-      }
-    }
-    return [...tagMap.values()]
-  }
-
-  // Dynamic blog tag routes
-  const blogTagRoutes = collectTags(posts.docs).map(({ label, lastModified }) => ({
-    url: `${baseUrl}/blog/tag/${encodeURIComponent(label)}`,
-    lastModified,
-    changeFrequency: 'weekly' as const,
-    priority: 0.4,
-  }))
-
-  // Dynamic tech tag routes
-  const techTagRoutes = collectTags(techPosts.docs).map(({ label, lastModified }) => ({
-    url: `${baseUrl}/dev/tag/${encodeURIComponent(label)}`,
-    lastModified,
-    changeFrequency: 'weekly' as const,
-    priority: 0.4,
-  }))
+  // NOTE: Tag/category listing pages (/blog/tag/*, /dev/tag/*) are intentionally
+  // NOT emitted into the sitemap. They are thin, auto-generated index pages whose
+  // set changes whenever an editor adds a tag, and exposing them invites Google to
+  // crawl/index low-value duplicate listings. We only advertise canonical content
+  // (articles) and the curated static routes above.
 
   return [
     ...staticRoutes,
     ...postRoutes,
     ...techPostRoutes,
     ...whatsNewRoutes,
-    ...blogTagRoutes,
-    ...techTagRoutes,
   ]
 }
-
