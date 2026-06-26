@@ -102,7 +102,7 @@ export default async function WhatsNewPage() {
                   >
                     <div className="relative w-full aspect-video bg-black/40 overflow-hidden">
                       {imgUrl ? (
-                        <div className="w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
+                        <div className="w-full h-full relative transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
                           <GcsImage src={imgUrl} alt={post.title} objectFit="cover" className="w-full h-full" />
                         </div>
                       ) : (

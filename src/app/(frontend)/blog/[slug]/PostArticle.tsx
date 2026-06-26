@@ -104,7 +104,7 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
                     </div>
                     
                     {/* Code container */}
-                    <pre className="p-6 overflow-x-auto text-[13px] leading-relaxed font-mono text-slate-100 bg-[#0d0f14] selection:bg-[#E2FF3D]/20 scrollbar-thin scrollbar-thumb-white/10">
+                    <pre tabIndex={0} className="p-6 overflow-x-auto text-[13px] leading-relaxed font-mono text-slate-100 bg-[#0d0f14] selection:bg-[#E2FF3D]/20 scrollbar-thin scrollbar-thumb-white/10">
                         <code 
                             className={`block whitespace-pre language-${language}`}
                             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
@@ -153,7 +153,7 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
                         </div>
                         
                         {/* Code container */}
-                        <pre className="p-6 overflow-x-auto text-[13px] leading-relaxed font-mono text-slate-100 bg-[#0d0f14] selection:bg-[#E2FF3D]/20 scrollbar-thin scrollbar-thumb-white/10">
+                        <pre tabIndex={0} className="p-6 overflow-x-auto text-[13px] leading-relaxed font-mono text-slate-100 bg-[#0d0f14] selection:bg-[#E2FF3D]/20 scrollbar-thin scrollbar-thumb-white/10">
                             <code 
                                 className={`block whitespace-pre language-${rawLang}`}
                                 dangerouslySetInnerHTML={{ __html: highlightedHtml }}
@@ -349,7 +349,7 @@ export const PostArticle: React.FC<{
                                             if (img && typeof img === 'object' && 'url' in img && img.url) {
                                                 const finalUrl = img.sizes?.medium?.url || img.url;
                                                 return (
-                                                    <div className="w-full h-full transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
+                                                    <div className="w-full h-full relative transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
                                                         <GcsImage
                                                             src={finalUrl}
                                                             alt={post.title}

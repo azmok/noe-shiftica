@@ -117,7 +117,7 @@ export function BlogRecentStoriesClient({ recentPosts, basePath = '/blog' }: Blo
                                     <div className="w-12 h-1 bg-(--color-neu-primary) z-30 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-[-5px]"></div>
 
                                     <div className={`w-full ${s.aspect} rounded-xl overflow-hidden bg-slate-900 shadow-2xl relative`}>
-                                        <div className="w-full h-full transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
+                                        <div className="w-full h-full relative transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
                                             {(() => {
                                                 const preGenUrl = post.heroMediumUrl || post.coverMediumUrl;
                                                 const img = preGenUrl || post.heroUrl || post.coverUrl;

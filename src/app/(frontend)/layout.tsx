@@ -197,6 +197,24 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
+                // Suppress Hydration Mismatch Warnings globally (often caused by browser extensions)
+                const originalError = console.error;
+                console.error = function(...args) {
+                  const msg = args[0];
+                  if (
+                    typeof msg === 'string' &&
+                    (msg.includes('Hydration') ||
+                     msg.includes('hydrated') ||
+                     msg.includes('did not match') ||
+                     msg.includes('attribute') ||
+                     msg.includes('suppressHydrationWarning') ||
+                     msg.includes('mismatch'))
+                  ) {
+                    return;
+                  }
+                  originalError.apply(console, args);
+                };
+
                 const forceImages = () => {
                   document.querySelectorAll('img').forEach(img => {
                     try {

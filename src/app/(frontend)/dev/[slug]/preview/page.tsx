@@ -1,6 +1,4 @@
 import React from "react";
-import { Header } from "../../../components/Header";
-import { Footer } from "../../../components/Footer";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
@@ -87,9 +85,7 @@ export default async function DevPostPreviewPage({
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
             </div>
 
-            <Header />
             <LivePreview initialPost={post as any} isPreview={true} prevPost={prevPost as any} nextPost={nextPost as any} />
-            <Footer variant="blog" />
 
             {/* SVG Global Filters */}
             <svg className="hidden">

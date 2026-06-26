@@ -16,6 +16,28 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
+// --- Suppress Hydration Mismatch Warnings globally in Admin area ---
+// This prevents browser extensions (e.g. Google Analytics Opt-out, editor bridges) 
+// from polluting the console with un-actionable server/client HTML attribute mismatches.
+if (typeof window !== 'undefined') {
+  const originalError = console.error
+  console.error = function patchedConsoleError(...args) {
+    const firstArg = args[0]
+    if (
+      typeof firstArg === 'string' &&
+      (firstArg.includes('Hydration') ||
+        firstArg.includes('hydrated') ||
+        firstArg.includes('did not match') ||
+        firstArg.includes('attribute') ||
+        firstArg.includes('suppressHydrationWarning') ||
+        firstArg.includes('mismatch'))
+    ) {
+      return
+    }
+    originalError.apply(console, args)
+  }
+}
+
 const MAX_SIZE_BYTES = 1 * 1024 * 1024 // 1 MB
 const PROGRESS_EVENT = 'noe:upload-compress-progress'
 

@@ -5,15 +5,20 @@ import { BlogRecentStoriesClient } from "../../../components/BlogRecentStoriesCl
 import Link from "next/link";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
+import type { Metadata } from "next";
 
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ tag: string }>;
-}) {
+}): Promise<Metadata> {
     const { tag } = await params;
     const decodedTag = typeof tag === 'string' ? decodeURIComponent(tag) : '';
     return {
+        robots: {
+            index: false,
+            follow: true,
+        },
         // Self-referencing canonical. Without this, the page inherits the root
         // layout's `canonical: "/"` and looks like a duplicate of the homepage.
         alternates: {

@@ -10,11 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         '/_payload',
         '/api',
         '/next-api',
-        // タグ一覧は編集者がタグを足すたびに増える薄い自動生成インデックス。
-        // sitemap から外す（sitemap.ts）だけでなくクロール自体も抑止して、
-        // 低品質な重複リスティングがインデックスされるのを防ぐ。
-        '/blog/tag/',
-        '/dev/tag/',
         // ログイン画面。検索結果に出る意味がなく、各ページの noindex も無いため塞ぐ。
         '/2fa-login',
         // 下書きプレビュー。各ページで noindex 済みだが多層防御として明示的に拒否。

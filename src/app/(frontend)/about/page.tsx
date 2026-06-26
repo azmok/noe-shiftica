@@ -212,6 +212,7 @@ export default function AboutPage() {
                 src="/images/azuma.png"
                 alt="Azuma"
                 fill
+                sizes="(max-width: 768px) 192px, 256px"
                 className="object-cover rounded-2xl grayscale"
               />
             </div>

@@ -30,9 +30,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen text-white overflow-hidden relative selection:bg-[#FFFFFF] selection:text-[#050505]">
       <div
-        className="fixed inset-0 w-full h-full opacity-[0.07] pointer-events-none z-20"
-        style={{ background: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
+        className="fixed inset-0 w-full h-full opacity-[0.03] pointer-events-none z-20 mix-blend-overlay"
+        style={{ filter: "url(#noiseFilter)" }}
       />
+      <svg className="sr-only">
+        <filter id="noiseFilter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+      </svg>
       <Header />
       <SideNav />
 

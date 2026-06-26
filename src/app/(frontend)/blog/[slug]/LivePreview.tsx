@@ -4,6 +4,9 @@ import React, { useEffect } from "react"
 import { useLivePreview } from "@payloadcms/live-preview-react"
 import { Post } from "@/payload-types"
 import { PostArticle } from "./PostArticle"
+import { MobileMenuProvider } from "@/context/MobileMenuContext"
+import { Header } from "../../components/Header"
+import { Footer } from "../../components/Footer"
 
 export const LivePreview: React.FC<{
     initialPost: Post
@@ -51,5 +54,11 @@ export const LivePreview: React.FC<{
         depth: 2,
     })
 
-    return <PostArticle post={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
+    return (
+        <MobileMenuProvider>
+            <Header />
+            <PostArticle post={post} isPreview={isPreview} prevPost={prevPost} nextPost={nextPost} />
+            <Footer variant="blog" />
+        </MobileMenuProvider>
+    )
 }

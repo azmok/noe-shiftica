@@ -133,7 +133,7 @@ export default async function DevBlogPage() {
                             return (
                               <>
                                 <div className="absolute inset-0 bg-linear-to-tr from-(--color-neu-primary)/20 to-transparent mix-blend-overlay z-10 pointer-events-none" />
-                                <div className="w-full h-full transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
+                                <div className="w-full h-full relative transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
                                   <GcsImage
                                     src={imgUrl}
                                     alt={featuredPost.title}
