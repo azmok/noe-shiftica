@@ -10,6 +10,8 @@ export default function robots(): MetadataRoute.Robots {
         '/_payload',
         '/api',
         '/next-api',
+        // Next.js の静的アセット/チャンク配信パス。コンテンツではないのでクロール不要。
+        '/_next/',
         // ログイン画面。検索結果に出る意味がなく、各ページの noindex も無いため塞ぐ。
         '/2fa-login',
         // 下書きプレビュー。各ページで noindex 済みだが多層防御として明示的に拒否。
