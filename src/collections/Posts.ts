@@ -241,6 +241,22 @@ export const Posts: CollectionConfig = {
             required: false,
         },
         {
+            name: 'customCss',
+            type: 'textarea',
+            label: 'カスタムCSS',
+            admin: {
+                description: 'この記事のレンダリング結果全体に適用されるCSS。記事ルートの範囲だけに自動スコープされ、他の記事やサイト共通UIには漏れません。',
+            },
+        },
+        {
+            name: 'customJs',
+            type: 'textarea',
+            label: 'カスタムJS',
+            admin: {
+                description: 'この記事のページに読み込まれるJS。記事内だけに存在するクラス名/IDを対象にしてください。',
+            },
+        },
+        {
             name: 'ogImage',
             type: 'text',
             label: 'OG画像URL',

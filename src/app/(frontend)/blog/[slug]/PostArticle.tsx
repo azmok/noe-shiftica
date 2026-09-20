@@ -6,6 +6,7 @@ import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
+import { ArticleCustomAssets } from "./ArticleCustomAssets"
 import styles from './PostArticle.module.css'
 import Prism from "prismjs"
 
@@ -131,6 +132,11 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
 
             const rawCode = fields.code || '';
             const rawLang = fields.language || 'javascript';
+
+            if (fields.renderAsHtml) {
+                return <div dangerouslySetInnerHTML={{ __html: rawCode }} />
+            }
+
             const grammar = Prism.languages[rawLang] || Prism.languages.plaintext;
             const highlightedHtml = Prism.highlight(rawCode, grammar, rawLang);
 
@@ -178,9 +184,11 @@ export const PostArticle: React.FC<{
         (post as any).readingTime ||
         calculateReadingTime(post.content) + calculateReadingTime(htmlBodyHtml) ||
         1
+    const scopeId = `article-${post.id}`
 
     return (
         <main className="grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
+            <ArticleCustomAssets scopeId={scopeId} css={(post as any).customCss} js={(post as any).customJs} />
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
                     <p className="font-bold">Preview Mode</p>
@@ -188,7 +196,7 @@ export const PostArticle: React.FC<{
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+            <div id={scopeId} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
 
                 {/* Mobile Article View */}
                 <article className="selection:bg-(--color-neu-primary)/30 md:hidden flex flex-col pt-0">

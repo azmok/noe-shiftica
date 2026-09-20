@@ -30,10 +30,10 @@ export function normalizeCodeLanguage(raw: string): string {
 // Helper to transform Markdown code blocks to Payload's CustomCodeBlock (Lexical BlockNode)
 export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: string) => any): any {
     const codeBlocks: Array<{ language: string; code: string }> = [];
-    
+
     // Regex to match markdown code blocks
     const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)\n```/g;
-    
+
     let placeholderIndex = 0;
     const preprocessedMarkdown = markdown.replace(codeBlockRegex, (match, lang, code) => {
         codeBlocks.push({
@@ -87,7 +87,7 @@ export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: 
                         }
                     }
                 }
-                
+
                 // Otherwise recursively process
                 newChildren.push(replacePlaceholders(child));
             }
@@ -106,6 +106,169 @@ export function convertMarkdownWithCodeBlocks(markdown: string, convertFn: (md: 
     return lexicalData;
 }
 
+/**
+ * posts/ フォルダのmdはCSS/JSを `<link rel="stylesheet">` / `<script src="...">`
+ * で直接参照する運用（Google Drive/iPadのプレビューツール向け）。その実体は
+ * MarkdownImporterUI側で同時アップロードされた.css/.jsファイルとして
+ * customCss/customJsフィールドに別途格納されるので、本文からはこの参照タグ
+ * だけを取り除く（残すとconvertMarkdownToLexicalが生HTMLをエスケープして
+ * プレーンテキストのまま記事本文の先頭に出力してしまう）。
+ * コードフェンス内の例示コードは対象外にするため、フェンスを退避してから処理する。
+ * プレースホルダーはOJECODEBLOCKPLACEHOLDER方式と同じく英数字のみのトークンにし、
+ * Markdownのアクティブ文字（アンダースコア等）を含めない。
+ */
+function stripAssetReferenceTags(markdown: string): string {
+    const fences: string[] = [];
+    let fenceIndex = 0;
+    const withoutFences = markdown.replace(/```[\s\S]*?```/g, (m) => {
+        fences.push(m);
+        return `MDASSETFENCEPLACEHOLDER${fenceIndex++}END`;
+    });
+
+    const stripped = withoutFences
+        .replace(/[ \t]*<link\b[^>]*rel=["']?stylesheet["']?[^>]*\/?>[ \t]*\n?/gi, '')
+        .replace(/[ \t]*<script\b[^>]*\bsrc=["'][^"']*["'][^>]*>\s*<\/script>[ \t]*\n?/gi, '');
+
+    return stripped.replace(/MDASSETFENCEPLACEHOLDER(\d+)END/g, (_, i) => fences[Number(i)]);
+}
+
+/**
+ * posts/ フォルダのmdは、SVGシンボル定義や比較チャットUIのdiv構造のような
+ * 生HTMLをMarkdown本文の途中にそのままベタ書きしている（Google Drive/iPad
+ * 側のプレビューツールが素のHTMLも扱える前提で作られているため）。
+ * convertMarkdownToLexicalはこれをMarkdown構文として解釈できず、タグを
+ * プレーンテキストとしてエスケープしてしまうので、行頭（インデントなしの
+ * 独立行）から始まるHTMLタグ／コメントのブロックだけを検出して抜き出し、
+ * customCodeBlock（'code-block'）に `renderAsHtml: true` フラグ付きで
+ * 差し替える。
+ *
+ * 文中に埋め込まれたインラインHTML（例: テーブルセル内の `<u>text</u>`）は
+ * 行頭にマッチしないため対象外＝そのまま通常のMarkdownとして処理される。
+ * ネスト判定は同じタグ名の開始/終了タグ数をカウントするだけの簡易パーサー
+ * （属性値内に `>` を含まない、整形済みのエクスポート済みHTMLが前提）。
+ */
+function extractRawHtmlBlocks(markdown: string): { text: string; blocks: string[] } {
+    const fences: string[] = [];
+    let fenceIndex = 0;
+    const withoutFences = markdown.replace(/```[\s\S]*?```/g, (m) => {
+        fences.push(m);
+        return `MDRAWHTMLFENCEPLACEHOLDER${fenceIndex++}END`;
+    });
+
+    const lines = withoutFences.split('\n');
+    const blocks: string[] = [];
+    const out: string[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trimStart();
+
+        // Multi-line (or single-line) HTML comment starting at column 0.
+        if (/^<!--/.test(trimmed)) {
+            const chunk: string[] = [];
+            while (i < lines.length) {
+                chunk.push(lines[i]);
+                const closed = lines[i].includes('-->');
+                i++;
+                if (closed) break;
+            }
+            blocks.push(chunk.join('\n'));
+            out.push(`RAWHTMLBLOCKPLACEHOLDER${blocks.length - 1}END`, '');
+            continue;
+        }
+
+        // An opening tag (not self-closing) starting at column 0.
+        const tagMatch = trimmed.match(/^<([a-zA-Z][a-zA-Z0-9-]*)\b[^>]*?(\/)?>/);
+        if (tagMatch && !tagMatch[2]) {
+            const tag = tagMatch[1];
+            const openRe = new RegExp(`<${tag}\\b[^>]*?(/)?>`, 'g');
+            const closeRe = new RegExp(`</${tag}>`, 'g');
+            const chunk: string[] = [];
+            let depth = 0;
+            while (i < lines.length) {
+                const l = lines[i];
+                chunk.push(l);
+                for (const m of l.matchAll(openRe)) { if (!m[1]) depth++; }
+                for (const _m of l.matchAll(closeRe)) { depth--; }
+                i++;
+                if (depth <= 0) break;
+            }
+            blocks.push(chunk.join('\n'));
+            out.push(`RAWHTMLBLOCKPLACEHOLDER${blocks.length - 1}END`, '');
+            continue;
+        }
+
+        out.push(line);
+        i++;
+    }
+
+    const text = out.join('\n').replace(/MDRAWHTMLFENCEPLACEHOLDER(\d+)END/g, (_, i2) => fences[Number(i2)]);
+    return { text, blocks };
+}
+
+/**
+ * Replaces RAWHTMLBLOCKPLACEHOLDER{n}END placeholder paragraphs in a
+ * converted Lexical tree with 'code-block' (CustomCodeBlock) block nodes
+ * carrying the original HTML back, flagged `renderAsHtml: true` so the
+ * frontend renders them live via dangerouslySetInnerHTML instead of as a
+ * syntax-highlighted sample. Reuses the existing 'code-block' block type
+ * rather than registering a new Lexical block — a separate 'raw-html-block'
+ * Block trips a "Cannot read properties of undefined (reading
+ * 'blockReferences')" crash in @payloadcms/richtext-lexical's client-side
+ * BlocksFeature schema map (repro'd on 3.79.0; root cause not chased down —
+ * flag this if it recurs when adding a genuinely new Lexical block type).
+ * Mirrors the placeholder-swap pattern convertMarkdownWithCodeBlocks uses
+ * for fenced code blocks.
+ */
+function restoreRawHtmlBlocks(lexicalData: any, blocks: string[]): any {
+    if (blocks.length === 0 || !lexicalData || typeof lexicalData !== 'object') {
+        return lexicalData;
+    }
+
+    const replaceIn = (node: any): any => {
+        if (!node) return node;
+
+        if (node.children && Array.isArray(node.children)) {
+            const newChildren: any[] = [];
+            for (const child of node.children) {
+                if (child.type === 'paragraph' && child.children && child.children.length === 1) {
+                    const textNode = child.children[0];
+                    if (textNode.type === 'text' && typeof textNode.text === 'string') {
+                        const match = textNode.text.match(/^RAWHTMLBLOCKPLACEHOLDER(\d+)END$/);
+                        if (match) {
+                            const html = blocks[parseInt(match[1], 10)];
+                            if (html !== undefined) {
+                                newChildren.push({
+                                    format: '',
+                                    type: 'block',
+                                    version: 2,
+                                    fields: {
+                                        blockType: 'code-block',
+                                        id: `raw-html-block-id-${Math.random().toString(36).substr(2, 9)}`,
+                                        language: 'html',
+                                        code: html,
+                                        renderAsHtml: true,
+                                    },
+                                });
+                                continue;
+                            }
+                        }
+                    }
+                }
+                newChildren.push(replaceIn(child));
+            }
+            node.children = newChildren;
+        }
+
+        return node;
+    };
+
+    const target = lexicalData.root ?? lexicalData;
+    replaceIn(target);
+    return lexicalData;
+}
+
 // Markdown → Lexical conversion endpoint handler
 export async function handleConvertMarkdown(req: any): Promise<Response> {
     try {
@@ -117,7 +280,8 @@ export async function handleConvertMarkdown(req: any): Promise<Response> {
         const cleanBody = rawBody.trimStart()
         const parsed = matter(cleanBody)
 
-        const markdownBody = parsed.content || ''
+        const strippedBody = stripAssetReferenceTags(parsed.content || '')
+        const { text: markdownBody, blocks: rawHtmlBlocks } = extractRawHtmlBlocks(strippedBody)
         const frontmatter = parsed.data || {}
 
         console.log('[DEBUG-API] Parsed Frontmatter:', JSON.stringify(frontmatter))
@@ -134,6 +298,7 @@ export async function handleConvertMarkdown(req: any): Promise<Response> {
                 markdown: md,
             })
         })
+        restoreRawHtmlBlocks(lexicalData, rawHtmlBlocks)
 
         return Response.json({ frontmatter, lexical: lexicalData })
     } catch (error) {
@@ -177,7 +342,7 @@ export async function beforeValidateMarkdown(args: any): Promise<any> {
                         children: [
                             {
                                 detail: 0, format: 0, mode: 'normal',
-                                style: '', text: '\u00A0',
+                                style: '', text: ' ',
                                 type: 'text', version: 1,
                             },
                         ],
