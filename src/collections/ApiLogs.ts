@@ -10,6 +10,9 @@ export const ApiLogs: CollectionConfig = {
     useAsTitle: 'action',
     defaultColumns: ['createdAt', 'action', 'status', 'postTitle', 'responseStatus', 'errorMessage'],
     group: 'Logs',
+    components: {
+      beforeListTable: ['@/components/admin/ApiEndpointGuide#ApiEndpointGuide'],
+    },
   },
   access: {
     // Admin users can read logs and delete old ones, but manual creation/editing from UI is disabled
