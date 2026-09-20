@@ -66,6 +66,39 @@ const cssStringToStyleObject = (css: string): React.CSSProperties => {
     return style as React.CSSProperties
 }
 
+// SVG <symbol>/<linearGradient> definition blocks (aria-hidden, width:0
+// height:0 — pure icon defs referenced elsewhere via <use href="#...">)
+// only need to exist once per page. This component renders the article
+// body TWICE (a mobile <article> and a desktop <article>, toggled by CSS),
+// so a defs block coming from Markdown import duplicates every id in the
+// DOM. Browsers resolve fill="url(#id)" to the FIRST matching element in
+// document order — the mobile tree renders first and sits under
+// display:none, so any icon using a gradient fill (vs. a plain
+// fill="currentColor" path) silently fails to paint. Detect these blocks,
+// skip them in the (duplicated) article body, and render them once,
+// up front, instead — see extractSvgDefs below.
+const isSvgDefsBlock = (code: string): boolean =>
+    /^\s*<svg\b[^>]*\baria-hidden=/i.test(code) && /<(symbol|lineargradient)\b/i.test(code)
+
+const extractSvgDefs = (content: unknown): string[] => {
+    const defs: string[] = []
+    const walk = (node: any) => {
+        if (!node) return
+        if (
+            node.type === 'block' &&
+            node.fields?.blockType === 'code-block' &&
+            node.fields?.renderAsHtml &&
+            typeof node.fields.code === 'string' &&
+            isSvgDefsBlock(node.fields.code)
+        ) {
+            defs.push(node.fields.code)
+        }
+        if (Array.isArray(node.children)) node.children.forEach(walk)
+    }
+    walk((content as any)?.root)
+    return defs
+}
+
 const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     ...defaultConverters,
     // Re-apply inline text styling (color / font-size / gradient) that the
@@ -134,6 +167,11 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
             const rawLang = fields.language || 'javascript';
 
             if (fields.renderAsHtml) {
+                // Rendered once, up front (see extractSvgDefs) instead of
+                // here — this converter runs inside both the mobile and
+                // desktop RichText trees, which would duplicate every
+                // symbol/gradient id.
+                if (isSvgDefsBlock(rawCode)) return null
                 return <div dangerouslySetInnerHTML={{ __html: rawCode }} />
             }
 
@@ -185,9 +223,13 @@ export const PostArticle: React.FC<{
         calculateReadingTime(post.content) + calculateReadingTime(htmlBodyHtml) ||
         1
     const scopeId = `article-${post.id}`
+    const svgDefs = extractSvgDefs(post.content)
 
     return (
         <main className="grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
+            {svgDefs.map((html, i) => (
+                <div key={i} dangerouslySetInnerHTML={{ __html: html }} />
+            ))}
             <ArticleCustomAssets scopeId={scopeId} css={(post as any).customCss} js={(post as any).customJs} />
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
