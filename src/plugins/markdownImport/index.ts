@@ -269,6 +269,34 @@ function restoreRawHtmlBlocks(lexicalData: any, blocks: string[]): any {
     return lexicalData;
 }
 
+// Core helper to convert Markdown string into Lexical AST
+export async function parseMarkdownToLexical(
+    rawMarkdown: string,
+    payloadConfig: any
+): Promise<{ frontmatter: any; lexical: any }> {
+    const cleanBody = rawMarkdown.trimStart()
+    const parsed = matter(cleanBody)
+
+    const strippedBody = stripAssetReferenceTags(parsed.content || '')
+    const { text: markdownBody, blocks: rawHtmlBlocks } = extractRawHtmlBlocks(strippedBody)
+    const frontmatter = parsed.data || {}
+
+    const editorConfig = payloadConfig.editor
+    const sanitizedEditorConfig = await sanitizeServerEditorConfig(
+        editorConfig as any,
+        payloadConfig as any
+    )
+    const lexicalData = convertMarkdownWithCodeBlocks(markdownBody, (md) => {
+        return convertMarkdownToLexical({
+            editorConfig: sanitizedEditorConfig,
+            markdown: md,
+        })
+    })
+    restoreRawHtmlBlocks(lexicalData, rawHtmlBlocks)
+
+    return { frontmatter, lexical: lexicalData }
+}
+
 // Markdown → Lexical conversion endpoint handler
 export async function handleConvertMarkdown(req: any): Promise<Response> {
     try {
@@ -277,30 +305,11 @@ export async function handleConvertMarkdown(req: any): Promise<Response> {
         console.log('[DEBUG-API] Received raw body length:', rawBody.length)
         console.log('[DEBUG-API] First 100 characters:', JSON.stringify(rawBody.substring(0, 100)))
 
-        const cleanBody = rawBody.trimStart()
-        const parsed = matter(cleanBody)
-
-        const strippedBody = stripAssetReferenceTags(parsed.content || '')
-        const { text: markdownBody, blocks: rawHtmlBlocks } = extractRawHtmlBlocks(strippedBody)
-        const frontmatter = parsed.data || {}
+        const { frontmatter, lexical } = await parseMarkdownToLexical(rawBody, req.payload.config)
 
         console.log('[DEBUG-API] Parsed Frontmatter:', JSON.stringify(frontmatter))
-        console.log('[DEBUG-API] Body content start:', JSON.stringify(markdownBody.substring(0, 100)))
 
-        const editorConfig = req.payload.config.editor
-        const sanitizedEditorConfig = await sanitizeServerEditorConfig(
-            editorConfig as any,
-            req.payload.config as any
-        )
-        const lexicalData = convertMarkdownWithCodeBlocks(markdownBody, (md) => {
-            return convertMarkdownToLexical({
-                editorConfig: sanitizedEditorConfig,
-                markdown: md,
-            })
-        })
-        restoreRawHtmlBlocks(lexicalData, rawHtmlBlocks)
-
-        return Response.json({ frontmatter, lexical: lexicalData })
+        return Response.json({ frontmatter, lexical })
     } catch (error) {
         console.error('Error converting markdown:', error)
         return Response.json({ error: 'Failed to convert markdown' }, { status: 500 })

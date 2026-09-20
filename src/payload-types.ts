@@ -77,6 +77,7 @@ export interface Config {
     'whats-new': WhatsNew;
     changelog: Changelog;
     passkeys: Passkey;
+    'api-logs': ApiLog;
     'html-files': HtmlFile;
     'hosted-pages': HostedPage;
     'payload-kv': PayloadKv;
@@ -94,6 +95,7 @@ export interface Config {
     'whats-new': WhatsNewSelect<false> | WhatsNewSelect<true>;
     changelog: ChangelogSelect<false> | ChangelogSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
+    'api-logs': ApiLogsSelect<false> | ApiLogsSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'hosted-pages': HostedPagesSelect<false> | HostedPagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -515,6 +517,30 @@ export interface Passkey {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-logs".
+ */
+export interface ApiLog {
+  id: number;
+  action: 'post' | 'delete';
+  status: 'success' | 'error';
+  responseStatus?: number | null;
+  postTitle?: string | null;
+  postSlug?: string | null;
+  postId?: string | null;
+  /**
+   * Client IP address or Source identifier
+   */
+  clientIp?: string | null;
+  /**
+   * Summary of the incoming request parameters (truncated if too long)
+   */
+  requestSummary?: string | null;
+  errorMessage?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * CSS/JS を含む HTML をアップロード、または直接編集して /p/<slug> で公開します。
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -591,6 +617,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'passkeys';
         value: number | Passkey;
+      } | null)
+    | ({
+        relationTo: 'api-logs';
+        value: number | ApiLog;
       } | null)
     | ({
         relationTo: 'html-files';
@@ -864,6 +894,23 @@ export interface PasskeysSelect<T extends boolean = true> {
   deviceLabel?: T;
   deviceType?: T;
   backedUp?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-logs_select".
+ */
+export interface ApiLogsSelect<T extends boolean = true> {
+  action?: T;
+  status?: T;
+  responseStatus?: T;
+  postTitle?: T;
+  postSlug?: T;
+  postId?: T;
+  clientIp?: T;
+  requestSummary?: T;
+  errorMessage?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -26,6 +26,7 @@ import { TechPosts } from './collections/TechPosts'
 import { WhatsNew } from './collections/WhatsNew'
 import { Changelog } from './collections/Changelog'
 import { Passkeys } from './collections/Passkeys'
+import { ApiLogs } from './collections/ApiLogs'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { htmlHostingPlugin } from './plugins/html-hosting'
@@ -94,7 +95,7 @@ const configPromise = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, TechPosts, WhatsNew, Changelog, Passkeys],
+  collections: [Users, Media, Categories, Posts, TechPosts, WhatsNew, Changelog, Passkeys, ApiLogs],
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
