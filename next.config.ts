@@ -1,8 +1,11 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Shares the ISR cache across Cloud Run containers via GCS (see cache-handler.mjs).
+  cacheHandler: path.join(process.cwd(), "cache-handler.mjs"),
   // Allow the dev server to accept requests proxied through a Cloudflare quick
   // tunnel (used for testing passkeys/WebAuthn over HTTPS on a phone).
   allowedDevOrigins: ['*.trycloudflare.com'],
