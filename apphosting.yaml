@@ -40,6 +40,13 @@ env:
   - variable: GCS_BUCKET
     value: "noe-shiftica.firebasestorage.app"
 
+  # Shared Next.js ISR cache (cache-handler.mjs). If unset, each container keeps its own
+  # cache and posts can vanish from /blog after a cold start.
+  - variable: ISR_CACHE_GCS_BUCKET
+    value: "noe-shiftica.firebasestorage.app"
+    availability:
+      - RUNTIME
+
   # AI / LLM API keys (required for AI Content Optimizer)
   - variable: GEMINI_API_KEY
     secret: GEMINI_API_KEY
