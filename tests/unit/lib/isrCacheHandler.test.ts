@@ -189,6 +189,33 @@ describe('GCS ISR cache handler', () => {
     expect(value.segmentData.get('/_tree')?.toString()).toBe('tree:binary')
   })
 
+  it('shares route handler output such as /sitemap.xml across containers', async () => {
+    const setSitemap = (cache: IncrementalCache, xml: string) =>
+      cache.set(
+        '/sitemap.xml',
+        {
+          kind: 'APP_ROUTE',
+          body: Buffer.from(xml),
+          status: 200,
+          headers: { 'content-type': 'application/xml', 'x-next-cache-tags': '_N_T_/layout,_N_T_/sitemap.xml/layout,_N_T_/sitemap.xml/route,_N_T_/sitemap.xml' },
+        } as never,
+        { cacheControl: { revalidate: false, expire: undefined }, isRoutePPREnabled: false, isFallback: false },
+      )
+    const getSitemap = (cache: IncrementalCache) =>
+      cache.get('/sitemap.xml', { kind: 'APP_ROUTE' as never, isRoutePPREnabled: false, isFallback: false })
+
+    const containerA = container()
+    await setSitemap(containerA, '<loc>/blog/a</loc>')
+    advance(1000)
+    await containerA.revalidateTag(['_N_T_/sitemap.xml'])
+    expect(await getSitemap(container())).toBeNull()
+
+    advance(1000)
+    await setSitemap(containerA, '<loc>/blog/a</loc><loc>/blog/c</loc>')
+    const value = (await getSitemap(container()))?.value as { body: Buffer }
+    expect(value.body.toString()).toBe('<loc>/blog/a</loc><loc>/blog/c</loc>')
+  })
+
   it('does not lose either tag when two containers revalidate at the same time', async () => {
     const containerA = container()
     const containerB = container()
