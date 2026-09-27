@@ -1,18 +1,12 @@
-import { Noto_Sans_JP } from "next/font/google";
 import Script from "next/script";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
 import { ProgressBar } from "./components/ProgressBar";
 
-// Google's build of Noto Sans JP is a variable font split into ~120 unicode-range
-// chunks, so browsers download only the chunks for characters on the page. Which
-// chunks a page needs can't be known ahead of time, so nothing is preloaded.
-const notoSansJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  variable: "--font-noto-sans-jp",
-  display: "swap",
-  preload: false,
-});
+// Japanese text uses each device's own system font (see --font-sans in styles.css).
+// The Noto Sans JP web font was dropped: its ~120 unicode-range @font-face chunks made
+// the browser's first layout of Japanese text take seconds on phones, leaving long
+// articles on a black screen after direct loads / reloads.
 
 import type { Viewport } from "next";
 
@@ -97,7 +91,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html
       lang="ja"
-      className={notoSansJP.variable}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

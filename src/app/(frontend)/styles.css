@@ -15,7 +15,6 @@
 
   /* Typography */
     --font-sans: 
-    var(--font-noto-sans-jp), /* Noto Sans JP (next/font/google) */
     "Helvetica Neue", /* macOS/iOS, Helvetica fallback */
     Arial, /* Windows, Helvetica fallback */
     "Hiragino Kaku Gothic ProN", /* older macOS/iOS */
