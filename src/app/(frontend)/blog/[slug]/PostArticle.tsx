@@ -245,8 +245,8 @@ const withHeadingAnchors = (idByNode: WeakMap<object, string>, withIds: boolean)
 export const PostArticle: React.FC<{
     post: Post
     isPreview?: boolean
-    prevPost?: Post | null
-    nextPost?: Post | null
+    prevPost?: Pick<Post, 'slug' | 'title'> | null
+    nextPost?: Pick<Post, 'slug' | 'title'> | null
     basePath?: string
 }> = ({ post, isPreview, prevPost, nextPost, basePath = '/blog' }) => {
     const htmlBodyHtml: string = (post as any).htmlEmbed?.bodyHtml || ''
