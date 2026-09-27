@@ -101,6 +101,18 @@ export default class GcsCacheHandler {
     if (!enabled) return new FileSystemCache(ctx)
     buildId ??= readBuildId(ctx.serverDistDir)
     this.prefix = `${ROOT_PREFIX}/${buildId}`
+    this.buildOutput = new FileSystemCache(ctx)
+  }
+
+  // Pages prerendered by `next build` live on disk, not in GCS. Serving them on a GCS
+  // miss avoids rendering every page from the DB after each deploy. They are treated as
+  // written at time 0: file mtimes may reflect container start, which could hide a
+  // revalidation made earlier on another container.
+  async readBuildOutput(key, ctx, manifest) {
+    const seeded = await this.buildOutput.get(key, ctx)
+    if (!seeded?.value) return null
+    const entry = { lastModified: 0, value: seeded.value }
+    return areTagsInvalidated(entryTags(entry, ctx), entry.lastModified, manifest) ? null : entry
   }
 
   entryFile(key) {
@@ -144,7 +156,7 @@ export default class GcsCacheHandler {
         }),
         this.readTags(),
       ])
-      if (!entryResult) return null
+      if (!entryResult) return await this.readBuildOutput(key, ctx, manifest)
       const entry = deserialize(entryResult[0].toString('utf8'))
       if (areTagsInvalidated(entryTags(entry, ctx), entry.lastModified, manifest)) return null
       return { lastModified: entry.lastModified, value: entry.value }
