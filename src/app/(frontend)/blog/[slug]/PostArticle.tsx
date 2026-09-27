@@ -11,6 +11,7 @@ import { ArticleToc, tocEntries } from "./ArticleToc"
 import { ArticleTocSidebar } from "./ArticleTocSidebar"
 import { HeadingAnchorBehavior } from "./HeadingAnchorBehavior"
 import { extractHeadings } from "@/lib/articleHeadings"
+import { toInternalHref } from "@/lib/articleLinks"
 import styles from './PostArticle.module.css'
 import Prism from "prismjs"
 
@@ -103,8 +104,19 @@ const extractSvgDefs = (content: unknown): string[] => {
     return defs
 }
 
+// Payload renders body links as plain <a>, so links to other articles reloaded the whole
+// page. Same-site links (not opening a new tab) use next/link for client-side navigation.
+const asSiteLink = (rendered: React.ReactNode): React.ReactNode => {
+    if (!React.isValidElement<React.AnchorHTMLAttributes<HTMLAnchorElement>>(rendered)) return rendered
+    const { href, target, children } = rendered.props
+    const internalHref = target ? null : toInternalHref(href)
+    return internalHref ? <Link href={internalHref}>{children}</Link> : rendered
+}
+
 const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     ...defaultConverters,
+    link: (args) => asSiteLink(typeof defaultConverters.link === 'function' ? defaultConverters.link(args) : null),
+    autolink: (args) => asSiteLink(typeof defaultConverters.autolink === 'function' ? defaultConverters.autolink(args) : null),
     // Re-apply inline text styling (color / font-size / gradient) that the
     // default text converter drops. We let the default converter handle the
     // format flags (bold/italic/…), then wrap its output in a styled <span>.
