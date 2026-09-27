@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync, promises as fsp } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { IncrementalCache } from 'next/dist/server/lib/incremental-cache'
@@ -90,11 +90,29 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+const diskFs = {
+  existsSync,
+  readFile: fsp.readFile,
+  readFileSync,
+  writeFile: fsp.writeFile,
+  mkdir: (dir: string) => fsp.mkdir(dir, { recursive: true }),
+  stat: fsp.stat,
+}
+
+// Files `next build` writes for a prerendered page (served by Next's FileSystemCache).
+function writeBuildOutput(route: string, html: string) {
+  const base = path.join(serverDistDir, 'app', route)
+  mkdirSync(path.dirname(base), { recursive: true })
+  writeFileSync(`${base}.html`, html)
+  writeFileSync(`${base}.rsc`, `rsc:${html}`)
+  writeFileSync(`${base}.meta`, JSON.stringify({ headers: { 'x-next-cache-tags': `_N_T_/layout,_N_T_${route}` }, status: 200 }))
+}
+
 // Each IncrementalCache stands in for one Cloud Run container.
 function container() {
   return new IncrementalCache({
     dev: false,
-    fs: undefined,
+    fs: diskFs as never,
     serverDistDir,
     requestHeaders: {},
     minimalMode: false,
@@ -214,6 +232,35 @@ describe('GCS ISR cache handler', () => {
     await setSitemap(containerA, '<loc>/blog/a</loc><loc>/blog/c</loc>')
     const value = (await getSitemap(container()))?.value as { body: Buffer }
     expect(value.body.toString()).toBe('<loc>/blog/a</loc><loc>/blog/c</loc>')
+  })
+
+  describe('build-time prerendered pages', () => {
+    const route = '/blog/prerendered'
+    const getRoute = (cache: IncrementalCache) =>
+      cache.get(route, { kind: 'APP_PAGE' as never, isRoutePPREnabled: false, isFallback: false })
+
+    it('serves the page built by next build when GCS has no entry yet', async () => {
+      writeBuildOutput(route, 'built at deploy')
+      const value = (await getRoute(container()))?.value as { html: string; rscData: Buffer }
+      expect(value.html).toBe('built at deploy')
+      expect(value.rscData.toString()).toBe('rsc:built at deploy')
+    })
+
+    it('stops serving the built page once its path is revalidated', async () => {
+      writeBuildOutput(route, 'built at deploy')
+      advance(1000)
+      await container().revalidateTag([`_N_T_${route}`])
+
+      expect(await getRoute(container())).toBeNull()
+    })
+
+    it('prefers the shared GCS entry over the built page', async () => {
+      writeBuildOutput(route, 'built at deploy')
+      const cache = container()
+      await cache.set(route, blogPage('regenerated') as never, { cacheControl: { revalidate: false, expire: undefined }, isRoutePPREnabled: false, isFallback: false })
+
+      expect((await getRoute(container()))?.value).toMatchObject({ html: 'regenerated' })
+    })
   })
 
   it('does not lose either tag when two containers revalidate at the same time', async () => {
