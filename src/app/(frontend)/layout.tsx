@@ -1,88 +1,16 @@
-import localFont from "next/font/local";
-import { Inconsolata, DM_Sans, DM_Serif_Display, Shippori_Mincho, Oxanium } from "next/font/google";
+import { Noto_Sans_JP } from "next/font/google";
 import Script from "next/script";
 import "./styles.css";
 import { CustomCursor } from "./components/CustomCursor";
 import { ProgressBar } from "./components/ProgressBar";
 
-const inconsolata = Inconsolata({
+// Google's build of Noto Sans JP is a variable font split into ~120 unicode-range
+// chunks, so browsers download only the chunks for characters on the page. Which
+// chunks a page needs can't be known ahead of time, so nothing is preloaded.
+const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
-  variable: "--font-inconsolata",
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
-  weight: ["300", "400", "500", "700"],
-});
-
-const dmSerifDisplay = DM_Serif_Display({
-  subsets: ["latin"],
-  variable: "--font-dm-serif",
-  display: "swap",
-  weight: ["400"],
-});
-
-const shipporiMincho = Shippori_Mincho({
-  subsets: ["latin"],
-  variable: "--font-shippori-mincho",
-  display: "swap",
-  weight: ["400", "500", "600"],
-  // Preloading forces every Japanese subset chunk (~250 files, 7MB) onto every page,
-  // even where the font is unused. Without it, browsers fetch only chunks the page needs.
-  preload: false,
-});
-
-const oxanium = Oxanium({
-  subsets: ["latin"],
-  variable: "--font-oxanium",
-  display: "swap",
-  weight: ["200", "300", "400", "500", "600", "700", "800"],
-});
-
-const notoSansJP = localFont({
-  src: [
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-100.woff2",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-200.woff2",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-300.woff2",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-regular.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-500.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-700.woff2",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/noto-sans-jp/noto-sans-jp-v56-japanese_latin-900.woff2",
-      weight: "900",
-      style: "normal",
-    },
-  ],
   variable: "--font-noto-sans-jp",
   display: "swap",
-  // ~1MB per weight; preloading pulled all seven weights even when a page uses fewer.
   preload: false,
 });
 
@@ -169,7 +97,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html
       lang="ja"
-      className={`${inconsolata.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${shipporiMincho.variable} ${oxanium.variable} ${notoSansJP.variable}`}
+      className={notoSansJP.variable}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

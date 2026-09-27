@@ -12,6 +12,7 @@ import { PricingSection } from "./components/PricingSection";
 import { ContactSection } from "./components/ContactSection";
 import { Faq } from "./components/Faq";
 import { SideNav } from "./components/SideNav";
+import { inconsolata, oxanium } from "./homeFonts";
 import { useState } from "react";
 
 export default function HomePage() {
@@ -28,7 +29,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen text-white overflow-hidden relative selection:bg-[#FFFFFF] selection:text-[#050505]">
+    <div className={`${oxanium.variable} ${inconsolata.variable} min-h-screen text-white overflow-hidden relative selection:bg-[#FFFFFF] selection:text-[#050505]`}>
       <div
         className="fixed inset-0 w-full h-full opacity-[0.03] pointer-events-none z-20 mix-blend-overlay"
         style={{ filter: "url(#noiseFilter)" }}
