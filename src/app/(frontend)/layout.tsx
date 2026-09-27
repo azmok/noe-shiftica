@@ -30,6 +30,9 @@ const shipporiMincho = Shippori_Mincho({
   variable: "--font-shippori-mincho",
   display: "swap",
   weight: ["400", "500", "600"],
+  // Preloading forces every Japanese subset chunk (~250 files, 7MB) onto every page,
+  // even where the font is unused. Without it, browsers fetch only chunks the page needs.
+  preload: false,
 });
 
 const oxanium = Oxanium({
@@ -79,6 +82,8 @@ const notoSansJP = localFont({
   ],
   variable: "--font-noto-sans-jp",
   display: "swap",
+  // ~1MB per weight; preloading pulled all seven weights even when a page uses fewer.
+  preload: false,
 });
 
 import type { Viewport } from "next";
