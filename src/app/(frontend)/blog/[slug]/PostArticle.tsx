@@ -1,12 +1,16 @@
 import React from "react"
 import { Post } from "@/payload-types"
-import { RichText, JSXConvertersFunction } from "@payloadcms/richtext-lexical/react"
+import { RichText, JSXConvertersFunction, HeadingJSXConverter } from "@payloadcms/richtext-lexical/react"
 import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
 import { ArticleCustomAssets } from "./ArticleCustomAssets"
+import { ArticleToc, tocEntries } from "./ArticleToc"
+import { ArticleTocSidebar } from "./ArticleTocSidebar"
+import { HeadingAnchorBehavior } from "./HeadingAnchorBehavior"
+import { extractHeadings } from "@/lib/articleHeadings"
 import styles from './PostArticle.module.css'
 import Prism from "prismjs"
 
@@ -210,6 +214,34 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     },
 })
 
+const LinkIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+)
+
+// The body renders twice (mobile + desktop). Only the first tree carries a real
+// `id`, so fragment IDs stay unique; HeadingAnchorBehavior scrolls to whichever
+// copy is visible via data-heading-id.
+const withHeadingAnchors = (idByNode: WeakMap<object, string>, withIds: boolean): JSXConvertersFunction => (args) => {
+    const heading: NonNullable<typeof HeadingJSXConverter.heading> = ({ node, nodesToJSX }) => {
+        const Tag = node.tag
+        const children = nodesToJSX({ nodes: node.children })
+        const id = idByNode.get(node)
+        if (!id) return <Tag>{children}</Tag>
+        return (
+            <Tag id={withIds ? id : undefined} data-heading-id={id} className={styles.anchoredHeading}>
+                {children}
+                <a href={`#${id}`} className={styles.headingLink} aria-label="この見出しへのリンク">
+                    <LinkIcon />
+                </a>
+            </Tag>
+        )
+    }
+    return { ...customConverters(args), heading }
+}
+
 export const PostArticle: React.FC<{
     post: Post
     isPreview?: boolean
@@ -224,6 +256,10 @@ export const PostArticle: React.FC<{
         1
     const scopeId = `article-${post.id}`
     const svgDefs = extractSvgDefs(post.content)
+    const { headings, idByNode } = extractHeadings(post.content)
+    const toc = tocEntries(headings)
+    const mobileConverters = withHeadingAnchors(idByNode, true)
+    const desktopConverters = withHeadingAnchors(idByNode, false)
 
     return (
         <main className="grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
@@ -231,6 +267,7 @@ export const PostArticle: React.FC<{
                 <div key={i} dangerouslySetInnerHTML={{ __html: html }} />
             ))}
             <ArticleCustomAssets scopeId={scopeId} css={(post as any).customCss} js={(post as any).customJs} />
+            <HeadingAnchorBehavior scopeId={scopeId} />
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
                     <p className="font-bold">Preview Mode</p>
@@ -312,12 +349,14 @@ export const PostArticle: React.FC<{
                             </p>
                         </div>
 
+                        <ArticleToc entries={toc} />
+
                         <div className={`prose prose-sm prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                             {(() => {
                                 try {
                                     if (post.content && typeof post.content === 'object' && 'root' in post.content) {
-                                        return <RichText data={post.content as any} converters={customConverters} />;
+                                        return <RichText data={post.content as any} converters={mobileConverters} />;
                                     } else if (post.content) {
                                         return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
                                     }
@@ -389,7 +428,8 @@ export const PostArticle: React.FC<{
                         </div>
 
                         {/* Main Card */}
-                        <div className="bg-white/5 border border-white/10 overflow-hidden rounded-[2.5rem] shadow-2xl backdrop-blur-xl">
+                        {/* overflow-clip (not hidden) keeps the rounded clipping without breaking the sticky TOC */}
+                        <div className="bg-white/5 border border-white/10 overflow-clip rounded-[2.5rem] shadow-2xl backdrop-blur-xl">
                             <div className="flex flex-col">
                                 {/* Hero Image Section with Title Overlay */}
                                 <div className="w-full aspect-video relative group overflow-hidden bg-black/20 border-b border-white/5">
@@ -461,13 +501,17 @@ export const PostArticle: React.FC<{
                                     </div>
                                 </div>
 
-                                <div className="max-w-[872px] mx-auto w-full px-6 lg:px-12 py-16 lg:py-12 lg:pb-24 text-white">
+                                <div className="xl:flex xl:justify-center xl:gap-8 xl:px-8">
+                                <div className="max-w-[872px] mx-auto xl:mx-0 w-full min-w-0 px-6 lg:px-12 py-16 lg:py-12 lg:pb-24 text-white">
+                                    <div className="mb-12">
+                                        <ArticleToc entries={toc} />
+                                    </div>
                                     <div className={`prose prose-lg prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                                         {(() => {
                                             try {
                                                 if (post.content && typeof post.content === 'object' && 'root' in post.content) {
-                                                    return <RichText data={post.content as any} converters={customConverters} />;
+                                                    return <RichText data={post.content as any} converters={desktopConverters} />;
                                                 } else if (post.content) {
                                                     return <div dangerouslySetInnerHTML={{ __html: post.content as any }} />;
                                                 }
@@ -505,6 +549,12 @@ export const PostArticle: React.FC<{
                                             </div>
                                         );
                                     })()}
+                                </div>
+                                {toc.length > 0 && (
+                                    <aside className="hidden xl:block w-60 shrink-0 py-12">
+                                        <ArticleTocSidebar entries={toc} scopeId={scopeId} />
+                                    </aside>
+                                )}
                                 </div>
                             </div>
                         </div>
