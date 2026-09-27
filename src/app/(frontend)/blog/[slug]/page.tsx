@@ -260,7 +260,7 @@ export default async function BlogPostPage({
     }
 
     return (
-        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-hidden">
+        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-clip">
             {/* Premium Depth Background Elements */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 {/* Mesh Gradient Blobs */}
