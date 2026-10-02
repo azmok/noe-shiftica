@@ -60,4 +60,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPayload(nextConfig);
+const payloadConfig = withPayload(nextConfig);
+const payloadHeaders = payloadConfig.headers;
+
+// withPayload adds Accept-CH / Critical-CH / Vary: Sec-CH-Prefers-Color-Scheme to every
+// path (for the admin's light/dark theme). On the public site, Critical-CH makes Chrome
+// throw away the first response and re-request every page (one extra round trip), and the
+// Vary splits the CDN cache. Keep those headers on the admin only.
+export default {
+  ...payloadConfig,
+  async headers() {
+    const rules = payloadHeaders ? await payloadHeaders() : [];
+    return rules.map((rule) =>
+      rule.source === "/:path*" && rule.headers.some((h) => h.key === "Critical-CH")
+        ? { ...rule, source: "/admin/:path*" }
+        : rule,
+    );
+  },
+} satisfies NextConfig;
