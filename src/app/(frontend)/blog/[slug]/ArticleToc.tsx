@@ -14,7 +14,7 @@ export const ArticleToc: React.FC<{ entries: ArticleHeading[] }> = ({ entries })
     if (entries.length === 0) return null
     return (
         <nav aria-label="目次">
-            <details open className="group rounded-(--mobile-radius) md:rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+            <details open className="group rounded-(--mobile-radius) md:rounded-2xl bg-white/5 border border-white/10">
                 <summary className="flex items-center justify-between gap-4 p-6 list-none [&::-webkit-details-marker]:hidden select-none">
                     <span className="text-sm font-bold text-(--color-neu-primary) uppercase tracking-widest flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-(--color-neu-primary)" />

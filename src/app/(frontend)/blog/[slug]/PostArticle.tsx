@@ -351,7 +351,7 @@ export const PostArticle: React.FC<{
                     {/* Mobile Article Content */}
                     <div className="px-6 py-10 space-y-10">
                         {/* Key Points / Intro Card */}
-                        <div className="p-6 rounded-(--mobile-radius) bg-white/5 backdrop-blur-sm border border-white/10">
+                        <div className="p-6 rounded-(--mobile-radius) bg-white/5 border border-white/10">
                             <h2 className="text-sm font-bold text-(--color-neu-primary) uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-(--color-neu-primary) animate-pulse" />
                                 Key Insights
@@ -441,7 +441,7 @@ export const PostArticle: React.FC<{
 
                         {/* Main Card */}
                         {/* overflow-clip (not hidden) keeps the rounded clipping without breaking the sticky TOC */}
-                        <div className="bg-white/5 border border-white/10 overflow-clip rounded-[2.5rem] shadow-2xl backdrop-blur-xl">
+                        <div className="bg-white/5 border border-white/10 overflow-clip rounded-[2.5rem] shadow-2xl">
                             <div className="flex flex-col">
                                 {/* Hero Image Section with Title Overlay */}
                                 <div className="w-full aspect-video relative group overflow-hidden bg-black/20 border-b border-white/5">
@@ -575,7 +575,7 @@ export const PostArticle: React.FC<{
                     {/* Navigation */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
                         {prevPost ? (
-                            <Link href={`${basePath}/${prevPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                            <Link href={`${basePath}/${prevPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                                     Previous
@@ -583,7 +583,7 @@ export const PostArticle: React.FC<{
                                 <h4 className="text-lg font-bold text-white leading-snug line-clamp-2 text-left group-hover:text-(--color-neu-primary) transition-colors">{prevPost.title}</h4>
                             </Link>
                         ) : (
-                            <Link href={basePath} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                            <Link href={basePath} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                                     Back to Journal
@@ -593,7 +593,7 @@ export const PostArticle: React.FC<{
                         )}
 
                         {nextPost ? (
-                            <Link href={`${basePath}/${nextPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                            <Link href={`${basePath}/${nextPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     Next
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
@@ -601,7 +601,7 @@ export const PostArticle: React.FC<{
                                 <h4 className="text-lg font-bold text-white leading-snug line-clamp-2 text-right group-hover:text-(--color-neu-primary) transition-colors">{nextPost.title}</h4>
                             </Link>
                         ) : (
-                            <Link href={basePath} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 backdrop-blur-sm">
+                            <Link href={basePath} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-end transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">
                                     Back to Journal
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>

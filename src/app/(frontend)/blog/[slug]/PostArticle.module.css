@@ -352,12 +352,3 @@
   opacity: 1;
   transform: scale(1.15);
 }
-
-/* Skip layout of off-screen article blocks until they scroll near the viewport, so the
-   first paint of long articles doesn't wait on laying out the whole body. `auto` in
-   contain-intrinsic-size keeps each block's real height once it has rendered, so
-   scrolling back up doesn't jump. */
-.postContent :global(.payload-richtext) > * {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 150px;
-}

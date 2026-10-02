@@ -198,29 +198,24 @@ export default async function BlogPostPage({
 
     return (
         <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-clip">
-            {/* Premium Depth Background Elements */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                {/* Mesh Gradient Blobs */}
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-neu-primary/10 blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-neu-primary/5 blur-[100px]" />
-                <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
-                
-                {/* SVG Noise Texture Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
-            </div>
+            {/* Premium Depth Background: static radial gradients. The previous blurred,
+                pulsing blobs + full-screen SVG noise (mix-blend-overlay) left iPhone Safari
+                on a black screen while loading and while scrolling to in-page links. */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none"
+                style={{
+                    backgroundImage: [
+                        "radial-gradient(circle at 10% 10%, rgb(204 221 0 / 0.07), transparent 35%)",
+                        "radial-gradient(circle at 90% 75%, rgb(204 221 0 / 0.035), transparent 30%)",
+                        "radial-gradient(circle at 80% 50%, rgb(59 130 246 / 0.035), transparent 25%)",
+                    ].join(", "),
+                }}
+            />
 
             <BlogPostingJsonLd post={post} basePath="/blog" />
             <Header />
             <PostArticle post={post} prevPost={prevPost} nextPost={nextPost} />
             <Footer variant="blog" />
-
-            {/* SVG Global Filters */}
-            <svg className="hidden">
-                <filter id="noiseFilterDetail">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
-                    <feColorMatrix type="saturate" values="0" />
-                </filter>
-            </svg>
 
             {/* GLOBAL FAILSAFE: Force visibility for any images stuck at opacity: 0 */}
             <Script
