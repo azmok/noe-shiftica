@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getPayload, type Payload, type TypedUser } from 'payload'
 import config from '@payload-config'
-import { parseMarkdownToLexical } from '@/plugins/markdownImport'
 import { translateToSlug } from '@/lib/translateToSlug'
 import {
   type Operation,
@@ -22,8 +21,8 @@ import {
 
 type PostCollection = 'posts' | 'tech-posts'
 
-/** API キー（またはログイン中の管理者セッション）を検証して、有効な利用者を返す */
-async function authenticate(payload: Payload, request: NextRequest): Promise<TypedUser | null> {
+/** x-api-key / Bearer を Payload 標準の `api-clients API-Key` 形式に揃えたヘッダーを返す */
+function normalizeAuthHeaders(request: NextRequest): Headers {
   const authHeader = request.headers.get('authorization') ?? ''
   const apiKey =
     request.headers.get('x-api-key')?.trim() ||
@@ -31,7 +30,46 @@ async function authenticate(payload: Payload, request: NextRequest): Promise<Typ
 
   const headers = new Headers(request.headers)
   if (apiKey) headers.set('authorization', `api-clients API-Key ${apiKey}`)
+  return headers
+}
 
+/**
+ * Markdown → Lexical 変換は Payload 側の /api/convert-markdown に任せる。
+ *
+ * このルートで parseMarkdownToLexical を直接 import すると、Next がこのルート用に
+ * lexical を別インスタンスとして同梱してしまい、HeadingNode などが「LexicalNode の
+ * サブクラスではない」と判定されて Lexical error #290 で落ちる（2026-10 本番で再現）。
+ * Payload の [...slug] ルートで動く変換エンドポイントなら正しい lexical で動くので、
+ * 呼び出し元の認証ヘッダーをそのまま付けて委譲する。
+ */
+async function convertMarkdown(
+  request: NextRequest,
+  markdown: string,
+): Promise<{ lexical: unknown; frontmatter: { description?: string } & Record<string, unknown> }> {
+  const origin = process.env.NEXT_PUBLIC_SERVER_URL || new URL(request.url).origin
+  const headers = new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
+  const auth = normalizeAuthHeaders(request)
+  for (const name of ['authorization', 'cookie']) {
+    const value = auth.get(name)
+    if (value) headers.set(name, value)
+  }
+
+  const res = await fetch(`${origin}/api/convert-markdown`, {
+    method: 'POST',
+    headers,
+    body: markdown,
+    cache: 'no-store',
+  })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok || !json.lexical) {
+    throw new Error(`Markdown conversion failed (${res.status}): ${json.error ?? 'unknown error'}`)
+  }
+  return { lexical: json.lexical, frontmatter: json.frontmatter ?? {} }
+}
+
+/** API キー（またはログイン中の管理者セッション）を検証して、有効な利用者を返す */
+async function authenticate(payload: Payload, request: NextRequest): Promise<TypedUser | null> {
+  const headers = normalizeAuthHeaders(request)
   try {
     const { user } = await payload.auth({ headers })
     return isActiveUser(user) ? user : null
@@ -217,7 +255,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Parse Markdown into Lexical AST
-    const { lexical, frontmatter } = await parseMarkdownToLexical(markdown, payload.config)
+    const { lexical, frontmatter } = await convertMarkdown(request, markdown)
 
     // Merge frontmatter description if not explicitly provided
     const finalDescription = description || frontmatter.description || ''
