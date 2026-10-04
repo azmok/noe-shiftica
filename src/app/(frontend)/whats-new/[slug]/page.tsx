@@ -11,6 +11,12 @@ import { ArticleJsonLd } from "../../components/ArticleJsonLd"
 import { GcsImage } from "@/lib/GcsImage"
 import type { WhatsNew, Media } from "@/payload-types"
 
+// CDN TTL. revalidatePath() refreshes the ISR cache but does NOT purge the App Hosting
+// CDN edge (verified 2026-10-04: Age kept growing after /api/revalidate). Without this the
+// page is sent as `s-maxage=31536000` and the edge keeps serving the pre-edit HTML until the
+// next deploy. 60s → the edge re-fetches within a minute of a CMS save.
+export const revalidate = 60
+
 const SITE_URL = "https://noe-shiftica.com"
 
 function mediaUrl(image?: (number | null) | Media): string | null {

@@ -18,10 +18,15 @@ const nextConfig: NextConfig = {
   // sends `Cache-Control: no-cache`, briefly revalidated against origin). The reverse —
   // forcing `no-store` — would kill BFCache and the CMS speed goals (see rules.md §4-E).
   //
-  // By leaving the headers to the framework, App Hosting binds its CDN edge to Next.js's
-  // on-demand revalidation, so revalidatePath() in Posts.ts hooks invalidates the edge in
-  // tandem with the Full Route Cache while preserving BFCache and edge speed.
+  // CORRECTION (verified in production 2026-10-04): revalidatePath() does NOT purge the
+  // App Hosting CDN edge. After POST /api/revalidate the edge kept serving the same copy
+  // (Age kept growing, Cdn-Cache-Status: hit), so with the framework default for static
+  // pages (`s-maxage=31536000`) new posts / hero images only appeared after a redeploy.
+  // Fix stays framework-native: CMS-backed pages export `revalidate = 60`, and
+  // `expireTime` below caps the stale-while-revalidate window, giving
+  // `s-maxage=60, stale-while-revalidate=240` → the edge is at most ~5 min behind a save.
   // (See .antigravity/bugs/isr-caching.md and rules.md §4-E.)
+  expireTime: 300,
   async redirects() {
     return [
       {
