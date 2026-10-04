@@ -32,7 +32,10 @@ export const Posts: CollectionConfig = {
         },
     },
     access: {
-        read: () => true,
+        // Anonymous REST/GraphQL callers only see published posts — otherwise drafts
+        // leak via /api/posts?draft=true. The frontend reads through the Local API
+        // (overrideAccess), so it is unaffected.
+        read: ({ req: { user } }) => (user ? true : { _status: { equals: 'published' } }),
     },
     hooks: {
         beforeChange: [

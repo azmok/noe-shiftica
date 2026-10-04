@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { isHumanUser } from '@/plugins/api-clients/permissions'
 
 export async function POST(request: Request) {
+    // Proxies to GitHub Models with the server's GITHUB_TOKEN — only logged-in human
+    // admins may use it, otherwise anyone could spend the token's quota.
+    const payload = await getPayload({ config })
+    const { user } = await payload.auth({ headers: request.headers })
+    if (!isHumanUser(user)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     try {
         const { messages, model = 'gpt-4o' } = await request.json()
 

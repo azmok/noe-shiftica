@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'api-clients': ApiClientAuthOperations;
   };
   blocks: {
     'code-block': CodeBlock;
@@ -80,6 +81,7 @@ export interface Config {
     'api-logs': ApiLog;
     'html-files': HtmlFile;
     'hosted-pages': HostedPage;
+    'api-clients': ApiClient;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,6 +100,7 @@ export interface Config {
     'api-logs': ApiLogsSelect<false> | ApiLogsSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'hosted-pages': HostedPagesSelect<false> | HostedPagesSelect<true>;
+    'api-clients': ApiClientsSelect<false> | ApiClientsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -113,13 +116,31 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | ApiClient;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface ApiClientAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -528,6 +549,8 @@ export interface ApiLog {
   postTitle?: string | null;
   postSlug?: string | null;
   postId?: string | null;
+  client?: (number | null) | ApiClient;
+  clientName?: string | null;
   /**
    * Client IP address or Source identifier
    */
@@ -539,6 +562,92 @@ export interface ApiLog {
   errorMessage?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * API キーで記事などを操作できる外部AIの一覧です。AIごとに API キーを発行し、触ってよい範囲をチェックボックスで決めます。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-clients".
+ */
+export interface ApiClient {
+  id: number;
+  /**
+   * 例: クラやん（Claude Code）
+   */
+  name: string;
+  /**
+   * 用途や、どの環境にキーを置いているか など
+   */
+  note?: string | null;
+  /**
+   * OFF にすると、権限設定に関係なくすべてのアクセスを拒否します。
+   */
+  enabled?: boolean | null;
+  /**
+   * 保存時に下のチェックボックスから自動生成されます。
+   */
+  permissionSummary?: string | null;
+  /**
+   * チェックした操作だけを許可します（既定はすべて OFF）。「公開」が OFF だと下書きとしてしか保存できません。ここに無いコレクション（ユーザー・パスキー・この外部AI連携・AI API Logs など）には一切アクセスできません。
+   */
+  permissions?: {
+    posts?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+      publish?: boolean | null;
+    };
+    techPosts?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+      publish?: boolean | null;
+    };
+    hostedPages?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+    };
+    htmlFiles?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+    };
+    media?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+    };
+    categories?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+    };
+    changelog?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+    };
+    whatsNew?: {
+      read?: boolean | null;
+      create?: boolean | null;
+      update?: boolean | null;
+      delete?: boolean | null;
+    };
+  };
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  collection: 'api-clients';
 }
 /**
  * CSS/JS を含む HTML をアップロード、または直接編集して /p/<slug> で公開します。
@@ -629,12 +738,21 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'hosted-pages';
         value: number | HostedPage;
+      } | null)
+    | ({
+        relationTo: 'api-clients';
+        value: number | ApiClient;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'api-clients';
+        value: number | ApiClient;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -644,10 +762,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'api-clients';
+        value: number | ApiClient;
+      };
   key?: string | null;
   value?:
     | {
@@ -908,6 +1031,8 @@ export interface ApiLogsSelect<T extends boolean = true> {
   postTitle?: T;
   postSlug?: T;
   postId?: T;
+  client?: T;
+  clientName?: T;
   clientIp?: T;
   requestSummary?: T;
   errorMessage?: T;
@@ -947,6 +1072,91 @@ export interface HostedPagesSelect<T extends boolean = true> {
   js?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-clients_select".
+ */
+export interface ApiClientsSelect<T extends boolean = true> {
+  name?: T;
+  note?: T;
+  enabled?: T;
+  permissionSummary?: T;
+  permissions?:
+    | T
+    | {
+        posts?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+              publish?: T;
+            };
+        techPosts?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+              publish?: T;
+            };
+        hostedPages?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+            };
+        htmlFiles?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+            };
+        media?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+            };
+        categories?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+            };
+        changelog?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+            };
+        whatsNew?:
+          | T
+          | {
+              read?: T;
+              create?: T;
+              update?: T;
+              delete?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

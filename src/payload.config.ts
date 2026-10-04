@@ -30,6 +30,7 @@ import { ApiLogs } from './collections/ApiLogs'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { htmlHostingPlugin } from './plugins/html-hosting'
+import { apiClientsPlugin } from './plugins/api-clients'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
@@ -167,6 +168,9 @@ const configPromise = buildConfig({
     panelResizerPlugin(),
     htmlFileManagerPlugin(),
     htmlHostingPlugin(),
+    // Must stay last: wraps the access of every collection (incl. ones added by the
+    // plugins above) so API-key clients only get what /admin → 外部AI連携 allows.
+    apiClientsPlugin(),
   ],
 });
 

@@ -1,4 +1,5 @@
 import { Endpoint } from 'payload'
+import { canAccess } from '../plugins/api-clients/permissions'
 
 const getStorageInstance = () => {
   const { Storage } = require('@google-cloud/storage')
@@ -31,7 +32,7 @@ export const mediaSizeEndpoints: Endpoint[] = [
     path: '/:id/rename',
     method: 'post',
     handler: async (req) => {
-      if (!req.user) {
+      if (!canAccess(req.user, 'media', 'update')) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
@@ -142,7 +143,7 @@ export const mediaSizeEndpoints: Endpoint[] = [
     path: '/:id/sizes/:sizeName',
     method: 'delete',
     handler: async (req) => {
-      if (!req.user) {
+      if (!canAccess(req.user, 'media', 'delete')) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
@@ -196,7 +197,7 @@ export const mediaSizeEndpoints: Endpoint[] = [
     path: '/:id/sizes/:sizeName',
     method: 'post',
     handler: async (req) => {
-      if (!req.user) {
+      if (!canAccess(req.user, 'media', 'update')) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
       }
 

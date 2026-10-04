@@ -22,7 +22,8 @@ export const TechPosts: CollectionConfig = {
         },
     },
     access: {
-        read: () => true,
+        // Anonymous callers only see published posts (see Posts.ts).
+        read: ({ req: { user } }) => (user ? true : { _status: { equals: 'published' } }),
     },
     hooks: {
         beforeChange: [

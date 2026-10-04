@@ -8,7 +8,7 @@ export const ApiLogs: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'action',
-    defaultColumns: ['createdAt', 'action', 'status', 'postTitle', 'responseStatus', 'errorMessage'],
+    defaultColumns: ['createdAt', 'clientName', 'action', 'status', 'postTitle', 'responseStatus', 'errorMessage'],
     group: 'Logs',
     components: {
       beforeListTable: ['@/components/admin/ApiEndpointGuide#ApiEndpointGuide'],
@@ -70,6 +70,25 @@ export const ApiLogs: CollectionConfig = {
     {
       name: 'postId',
       type: 'text',
+    },
+    {
+      // Which 外部AI連携 entry made the call (empty for admin sessions / failed auth)
+      name: 'client',
+      type: 'relationship',
+      relationTo: 'api-clients',
+      label: '外部AI',
+      admin: {
+        width: '50%',
+      },
+    },
+    {
+      // Snapshot of the caller's name, kept even if the api-client is later deleted
+      name: 'clientName',
+      type: 'text',
+      label: '呼び出し元',
+      admin: {
+        width: '50%',
+      },
     },
     {
       name: 'clientIp',

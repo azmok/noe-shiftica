@@ -9,17 +9,32 @@
  *   pnpm dev:test   (Terminal 1)
  *   pnpm test:integration (Terminal 2)
  *
- * Note: these endpoints are unauthenticated — no token is required.
+ * Both endpoints require a logged-in user (401 otherwise).
  */
 
-import { describe, it, expect } from 'vitest'
-import { BASE_URL } from './helpers'
+import { describe, it, expect, beforeAll } from 'vitest'
+import { BASE_URL, loginAsAdmin, bearer } from './helpers'
+
+let auth: Record<string, string> = {}
+
+beforeAll(async () => {
+    auth = bearer(await loginAsAdmin())
+})
 
 // ---------------------------------------------------------------------------
 // POST /api/convert-markdown
 // ---------------------------------------------------------------------------
 
 describe('markdownImport — POST /api/convert-markdown', () => {
+    it('returns 401 when not logged in', async () => {
+        const res = await fetch(`${BASE_URL}/api/convert-markdown`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: '# Hello',
+        })
+        expect(res.status).toBe(401)
+    })
+
     it('returns 200 with parsed frontmatter and lexical for markdown with frontmatter', async () => {
         const markdown = `---
 title: Integration Test Post
@@ -32,7 +47,7 @@ This is the **body** content.`
 
         const res = await fetch(`${BASE_URL}/api/convert-markdown`, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain', ...auth },
             body: markdown,
         })
 
@@ -54,7 +69,7 @@ This is the **body** content.`
 
         const res = await fetch(`${BASE_URL}/api/convert-markdown`, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain', ...auth },
             body: markdown,
         })
 
@@ -68,7 +83,7 @@ This is the **body** content.`
     it('returns 200 and handles empty body gracefully', async () => {
         const res = await fetch(`${BASE_URL}/api/convert-markdown`, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain', ...auth },
             body: '',
         })
 
@@ -83,7 +98,7 @@ This is the **body** content.`
 
         const res = await fetch(`${BASE_URL}/api/convert-markdown`, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain', ...auth },
             body: markdown,
         })
 
@@ -106,7 +121,7 @@ Body text.`
 
         const res = await fetch(`${BASE_URL}/api/convert-markdown`, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain', ...auth },
             body: markdown,
         })
 
@@ -124,9 +139,14 @@ Body text.`
 // ---------------------------------------------------------------------------
 
 describe('markdownImport — GET /api/translate-slug', () => {
+    it('returns 401 when not logged in', async () => {
+        const res = await fetch(`${BASE_URL}/api/translate-slug?title=test`)
+        expect(res.status).toBe(401)
+    })
+
     it('returns a kebab-case slug for an English title', async () => {
         const res = await fetch(
-            `${BASE_URL}/api/translate-slug?title=${encodeURIComponent('Hello World Post')}`,
+            `${BASE_URL}/api/translate-slug?title=${encodeURIComponent('Hello World Post')}`, { headers: auth },
         )
 
         expect(res.status).toBe(200)
@@ -135,7 +155,7 @@ describe('markdownImport — GET /api/translate-slug', () => {
     })
 
     it('returns empty slug for empty title', async () => {
-        const res = await fetch(`${BASE_URL}/api/translate-slug?title=`)
+        const res = await fetch(`${BASE_URL}/api/translate-slug?title=`, { headers: auth })
 
         expect(res.status).toBe(200)
         const data = await res.json()
@@ -143,7 +163,7 @@ describe('markdownImport — GET /api/translate-slug', () => {
     })
 
     it('returns empty slug when title param is omitted', async () => {
-        const res = await fetch(`${BASE_URL}/api/translate-slug`)
+        const res = await fetch(`${BASE_URL}/api/translate-slug`, { headers: auth })
 
         expect(res.status).toBe(200)
         const data = await res.json()
@@ -152,7 +172,7 @@ describe('markdownImport — GET /api/translate-slug', () => {
 
     it('returns empty slug for whitespace-only title', async () => {
         const res = await fetch(
-            `${BASE_URL}/api/translate-slug?title=${encodeURIComponent('   ')}`,
+            `${BASE_URL}/api/translate-slug?title=${encodeURIComponent('   ')}`, { headers: auth },
         )
 
         expect(res.status).toBe(200)
@@ -162,7 +182,7 @@ describe('markdownImport — GET /api/translate-slug', () => {
 
     it('lowercases and strips special characters from slug', async () => {
         const res = await fetch(
-            `${BASE_URL}/api/translate-slug?title=${encodeURIComponent('My Cool Blog Post!')}`,
+            `${BASE_URL}/api/translate-slug?title=${encodeURIComponent('My Cool Blog Post!')}`, { headers: auth },
         )
 
         expect(res.status).toBe(200)

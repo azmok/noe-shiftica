@@ -423,7 +423,8 @@ export const ApiEndpointGuide: React.FC = () => {
                   }}
                 >
                   x-api-key: YOUR_AI_API_KEY{'\n'}
-                  Authorization: Bearer YOUR_AI_API_KEY
+                  Authorization: Bearer YOUR_AI_API_KEY{'\n'}
+                  Authorization: api-clients API-Key YOUR_AI_API_KEY
                 </pre>
               </div>
 
@@ -437,10 +438,16 @@ export const ApiEndpointGuide: React.FC = () => {
                   lineHeight: 1.6,
                 }}
               >
-                <strong>⚙️ キーの設定場所:</strong>
+                <strong>⚙️ キーの発行と権限:</strong>
                 <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                  <li>ローカル開発環境: <code>.env.local</code> の <code>AI_API_KEY</code></li>
-                  <li>本番環境 (Firebase App Hosting): Secret Manager / App Hosting 環境変数に <code>AI_API_KEY</code> を登録</li>
+                  <li>
+                    <code>設定 → 外部AI連携</code> で AI ごとにエントリを作り、「Enable API Key」でキーを発行します。
+                  </li>
+                  <li>
+                    作成・編集・削除・公開は、そのエントリのチェックボックスで許可したものだけ実行できます（足りないと <code>403</code>）。
+                    「公開」が OFF のときは <code>status: &quot;draft&quot;</code> でしか保存できません。
+                  </li>
+                  <li>「有効」を OFF にするか、キーを再発行すると、古いキーはすぐ使えなくなります。</li>
                 </ul>
               </div>
             </div>

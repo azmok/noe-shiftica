@@ -7,6 +7,7 @@ import * as migration_20260315_add_media_admin_sizes from './20260315_add_media_
 import * as migration_20260522_115238_add_tech_posts_collection from './20260522_115238_add_tech_posts_collection';
 import * as migration_20260607_071847_add_passkeys_collection from './20260607_071847_add_passkeys_collection';
 import * as migration_20260616_214317_add_hosted_pages_collection from './20260616_214317_add_hosted_pages_collection';
+import * as migration_20261004_082418_add_api_clients from './20261004_082418_add_api_clients';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20260616_214317_add_hosted_pages_collection.up,
     down: migration_20260616_214317_add_hosted_pages_collection.down,
-    name: '20260616_214317_add_hosted_pages_collection'
+    name: '20260616_214317_add_hosted_pages_collection',
+  },
+  {
+    up: migration_20261004_082418_add_api_clients.up,
+    down: migration_20261004_082418_add_api_clients.down,
+    name: '20261004_082418_add_api_clients'
   },
 ];

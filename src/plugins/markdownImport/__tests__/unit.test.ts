@@ -37,16 +37,20 @@ import {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeConvertReq(body: string, editorConfig: any = {}) {
+const MOCK_USER = { id: 1, email: 'admin@example.com', collection: 'users' }
+
+function makeConvertReq(body: string, editorConfig: any = {}, user: unknown = MOCK_USER) {
     return {
         text: async () => body,
         payload: { config: { editor: editorConfig } },
+        user,
     }
 }
 
-function makeSlugReq(title: string) {
+function makeSlugReq(title: string, user: unknown = MOCK_USER) {
     return {
         url: `http://localhost:3000/api/translate-slug?title=${encodeURIComponent(title)}`,
+        user,
     }
 }
 
@@ -76,6 +80,18 @@ describe('handleConvertMarkdown', () => {
         vi.clearAllMocks()
         mockSanitizeServerEditorConfig.mockResolvedValue(MOCK_SANITIZED_CONFIG)
         mockConvertMarkdownToLexical.mockReturnValue(MOCK_LEXICAL)
+    })
+
+    it('returns 401 without converting when not logged in', async () => {
+        const res = await handleConvertMarkdown(makeConvertReq('# Hello', {}, null))
+        expect(res.status).toBe(401)
+        expect(mockConvertMarkdownToLexical).not.toHaveBeenCalled()
+    })
+
+    it('returns 401 for a disabled API client', async () => {
+        const disabled = { id: 9, collection: 'api-clients', enabled: false }
+        const res = await handleConvertMarkdown(makeConvertReq('# Hello', {}, disabled))
+        expect(res.status).toBe(401)
     })
 
     it('parses frontmatter fields and returns lexical data', async () => {
@@ -188,6 +204,12 @@ describe('handleTranslateSlug', () => {
 
         const data = await res.json()
         expect(data.slug).toBe('')
+        expect(mockTranslateToSlug).not.toHaveBeenCalled()
+    })
+
+    it('returns 401 without calling translateToSlug when not logged in', async () => {
+        const res = await handleTranslateSlug(makeSlugReq('Some Title', null))
+        expect(res.status).toBe(401)
         expect(mockTranslateToSlug).not.toHaveBeenCalled()
     })
 

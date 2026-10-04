@@ -1,8 +1,14 @@
 import { PayloadHandler } from 'payload'
 import { enrichPostContent } from '@/lib/gemini'
 import { EnrichmentRequest } from '../types'
+import { isHumanUser } from '../../api-clients/permissions'
 
 export const aiEnrichPostHandler: PayloadHandler = async (req) => {
+    // Calls the paid Gemini API — only logged-in human admins (the AiContentOptimizerUI
+    // in the post editor) may use it. API-key clients and anonymous callers are rejected.
+    if (!isHumanUser(req.user)) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         console.log('[AI-ENRICH] Parsing request body...')
         const rawBody = await (req as unknown as Request).text()

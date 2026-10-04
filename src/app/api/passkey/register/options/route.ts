@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { isHumanUser } from '@/plugins/api-clients/permissions'
 import { generateRegistrationOptions } from '@simplewebauthn/server'
 import { rpID, rpName, REG_CHALLENGE_COOKIE, challengeCookieOptions } from '@/lib/webauthn'
 
@@ -12,7 +13,10 @@ import { rpID, rpName, REG_CHALLENGE_COOKIE, challengeCookieOptions } from '@/li
 export async function POST(request: NextRequest) {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: request.headers })
-  if (!user) {
+  // Passkeys belong to human admins only. An API-key client (api-clients) must never
+  // register one: its id would be stored against the users collection and could
+  // end up bound to a real admin account with the same id.
+  if (!user || !isHumanUser(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -3,6 +3,7 @@ import { convertMarkdownToLexical } from '@payloadcms/richtext-lexical'
 import matter from 'gray-matter'
 import { sanitizeServerEditorConfig } from '@payloadcms/richtext-lexical'
 import { translateToSlug } from '../../lib/translateToSlug'
+import { isActiveUser } from '../api-clients/permissions'
 
 /**
  * The set of languages the CustomCodeBlock `language` select accepts
@@ -297,8 +298,18 @@ export async function parseMarkdownToLexical(
     return { frontmatter, lexical: lexicalData }
 }
 
+// Both endpoints are only called from the admin UI (MarkdownImporterUI, same-origin
+// with the session cookie), so reject anonymous callers. Without this, anyone could
+// burn server CPU on Markdown conversion or proxy Google Translate through the site.
+function unauthorized(req: { user?: unknown }): Response | null {
+    if (isActiveUser(req?.user)) return null
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+}
+
 // Markdown → Lexical conversion endpoint handler
 export async function handleConvertMarkdown(req: any): Promise<Response> {
+    const denied = unauthorized(req)
+    if (denied) return denied
     try {
         const rawBody = await (req as unknown as Request).text()
 
@@ -318,6 +329,8 @@ export async function handleConvertMarkdown(req: any): Promise<Response> {
 
 // Title → English slug translation endpoint handler
 export async function handleTranslateSlug(req: any): Promise<Response> {
+    const denied = unauthorized(req)
+    if (denied) return denied
     try {
         const url = new URL((req as unknown as Request).url)
         const title = url.searchParams.get('title') || ''

@@ -12,12 +12,27 @@ const mockPayload = {
     create: vi.fn(),
 }
 
-const makeReq = (body: string) => ({
+const MOCK_USER = { id: 1, email: 'admin@example.com', collection: 'users' }
+
+const makeReq = (body: string, user: unknown = MOCK_USER) => ({
     text: async () => body,
     payload: mockPayload,
+    user,
 } as any)
 
 describe('aiEnrichPostHandler', () => {
+    it('returns 401 without calling Gemini when not logged in', async () => {
+        const res = await aiEnrichPostHandler(makeReq('{"title":"x"}', null))
+        expect(res.status).toBe(401)
+        expect(mockEnrichPostContent).not.toHaveBeenCalled()
+    })
+
+    it('returns 401 for an API-key client', async () => {
+        const client = { id: 7, collection: 'api-clients', enabled: true }
+        const res = await aiEnrichPostHandler(makeReq('{"title":"x"}', client))
+        expect(res.status).toBe(401)
+    })
+
     beforeEach(() => {
         vi.clearAllMocks()
     })

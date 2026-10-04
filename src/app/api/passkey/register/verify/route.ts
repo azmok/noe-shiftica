@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { isHumanUser } from '@/plugins/api-clients/permissions'
 import { verifyRegistrationResponse } from '@simplewebauthn/server'
 import {
   rpID,
@@ -17,7 +18,8 @@ import {
 export async function POST(request: NextRequest) {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: request.headers })
-  if (!user) {
+  // Human admins only — see register/options/route.ts.
+  if (!user || !isHumanUser(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
