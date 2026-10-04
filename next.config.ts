@@ -1,8 +1,11 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Shares the ISR cache across Cloud Run containers via GCS (see cache-handler.mjs).
+  cacheHandler: path.join(process.cwd(), "cache-handler.mjs"),
   // Allow the dev server to accept requests proxied through a Cloudflare quick
   // tunnel (used for testing passkeys/WebAuthn over HTTPS on a phone).
   allowedDevOrigins: ['*.trycloudflare.com'],
@@ -57,4 +60,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPayload(nextConfig);
+const payloadConfig = withPayload(nextConfig);
+const payloadHeaders = payloadConfig.headers;
+
+// withPayload adds Accept-CH / Critical-CH / Vary: Sec-CH-Prefers-Color-Scheme to every
+// path (for the admin's light/dark theme). On the public site, Critical-CH makes Chrome
+// throw away the first response and re-request every page (one extra round trip), and the
+// Vary splits the CDN cache. Keep those headers on the admin only.
+export default {
+  ...payloadConfig,
+  async headers() {
+    const rules = payloadHeaders ? await payloadHeaders() : [];
+    return rules.map((rule) =>
+      rule.source === "/:path*" && rule.headers.some((h) => h.key === "Critical-CH")
+        ? { ...rule, source: "/admin/:path*" }
+        : rule,
+    );
+  },
+} satisfies NextConfig;

@@ -15,7 +15,6 @@
 
   /* Typography */
     --font-sans: 
-    var(--font-noto-sans-jp), /* Noto Sans JP (next/font/google) */
     "Helvetica Neue", /* macOS/iOS, Helvetica fallback */
     Arial, /* Windows, Helvetica fallback */
     "Hiragino Kaku Gothic ProN", /* older macOS/iOS */
@@ -85,12 +84,6 @@
   --mobile-shadow-inset: inset 2px 2px 5px #D0CDC7, inset -2px -2px 5px #FDFCFA;
   --mobile-radius: 16px;
   --mobile-radius-sm: 10px;
-}
-
-@theme {
-  --font-dm-sans: var(--font-dm-sans);
-  --font-dm-serif: var(--font-dm-serif);
-  --font-shippori-mincho: var(--font-shippori-mincho);
 }
 
 * {

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PostArticle } from "./PostArticle";
 import { BlogPostingJsonLd } from "../../components/BlogPostingJsonLd";
+import { findAdjacentPosts, findPublishedPost } from "@/lib/postQueries";
 import { Metadata } from "next";
 
 
@@ -22,24 +23,12 @@ export async function generateMetadata({
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     try {
-        const payload = await getPayload({ config: configPromise });
-
-        const posts = await payload.find({
-            collection: "posts",
-            where: {
-                slug: {
-                    equals: decodedSlug,
-                },
-            },
-            depth: 1,
-            limit: 1,
-            overrideAccess: true,
-        });
-
-        let post = posts.docs?.[0] || null;
+        // Same cached lookup as the page below, so a render queries the post once.
+        const post = await findPublishedPost("posts", decodedSlug, 1);
 
         // Try historical slug check for redirection
         if (!post) {
+            const payload = await getPayload({ config: configPromise });
             const redirectPosts = await payload.find({
                 collection: "posts",
                 where: {
@@ -159,30 +148,14 @@ export default async function BlogPostPage({
     // draft: false — explicit to prevent any draft version interference.
     // IIFE + try/catch — DB errors throw (preserving stale cached page) instead of calling
     // notFound(), so the 404 is only served when the query succeeds but returns 0 docs.
-    const posts = await (async () => {
+    let post = await (async () => {
         try {
-            return await payload.find({
-                collection: "posts",
-                where: {
-                    slug: {
-                        equals: decodedSlug,
-                    },
-                    _status: {
-                        equals: 'published',
-                    },
-                },
-                depth: 1,
-                limit: 1,
-                overrideAccess: true,
-                draft: false,
-            });
+            return await findPublishedPost("posts", decodedSlug, 1);
         } catch (error) {
             console.error(`[ISR][blog/${slug}] payload.find threw an error — preserving stale cache:`, error);
             throw error;
         }
     })();
-
-    let post = posts.docs?.[0] || null;
 
     // Try historical slug check for redirection
     if (!post) {
@@ -219,71 +192,30 @@ export default async function BlogPostPage({
         notFound();
     }
 
-    // Fetch Previous and Next posts
-    let prevPost = null;
-    let nextPost = null;
-
-    if (post.publishedAt) {
-        const prevPostsRes = await payload.find({
-            collection: "posts",
-            where: {
-                publishedAt: {
-                    less_than: post.publishedAt,
-                },
-                _status: {
-                    equals: 'published',
-                },
-            },
-            sort: '-publishedAt',
-            limit: 1,
-            depth: 0,
-            overrideAccess: true,
-        });
-        prevPost = prevPostsRes.docs[0] || null;
-
-        const nextPostsRes = await payload.find({
-            collection: "posts",
-            where: {
-                publishedAt: {
-                    greater_than: post.publishedAt,
-                },
-                _status: {
-                    equals: 'published',
-                },
-            },
-            sort: 'publishedAt',
-            limit: 1,
-            depth: 0,
-            overrideAccess: true,
-        });
-        nextPost = nextPostsRes.docs[0] || null;
-    }
+    const { prevPost, nextPost } = post.publishedAt
+        ? await findAdjacentPosts("posts", post.publishedAt)
+        : { prevPost: null, nextPost: null };
 
     return (
-        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-hidden">
-            {/* Premium Depth Background Elements */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                {/* Mesh Gradient Blobs */}
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-neu-primary/10 blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-neu-primary/5 blur-[100px]" />
-                <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
-                
-                {/* SVG Noise Texture Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilterDetail)' }}></div>
-            </div>
+        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-clip">
+            {/* Premium Depth Background: static radial gradients. The previous blurred,
+                pulsing blobs + full-screen SVG noise (mix-blend-overlay) left iPhone Safari
+                on a black screen while loading and while scrolling to in-page links. */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none"
+                style={{
+                    backgroundImage: [
+                        "radial-gradient(circle at 10% 10%, rgb(204 221 0 / 0.07), transparent 35%)",
+                        "radial-gradient(circle at 90% 75%, rgb(204 221 0 / 0.035), transparent 30%)",
+                        "radial-gradient(circle at 80% 50%, rgb(59 130 246 / 0.035), transparent 25%)",
+                    ].join(", "),
+                }}
+            />
 
             <BlogPostingJsonLd post={post} basePath="/blog" />
             <Header />
             <PostArticle post={post} prevPost={prevPost} nextPost={nextPost} />
             <Footer variant="blog" />
-
-            {/* SVG Global Filters */}
-            <svg className="hidden">
-                <filter id="noiseFilterDetail">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
-                    <feColorMatrix type="saturate" values="0" />
-                </filter>
-            </svg>
 
             {/* GLOBAL FAILSAFE: Force visibility for any images stuck at opacity: 0 */}
             <Script

@@ -7,6 +7,7 @@ import configPromise from "@payload-config";
 import { notFound, redirect } from "next/navigation";
 import { PostArticle } from "../../blog/[slug]/PostArticle";
 import { BlogPostingJsonLd } from "../../components/BlogPostingJsonLd";
+import { findAdjacentPosts, findPublishedPost } from "@/lib/postQueries";
 import { Metadata } from "next";
 
 export async function generateMetadata({
@@ -17,24 +18,12 @@ export async function generateMetadata({
     const { slug } = await params;
     const decodedSlug = decodeURIComponent(slug);
     try {
-        const payload = await getPayload({ config: configPromise });
-
-        const posts = await payload.find({
-            collection: "tech-posts",
-            where: {
-                slug: {
-                    equals: decodedSlug,
-                },
-            },
-            depth: 1,
-            limit: 1,
-            overrideAccess: true,
-        });
-
-        let post = posts.docs?.[0] || null;
+        // Same cached lookup as the page below, so a render queries the post once.
+        const post = await findPublishedPost("tech-posts", decodedSlug, 2);
 
         // Try historical slug check for redirection
         if (!post) {
+            const payload = await getPayload({ config: configPromise });
             const redirectPosts = await payload.find({
                 collection: "tech-posts",
                 where: {
@@ -142,31 +131,14 @@ export default async function DevPostPage({
     const decodedSlug = decodeURIComponent(slug);
     const payload = await getPayload({ config: configPromise });
 
-    const posts = await (async () => {
+    let post = await (async () => {
         try {
-            return await payload.find({
-                collection: "tech-posts",
-                where: {
-                    slug: {
-                        equals: decodedSlug,
-                    },
-                    _status: {
-                        equals: 'published',
-                    },
-                },
-                depth: 2,
-                limit: 1,
-                overrideAccess: true,
-                draft: false,
-            });
+            return await findPublishedPost("tech-posts", decodedSlug, 2);
         } catch (error) {
             console.error(`[ISR][dev/${slug}] payload.find threw an error — preserving stale cache:`, error);
             throw error;
         }
     })();
-
-
-    let post = posts.docs?.[0] || null;
 
     // Try historical slug check for redirection
     if (!post) {
@@ -204,47 +176,12 @@ export default async function DevPostPage({
     }
 
     // Fetch Previous and Next posts within tech-posts
-    let prevPost = null;
-    let nextPost = null;
-
-    if (post.publishedAt) {
-        const prevPostsRes = await payload.find({
-            collection: "tech-posts",
-            where: {
-                publishedAt: {
-                    less_than: post.publishedAt,
-                },
-                _status: {
-                    equals: 'published',
-                },
-            },
-            sort: '-publishedAt',
-            limit: 1,
-            depth: 0,
-            overrideAccess: true,
-        });
-        prevPost = prevPostsRes.docs[0] || null;
-
-        const nextPostsRes = await payload.find({
-            collection: "tech-posts",
-            where: {
-                publishedAt: {
-                    greater_than: post.publishedAt,
-                },
-                _status: {
-                    equals: 'published',
-                },
-            },
-            sort: 'publishedAt',
-            limit: 1,
-            depth: 0,
-            overrideAccess: true,
-        });
-        nextPost = nextPostsRes.docs[0] || null;
-    }
+    const { prevPost, nextPost } = post.publishedAt
+        ? await findAdjacentPosts("tech-posts", post.publishedAt)
+        : { prevPost: null, nextPost: null };
 
     return (
-        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-hidden">
+        <div className="min-h-screen bg-background-void selection:bg-neu-primary/30 selection:text-background-void flex flex-col font-sans antialiased relative overflow-clip">
             {/* Premium Depth Background Elements */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 {/* Mesh Gradient Blobs */}

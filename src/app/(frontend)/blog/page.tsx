@@ -40,17 +40,6 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background-void font-sans antialiased relative selection:bg-(--color-neu-primary)/40 overflow-hidden">
-      {/* Premium Depth Background Elements */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Mesh Gradient Blobs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-neu-primary)/10 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-(--color-neu-primary)/5 blur-[100px]" />
-        <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-500/5 blur-[80px]" />
-
-        {/* SVG Noise Texture Overlay */}
-        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ filter: 'url(#noiseFilter)' }}></div>
-      </div>
-
       <Header />
 
       <main className="grow px-4 sm:px-6 lg:px-12 pt-20 pb-24 md:pt-28 md:pb-32 relative z-10 transition-colors duration-500">
