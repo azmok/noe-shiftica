@@ -87,37 +87,48 @@ export const Media: CollectionConfig = {
   },
   upload: {
     // Auto-generate resized variants via Sharp on every upload
-    // These are stored in GCS alongside the original
+    // These are stored in GCS alongside the original.
+    // Variants are encoded explicitly (formatOptions on EVERY size — Payload carries the
+    // previous size's formatOptions forward otherwise). Before 2026-10 they kept the
+    // upload's format, so PNG screenshots produced e.g. a 1 MB 1200px `og` PNG.
+    // WebP q85 is visually lossless at these sizes; `og` stays JPEG because WebP OG
+    // images are not reliably rendered by every SNS/messenger preview.
     imageSizes: [
       {
         name: 'adminList',
         width: 100,
         height: 100,
         position: 'centre',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
       },
       {
         name: 'adminPreview',
         width: 480,
+        formatOptions: { format: 'webp', options: { quality: 85 } },
       },
       {
         // Blog list grid cards (4:3 aspect), small screens
         name: 'thumbnail',
         width: 400,
+        formatOptions: { format: 'webp', options: { quality: 85 } },
       },
       {
         // Blog list view / sidebar images
         name: 'medium',
         width: 800,
+        formatOptions: { format: 'webp', options: { quality: 85 } },
       },
       {
         // Featured posts, hero images (16:9-ish)
         name: 'large',
         width: 1920,
+        formatOptions: { format: 'webp', options: { quality: 85 } },
       },
       {
         // OG image for social media (Twitter/X, Facebook, LINE) — recommended 1200×630
         name: 'og',
         width: 1200,
+        formatOptions: { format: 'jpeg', options: { quality: 85, mozjpeg: true } },
       },
     ],
     // Allow Next.js Image optimization to work with GCS URLs

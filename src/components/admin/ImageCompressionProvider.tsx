@@ -4,11 +4,11 @@
  * ImageCompressionProvider
  *
  * Global Payload admin provider that intercepts all fetch() calls to /api/media
- * and compresses images exceeding MAX_SIZE_BYTES before they are sent to the server.
+ * and re-encodes large JPEG/PNG/WebP uploads as high-quality WebP (see shouldCompress)
+ * before they are sent to the server.
  *
- * This runs entirely in the browser — no server changes needed.
- * Large uploads (e.g. 8MB RAW) are compressed to under 1MB before transmission,
- * dramatically reducing upload time on Firebase App Hosting (Cloud Run).
+ * This runs entirely in the browser — no server changes needed. Resolution is kept,
+ * so files get smaller (faster uploads to Cloud Run) without visible quality loss.
  *
  * A fixed progress bar overlay is shown during compression so the user knows
  * something is happening instead of looking at a frozen UI.
@@ -38,8 +38,28 @@ if (typeof window !== 'undefined') {
   }
 }
 
-const MAX_SIZE_BYTES = 1 * 1024 * 1024 // 1 MB
+// Quality-first policy (2026-10). The old rule squeezed everything over 1 MB down to
+// 0.9 MB; a PNG cannot lower its quality, so the library shrank its RESOLUTION instead
+// and article images were already blurry at the original. Now:
+//  - JPEG/PNG/WebP are re-encoded as WebP q0.9 (visually lossless, PNG → ~1/3–1/5 size)
+//  - resolution is kept (only capped at 3840px on the long edge)
+//  - the result is used only if it is actually smaller
+// Anything else (GIF/SVG/AVIF/HEIC…) is uploaded untouched.
+const COMPRESSIBLE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const PNG_MIN_BYTES = 300 * 1024 // PNGs above this are worth converting to WebP
+const OTHER_MIN_BYTES = 1.5 * 1024 * 1024 // JPEG/WebP are already compact below this
+const MAX_EDGE_PX = 3840
+const WEBP_QUALITY = 0.9
 const PROGRESS_EVENT = 'noe:upload-compress-progress'
+
+function shouldCompress(file: File): boolean {
+  if (!COMPRESSIBLE_TYPES.includes(file.type)) return false
+  return file.size > (file.type === 'image/png' ? PNG_MIN_BYTES : OTHER_MIN_BYTES)
+}
+
+function toWebpName(name: string): string {
+  return /\.[^./\\]+$/.test(name) ? name.replace(/\.[^./\\]+$/, '.webp') : `${name}.webp`
+}
 
 type ProgressDetail =
   | { state: 'start'; percent: 0; filename: string }
@@ -93,8 +113,10 @@ export function ImageCompressionProvider({ children }: { children: React.ReactNo
             ? input.url
             : String(input)
 
+      // POST = new upload, PATCH = "replace file" on an existing media doc
+      const method = init?.method?.toUpperCase()
       const isMediaPost =
-        init?.method?.toUpperCase() === 'POST' &&
+        (method === 'POST' || method === 'PATCH') &&
         url.includes('/api/media') &&
         init?.body instanceof FormData
 
@@ -103,28 +125,35 @@ export function ImageCompressionProvider({ children }: { children: React.ReactNo
         // Payload uses "file" as the field name for upload collections
         const file = (fd.get('file') ?? fd.get('_file')) as File | null
 
-        if (file && file.type.startsWith('image/') && file.size > MAX_SIZE_BYTES) {
+        if (file && shouldCompress(file)) {
           emit({ state: 'start', percent: 0, filename: file.name })
           try {
             const { default: compress } = await import('browser-image-compression')
             const compressed = await compress(file, {
-              maxSizeMB: 0.9,
-              maxWidthOrHeight: 3840,
+              fileType: 'image/webp',
+              initialQuality: WEBP_QUALITY,
+              maxWidthOrHeight: MAX_EDGE_PX,
+              // Never trade resolution for bytes (that was the source of the blur)
+              alwaysKeepResolution: true,
               useWebWorker: true,
               onProgress: (p: number) =>
                 emit({ state: 'progress', percent: p, filename: file.name }),
             })
-            const replaced = new File([compressed], file.name, {
-              type: compressed.type || file.type,
-            })
-            // Replace in FormData (try both field names to be safe)
-            fd.delete('file')
-            fd.delete('_file')
-            fd.set('file', replaced)
-            console.info(
-              `[Upload] Compressed "${file.name}": ` +
-              `${Math.round(file.size / 1024)}KB → ${Math.round(replaced.size / 1024)}KB`,
-            )
+            if (compressed.size < file.size) {
+              const replaced = new File([compressed], toWebpName(file.name), {
+                type: 'image/webp',
+              })
+              // Replace in FormData (try both field names to be safe)
+              fd.delete('file')
+              fd.delete('_file')
+              fd.set('file', replaced)
+              console.info(
+                `[Upload] Re-encoded "${file.name}" → "${replaced.name}": ` +
+                `${Math.round(file.size / 1024)}KB → ${Math.round(replaced.size / 1024)}KB`,
+              )
+            } else {
+              console.info(`[Upload] Kept original "${file.name}" (WebP was not smaller)`)
+            }
             emit({ state: 'done', percent: 100, filename: file.name })
           } catch (err) {
             console.warn('[Upload] Compression failed, uploading original:', err)

@@ -23,6 +23,11 @@ import "prismjs/components/prism-json"
 import "prismjs/components/prism-sql"
 import "prismjs/components/prism-python"
 
+// Hero renders up to the 7xl container (~1216px; 2x on Retina), so it must not use the
+// 800px `medium` variant. Must be listed in next.config.ts `images.qualities`.
+const HERO_QUALITY = 90
+const HERO_SIZES = "(min-width: 1280px) 1216px, 100vw"
+
 // Date+time formatting in JST. The site is Japan-facing and the hosting runtime
 // is UTC, so we pin the timezone to Asia/Tokyo to show correct local時刻.
 const fmtDateTimeJst = (value: string): string =>
@@ -297,13 +302,15 @@ export const PostArticle: React.FC<{
                             try {
                                 const img = (post.heroImage || post.coverImage);
                                 if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                    const finalUrl = img.sizes?.medium?.url || img.url;
+                                    // Original through next/image (not the 800px `medium`): the
+                                    // optimizer serves a width matched to the screen/DPR as WebP.
                                     return (
                                         <GcsImage
-                                            src={finalUrl}
+                                            src={img.url}
                                             alt={post.title}
                                             priority
-                                            preOptimized={!!img.sizes?.medium}
+                                            quality={HERO_QUALITY}
+                                            sizes={HERO_SIZES}
                                             objectFit="contain"
                                             className="w-full h-full object-contain"
                                         />
@@ -449,14 +456,14 @@ export const PostArticle: React.FC<{
                                         try {
                                             const img = (post.heroImage || post.coverImage);
                                             if (img && typeof img === 'object' && 'url' in img && img.url) {
-                                                const finalUrl = img.sizes?.medium?.url || img.url;
                                                 return (
                                                     <div className="w-full h-full relative transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
                                                         <GcsImage
-                                                            src={finalUrl}
+                                                            src={img.url}
                                                             alt={post.title}
                                                             priority
-                                                            preOptimized={!!img.sizes?.medium}
+                                                            quality={HERO_QUALITY}
+                                                            sizes={HERO_SIZES}
                                                             objectFit="contain"
                                                             className="w-full h-full"
                                                         />

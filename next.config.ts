@@ -60,8 +60,9 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     // Image sizes: smaller increments for UI components.
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Quality 75 default — excellent visual quality at ~40% smaller file size vs q90
-    qualities: [25, 50, 75],
+    // Quality 75 default — excellent visual quality at ~40% smaller file size vs q90.
+    // 90 is for article hero images (PostArticle HERO_QUALITY), shown large on desktop.
+    qualities: [25, 50, 75, 90],
   },
 };
 
