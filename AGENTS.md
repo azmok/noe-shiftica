@@ -25,6 +25,24 @@ before retrying (the original instruction + Signs win over your latest failure l
 - Packages: JS = pnpm (+ fnm) only / Python = uv only. NEVER use pip or npm.
 - After editing source, verify it is clean UTF-8 with no NUL bytes (see Sign "Source files must stay clean UTF-8" in `memory/signs.md`).
 
+## Architecture rule — Payload CMS changes ship as plugins (Azuma, standing)
+Every feature added to or changed in anything Payload CMS–related (admin UI, collections'
+behaviour, hooks, endpoints, Lexical editor features, rich-text rendering on the frontend, …)
+MUST be built as a self-contained module under `src/plugins/<pluginName>/`.
+- **One plugin = one directory**: the entry point (`index.ts` exporting the Payload `Plugin`,
+  or `feature.server.ts` / `feature.client.tsx` for a Lexical feature, or exported JSX
+  converters), a `README.md` (what it does, why, how it is registered), and
+  `__tests__/unit.test.ts` whenever it contains logic.
+- **Outside the plugin directory, only wire it up**: one import + one registration line
+  (`payload.config.ts` `plugins` / editor `features`, or the consuming component). Do not
+  spread the plugin's logic across core files.
+- **Extend, don't edit core**: add fields / hooks / endpoints from the plugin instead of
+  editing `src/collections/*` or `src/payload.config.ts` directly. Those are protected files,
+  so even the single registration line there needs Azuma's approval first (HARD STOP).
+- Helpers shared between plugins go in `src/plugins/shared/`.
+- Examples to follow: `markdownImport/`, `ogImageAutoFill/`, `searchReplace/`, `articleImages/`.
+- If a change genuinely cannot be a plugin, STOP and ask Azuma before implementing it in core.
+
 ## Protected files (editing requires explicit approval — HARD STOP)
 - src/collections/*
 - src/payload.config.ts

@@ -1,5 +1,11 @@
 # CLAUDE.md — Noe Shiftica (project rules for Claude Code / Kura-yan)
 
+@AGENTS.md
+
+> `AGENTS.md` (imported above) is the single source of truth for rules shared by every
+> agent (Claude Code / Cline / Codex / Gemini) — e.g. the **Payload CMS → plugin** rule.
+> Put new shared rules there, not here.
+
 > Agent identity and the universal workflow (Startup Protocol / HARD STOP /
 > Coder–Tester loop / Self-Check) live in global config (`~/.claude/CLAUDE.md`,
 > `~/.gemini/AGENTS.md`) and project `AGENTS.md`. This file holds only Azuma's
