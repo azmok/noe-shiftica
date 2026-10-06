@@ -1,0 +1,12 @@
+/* The <a> wrapping a body image: block-level so it hugs the image, no body-link underline. */
+.link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease;
+}
+
+.link:hover {
+  opacity: 0.85;
+}

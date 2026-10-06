@@ -12,6 +12,7 @@ import { ArticleTocSidebar } from "./ArticleTocSidebar"
 import { HeadingAnchorBehavior } from "./HeadingAnchorBehavior"
 import { extractHeadings } from "@/lib/articleHeadings"
 import { toInternalHref } from "@/lib/articleLinks"
+import { articleImageConverters } from "@/plugins/articleImages"
 import styles from './PostArticle.module.css'
 import Prism from "prismjs"
 
@@ -120,6 +121,8 @@ const asSiteLink = (rendered: React.ReactNode): React.ReactNode => {
 
 const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     ...defaultConverters,
+    // Body images: responsive srcset + click-to-open original (src/plugins/articleImages)
+    ...articleImageConverters,
     link: (args) => asSiteLink(typeof defaultConverters.link === 'function' ? defaultConverters.link(args) : null),
     autolink: (args) => asSiteLink(typeof defaultConverters.autolink === 'function' ? defaultConverters.autolink(args) : null),
     // Re-apply inline text styling (color / font-size / gradient) that the
