@@ -11,7 +11,7 @@ export const ApiLogs: CollectionConfig = {
     defaultColumns: ['createdAt', 'clientName', 'action', 'status', 'postTitle', 'responseStatus', 'errorMessage'],
     group: 'Logs',
     components: {
-      beforeListTable: ['@/components/admin/ApiEndpointGuide#ApiEndpointGuide'],
+      beforeListTable: ['@/plugins/ai-api/components/ApiEndpointGuide#ApiEndpointGuide'],
     },
   },
   access: {

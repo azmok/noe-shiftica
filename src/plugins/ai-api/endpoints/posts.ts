@@ -1,18 +1,12 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { getPayload, type Payload, type TypedUser } from 'payload'
-import config from '@payload-config'
+import type { Payload, PayloadHandler, PayloadRequest, TypedUser } from 'payload'
 import matter from 'gray-matter'
-import { translateToSlug } from '@/lib/translateToSlug'
-import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '@/lib/aiPostMarkdown'
-import {
-  type Operation,
-  canAccess,
-  isActiveUser,
-  isApiClient,
-} from '@/plugins/api-clients/permissions'
+import { translateToSlug } from '../../../lib/translateToSlug'
+import { parseMarkdownToLexical } from '../../markdownImport'
+import { type Operation, canAccess, isActiveUser, isApiClient } from '../../api-clients/permissions'
+import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '../markdown'
 
 /**
- * AI 用の記事 API。
+ * AI 用の記事 API（Payload のルートエンドポイント。URL は /api/ai/posts）。
  *
  * 認証は /admin → 設定 → 外部AI連携 で発行した API キー。次のどれかのヘッダーで渡す:
  *   - `x-api-key: <キー>`
@@ -54,7 +48,7 @@ interface ImageInput {
 type PostCollection = 'posts' | 'tech-posts'
 
 /** x-api-key / Bearer を Payload 標準の `api-clients API-Key` 形式に揃えたヘッダーを返す */
-function normalizeAuthHeaders(request: NextRequest): Headers {
+function normalizeAuthHeaders(request: { headers: Headers }): Headers {
   const authHeader = request.headers.get('authorization') ?? ''
   const apiKey =
     request.headers.get('x-api-key')?.trim() ||
@@ -66,44 +60,15 @@ function normalizeAuthHeaders(request: NextRequest): Headers {
 }
 
 /**
- * Markdown → Lexical 変換は Payload 側の /api/convert-markdown に任せる。
- *
- * このルートで parseMarkdownToLexical を直接 import すると、Next がこのルート用に
- * lexical を別インスタンスとして同梱してしまい、HeadingNode などが「LexicalNode の
- * サブクラスではない」と判定されて Lexical error #290 で落ちる（2026-10 本番で再現）。
- * Payload の [...slug] ルートで動く変換エンドポイントなら正しい lexical で動くので、
- * 呼び出し元の認証ヘッダーをそのまま付けて委譲する。
+ * API キー（またはログイン中の管理者セッション）を検証して、有効な利用者を返す。
+ * Payload が認証済みの req.user（`api-clients API-Key` 形式・セッション）をまず使い、
+ * x-api-key / Bearer で来た場合だけ標準形式に直して認証し直す。
  */
-async function convertMarkdown(
-  request: NextRequest,
-  markdown: string,
-): Promise<{ lexical: unknown; frontmatter: { description?: string } & Record<string, unknown> }> {
-  const origin = process.env.NEXT_PUBLIC_SERVER_URL || new URL(request.url).origin
-  const headers = new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
-  const auth = normalizeAuthHeaders(request)
-  for (const name of ['authorization', 'cookie']) {
-    const value = auth.get(name)
-    if (value) headers.set(name, value)
-  }
-
-  const res = await fetch(`${origin}/api/convert-markdown`, {
-    method: 'POST',
-    headers,
-    body: markdown,
-    cache: 'no-store',
-  })
-  const json = await res.json().catch(() => ({}))
-  if (!res.ok || !json.lexical) {
-    throw new Error(`Markdown conversion failed (${res.status}): ${json.error ?? 'unknown error'}`)
-  }
-  return { lexical: json.lexical, frontmatter: json.frontmatter ?? {} }
-}
-
-/** API キー（またはログイン中の管理者セッション）を検証して、有効な利用者を返す */
-async function authenticate(payload: Payload, request: NextRequest): Promise<TypedUser | null> {
-  const headers = normalizeAuthHeaders(request)
+async function authenticate(req: PayloadRequest): Promise<TypedUser | null> {
+  if (isActiveUser(req.user)) return req.user
+  const headers = normalizeAuthHeaders(req)
   try {
-    const { user } = await payload.auth({ headers })
+    const { user } = await req.payload.auth({ headers })
     return isActiveUser(user) ? user : null
   } catch {
     return null
@@ -287,7 +252,7 @@ async function publishExistingDraft(
       requestSummary: summary,
       errorMessage: message,
     })
-    return NextResponse.json({ error: message }, { status: 404 })
+    return Response.json({ error: message }, { status: 404 })
   }
 
   const missing: Operation | null = !canAccess(user, collection, 'update')
@@ -308,7 +273,7 @@ async function publishExistingDraft(
       requestSummary: summary,
       errorMessage: message,
     })
-    return NextResponse.json({ error: message }, { status: 403 })
+    return Response.json({ error: message }, { status: 403 })
   }
 
   try {
@@ -333,7 +298,7 @@ async function publishExistingDraft(
       clientIp,
       requestSummary: summary,
     })
-    return NextResponse.json({
+    return Response.json({
       success: true,
       operation: 'publish',
       id: String(saved.id),
@@ -356,7 +321,7 @@ async function publishExistingDraft(
       requestSummary: summary,
       errorMessage: message,
     })
-    return NextResponse.json({ error: 'Internal Server Error', details: message }, { status: 500 })
+    return Response.json({ error: 'Internal Server Error', details: message }, { status: 500 })
   }
 }
 
@@ -364,12 +329,12 @@ async function publishExistingDraft(
  * POST /api/ai/posts
  * Creates or updates an article via AI request.
  */
-export async function POST(request: NextRequest) {
-  const payload = await getPayload({ config })
-  const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+export const aiPostsCreateHandler: PayloadHandler = async (req) => {
+  const { payload } = req
+  const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
 
   // 1. Auth check
-  const user = await authenticate(payload, request)
+  const user = await authenticate(req)
   if (!user) {
     await recordApiLog(payload, null, {
       action: 'post',
@@ -378,12 +343,12 @@ export async function POST(request: NextRequest) {
       clientIp,
       errorMessage: 'Unauthorized: Invalid or missing API key',
     })
-    return NextResponse.json({ error: 'Unauthorized: Invalid or missing API key' }, { status: 401 })
+    return Response.json({ error: 'Unauthorized: Invalid or missing API key' }, { status: 401 })
   }
 
   let body: any = {}
   try {
-    body = await request.json()
+    body = (await req.json?.()) ?? {}
   } catch {
     await recordApiLog(payload, user, {
       action: 'post',
@@ -392,7 +357,7 @@ export async function POST(request: NextRequest) {
       clientIp,
       errorMessage: 'Invalid JSON request body',
     })
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
   const {
@@ -449,7 +414,7 @@ export async function POST(request: NextRequest) {
       requestSummary: summary,
       errorMessage: 'Field "title" is required and cannot be empty.',
     })
-    return NextResponse.json({ error: 'Field "title" is required' }, { status: 400 })
+    return Response.json({ error: 'Field "title" is required' }, { status: 400 })
   }
 
   if (markdown === undefined || typeof markdown !== 'string') {
@@ -462,7 +427,7 @@ export async function POST(request: NextRequest) {
       requestSummary: summary,
       errorMessage: 'Field "markdown" is required.',
     })
-    return NextResponse.json({ error: 'Field "markdown" is required' }, { status: 400 })
+    return Response.json({ error: 'Field "markdown" is required' }, { status: 400 })
   }
 
   try {
@@ -504,7 +469,7 @@ export async function POST(request: NextRequest) {
         requestSummary: summary,
         errorMessage: message,
       })
-      return NextResponse.json({ error: message }, { status: 403 })
+      return Response.json({ error: message }, { status: 403 })
     }
 
     // 6. Strip preview-only markup and swap image lines for placeholders, then
@@ -522,11 +487,13 @@ export async function POST(request: NextRequest) {
         requestSummary: summary,
         errorMessage: imageResult.error,
       })
-      return NextResponse.json({ error: imageResult.error }, { status: imageResult.status })
+      return Response.json({ error: imageResult.error }, { status: imageResult.status })
     }
 
     // 7. Parse Markdown into Lexical AST and embed the uploaded images
-    const { lexical, frontmatter } = await convertMarkdown(request, prepared.markdown)
+    // Payload のルートエンドポイントは管理画面と同じ lexical を使うので、変換を直接呼べる
+    // （旧 Next.js ルートでは lexical が二重に読み込まれ、Lexical error #290 で落ちていた）
+    const { lexical, frontmatter } = await parseMarkdownToLexical(prepared.markdown, payload.config)
     replaceImagePlaceholders(lexical as Parameters<typeof replaceImagePlaceholders>[0], imageResult.mediaIds)
     // Same as posts written in the admin editor: links open in a new tab
     openLinksInNewTab(lexical as Parameters<typeof openLinksInNewTab>[0])
@@ -551,7 +518,7 @@ export async function POST(request: NextRequest) {
         requestSummary: summary,
         errorMessage: categoryResult.error,
       })
-      return NextResponse.json({ error: categoryResult.error }, { status: 400 })
+      return Response.json({ error: categoryResult.error }, { status: 400 })
     }
     const categoryIds = categoryResult.ids
 
@@ -605,7 +572,7 @@ export async function POST(request: NextRequest) {
       requestSummary: summary,
     })
 
-    return NextResponse.json(
+    return Response.json(
       {
         success: true,
         operation,
@@ -632,7 +599,7 @@ export async function POST(request: NextRequest) {
       errorMessage: error.message || 'Internal Server Error',
     })
 
-    return NextResponse.json(
+    return Response.json(
       { error: 'Internal Server Error', details: error.message },
       { status: 500 },
     )
@@ -643,12 +610,12 @@ export async function POST(request: NextRequest) {
  * DELETE /api/ai/posts?id=xxx OR ?slug=xxx
  * Deletes a post via AI request.
  */
-export async function DELETE(request: NextRequest) {
-  const payload = await getPayload({ config })
-  const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+export const aiPostsDeleteHandler: PayloadHandler = async (req) => {
+  const { payload } = req
+  const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
 
   // 1. Auth check
-  const user = await authenticate(payload, request)
+  const user = await authenticate(req)
   if (!user) {
     await recordApiLog(payload, null, {
       action: 'delete',
@@ -657,11 +624,11 @@ export async function DELETE(request: NextRequest) {
       clientIp,
       errorMessage: 'Unauthorized: Invalid or missing API key',
     })
-    return NextResponse.json({ error: 'Unauthorized: Invalid or missing API key' }, { status: 401 })
+    return Response.json({ error: 'Unauthorized: Invalid or missing API key' }, { status: 401 })
   }
 
   // Parse target from query params or body
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = req
   let targetId = searchParams.get('id')
   let targetSlug = searchParams.get('slug')
   let collectionName = searchParams.get('collection') || 'posts'
@@ -669,7 +636,7 @@ export async function DELETE(request: NextRequest) {
   // Also accept JSON body if params are absent
   if (!targetId && !targetSlug) {
     try {
-      const body = await request.json()
+      const body = await req.json?.()
       targetId = body.id
       targetSlug = body.slug
       if (body.collection) collectionName = body.collection
@@ -694,7 +661,7 @@ export async function DELETE(request: NextRequest) {
       requestSummary: summary,
       errorMessage: message,
     })
-    return NextResponse.json({ error: message }, { status: 403 })
+    return Response.json({ error: message }, { status: 403 })
   }
 
   if (!targetId && !targetSlug) {
@@ -706,7 +673,7 @@ export async function DELETE(request: NextRequest) {
       requestSummary: summary,
       errorMessage: 'Either "id" or "slug" query parameter / body field is required.',
     })
-    return NextResponse.json(
+    return Response.json(
       { error: 'Either "id" or "slug" is required to delete an article.' },
       { status: 400 },
     )
@@ -742,7 +709,7 @@ export async function DELETE(request: NextRequest) {
         requestSummary: summary,
         errorMessage: 'Article not found.',
       })
-      return NextResponse.json({ error: 'Article not found.' }, { status: 404 })
+      return Response.json({ error: 'Article not found.' }, { status: 404 })
     }
 
     const deleteId = docToDelete.id
@@ -767,7 +734,7 @@ export async function DELETE(request: NextRequest) {
       requestSummary: summary,
     })
 
-    return NextResponse.json({
+    return Response.json({
       success: true,
       message: `Article "${deleteTitle}" (${deleteSlug}) was successfully deleted.`,
       id: deleteId,
@@ -787,7 +754,7 @@ export async function DELETE(request: NextRequest) {
       errorMessage: error.message || 'Internal Server Error',
     })
 
-    return NextResponse.json(
+    return Response.json(
       { error: 'Internal Server Error', details: error.message },
       { status: 500 },
     )

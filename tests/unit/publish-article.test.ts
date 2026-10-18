@@ -2,7 +2,7 @@
  * Unit tests: scripts/publish-article.mjs (no network)
  *
  * The script only decides which image files to attach; everything else is done by
- * /api/ai/posts (see tests/unit/api/aiPosts.test.ts).
+ * /api/ai/posts (see src/plugins/ai-api/__tests__/unit.test.ts).
  */
 
 import { describe, it, expect } from 'vitest'

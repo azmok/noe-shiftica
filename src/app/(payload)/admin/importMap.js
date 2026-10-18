@@ -40,11 +40,11 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { TagsField as TagsField_f244308917f813f13f900c89daefb407 } from '@/components/admin/TagsField'
 import { JsonCodeField as JsonCodeField_48b0254b06c95d4fad24ce116bd7a684 } from '@/components/admin/JsonCodeField'
 import { OgImageField as OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f } from '../../../plugins/ogImageAutoFill/components/OgImageField'
-import { ApiEndpointGuide as ApiEndpointGuide_129f8a86d19e3878da0901b9f6b5d14a } from '@/components/admin/ApiEndpointGuide'
 import { LinkedPostCell as LinkedPostCell_fc307546e6356b32183e083dd01c5c7f } from '@/plugins/html-file-manager/components/LinkedPostCell'
 import { MobileFullscreenEditor as MobileFullscreenEditor_94986dd0765443c6a447569bd388326c } from '@/plugins/html-file-manager/components/MobileFullscreenEditor'
 import { HostingUrlField as HostingUrlField_4a2099868d4869c9b5da93d211c320a6 } from '@/plugins/html-hosting/components/HostingUrlField'
 import { HostingEditor as HostingEditor_15976d9876b7ed1dab5acb3473d683df } from '@/plugins/html-hosting/components/HostingEditor'
+import { ApiEndpointGuide as ApiEndpointGuide_125f1c5d5dc04998c19f20c7335a6325 } from '@/plugins/ai-api/components/ApiEndpointGuide'
 import { PasskeyLoginButton as PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5 } from '@/components/admin/PasskeyLoginButton'
 import { ImageCompressionProvider as ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc } from '@/components/admin/ImageCompressionProvider'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
@@ -95,11 +95,11 @@ export const importMap = {
   "@/components/admin/TagsField#TagsField": TagsField_f244308917f813f13f900c89daefb407,
   "@/components/admin/JsonCodeField#JsonCodeField": JsonCodeField_48b0254b06c95d4fad24ce116bd7a684,
   "/plugins/ogImageAutoFill/components/OgImageField#OgImageField": OgImageField_504683e6233c1c3fb9eaf563e8d3aa9f,
-  "@/components/admin/ApiEndpointGuide#ApiEndpointGuide": ApiEndpointGuide_129f8a86d19e3878da0901b9f6b5d14a,
   "@/plugins/html-file-manager/components/LinkedPostCell#LinkedPostCell": LinkedPostCell_fc307546e6356b32183e083dd01c5c7f,
   "@/plugins/html-file-manager/components/MobileFullscreenEditor#MobileFullscreenEditor": MobileFullscreenEditor_94986dd0765443c6a447569bd388326c,
   "@/plugins/html-hosting/components/HostingUrlField#HostingUrlField": HostingUrlField_4a2099868d4869c9b5da93d211c320a6,
   "@/plugins/html-hosting/components/HostingEditor#HostingEditor": HostingEditor_15976d9876b7ed1dab5acb3473d683df,
+  "@/plugins/ai-api/components/ApiEndpointGuide#ApiEndpointGuide": ApiEndpointGuide_125f1c5d5dc04998c19f20c7335a6325,
   "@/components/admin/PasskeyLoginButton#PasskeyLoginButton": PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5,
   "@/components/admin/ImageCompressionProvider#ImageCompressionProvider": ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,

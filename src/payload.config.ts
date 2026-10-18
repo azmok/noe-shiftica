@@ -26,11 +26,11 @@ import { TechPosts } from './collections/TechPosts'
 import { WhatsNew } from './collections/WhatsNew'
 import { Changelog } from './collections/Changelog'
 import { Passkeys } from './collections/Passkeys'
-import { ApiLogs } from './collections/ApiLogs'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { htmlHostingPlugin } from './plugins/html-hosting'
 import { apiClientsPlugin } from './plugins/api-clients'
+import { aiApiPlugin } from './plugins/ai-api'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
@@ -96,7 +96,7 @@ const configPromise = buildConfig({
     defaultFromName: 'Noe Shiftica',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Media, Categories, Posts, TechPosts, WhatsNew, Changelog, Passkeys, ApiLogs],
+  collections: [Users, Media, Categories, Posts, TechPosts, WhatsNew, Changelog, Passkeys],
   blocks: [CustomCodeBlock],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
@@ -168,6 +168,8 @@ const configPromise = buildConfig({
     panelResizerPlugin(),
     htmlFileManagerPlugin(),
     htmlHostingPlugin(),
+    // AI 記事 API（/api/ai/posts）と api-logs。api-logs も下の権限ラップに含めるため apiClientsPlugin() より前に置く
+    aiApiPlugin(),
     // Must stay last: wraps the access of every collection (incl. ones added by the
     // plugins above) so API-key clients only get what /admin → 外部AI連携 allows.
     apiClientsPlugin(),
