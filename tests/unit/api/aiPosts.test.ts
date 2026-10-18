@@ -63,7 +63,14 @@ const fetchMock = vi.fn(async (_url: string, init: { body: string }) => {
   const children = body
     .split('\n')
     .filter((l) => l.trim())
-    .map((text) => ({ type: 'paragraph', children: [{ type: 'text', text: text.trim() }] }))
+    .map((text) =>
+      text.startsWith('LINK:')
+        ? {
+            type: 'paragraph',
+            children: [{ type: 'link', fields: { url: text.slice(5).trim(), linkType: 'custom', newTab: false }, children: [] }],
+          }
+        : { type: 'paragraph', children: [{ type: 'text', text: text.trim() }] },
+    )
   return new Response(JSON.stringify({ lexical: { root: { type: 'root', children } }, frontmatter: {} }), {
     status: 200,
   })
@@ -173,6 +180,16 @@ describe('POST /api/ai/posts — article folder flow', () => {
     })
     expect((await res.json()).mediaIds).toEqual([101, 101])
     expect(mockPayload.create.mock.calls.filter(([a]) => a.collection === 'media')).toHaveLength(2)
+  })
+
+  it('saves every link to open in a new tab', async () => {
+    const res = await post({
+      collection: 'tech-posts',
+      markdown: '---\ntitle: "T"\nslug: "t"\n---\n\nLINK: https://example.com',
+    })
+    expect(res.status).toBe(201)
+    const link = createdPost()!.data.content.root.children[0].children[0]
+    expect(link).toMatchObject({ type: 'link', fields: { url: 'https://example.com', newTab: true } })
   })
 
   it('rejects a referenced image that was not sent', async () => {

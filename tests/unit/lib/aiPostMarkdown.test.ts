@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { prepareArticleMarkdown, replaceImagePlaceholders } from '@/lib/aiPostMarkdown'
+import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '@/lib/aiPostMarkdown'
 
 const article = `---
 title: "Title"
@@ -99,3 +99,31 @@ describe('replaceImagePlaceholders', () => {
     expect(() => replaceImagePlaceholders(lexical, [1])).toThrow()
   })
 })
+
+describe('openLinksInNewTab', () => {
+  it('sets newTab on every link and autolink, keeping the other fields', () => {
+    const lexical = {
+      root: {
+        type: 'root',
+        children: [
+          {
+            type: 'paragraph',
+            children: [
+              { type: 'link', fields: { url: 'https://example.com', linkType: 'custom', newTab: false }, children: [] },
+              { type: 'text', text: 'plain' },
+            ],
+          },
+          { type: 'list', children: [{ type: 'listitem', children: [{ type: 'autolink', fields: { url: 'https://a.b' } }] }] },
+        ],
+      },
+    }
+    openLinksInNewTab(lexical)
+    const p = lexical.root.children[0] as { children: { fields?: Record<string, unknown> }[] }
+    expect(p.children[0].fields).toEqual({ url: 'https://example.com', linkType: 'custom', newTab: true })
+    expect(p.children[1].fields).toBeUndefined()
+    const list = lexical.root.children[1] as { children: { children: { fields?: Record<string, unknown> }[] }[] }
+    const auto = list.children[0].children[0]
+    expect(auto.fields).toEqual({ url: 'https://a.b', newTab: true })
+  })
+})
+

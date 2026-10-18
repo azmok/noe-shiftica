@@ -112,3 +112,21 @@ export function replaceImagePlaceholders<T extends { root?: LexicalNode }>(
   if (leftover) throw new Error(`Image placeholder could not be replaced: ${leftover[0]}`)
   return lexical
 }
+
+/**
+ * 本文中のリンク（link / autolink ノード）をすべて「新しいタブで開く」にする。
+ * 管理画面で手動投稿した記事と同じ挙動（target="_blank"）に揃えるため。
+ */
+export function openLinksInNewTab<T extends { root?: LexicalNode }>(lexical: T): T {
+  const visit = (node: LexicalNode | undefined) => {
+    if (!node) return
+    if (node.type === 'link' || node.type === 'autolink') {
+      const fields = (node.fields ?? {}) as Record<string, unknown>
+      node.fields = { ...fields, newTab: true }
+    }
+    if (Array.isArray(node.children)) node.children.forEach(visit)
+  }
+  visit(lexical.root)
+  return lexical
+}
+

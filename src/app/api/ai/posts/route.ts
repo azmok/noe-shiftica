@@ -3,7 +3,7 @@ import { getPayload, type Payload, type TypedUser } from 'payload'
 import config from '@payload-config'
 import matter from 'gray-matter'
 import { translateToSlug } from '@/lib/translateToSlug'
-import { prepareArticleMarkdown, replaceImagePlaceholders } from '@/lib/aiPostMarkdown'
+import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '@/lib/aiPostMarkdown'
 import {
   type Operation,
   canAccess,
@@ -28,6 +28,7 @@ import {
  *                         media にアップロードして画像ブロックとして埋め込む。同名の media が
  *                         既にあれば再利用するので、更新時に送り直しても重複しない
  *   - categories          [ID or カテゴリ名, ...]（旧 `category` 単数も可）
+ *   - 本文のリンクはすべて「新しいタブで開く」（target="_blank"）で保存する
  *   - status              "draft"（既定）/ "published"
  *   - markdown を省略して { slug, collection, status: "published" } だけ送ると、
  *     既存の最新下書きをそのまま公開する（下書き確認 → 公開の2段階運用向け）
@@ -527,6 +528,8 @@ export async function POST(request: NextRequest) {
     // 7. Parse Markdown into Lexical AST and embed the uploaded images
     const { lexical, frontmatter } = await convertMarkdown(request, prepared.markdown)
     replaceImagePlaceholders(lexical as Parameters<typeof replaceImagePlaceholders>[0], imageResult.mediaIds)
+    // Same as posts written in the admin editor: links open in a new tab
+    openLinksInNewTab(lexical as Parameters<typeof openLinksInNewTab>[0])
 
     // Merge frontmatter description if not explicitly provided
     const finalDescription = description || (frontmatter.description as string | undefined) || ''
