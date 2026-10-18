@@ -302,19 +302,22 @@ export const ApiEndpointGuide: React.FC = () => {
                     <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>title</td>
                     <td style={{ padding: '6px 8px' }}>string</td>
                     <td style={{ padding: '6px 8px', color: '#ff7b72' }}>必須</td>
-                    <td style={{ padding: '6px 8px' }}>記事のタイトル</td>
+                    <td style={{ padding: '6px 8px' }}>記事のタイトル（markdown の frontmatter に title があれば省略可）</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>markdown</td>
                     <td style={{ padding: '6px 8px' }}>string</td>
                     <td style={{ padding: '6px 8px', color: '#ff7b72' }}>必須</td>
-                    <td style={{ padding: '6px 8px' }}>記事の本文（Markdown形式）</td>
+                    <td style={{ padding: '6px 8px' }}>
+                      記事の本文（Markdown形式）。記事フォルダの .md をそのまま送れる。冒頭の &lt;link&gt; / &lt;h1&gt;、HTML コメント、X の widgets.js &lt;script&gt; は自動で除去。
+                      <code>slug</code> と <code>status: &quot;published&quot;</code> だけを送ると、既存の最新下書きをそのまま公開する（この場合は省略可）
+                    </td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>slug</td>
                     <td style={{ padding: '6px 8px' }}>string</td>
                     <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
-                    <td style={{ padding: '6px 8px' }}>URLスラッグ（省略時はタイトルから英訳自動生成）</td>
+                    <td style={{ padding: '6px 8px' }}>URLスラッグ（省略時は frontmatter の slug、それも無ければタイトルから英訳自動生成）</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>status</td>
@@ -328,11 +331,32 @@ export const ApiEndpointGuide: React.FC = () => {
                     <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
                     <td style={{ padding: '6px 8px' }}>記事概要・SEOメタディスクリプション</td>
                   </tr>
-                  <tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>collection</td>
                     <td style={{ padding: '6px 8px' }}>string</td>
                     <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
                     <td style={{ padding: '6px 8px' }}>"posts" または "tech-posts"（既定: posts）</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>images</td>
+                    <td style={{ padding: '6px 8px' }}>array</td>
+                    <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
+                    <td style={{ padding: '6px 8px' }}>
+                      <code>[{'{'} filename, data, alt? {'}'}]</code>（data は base64）。本文の <code>![alt](./filename)</code> を Media にアップロードして画像ブロックとして埋め込む。
+                      同名の Media があれば再利用。png / jpg / gif / webp、合計 20MB まで。Media の「作成」権限が必要
+                    </td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>categories</td>
+                    <td style={{ padding: '6px 8px' }}>array</td>
+                    <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
+                    <td style={{ padding: '6px 8px' }}>カテゴリの ID または名前の配列（複数可）。存在しない名前はエラー。単数の <code>category</code> も引き続き使える</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>tags</td>
+                    <td style={{ padding: '6px 8px' }}>string[]</td>
+                    <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
+                    <td style={{ padding: '6px 8px' }}>タグの配列</td>
                   </tr>
                 </tbody>
               </table>

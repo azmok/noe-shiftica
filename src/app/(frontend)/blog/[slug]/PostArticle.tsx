@@ -10,6 +10,7 @@ import { ArticleCustomAssets } from "./ArticleCustomAssets"
 import { ArticleToc, tocEntries } from "./ArticleToc"
 import { ArticleTocSidebar } from "./ArticleTocSidebar"
 import { HeadingAnchorBehavior } from "./HeadingAnchorBehavior"
+import { TwitterEmbedLoader } from "./TwitterEmbedLoader"
 import { extractHeadings } from "@/lib/articleHeadings"
 import { toInternalHref } from "@/lib/articleLinks"
 import styles from './PostArticle.module.css'
@@ -107,6 +108,31 @@ const extractSvgDefs = (content: unknown): string[] => {
     }
     walk((content as any)?.root)
     return defs
+}
+
+// True when a raw-HTML block holds an X (Twitter) embed, so widgets.js is only
+// loaded on articles that actually need it.
+type EmbedScanNode = {
+    type?: string
+    fields?: { blockType?: string; renderAsHtml?: boolean; code?: unknown }
+    children?: EmbedScanNode[]
+}
+
+const hasTwitterEmbed = (content: unknown): boolean => {
+    const walk = (node: EmbedScanNode | undefined): boolean => {
+        if (!node) return false
+        if (
+            node.type === 'block' &&
+            node.fields?.blockType === 'code-block' &&
+            node.fields?.renderAsHtml &&
+            typeof node.fields.code === 'string' &&
+            /class=["'][^"']*\btwitter-tweet\b/.test(node.fields.code)
+        ) {
+            return true
+        }
+        return Array.isArray(node.children) && node.children.some(walk)
+    }
+    return walk((content as { root?: EmbedScanNode } | null)?.root)
 }
 
 // Payload renders body links as plain <a>, so links to other articles reloaded the whole
@@ -285,6 +311,7 @@ export const PostArticle: React.FC<{
             ))}
             <ArticleCustomAssets scopeId={scopeId} css={(post as any).customCss} js={(post as any).customJs} />
             <HeadingAnchorBehavior scopeId={scopeId} />
+            {hasTwitterEmbed(post.content) && <TwitterEmbedLoader />}
             {isPreview && (
                 <div className="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-r-xl neu-flat mx-4 mt-6 md:mx-0 md:mt-0">
                     <p className="font-bold">Preview Mode</p>
