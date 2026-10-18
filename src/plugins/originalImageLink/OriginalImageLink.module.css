@@ -1,0 +1,12 @@
+/*
+ * 記事本文のリンク装飾（下線・「新しいタブ」アイコン）は画像リンクには付けない。
+ * 本文側の `.postContent a::after` より強くするため、クラスを2回重ねて詳細度を上げている。
+ */
+.link.link {
+  display: block;
+  text-decoration: none;
+
+  &::after {
+    content: none;
+  }
+}
