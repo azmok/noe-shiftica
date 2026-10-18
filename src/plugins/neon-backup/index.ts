@@ -1,8 +1,53 @@
 import type { Config, Plugin, CollectionAfterChangeHook } from 'payload'
 
-const BACKUP_BRANCH_NAME = 'backup/pre-deploy'
+/** 記事保存時のバックアップ。名前は `backup/on-save-YYYYMMDD-HHmmss`（JST） */
+export const ON_SAVE_PREFIX = 'backup/on-save'
+/** 残す世代数 */
+export const KEEP_GENERATIONS = 2
+/** 保存時バックアップの最短間隔（直近の世代がこれより新しければ作らない） */
+export const MIN_INTERVAL_MS = 30 * 60 * 1000
 
-async function triggerNeonBackup(): Promise<void> {
+export interface NeonBranch {
+  id: string
+  name: string
+  created_at: string
+  primary?: boolean
+}
+
+/** prefix の世代に属するか（`prefix` そのもの＝旧形式の名前も含む） */
+export function isGeneration(name: string, prefix: string): boolean {
+  return name === prefix || name.startsWith(`${prefix}-`)
+}
+
+/** prefix の世代を新しい順に返す */
+export function generationsOf(branches: NeonBranch[], prefix: string): NeonBranch[] {
+  return branches
+    .filter((b) => isGeneration(b.name, prefix))
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+}
+
+/** 直近の世代が minIntervalMs 以内に作られていれば true（今回は作らない） */
+export function isTooSoon(branches: NeonBranch[], prefix: string, now: number, minIntervalMs: number): boolean {
+  const latest = generationsOf(branches, prefix)[0]
+  return latest !== undefined && now - Date.parse(latest.created_at) < minIntervalMs
+}
+
+/** 新しい順に keep 世代を残し、それより古い世代を返す */
+export function generationsToDelete(branches: NeonBranch[], prefix: string, keep: number): NeonBranch[] {
+  return generationsOf(branches, prefix).slice(keep)
+}
+
+/** `backup/on-save-20261018-213214` のような JST タイムスタンプ付きの名前 */
+export function generationName(prefix: string, now: Date): string {
+  const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString()
+  return `${prefix}-${jst.slice(0, 10).replace(/-/g, '')}-${jst.slice(11, 19).replace(/:/g, '')}`
+}
+
+/**
+ * 本番（primary）ブランチから新しい世代を作り、作成に成功したときだけ古い世代を消す。
+ * 直近の世代が MIN_INTERVAL_MS 以内なら何もしない。
+ */
+export async function triggerNeonBackup(now: Date = new Date()): Promise<void> {
   const apiToken = process.env.NEON_API_TOKEN
   const projectId = process.env.NEON_PROJECT_ID
 
@@ -11,67 +56,58 @@ async function triggerNeonBackup(): Promise<void> {
     return
   }
 
+  const baseUrl = `https://console.neon.tech/api/v2/projects/${projectId}/branches`
   const headers: Record<string, string> = {
     Authorization: `Bearer ${apiToken}`,
     'Content-Type': 'application/json',
   }
 
   // 1. Get all branches
-  const branchesRes = await fetch(
-    `https://console.neon.tech/api/v2/projects/${projectId}/branches`,
-    { headers },
-  )
+  const branchesRes = await fetch(baseUrl, { headers })
   const branchesData = await branchesRes.json()
 
   if (!Array.isArray(branchesData.branches)) {
     console.error('[neon-backup] Failed to fetch branches:', branchesData)
     return
   }
+  const branches: NeonBranch[] = branchesData.branches
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const primaryBranch = branchesData.branches.find((b: any) => b.primary === true)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const backupBranch = branchesData.branches.find((b: any) => b.name === BACKUP_BRANCH_NAME)
-
+  const primaryBranch = branches.find((b) => b.primary === true)
   if (!primaryBranch) {
     console.error('[neon-backup] Could not find primary (production) branch.')
     return
   }
 
-  // 2. Delete existing backup branch if it exists
-  if (backupBranch) {
-    const deleteRes = await fetch(
-      `https://console.neon.tech/api/v2/projects/${projectId}/branches/${backupBranch.id}`,
-      { method: 'DELETE', headers },
-    )
-    if (!deleteRes.ok) {
-      console.error('[neon-backup] Failed to delete old backup branch:', await deleteRes.text())
-      return
-    }
-    // Wait for deletion to complete before creating a new branch
-    await new Promise((resolve) => setTimeout(resolve, 3000))
+  if (isTooSoon(branches, ON_SAVE_PREFIX, now.getTime(), MIN_INTERVAL_MS)) {
+    console.log('[neon-backup] Latest on-save backup is less than 30 minutes old. Skipping.')
+    return
   }
 
-  // 3. Create new backup branch from production (primary) branch
-  const createRes = await fetch(
-    `https://console.neon.tech/api/v2/projects/${projectId}/branches`,
-    {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        branch: {
-          name: BACKUP_BRANCH_NAME,
-          parent_id: primaryBranch.id,
-        },
-      }),
-    },
-  )
+  // 2. Create the new generation from production (primary) branch
+  const name = generationName(ON_SAVE_PREFIX, now)
+  const createRes = await fetch(baseUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ branch: { name, parent_id: primaryBranch.id } }),
+  })
   const createData = await createRes.json()
 
-  if (createData.branch) {
-    console.log(`[neon-backup] Backup branch created: ${createData.branch.id} (parent: ${primaryBranch.id})`)
-  } else {
+  if (!createData.branch) {
+    // Keep the old generations untouched when the new one could not be created
     console.error('[neon-backup] Failed to create backup branch:', createData)
+    return
+  }
+  console.log(`[neon-backup] Backup branch created: ${name} (${createData.branch.id}, parent: ${primaryBranch.id})`)
+
+  // 3. Delete generations older than the newest KEEP_GENERATIONS (including the one just created)
+  const stale = generationsToDelete([...branches, createData.branch], ON_SAVE_PREFIX, KEEP_GENERATIONS)
+  for (const branch of stale) {
+    const deleteRes = await fetch(`${baseUrl}/${branch.id}`, { method: 'DELETE', headers })
+    if (deleteRes.ok) {
+      console.log(`[neon-backup] Deleted old backup branch: ${branch.name} (${branch.id})`)
+    } else {
+      console.error(`[neon-backup] Failed to delete old backup branch ${branch.name}:`, await deleteRes.text())
+    }
   }
 }
 
