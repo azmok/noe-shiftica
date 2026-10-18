@@ -24,6 +24,12 @@ before retrying (the original instruction + Signs win over your latest failure l
 - No need to wait on or report background rollouts / long prod builds (Azuma checks those); tsc/unit verification is enough to report done.
 - Packages: JS = pnpm (+ fnm) only / Python = uv only. NEVER use pip or npm.
 - After editing source, verify it is clean UTF-8 with no NUL bytes (see Sign "Source files must stay clean UTF-8" in `memory/signs.md`).
+- **Build features as Payload plugins** (`src/plugins/<name>/`) — 機能はプラグイン単位で作る:
+  1. If a change fits the scope of an existing plugin, modify / extend **that** plugin instead of adding
+     code elsewhere (`src/app/api/*`, `src/lib/*`, `src/collections/*`, …).
+  2. If it belongs to no existing plugin, create a **new plugin** for it and register it in
+     `payload.config.ts` → `plugins` (that file is protected: get approval first).
+  Check `ls src/plugins` and each plugin's `index.ts` / README before deciding where a change goes.
 
 ## Protected files (editing requires explicit approval — HARD STOP)
 - src/collections/*
