@@ -78,9 +78,9 @@ export interface Config {
     'whats-new': WhatsNew;
     changelog: Changelog;
     passkeys: Passkey;
-    'api-logs': ApiLog;
     'html-files': HtmlFile;
     'hosted-pages': HostedPage;
+    'api-logs': ApiLog;
     'api-clients': ApiClient;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -97,9 +97,9 @@ export interface Config {
     'whats-new': WhatsNewSelect<false> | WhatsNewSelect<true>;
     changelog: ChangelogSelect<false> | ChangelogSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
-    'api-logs': ApiLogsSelect<false> | ApiLogsSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
     'hosted-pages': HostedPagesSelect<false> | HostedPagesSelect<true>;
+    'api-logs': ApiLogsSelect<false> | ApiLogsSelect<true>;
     'api-clients': ApiClientsSelect<false> | ApiClientsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -538,6 +538,28 @@ export interface Passkey {
   createdAt: string;
 }
 /**
+ * CSS/JS を含む HTML をアップロード、または直接編集して /p/<slug> で公開します。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hosted-pages".
+ */
+export interface HostedPage {
+  id: number;
+  /**
+   * 管理画面の一覧表示用の名前です（公開ページの <title> にも使われます）。
+   */
+  title?: string | null;
+  /**
+   * 公開 URL の末尾。英小文字・数字・ハイフンのみ。例: my-landing-page
+   */
+  slug: string;
+  html?: string | null;
+  css?: string | null;
+  js?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "api-logs".
  */
@@ -650,28 +672,6 @@ export interface ApiClient {
   collection: 'api-clients';
 }
 /**
- * CSS/JS を含む HTML をアップロード、または直接編集して /p/<slug> で公開します。
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "hosted-pages".
- */
-export interface HostedPage {
-  id: number;
-  /**
-   * 管理画面の一覧表示用の名前です（公開ページの <title> にも使われます）。
-   */
-  title?: string | null;
-  /**
-   * 公開 URL の末尾。英小文字・数字・ハイフンのみ。例: my-landing-page
-   */
-  slug: string;
-  html?: string | null;
-  css?: string | null;
-  js?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -728,16 +728,16 @@ export interface PayloadLockedDocument {
         value: number | Passkey;
       } | null)
     | ({
-        relationTo: 'api-logs';
-        value: number | ApiLog;
-      } | null)
-    | ({
         relationTo: 'html-files';
         value: number | HtmlFile;
       } | null)
     | ({
         relationTo: 'hosted-pages';
         value: number | HostedPage;
+      } | null)
+    | ({
+        relationTo: 'api-logs';
+        value: number | ApiLog;
       } | null)
     | ({
         relationTo: 'api-clients';
@@ -1022,25 +1022,6 @@ export interface PasskeysSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "api-logs_select".
- */
-export interface ApiLogsSelect<T extends boolean = true> {
-  action?: T;
-  status?: T;
-  responseStatus?: T;
-  postTitle?: T;
-  postSlug?: T;
-  postId?: T;
-  client?: T;
-  clientName?: T;
-  clientIp?: T;
-  requestSummary?: T;
-  errorMessage?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "html-files_select".
  */
 export interface HtmlFilesSelect<T extends boolean = true> {
@@ -1070,6 +1051,25 @@ export interface HostedPagesSelect<T extends boolean = true> {
   html?: T;
   css?: T;
   js?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-logs_select".
+ */
+export interface ApiLogsSelect<T extends boolean = true> {
+  action?: T;
+  status?: T;
+  responseStatus?: T;
+  postTitle?: T;
+  postSlug?: T;
+  postId?: T;
+  client?: T;
+  clientName?: T;
+  clientIp?: T;
+  requestSummary?: T;
+  errorMessage?: T;
   updatedAt?: T;
   createdAt?: T;
 }
