@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getPayload, type Payload, type TypedUser } from 'payload'
 import config from '@payload-config'
+import matter from 'gray-matter'
 import { translateToSlug } from '@/lib/translateToSlug'
+import { prepareArticleMarkdown, replaceImagePlaceholders } from '@/lib/aiPostMarkdown'
 import {
   type Operation,
   canAccess,
@@ -17,7 +19,36 @@ import {
  *   - `Authorization: Bearer <キー>`
  *   - `Authorization: api-clients API-Key <キー>`（Payload 標準形式）
  * 実行できる操作は、そのAIに付けた権限（作成 / 編集 / 削除 / 公開）に従う。
+ *
+ * POST の本文（JSON）:
+ *   - markdown            記事フォルダの .md そのまま。冒頭の <link>/<h1>・HTML コメント・
+ *                         X の widgets.js <script> は自動で除去する
+ *   - title / slug / description   省略時は markdown の frontmatter から補う
+ *   - images              [{ filename, data(base64), alt? }]。本文の `![alt](./filename)` を
+ *                         media にアップロードして画像ブロックとして埋め込む。同名の media が
+ *                         既にあれば再利用するので、更新時に送り直しても重複しない
+ *   - categories          [ID or カテゴリ名, ...]（旧 `category` 単数も可）
+ *   - status              "draft"（既定）/ "published"
+ *   - markdown を省略して { slug, collection, status: "published" } だけ送ると、
+ *     既存の最新下書きをそのまま公開する（下書き確認 → 公開の2段階運用向け）
  */
+
+const IMAGE_MIME: Record<string, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+}
+
+/** 1リクエストで受け付ける画像の合計サイズ（デコード後）。base64 で約1.33倍になり、App Hosting（Cloud Run）のリクエスト上限 32MB に収まるように */
+const MAX_IMAGE_BYTES = 20 * 1024 * 1024
+
+interface ImageInput {
+  filename?: unknown
+  data?: unknown
+  alt?: unknown
+}
 
 type PostCollection = 'posts' | 'tech-posts'
 
@@ -122,8 +153,210 @@ async function recordApiLog(
   }
 }
 
-function forbidden(operation: Operation, collection: PostCollection) {
+function forbidden(operation: Operation, collection: string) {
   return `Forbidden: this API key is not allowed to "${operation}" in "${collection}". Ask the site admin to enable it in 外部AI連携.`
+}
+
+const baseName = (p: string) => p.split('/').pop() ?? p
+
+/**
+ * 本文で参照している画像を media の ID に解決する。
+ * 同名ファイルが media にあり、送られたデータとサイズが同じ（またはデータが送られていない）なら
+ * 再利用する。別記事の同名・別画像を取り違えないよう、サイズが違えば新規にアップロードする
+ * （Payload が名前の重複を -1 などで回避する）。アップロードは呼び出し元として実行するので、
+ * Media の「作成」権限が必要。
+ */
+async function resolveImages(
+  payload: Payload,
+  user: TypedUser,
+  refs: { src: string; alt: string }[],
+  inputs: ImageInput[],
+): Promise<{ mediaIds: Array<number | string> } | { error: string; status: number }> {
+  if (refs.length === 0) return { mediaIds: [] }
+
+  const provided = new Map<string, { buffer: Buffer; mimetype: string; alt?: string }>()
+  let totalBytes = 0
+  for (const img of inputs) {
+    if (typeof img?.filename !== 'string' || typeof img?.data !== 'string') {
+      return { error: 'Each item in "images" needs "filename" and base64 "data"', status: 400 }
+    }
+    const name = baseName(img.filename)
+    const mimetype = IMAGE_MIME[name.split('.').pop()?.toLowerCase() ?? '']
+    if (!mimetype) {
+      return { error: `Unsupported image type: ${name} (png / jpg / gif / webp only)`, status: 400 }
+    }
+    const buffer = Buffer.from(img.data.replace(/^data:[^;,]+;base64,/, ''), 'base64')
+    totalBytes += buffer.length
+    if (totalBytes > MAX_IMAGE_BYTES) {
+      return { error: `Images exceed ${MAX_IMAGE_BYTES / 1024 / 1024}MB in total`, status: 413 }
+    }
+    provided.set(name, { buffer, mimetype, alt: typeof img.alt === 'string' ? img.alt : undefined })
+  }
+
+  const mediaIds: Array<number | string> = []
+  for (const ref of refs) {
+    const name = baseName(ref.src)
+    // Internal lookup by filename so re-sending the same article does not duplicate media.
+    const existing = await payload.find({
+      collection: 'media',
+      where: { filename: { equals: name } },
+      limit: 1,
+      depth: 0,
+    })
+    const file = provided.get(name)
+    const found = existing.docs[0] as { id: number | string; filesize?: number | null } | undefined
+    if (found && (!file || found.filesize === file.buffer.length)) {
+      mediaIds.push(found.id)
+      continue
+    }
+
+    if (!file) {
+      return {
+        error: `Image "${ref.src}" is referenced in the markdown but was not sent in "images"`,
+        status: 400,
+      }
+    }
+    if (!canAccess(user, 'media', 'create')) {
+      return { error: forbidden('create', 'media'), status: 403 }
+    }
+    const created = await payload.create({
+      collection: 'media',
+      data: { alt: file.alt || ref.alt },
+      file: { data: file.buffer, mimetype: file.mimetype, name, size: file.buffer.length },
+      user,
+      overrideAccess: false,
+    })
+    mediaIds.push(created.id)
+  }
+  return { mediaIds }
+}
+
+/** カテゴリ指定（ID または名前）を ID の配列にする。見つからない名前はエラー */
+async function resolveCategories(
+  payload: Payload,
+  inputs: unknown[],
+): Promise<{ ids: number[] } | { error: string }> {
+  const ids: number[] = []
+  for (const input of inputs) {
+    if (typeof input === 'number' || (typeof input === 'string' && /^\d+$/.test(input.trim()))) {
+      ids.push(Number(input))
+      continue
+    }
+    if (typeof input !== 'string' || !input.trim()) {
+      return { error: 'Each category must be an ID or a category name' }
+    }
+    const found = await payload.find({
+      collection: 'categories',
+      where: { name: { equals: input.trim() } },
+      limit: 1,
+      depth: 0,
+    })
+    if (!found.docs[0]) return { error: `Category not found: ${input}` }
+    ids.push(Number(found.docs[0].id))
+  }
+  return { ids: [...new Set(ids)] }
+}
+
+/** 既存記事の最新下書きを、内容そのままで公開する */
+async function publishExistingDraft(
+  payload: Payload,
+  user: TypedUser,
+  collection: PostCollection,
+  slug: string,
+  clientIp: string,
+) {
+  const summary = JSON.stringify({ slug, collection, status: 'published', publishOnly: true })
+  const found = await payload.find({
+    collection,
+    where: { slug: { equals: slug } },
+    limit: 1,
+    depth: 0,
+    draft: true,
+  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const latest: any = found.docs[0]
+  if (!latest) {
+    const message = `Not found: no "${collection}" post with slug "${slug}"`
+    await recordApiLog(payload, user, {
+      action: 'post',
+      status: 'error',
+      responseStatus: 404,
+      postSlug: slug,
+      clientIp,
+      requestSummary: summary,
+      errorMessage: message,
+    })
+    return NextResponse.json({ error: message }, { status: 404 })
+  }
+
+  const missing: Operation | null = !canAccess(user, collection, 'update')
+    ? 'update'
+    : !canAccess(user, collection, 'publish')
+      ? 'publish'
+      : null
+  if (missing) {
+    const message = forbidden(missing, collection)
+    await recordApiLog(payload, user, {
+      action: 'post',
+      status: 'error',
+      responseStatus: 403,
+      postTitle: latest.title,
+      postSlug: slug,
+      postId: String(latest.id),
+      clientIp,
+      requestSummary: summary,
+      errorMessage: message,
+    })
+    return NextResponse.json({ error: message }, { status: 403 })
+  }
+
+  try {
+    // Send the whole latest draft: a partial update could publish an older body.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, createdAt, updatedAt, _status, ...data } = latest
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const saved: any = await payload.update({
+      collection,
+      id,
+      data: { ...data, _status: 'published' },
+      user,
+      overrideAccess: false,
+    })
+    await recordApiLog(payload, user, {
+      action: 'post',
+      status: 'success',
+      responseStatus: 200,
+      postTitle: saved.title,
+      postSlug: saved.slug,
+      postId: String(saved.id),
+      clientIp,
+      requestSummary: summary,
+    })
+    return NextResponse.json({
+      success: true,
+      operation: 'publish',
+      id: String(saved.id),
+      slug: saved.slug,
+      status: saved._status,
+      url: collection === 'tech-posts' ? `/dev/${saved.slug}` : `/blog/${saved.slug}`,
+      adminUrl: `/admin/collections/${collection}/${saved.id}`,
+    })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Internal Server Error'
+    console.error('[AI Post API] Error publishing post:', error)
+    await recordApiLog(payload, user, {
+      action: 'post',
+      status: 'error',
+      responseStatus: 500,
+      postTitle: latest.title,
+      postSlug: slug,
+      postId: String(latest.id),
+      clientIp,
+      requestSummary: summary,
+      errorMessage: message,
+    })
+    return NextResponse.json({ error: 'Internal Server Error', details: message }, { status: 500 })
+  }
 }
 
 /**
@@ -162,17 +395,38 @@ export async function POST(request: NextRequest) {
   }
 
   const {
-    title,
     markdown,
-    slug: rawSlug,
     status = 'draft',
     collection = 'posts',
-    description,
     category,
+    categories,
     tags,
     customCss,
     customJs,
   } = body
+  const images: ImageInput[] = Array.isArray(body.images) ? body.images : []
+
+  const targetCollection: PostCollection = collection === 'tech-posts' ? 'tech-posts' : 'posts'
+  const wantsPublish = status === 'published'
+
+  // markdown 無しの publish は「既存の下書きをそのまま公開」
+  if (markdown === undefined && wantsPublish && typeof body.slug === 'string' && body.slug.trim()) {
+    return publishExistingDraft(payload, user, targetCollection, body.slug.trim(), clientIp)
+  }
+
+  // title / slug / description は frontmatter で補う（記事フォルダの .md をそのまま送れるように）
+  let frontmatterData: Record<string, unknown> = {}
+  if (typeof markdown === 'string') {
+    try {
+      frontmatterData = matter(markdown.trimStart()).data ?? {}
+    } catch {
+      frontmatterData = {}
+    }
+  }
+  const pickString = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : undefined)
+  const title = pickString(body.title) ?? pickString(frontmatterData.title)
+  const rawSlug = pickString(body.slug) ?? pickString(frontmatterData.slug)
+  const description = pickString(body.description) ?? pickString(frontmatterData.description)
 
   const summary = JSON.stringify({
     title,
@@ -181,10 +435,11 @@ export async function POST(request: NextRequest) {
     collection,
     hasMarkdown: Boolean(markdown),
     markdownLength: markdown?.length ?? 0,
+    images: images.map((img) => (typeof img?.filename === 'string' ? img.filename : '?')),
   })
 
   // 2. Validate input
-  if (!title || typeof title !== 'string' || !title.trim()) {
+  if (!title) {
     await recordApiLog(payload, user, {
       action: 'post',
       status: 'error',
@@ -209,12 +464,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Field "markdown" is required' }, { status: 400 })
   }
 
-  const targetCollection: PostCollection = collection === 'tech-posts' ? 'tech-posts' : 'posts'
-  const wantsPublish = status === 'published'
-
   try {
     // 3. Resolve slug
-    let slug = rawSlug?.trim()
+    let slug = rawSlug
     if (!slug) {
       slug = await translateToSlug(title)
     }
@@ -254,29 +506,51 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: message }, { status: 403 })
     }
 
-    // 6. Parse Markdown into Lexical AST
-    const { lexical, frontmatter } = await convertMarkdown(request, markdown)
+    // 6. Strip preview-only markup and swap image lines for placeholders, then
+    //    upload / reuse the referenced images before converting.
+    const prepared = prepareArticleMarkdown(markdown)
+    const imageResult = await resolveImages(payload, user, prepared.images, images)
+    if ('error' in imageResult) {
+      await recordApiLog(payload, user, {
+        action: 'post',
+        status: 'error',
+        responseStatus: imageResult.status,
+        postTitle: title,
+        postSlug: slug,
+        clientIp,
+        requestSummary: summary,
+        errorMessage: imageResult.error,
+      })
+      return NextResponse.json({ error: imageResult.error }, { status: imageResult.status })
+    }
+
+    // 7. Parse Markdown into Lexical AST and embed the uploaded images
+    const { lexical, frontmatter } = await convertMarkdown(request, prepared.markdown)
+    replaceImagePlaceholders(lexical as Parameters<typeof replaceImagePlaceholders>[0], imageResult.mediaIds)
 
     // Merge frontmatter description if not explicitly provided
-    const finalDescription = description || frontmatter.description || ''
+    const finalDescription = description || (frontmatter.description as string | undefined) || ''
 
-    // 7. Resolve category ID if category name or ID is passed
-    let categoryId: number | undefined
-    if (category) {
-      if (typeof category === 'number') {
-        categoryId = category
-      } else if (typeof category === 'string') {
-        const catResult = await payload.find({
-          collection: 'categories',
-          where: { name: { equals: category } },
-          limit: 1,
-          depth: 0,
-        })
-        if (catResult.docs.length > 0) {
-          categoryId = Number(catResult.docs[0].id)
-        }
-      }
+    // 8. Resolve categories (IDs or names). The legacy single `category` is still accepted.
+    const categoryInputs: unknown[] = [
+      ...(Array.isArray(categories) ? categories : []),
+      ...(category !== undefined && category !== null && category !== '' ? [category] : []),
+    ]
+    const categoryResult = await resolveCategories(payload, categoryInputs)
+    if ('error' in categoryResult) {
+      await recordApiLog(payload, user, {
+        action: 'post',
+        status: 'error',
+        responseStatus: 400,
+        postTitle: title,
+        postSlug: slug,
+        clientIp,
+        requestSummary: summary,
+        errorMessage: categoryResult.error,
+      })
+      return NextResponse.json({ error: categoryResult.error }, { status: 400 })
     }
+    const categoryIds = categoryResult.ids
 
     // Tags live in customMetaData.tags (TagsField). Keep any other existing metadata.
     const customMetaData = Array.isArray(tags)
@@ -289,7 +563,7 @@ export async function POST(request: NextRequest) {
       content: lexical,
       _status: wantsPublish ? 'published' : 'draft',
       ...(finalDescription ? { description: finalDescription } : {}),
-      ...(categoryId ? { categories: [categoryId] } : {}),
+      ...(categoryIds.length ? { categories: categoryIds } : {}),
       ...(customMetaData ? { customMetaData } : {}),
       ...(customCss ? { customCss } : {}),
       ...(customJs ? { customJs } : {}),
@@ -316,7 +590,7 @@ export async function POST(request: NextRequest) {
     const docSlug = savedDoc.slug || slug
     const publicUrl = targetCollection === 'tech-posts' ? `/dev/${docSlug}` : `/blog/${docSlug}`
 
-    // 8. Log success
+    // 9. Log success
     await recordApiLog(payload, user, {
       action: 'post',
       status: 'success',
@@ -336,6 +610,8 @@ export async function POST(request: NextRequest) {
         slug: docSlug,
         status: savedDoc._status || status,
         url: publicUrl,
+        adminUrl: `/admin/collections/${targetCollection}/${docId}`,
+        mediaIds: imageResult.mediaIds,
       },
       { status: operation === 'create' ? 201 : 200 },
     )
