@@ -27,6 +27,7 @@ import { WhatsNew } from './collections/WhatsNew'
 import { Changelog } from './collections/Changelog'
 import { Passkeys } from './collections/Passkeys'
 import { markdownImportPlugin } from './plugins/markdownImport'
+import { customAssetsPlugin } from './plugins/customAssets'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { htmlHostingPlugin } from './plugins/html-hosting'
 import { apiClientsPlugin } from './plugins/api-clients'
@@ -154,6 +155,8 @@ const configPromise = buildConfig({
       },
     }),
     markdownImportPlugin(),
+    // Per-post custom CSS / JS fields (General + Dev)
+    customAssetsPlugin({ collections: ['posts', 'tech-posts'] }),
     aiContentOptimizerPlugin({ collections: ['posts', 'tech-posts'] }),
     autosavePlugin(),
     slugTrackerPlugin({ collections: ['posts', 'tech-posts'] }),

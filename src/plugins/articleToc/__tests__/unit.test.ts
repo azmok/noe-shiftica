@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { extractHeadings, slugifyHeading } from '@/lib/articleHeadings'
+import { extractHeadings, slugifyHeading } from '@/plugins/articleToc/headings'
 
 const text = (value: string) => ({ type: 'text', text: value })
 const heading = (tag: string, ...children: object[]) => ({ type: 'heading', tag, children })
