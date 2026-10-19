@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>個人のための2026年最適解——蓄積量で、やるべきことは変わる</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff; }
+h4{ margin:1.5rem auto 0.5rem; font-weight:600; font-size:0.97rem; color:var(--fg); }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>個人のための2026年最適解——蓄積量で、やるべきことは変わる</h1>
+
+<div class="tldr">
+<ul>
+<li>判断基準は「蓄積量」だけ。3段階に分かれます</li>
+<li>数百ノートまでは、<strong>何もしなくていい</strong></li>
+<li>個人スケールなら、データベースはファイル1つで完結します</li>
+<li>Microsoft純正のGraphRAGは、個人には確実に過剰です</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">判断基準は「蓄積量」だけです</a></li>
+      <li><a href="#s2">なぜ段階を分ける必要があるのか</a></li>
+      <li><a href="#s3">技術選定——ファイル1つで完結する</a></li>
+      <li><a href="#s4">実装の落とし穴3つ</a></li>
+      <li><a href="#s5">今日から動かせる実装プロンプト</a></li>
+      <li><a href="#s5b">全体像——どこまで行くと、何が必要になるか</a></li>
+      <li><a href="#s6">まだ埋まっていない空白</a></li>
+      <li><a href="#s7">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>ここまでで、Obsidianの限界も、Vector・Graph・GraphRAGの仕組みも押さえました。</p>
+<p>残る問いは1つです。<strong>「で、自分は結局どうすればいいのか」</strong></p>
+<p>結論を先に書きます。</p>
+<blockquote>
+<p><strong>多くの人は、まだ何もしなくていいです。</strong></p>
+</blockquote>
+<p>そして、やるべきタイミングが来たときも、<strong>最も高機能な選択肢が最も適切であることは、まずありません。</strong> 順番に説明します。</p>
+
+<h2 id="s1">判断基準は「蓄積量」だけです</h2>
+
+<p>技術の話に入る前に、いちばん実用的な判断表を置いておきます。</p>
+
+<table>
+<tr><th>段階</th><th>蓄積量の目安</th><th>やるべきこと</th></tr>
+<tr><td>第1段階</td><td>〜数百ノート</td><td><strong>索引の仕組みを作る。</strong>設定は数行で済む</td></tr>
+<tr><td>第2段階</td><td>数百〜数千</td><td><strong>意味で探す仕組みだけ</strong>を追加する</td></tr>
+<tr><td>第3段階</td><td>数千以上</td><td>つながりの自動抽出を<strong>検討</strong>する</td></tr>
+</table>
+
+<p>多くの個人は、第1段階か第2段階のどこかにいます。<strong>第3段階まで行く人は、かなり限られます。</strong></p>
+
+<h3>第1段階：作り込む必要はない。ただしゼロでもない</h3>
+
+<p>ここが最も重要な段階です。</p>
+<p>数百ノート程度なら、<strong>検索の仕組みを自分で作り込む必要はありません。</strong> この段階でデータベースを構築するのは、目的と手段の逆転です。</p>
+<p>ただし、<strong>やることがゼロというわけでもありません。</strong></p>
+<p>正確に言うと、こうなります。</p>
+
+<blockquote>
+<p><strong>「索引の仕組み」だけは用意する。ただし設定は数行で済む。</strong></p>
+</blockquote>
+
+<p>そして——<strong>この「数行」の中身が、チャットで使っているか、ターミナルで使っているかで変わります。</strong> 後半で分けて説明します。</p>
+<p>前回紹介した事例が、そのまま根拠になります。約100記事・40万語の規模で「凝った検索の仕組みは不要だった」という報告がありました。</p>
+<p><strong>規模が小さいうちは、シンプルな構成が正解です。</strong></p>
+
+<h4>実例：Karpathy氏の「LLM Wiki」</h4>
+
+<p>この事例は、2026年4月に本人が具体的な設計として公開しています。よくできているので、簡単に紹介します。</p>
+<p><strong>構成は、3つのフォルダだけです。</strong></p>
+
+<pre><code>raw/       ← 元の資料をそのまま置く（追記のみ。編集しない）
+wiki/      ← AIが書いた、整理済みのページ
+agents.md  ← AIへの指示書</code></pre>
+
+<p>やっていることは、こうです。</p>
+
+<ol>
+<li><code>raw/</code> に資料を放り込む（PDF、記事、議事録、何でも）</li>
+<li>AIがそれを読んで、<code>wiki/</code> に整理したページを書く</li>
+<li><strong>AIがページ同士のリンクも自動で張る</strong></li>
+<li>AIが「索引ファイル」を更新する（全ページの一覧＋一行要約）</li>
+</ol>
+
+<p>そして質問するときは——<strong>AIはまず索引を読み、必要なページだけを開きます。</strong></p>
+<p>ここが肝です。<strong>毎回すべてを検索するのではなく、あらかじめ整理された結果を読む。</strong> ある解説はこれを「検索エンジンではなく、知識のコンパイラ」と表現していました。</p>
+
+<p>📌 <strong>注目してほしい点が1つあります。</strong></p>
+<blockquote>
+<p><strong>リンクを張っているのは人間ではなく、AIです。</strong></p>
+</blockquote>
+<p>Obsidianは、そのリンクを図で見るために使われているだけ。<strong>Karpathy氏自身も「必須ではない」としています。</strong></p>
+<p>つまりこれは、前回の記事で書いた<strong>「書く層」と「活かす層」を分けた構成そのもの</strong>です。Obsidianは見るための道具で、活かす層はAIが担当しています。</p>
+
+<h4>この方式が壊れるのは、いつか</h4>
+
+<p>限界も、はっきりしています。</p>
+<blockquote>
+<p><strong>ファイル数がおよそ200件を超えると、索引が大きくなりすぎて、AIが全体を保持できなくなる</strong></p>
+</blockquote>
+<p>対処は2つあります。</p>
+<ol>
+<li><strong>索引を階層化する</strong>（フォルダごとに索引を作る）→ 数百件までは延命できます</li>
+<li>それでも足りなくなったら → <strong>意味で探す仕組み（第2段階）へ</strong></li>
+</ol>
+
+<h4>「数百ノート」とは、どのくらいの量か</h4>
+
+<p>具体的な数字にしてみます。前回紹介した事例を日本語に換算すると、こうなります。</p>
+
+<table>
+<tr><th>項目</th><th>数値</th></tr>
+<tr><td>ファイル数</td><td>約100件</td></tr>
+<tr><td>総量（英語）</td><td>40万語</td></tr>
+<tr><td><strong>日本語に換算すると</strong></td><td><strong>約80万〜100万文字</strong></td></tr>
+<tr><td><strong>1件あたり</strong></td><td><strong>約8,000〜10,000文字</strong></td></tr>
+</table>
+
+<p>1件あたりがかなり長いことに気づくと思います。研究用のまとめなので、<strong>1件が長めのブログ記事くらいの分量</strong>です。</p>
+<p>そして、ここが重要な点です。</p>
+
+<blockquote>
+<p><strong>基準になるのは、総文字数ではなくファイル数です。</strong></p>
+</blockquote>
+
+<p>理由はシンプルで、索引を使う方式では<strong>開くのは必要なファイルだけ</strong>だからです。総量が100万文字あっても、索引を見て3件だけ開けば済むなら、<strong>残りの97万文字は読まれません。</strong></p>
+<p>だから、こう考えてください。</p>
+
+<table>
+<tr><th>1件あたり</th><th>300件のときの総量</th><th>索引方式で回るか</th></tr>
+<tr><td>500文字（短いメモ）</td><td>15万文字</td><td>⭕</td></tr>
+<tr><td>2,000文字（調べ物メモ）</td><td>60万文字</td><td>⭕</td></tr>
+<tr><td>8,000文字（長文記事）</td><td>240万文字</td><td>⭕</td></tr>
+</table>
+
+<p><strong>総量がどれだけ大きくても、ファイル数が索引に収まれば機能します。</strong></p>
+<p>逆に言えば、限界が来るのは<strong>ファイル数のほう</strong>です。1行1件の索引なら、<strong>300〜500行あたりが読みやすさの上限</strong>でしょう。それを超えると、索引そのものが読めなくなります。</p>
+<p>💡 <strong>第1段階の目安は「300件程度まで」。</strong> 1件が短いメモでも、長文記事でも、判断は変わりません。</p>
+
+<h4>【チャットで使っている方】索引は不要です</h4>
+
+<p>まず、ブラウザやアプリの<strong>チャット画面だけ</strong>を使っている方。</p>
+<p><strong>結論から言うと、索引ファイルを作る必要はありません。</strong></p>
+<p>理由は、<strong>各社のプロジェクト機能に、すでに検索の仕組みが入っているから</strong>です。</p>
+<p>やることは1つだけ。<strong>資料をプロジェクトに入れる。それだけです。</strong></p>
+
+<table>
+<tr><th>サービス</th><th>機能名</th><th>中の動き</th></tr>
+<tr><td>ChatGPT</td><td>プロジェクト／GPTs</td><td>最初から検索方式（関連部分だけを引く）</td></tr>
+<tr><td>Claude</td><td>プロジェクト</td><td>まず全部読む。増えたら<strong>自動で検索方式に切り替わる</strong></td></tr>
+<tr><td>Gemini</td><td>Gem</td><td>検索方式</td></tr>
+</table>
+
+<p><strong>Claudeの挙動が特に分かりやすい</strong>です。入れた資料が一定量を超えると、<strong>自動的に「全部読む」から「必要な部分だけ引く」へ切り替わります。</strong> 利用者は何も設定しなくて済みます。</p>
+
+<p>⚠️ <strong>ただし、上限が早く来ます。</strong></p>
+
+<table>
+<tr><th>サービス</th><th>ファイル数の目安</th></tr>
+<tr><td>Gemini（Gem）</td><td><strong>10ファイルまで</strong></td></tr>
+<tr><td>ChatGPT（GPTs）</td><td><strong>20ファイルまで</strong></td></tr>
+<tr><td>Claude（プロジェクト）</td><td>件数の制限はないが、容量に実質的な上限あり</td></tr>
+</table>
+
+<p>数字を見てのとおり、<strong>「数百ノート」に到達する前に、上限のほうが先に来ます。</strong></p>
+<p>💡 <strong>チャットだけで使う場合、第1段階は「プロジェクトに入れるだけ」で完了です。</strong> ファイルが増えてきたら、まとめたり整理したりが必要になります。</p>
+<p>⚠️ そしてもう1つ大事な点。<strong>チャットのAIは、あなたのファイルを書き換えられません。</strong> 索引を作っても、更新はあなたの手作業になります。<strong>ここが、次の話との決定的な差です。</strong></p>
+
+<h4>【ターミナルで使っている方】索引システムを作る価値があります</h4>
+
+<p>Claude Code CLI、Codex CLI、Antigravity CLIなど、<strong>ターミナルから使うAIツール</strong>を導入している方。こちらは事情がまったく違います。</p>
+<p>決定的な差はここです。</p>
+
+<blockquote>
+<p><strong>AIが、あなたのファイルを直接読み書きできます。</strong></p>
+</blockquote>
+
+<p>つまり——<strong>索引ファイルを、AIに自動で維持させられます。</strong> 手作業になりません。</p>
+
+<h4>セットアップ：プロンプト1つで完了します</h4>
+
+<p>作業フォルダでAIを起動し、次の文章を貼り付けてください。<strong>ファイルがまだ存在しなくても大丈夫です。作るところからやってくれます。</strong></p>
+
+<pre><code>このプロジェクトに、記録を蓄積するための索引システムを作ってください。
+まだ何も存在しない状態からのセットアップです。
+
+## 1. フォルダとファイルを作る
+- docs/ フォルダを作る（なければ）
+- docs/INDEX.md を作る（なければ）
+  - 冒頭に「これは記録の索引です」と書く
+  - すでに記録があれば一覧にする。なければ空の一覧として作る
+
+## 2. 指示書ファイルにルールを追記する
+使っているツールに合わせて、次のファイルに追記してください。
+存在しなければ、新規作成してください。
+  - Claude Code CLI なら CLAUDE.md
+  - Codex CLI なら AGENTS.md
+  - Antigravity CLI なら GEMINI.md
+
+追記する内容：
+
+  ## 記録の扱い
+  - 作業を始める前に docs/INDEX.md を読むこと
+  - docs/INDEX.md が存在しない場合は、新規作成すること
+  - 索引を見て、関係しそうな記録だけを開くこと
+  - 重要な判断をしたら docs/ に記録ファイルを追加し、
+    INDEX.md に1行（ファイル名＋一行要約）を追記すること
+  - 記録に書くのは「判断・好み・失敗」の3つだけ。
+    作業の過程は書かないこと
+
+## 3. 最後に
+作ったファイルの一覧と、これで何ができるようになったかを
+日本語で説明してください。</code></pre>
+
+<p>📌 <strong>指示書ファイルの名前は、ツールによって違います。</strong> 上のプロンプトには3つとも書いてあるので、AIが自分で判断して正しいものを使ってくれます。</p>
+
+<h4>できあがる索引ファイル</h4>
+
+<p>こういう形のものが、自動で維持されるようになります。</p>
+
+<pre><code># 索引
+
+- `2026-07-01-配色の方針.md` — 落ち着いた配色に統一すると決めた経緯
+- `2026-07-08-スマホ対応.md` — 横スクロールが出る問題と対処
+- `2026-07-15-競合調査.md` — 同ジャンル5サイトの構成比較</code></pre>
+
+<p>AIは作業のたびにこの索引を読み、<strong>必要なファイルだけを開きます。</strong> 全部読むわけではないので、<strong>量が増えても重くなりません。</strong></p>
+<p>💡 更新が気になる場合は、1日1回「今日の記録を索引に反映して」と頼むだけでも十分です。</p>
+
+<h4>組み合わせると効く、3つの道具</h4>
+
+<p>ターミナル版には、無料で使える道具が3つあります。<strong>性質が違うので、揃うと強くなります。</strong></p>
+
+<table>
+<tr><th>道具</th><th>得意なこと</th><th>費用</th></tr>
+<tr><td>キーワード検索</td><td>書いた言葉を覚えているとき、最速</td><td>ゼロ</td></tr>
+<tr><td>自動記憶（標準搭載）</td><td>直近の作業の文脈を引き継ぐ</td><td>ゼロ</td></tr>
+<tr><td>索引ファイル</td><td>全体を俯瞰し、必要な場所へ案内する</td><td>ほぼゼロ</td></tr>
+</table>
+
+<p>⚠️ <strong>1つ注意点があります。</strong> 自動記憶は、Claude Code CLIとCodex CLIには標準で入っていますが、<strong>Antigravity CLIには入っていません。</strong> Antigravity CLIを使う場合、索引ファイルの重要度が上がります。</p>
+
+<p>⚠️ そして、この方式の限界は1つだけ。<strong>意味では探せません。</strong> 索引に書かれた説明文から推測するだけなので、まったく違う言葉で書かれた記録は見つかりません。<strong>それが頻発し始めたら、第2段階です。</strong></p>
+
+<h3>第2段階：意味で探す仕組みだけを追加する</h3>
+
+<p>「あのノート、何と書いたか思い出せない」が頻発し始めたら、この段階です。</p>
+<p><strong>追加するのはVector検索だけで十分です。</strong> つながりの自動抽出（Graph）は、まだ要りません。</p>
+<p>理由は、個人の使い方の大半が<strong>「あの話、どこかに書いたはず」という意味での検索</strong>だからです。「Aから3手先にある関係」を探す場面は、実際にはあまり訪れません。</p>
+
+<h3>第3段階：つながりの自動抽出を検討する</h3>
+
+<p>数千ノートを超えて、かつ<strong>「つながりを発見したい」という明確な目的があるとき</strong>だけ、Graphを足す価値が出ます。</p>
+<p>「検討する」と書いたのは、この段階でも必須ではないからです。次のコストの話が効いてきます。</p>
+
+<h2 id="s2">なぜ段階を分ける必要があるのか</h2>
+
+<p>理由は2つあります。1つは精度、もう1つはコストです。</p>
+
+<h3>理由①：入りきることと、読まれることは別問題</h3>
+
+<p>前回触れた<strong>Lost in the Middle</strong>（中抜け）を、もう少し正確に説明します。</p>
+<p>AIは渡された情報のうち、<strong>最初と最後には強く反応しますが、真ん中に埋もれた情報を見落としやすい</strong>という性質を持っています。これは注意の仕組みそのものに組み込まれた偏りで、2026年時点でも構造的には解消されていません。</p>
+<p>ここが誤解されやすいポイントです。</p>
+
+<pre><code>AIが一度に扱える量が増えた
+　　≠
+渡したもの全部を、均等に読んでくれる</code></pre>
+
+<p>つまり、<strong>「全部読ませればいい」という発想そのものが成立しません。</strong> 数千ノートが仮に収まったとしても、真ん中は見落とされます。</p>
+<p>だからこそ、<strong>質問に関係するものだけを事前に絞り込んで渡す</strong>必要がある。これがVector検索を入れる本当の理由です。</p>
+
+<h3>理由②：純正のGraphRAGは、個人には確実に過剰</h3>
+
+<p>前回、GraphRAGはMicrosoft Researchが2024年に発表した手法だと紹介しました。ただし、そのまま導入するのは個人にはまったく勧められません。<strong>コストが桁違いだからです。</strong></p>
+<p>初期の実装では、大規模なデータセットの処理に<strong>3.3万ドル</strong>かかったという報告があります。32,000語程度の書籍1冊でも、<strong>約7ドル。</strong></p>
+<p>前回説明したとおり、費用の主犯は<strong>AIを呼び出す工程</strong>です。そして純正のGraphRAGは、その高コストな工程を<strong>全部、事前に一括で実行する</strong>設計になっています。</p>
+
+<h3>継続的に増えていく用途との相性</h3>
+
+<p>個人にとって、さらに相性が悪い点があります。</p>
+<p>GraphRAGは<strong>データ全体を作り直す前提</strong>なので、毎日ノートが増える使い方だと、更新のたびに重い再構築が発生しやすくなります。</p>
+<p>Microsoft自身もこの問題を認識していて、2025年には<strong>LazyGraphRAG</strong>（重い処理を、質問が来るまで先送りする手法）を発表しています。外部からも<strong>LightRAG</strong>（追加分だけを処理できる手法）が登場し、コストを大幅に圧縮しています。</p>
+<p><strong>「純正GraphRAGは重すぎる」というのが、すでに共通認識</strong>になっているということです。</p>
+<p>個人が採るべきは、<strong>「保存したときに、そのノートだけを処理する」</strong>という追加分だけの方式です。これなら費用は使った分だけで済みます。</p>
+
+<h2 id="s3">技術選定——ファイル1つで完結する</h2>
+
+<p>第2段階以降に進む場合、何を使うか。個人スケールなら答えは単純です。</p>
+
+<pre><code>SQLite（データベース本体）
+  ＋ sqlite-vec（意味検索の拡張機能）
+  ＝ 単一ファイルで完結</code></pre>
+
+<p>大がかりなデータベースサーバーは要りません。<strong>ファイル1つで動きます。</strong></p>
+<p>しかも、これは前々回の話と綺麗につながります。<strong>SQLiteのファイル形式は米国議会図書館の長期保存推奨形式で、2050年までのサポートが宣言されています。</strong></p>
+<p><strong>Markdownと同等の永続性を持ったまま、検索の仕組みだけを手に入れられる</strong>わけです。</p>
+
+<h3>全体の構成</h3>
+
+<pre><code>【保存層】 SQLite + sqlite-vec
+          ノートの原文と、意味の座標を1ファイルに格納
+
+【処理層】 ノートを保存したとき、そのノートだけを処理
+          → 意味の座標を計算
+          → 既存ノートとの関係候補を算出
+          → つながりとして追記
+
+【検索層】 意味検索 ＋ キーワード検索を組み合わせる
+          （第3段階なら、ここに関係の探索を足す）</code></pre>
+
+<p><strong>ポイントは、原文をデータベースの中に持つこと</strong>です。こうしておけば、AIモデルが世代交代して座標が古くなっても、原文から作り直せます。<strong>壊れやすい部分を使い捨てにできる設計</strong>です。</p>
+
+<h2 id="s4">実装の落とし穴3つ</h2>
+
+<p>自分で作る場合、必ずぶつかる課題があります。<strong>知らずに始めると確実に手戻りします。</strong></p>
+
+<h3>① つながりの判定基準</h3>
+
+<p>意味の近さでつながりを自動生成するとき、基準の設定が要ります。<strong>緩すぎれば全部がつながって読めなくなり、厳しすぎれば孤立したノートだらけになります。</strong></p>
+<p>堅実なのは<strong>二段構え</strong>です。まず意味の近さで候補を出し、次にAIに関係の内容を判定させて絞り込む。この2段階にすると、精度が安定します。</p>
+
+<h3>② 表記のゆれ</h3>
+
+<p>「田中太郎」「田中さん」「タナカ」が、<strong>別々のものとして登録されてしまう</strong>問題です。</p>
+<p>個人のノートでは、同じ人や同じプロジェクトを気分で呼び分けていることが普通にあります。<strong>同一のものとしてまとめる処理を、最初から設計に入れてください。</strong></p>
+
+<h3>③ 表示位置の連続性</h3>
+
+<p>つながりを図で表示する場合の注意点です。</p>
+<p>絞り込みをかけるたびに配置が作り直されると、<strong>「あのかたまりは左上にあった」という空間的な記憶がリセットされます。</strong> 図で見る利点そのものが消えてしまうんです。</p>
+<p>位置は保存しておき、絞り込み時は<strong>差分だけを動かす</strong>設計にしてください。</p>
+
+<h2 id="s5">今日から動かせる実装プロンプト</h2>
+
+<p>AIコーディングエージェント（Claude Code CLIやAntigravity CLIなど）に渡すだけで、試作品の構築が始まるプロンプトを置いておきます。<strong>上の落とし穴3つへの対策も、あらかじめ組み込んであります。</strong></p>
+
+<pre><code>Build a local-first personal knowledge base prototype.
+
+## Stack
+- Backend: Node.js + SQLite (better-sqlite3) with the sqlite-vec extension
+  — single file, no database server
+- Frontend: React + React Flow (graph canvas) + a Markdown editor pane
+- Embeddings: pluggable provider interface — assume an embed(text) -> float[]
+  function; stub it so I can swap in a local model or an API
+
+## Data model
+- notes(id INTEGER PRIMARY KEY, title TEXT, body TEXT, created_at, updated_at)
+- embeddings(note_id, vector) — one per note, always regenerable from body
+- edges(from_id, to_id, weight REAL, label TEXT,
+        source TEXT CHECK(source IN ('auto','manual')))
+- entities(id, canonical_name, aliases TEXT[]) — for name normalization
+- node_positions(note_id, x REAL, y REAL)
+All relations use integer IDs. Titles are display-only, never keys.
+
+## Core behaviors
+1. Incremental indexing on save: re-embed ONLY the saved note, compute
+   candidate edges against existing notes via cosine similarity
+   (threshold as a config constant, default 0.78), then pass the top
+   candidates to an LLM to assign a relationship label and prune
+   false positives. Upsert with source='auto'. Never delete manual edges.
+2. Entity normalization: before creating a node, check the entities table
+   for an alias match. Merge instead of creating duplicates.
+3. Search API: hybrid retrieval — vector similarity + keyword (FTS5),
+   merged and re-ranked. Return only the top N chunks, never whole files.
+4. Graph API: GET /graph?root={id}&hops={n}&from={date}&to={date}
+   returns the filtered subgraph using a recursive query over edges.
+5. Frontend layout: run force-directed layout ON FIRST RENDER ONLY.
+   Persist positions to node_positions. On filter change, animate the
+   enter/exit of nodes — never recompute positions of surviving nodes.
+6. Include a "reindex all" command that regenerates every embedding and all
+   auto edges from source text, proving the analysis layer is disposable.
+
+## Constraints
+- Single repo, npm scripts for dev/run
+- Seed with 30 sample notes across 3 topics so the graph is demoable
+- README documenting the similarity threshold and how to tune it
+
+Confirm the schema with me before implementing the frontend.</code></pre>
+
+<p>💡 <strong>第2段階までで十分な人は、<code>4</code>と<code>5</code>のグラフ関連を外してください。</strong> それだけで、意味検索だけのシンプルな構成になります。</p>
+
+<h2 id="s5b">全体像——どこまで行くと、何が必要になるか</h2>
+
+<p>ここまでの話を、1枚にまとめます。</p>
+
+<table>
+<tr><th>段階</th><th>やること</th><th>目安</th><th>費用</th></tr>
+<tr><td>第0段階</td><td>AIツールの標準機能を有効にする</td><td>常に</td><td>ゼロ</td></tr>
+<tr><td>第1段階</td><td>＋ 索引ファイル方式</td><td>〜200件</td><td>ほぼゼロ</td></tr>
+<tr><td>第1.5段階</td><td>＋ 索引の階層化</td><td>〜数百件</td><td>ほぼゼロ</td></tr>
+<tr><td>第2段階</td><td>＋ 意味で探す仕組み（Vector）</td><td>数百〜数千件</td><td>座標化の費用</td></tr>
+<tr><td>第3段階</td><td>＋ つながりの自動抽出（Graph）</td><td>数千件〜</td><td>高い</td></tr>
+</table>
+
+<p><strong>下に行くほど強力になりますが、同時に「作る手間」と「壊れたときの責任」も増えます。</strong></p>
+
+<h3>よくある誤解——フレームワークは、この表の続きではない</h3>
+
+<p>「もっと本格的なフレームワークを導入すれば、さらに賢くなるのでは」と考える方もいると思います。</p>
+<p><strong>ですが、それは別の軸の道具です。</strong></p>
+
+<pre><code>【この表の軸】検索・想起の精度を上げる
+              索引 → Vector → Graph
+
+【フレームワークの軸】自動で動き続ける・自分で学習する
+              定期実行、記憶の自動蓄積、スキルの自己生成</code></pre>
+
+<p>実際、有名なエージェント用のフレームワークの中には、<strong>記憶にキーワード検索を使っているもの</strong>があります。<strong>検索の精度で言えば、Vector検索よりむしろ素朴です。</strong></p>
+<p>つまり——<strong>「フレームワークを入れれば検索が良くなる」わけではありません。</strong> 目的がまったく違います。</p>
+<p>📌 この点は、別のシリーズ（実装編）で詳しく扱います。ここでは<strong>「軸が2本ある」ということだけ</strong>覚えておいてください。</p>
+
+<h2 id="s6">まだ埋まっていない空白</h2>
+
+<p>最後に、現状の限界も書いておきます。</p>
+<p><strong>裏側の技術は、すでに成熟しています。</strong> Vector検索もGraphも、部品としては手に入る状態です。</p>
+<p>空白なのは、<strong>人間が見て触る部分</strong>です。</p>
+<p>全体像（マクロ）と個別のノート（ミクロ）を、滑らかに行き来できる画面。「この話題から2手先まで」と絞り込んだ瞬間に、その部分だけが再構築される表示。<strong>これを備えた製品は、まだほとんど存在しません。</strong></p>
+<p>裏側が揃った今、ここが最も面白い領域だと僕は思っています。上のプロンプトを起点に、自分好みの形を作れる時代になりました。</p>
+
+<h2 id="s7">まとめ</h2>
+
+<ul>
+<li>判断基準は<strong>蓄積量だけ</strong>。数百ノートまでは何もしなくていい</li>
+<li>数百〜数千なら<strong>意味検索だけ</strong>。つながりの自動抽出は数千を超えてから</li>
+<li><strong>「全部読ませればいい」は成立しない</strong>（中抜けが起きる）</li>
+<li>個人スケールなら<strong>ファイル1つで完結する</strong></li>
+<li>純正のGraphRAGは個人には過剰。<strong>追加分だけを処理する方式</strong>にする</li>
+</ul>
+
+<p>ここまでが、<strong>溜めたデータをどう活かすか</strong>という話でした。</p>
+<p>次のシリーズからは、もう1つのテーマに入ります。<strong>役割を持ったAIに、実際に仕事を任せる</strong>仕組みです。</p>
+<p>そちらでも方針は同じです。<strong>まず標準機能を徹底的に使い倒し、どこまでが標準で足りて、どこから足りなくなるのかを実測する。</strong> その順番でしか、本当の判断基準は手に入りません ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

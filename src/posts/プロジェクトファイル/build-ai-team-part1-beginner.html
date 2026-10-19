@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>初心者でも作れるAI社員の作り方①——コードは1行も書きません</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.88em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.step{
+  display:inline-block; font-family:var(--font-mono), monospace;
+  font-size:0.72rem; font-weight:600; letter-spacing:0.06em;
+  padding:0.2em 0.6em; border-radius:999px;
+  background:var(--grad); color:#14151a; margin-bottom:0.5rem;
+}
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+.toc-sub{ margin:0.15rem 0 0.35rem; padding-left:1.1rem; list-style:none; }
+.toc-sub li{ margin:0.1em 0; padding-left:0; }
+.toc-sub li::before{ display:none; }
+.toc-sub a{
+  font-size:0.84rem; color:var(--fg-faint);
+  border-left:2px solid var(--line); padding-left:0.7rem;
+}
+.toc-sub a:hover{ border-left-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>初心者でも作れるAI社員の作り方①——コードは1行も書きません</h1>
+
+<div class="tldr">
+<ul>
+<li>プログラミングの知識はまったく要りません</li>
+<li>あなたがやるのは、<strong>用意された文章を貼り付けることだけ</strong></li>
+<li>月3,000円のサブスクがあれば、最新モデルで快適に作れます</li>
+<li>できあがったコードを読むと、「AI社員」の正体が分かります</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s0">この記事で作るもの</a></li>
+      <li><a href="#s1">先に、お金の話をします</a></li>
+      <li>
+        <a href="#s2">用意するもの（2つ）</a>
+        <ul class="toc-sub">
+          <li><a href="#s2a">① 作業する場所</a></li>
+          <li><a href="#s2b">② AIを呼び出す鍵</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#s3">作ってもらう（3ステップ）</a>
+        <ul class="toc-sub">
+          <li><a href="#s3a">ステップ1：作ってもらう</a></li>
+          <li><a href="#s3b">ステップ2：鍵を1行貼る</a></li>
+          <li><a href="#s3c">ステップ3：動かしてもらう</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#s4">何が起きたのか——コードを読んでみる</a>
+        <ul class="toc-sub">
+          <li><a href="#s4a">別々の机で働く、という発想</a></li>
+          <li><a href="#s4b">「AI社員」の本体は15行</a></li>
+          <li><a href="#s4c">役割の正体は、ただの文章</a></li>
+          <li><a href="#s4d">なぜ机が分かれるのか</a></li>
+        </ul>
+      </li>
+      <li><a href="#s5">うまくいかないときは</a></li>
+      <li><a href="#s6">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回までのシリーズで、「AI社員」の正体は<strong>AIに役割を与えたもの</strong>でしかない、と書きました。</p>
+<p>今回からは、実際に作ってみます。<strong>Webサイトを作るAIチーム</strong>を、ゼロから組み上げていきます。</p>
+<p>最初に、いちばん大事なことを書いておきます。</p>
+<blockquote>
+<p><strong>プログラミングの知識は、まったく必要ありません。</strong><br>
+コードを書くのも、ファイルを作るのも、全部AIがやります。<br>
+あなたがやるのは、この記事にある文章を貼り付けることだけです。</p>
+</blockquote>
+<p>「そんなうまい話が」と思うかもしれませんが、2026年の今はこれが普通です。むしろ<strong>この事実こそが、高額な講座が不要な理由</strong>でもあります。</p>
+
+<h2 id="s0">この記事で作るもの</h2>
+<p>2人のAIが、役割を分けて働くチームです。</p>
+<pre><code>あなた「海の見えるカフェのページを作って」
+      ↓
+デザイナー役のAI ── どんなページにするか考える
+      ↓ 考えた内容を渡す
+コーダー役のAI  ── 実際のWebページを作る
+      ↓
+Webページが完成する</code></pre>
+<p>テーマを1つ伝えるだけで、勝手に構成が考えられ、勝手にページが出来上がります。<strong>かかる時間は15分ほど</strong>です。</p>
+
+<h2 id="s1">先に、お金の話をします</h2>
+<p>気持ちよく進めるために、費用の話を最初に済ませておきます。</p>
+<p>結論から言うと、<strong>月3,000円ほどのサブスクを1つ契約している状態</strong>が、いちばん快適です。</p>
+<table>
+<tr><th>サービス</th><th>プラン</th><th>月額の目安</th></tr>
+<tr><td>Antigravity（Google）</td><td>Google AI Pro</td><td>約3,000円</td></tr>
+<tr><td>Claude Code（Anthropic）</td><td>Claude Pro</td><td>約3,000円</td></tr>
+<tr><td>Codex CLI（OpenAI）</td><td>ChatGPT Plus</td><td>約3,000円</td></tr>
+</table>
+<p><strong>どれか1つで大丈夫です。</strong> すでにChatGPTやClaudeを契約している方は、<strong>追加の費用はかかりません。</strong> そのまま使えます。</p>
+
+<h3>なぜサブスクを勧めるのか</h3>
+<p>正直に書きます。無料でも試すことはできますが、<strong>使える回数がかなり限られています。</strong> 途中で上限に達して、数日待たされることもあります。</p>
+<p>せっかく作り始めたのに止まってしまうと、それだけで嫌になります。<strong>最初の一歩でつまずかないために、月3,000円は妥当な投資</strong>だと僕は考えています。</p>
+<p>それに、有料プランでは<strong>最新の高性能なモデル</strong>が使えます。同じ手順でも、出来上がるものの質が変わります。</p>
+
+<h3>数十万円の講座と比べてみてください</h3>
+<p>このシリーズの前半で扱った「AI社員」の高額な講座は、<strong>数十万円</strong>という価格帯でした。</p>
+<p>一方こちらは<strong>月3,000円</strong>。しかも月単位なので、合わなければすぐやめられます。<strong>桁が2つ違います。</strong></p>
+<blockquote>
+<p>数十万円を払う前に、まず月3,000円を1か月だけ試してみる。<br>
+そのほうが確実で、速くて、失うものが少ない——これが僕の考えです。</p>
+</blockquote>
+<p>⚠️ 料金は変わりやすい分野です。上記は2026年7月時点の目安なので、契約前に各社の公式ページで確認してください。</p>
+
+<h2 id="s2">用意するもの（2つ）</h2>
+
+<h3 id="s2a">① 作業する場所</h3>
+<p>AIが実際にファイルを作る場所です。<strong>契約しているサービスに合わせて選んでください。</strong></p>
+
+<p><strong>▸ Googleを使う場合：Antigravity IDE</strong></p>
+<p><a href="https://antigravity.google/">antigravity.google</a> を開いてください。Windows・Mac・Linuxすべてに対応しています。</p>
+<p>⚠️ <strong>ここで注意が必要です。</strong> ダウンロードページには、似た名前のものが4つ並んでいます。</p>
+<table>
+<tr><th>名前</th><th>何のためのものか</th></tr>
+<tr><td><strong>Antigravity IDE</strong></td><td><strong>← 今回使うのはこれです</strong></td></tr>
+<tr><td>Antigravity 2.0</td><td>複数の作業をまとめて管理するアプリ</td></tr>
+<tr><td>Antigravity CLI</td><td>黒い画面（ターミナル）から使う版</td></tr>
+<tr><td>Antigravity SDK</td><td>開発者が自分でAIを組む用の部品</td></tr>
+</table>
+<p><strong>「Antigravity IDE」を選んでください。</strong> 理由は、1つの画面の中に<strong>「ファイルの一覧」「AIと会話する欄」「文章を書き換える機能」がすべて揃っている</strong>からです。あとの手順が、この1画面だけで完結します。</p>
+<p>インストールしたら起動して、Googleアカウントでログインしてください。</p>
+
+<p><strong>▸ Claudeを使う場合：Claude Code</strong></p>
+<p>Macの方は、ターミナルで次を実行します。</p>
+<pre><code>brew install --cask claude-code</code></pre>
+<p>Windowsの方や、うまくいかない場合は<a href="https://code.claude.com/docs/en/installation">公式のインストール手順</a>をご覧ください。作業したいフォルダで <code>claude</code> と入力すると起動し、初回はブラウザでログインを求められます。</p>
+
+<p><strong>▸ ChatGPTを使う場合：Codex CLI</strong></p>
+<pre><code># Mac / Linux
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+# Windows（PowerShell）
+powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"</code></pre>
+<p>インストール後、<code>codex</code> と入力すると起動します。「Sign in with ChatGPT」を選べば、契約中のプランでそのまま使えます。</p>
+
+<p>📌 <strong>どれを選んでも、この先の手順はまったく同じです。</strong> 貼り付ける文章も共通です。</p>
+
+<h3 id="s2b">② AIを呼び出す鍵（Gemini APIキー）</h3>
+<p>「APIキー」は、<strong>作ったプログラムがAIを呼び出すための鍵</strong>です。</p>
+<p>ここで混乱しやすいので、はっきり分けておきます。</p>
+<pre><code>作業する場所（Antigravity IDE など）
+  → AIがあなたの代わりにファイルを作る
+  → 契約しているサブスクで動く
+
+APIキー
+  → 出来上がったプログラムがAIを呼ぶ
+  → サブスクとは別の仕組み。別途取得が必要</code></pre>
+<p><strong>サブスクを契約していても、APIキーは別に取得する必要があります。</strong> ここは多くの人がつまずく点なので、覚えておいてください。</p>
+<p>取得は1分で終わります。</p>
+<pre><code>① https://aistudio.google.com/apikey を開く
+        ↓
+② Googleアカウントでログイン
+        ↓
+③ 「APIキーを作成」をクリック
+        ↓
+④ 表示された文字列をコピーする
+   （AIza... で始まる長い文字列です）</code></pre>
+<p>💰 <strong>料金について</strong>：この記事で作るものは、1回動かしても<strong>ごくわずかな金額</strong>です。ただし利用量に応じた課金があるので、正確な単価は<a href="https://ai.google.dev/pricing">公式の料金ページ</a>で確認してください。</p>
+<p>コピーした鍵は、あとで使います。メモ帳などに一時的に貼っておいてください。</p>
+
+<h2 id="s3">作ってもらう（3ステップ）</h2>
+
+<h3 id="s3a"><span class="step">STEP 1</span><br>作ってもらう</h3>
+<p>用意したツール（Antigravity IDE、Claude Code、Codex CLIのいずれか）を開いて、AIと会話する欄に、次の文章を<strong>そのまま貼り付けてください。</strong></p>
+<pre><code>Pythonで「役割を持つAIエージェント」の最小構成を作ってください。
+私はプログラミング初心者なので、必要なものはすべて自動で用意してください。
+
+## 環境
+- 作業フォルダは ai-team という名前で新規作成する
+- パッケージ管理には uv を使う（未インストールなら導入から行う）
+- 必要なパッケージは google-genai と python-dotenv
+
+## 作ってほしいファイル
+
+### .env
+GEMINI_API_KEY=ここにキーを貼ってください
+（この1行だけ。実際のキーは私があとで貼ります）
+
+### .gitignore
+.env と output/ と .venv/ を除外する
+
+### agents.py
+- .env からAPIキーを読み込む
+- agent(role, task, model="gemini-2.5-flash") という関数を1つ定義する
+- role は system_instruction として渡す
+- task は contents として渡す
+- 戻り値は応答テキストのみ
+
+### roles.py
+DESIGNER と CODER という2つの文字列を定義する
+- DESIGNER: UIデザイナー。渡されたテーマから、1枚のWebページの
+  構成・配色・フォント・各セクションの文言を決める。
+  仕様だけを日本語で書き、コードは書かない
+- CODER: フロントエンドエンジニア。渡された仕様を、
+  外部ファイルに依存しない1枚のHTMLとして実装する。
+  レスポンシブ対応。出力はHTMLコードのみ
+
+### main.py
+- THEME という変数にテーマを書く
+  （初期値は「海の見える個人経営のカフェ。落ち着いた大人向けの雰囲気」）
+- デザイナーを呼んで仕様を作り、output/design.md に保存
+- その仕様をコーダーに渡してHTMLを作り、output/index.html に保存
+- AIの返答からコードフェンスを取り除く処理を入れる
+- 各工程の進行状況を日本語でわかりやすく表示する
+
+### README.md
+セットアップ手順と実行方法を書く
+
+## 最後に
+- 作ったファイルの一覧と、それぞれの役割を日本語で説明してください
+- 私が次に何をすればいいかも教えてください</code></pre>
+<p>貼り付けたら、あとは待つだけです。<strong>フォルダの作成から、必要な道具の準備、コードの作成まで、全部やってくれます。</strong></p>
+<p>終わると、AIが「次はこうしてください」と教えてくれます。</p>
+
+<h3 id="s3b"><span class="step">STEP 2</span><br>鍵を1行貼る</h3>
+<p><strong>ここだけが、あなたの手作業です。</strong></p>
+<p>AIが <code>.env</code> というファイルを作ってくれています。画面の左側にあるファイル一覧から、それをクリックして開いてください。</p>
+<p>中身はこうなっています。</p>
+<pre><code>GEMINI_API_KEY=ここにキーを貼ってください</code></pre>
+<p>この「ここにキーを貼ってください」の部分を消して、さきほどコピーした鍵に置き換えます。</p>
+<pre><code>GEMINI_API_KEY=AIzaSy...（あなたの鍵）</code></pre>
+<p>保存したら完了です。</p>
+<p>💡 <strong>なぜAIに鍵を渡さないのか</strong>：AIとの会話に鍵を書くと、その内容が記録として残る可能性があります。鍵は、あなたのパソコンの中だけに置いておくのが安全です。この1回の手作業は、そのためのものです。</p>
+<p>⚠️ <code>.env</code> の中身は、誰にも見せないでください。鍵が漏れると、他人にあなたの分の料金を使われてしまいます。</p>
+
+<h3 id="s3c"><span class="step">STEP 3</span><br>動かしてもらう</h3>
+<p>また会話欄に戻って、こう伝えてください。</p>
+<pre><code>.env にAPIキーを設定しました。実行してください。</code></pre>
+<p><strong>これだけです。</strong> コマンドを打つ必要もありません。</p>
+<p>こんな表示が流れれば成功です。</p>
+<pre><code>デザイナーが仕様を作成中...
+コーダーが実装中...
+完了: output/index.html</code></pre>
+<p>できあがった <code>output/index.html</code> を開いてみてください。<strong>1枚のWebページができています。</strong></p>
+<p>気に入らなければ、テーマを変えてもう一度頼めます。</p>
+<pre><code>main.py のテーマを「隠れ家風の古書店」に変えて、もう一度実行してください。</code></pre>
+<p>💡 <strong>もっと質を上げたい場合</strong>は、こう伝えてください。有料プランなら、より高性能なモデルが使えます。</p>
+<pre><code>使っているモデルを、今使える中でいちばん高性能なものに変更してください。</code></pre>
+
+<h2 id="s4">何が起きたのか——コードを読んでみる</h2>
+<p>ここからは、<strong>読むだけのパート</strong>です。何かを書く必要はありません。</p>
+<p>AIが作ってくれたファイルの中身を見ると、「AI社員」と呼ばれているものの正体がはっきりします。<strong>ここが、この記事でいちばん価値のある部分です。</strong></p>
+
+<h3 id="s4a">別々の机で働く、という発想</h3>
+<p>まず、いちばん大事な考え方から説明します。</p>
+<p>AIには<strong>「一度に見渡せる情報の量」</strong>に限りがあります。作業机の広さをイメージしてください。</p>
+<p>会話を続けると、それまでのやり取りが全部この机の上に積み上がっていきます。そして机が散らかると、<strong>AIの精度そのものが落ちます。</strong></p>
+<p>AIは机の上の情報のうち、最初と最後にはよく反応するのに、<strong>真ん中に埋もれたものを見落としやすい</strong>という性質があります。長い会議の冒頭と結論だけ覚えていて、中盤を忘れてしまう感覚に近いものです。</p>
+<p>ここで、多くの人がやってしまう方法があります。</p>
+<pre><code>1人のAIに
+「今はデザイナーとして考えて」
+「次はコーダーとして書いて」
+と指示を切り替える</code></pre>
+<p><strong>これは役割分担ではありません。</strong> 同じ1つの机の上で、AIが服を着替えているだけです。デザイナーとして考えた内容も、コーダーとして書いた内容も、全部同じ机に積み上がっていきます。</p>
+<p>本当の役割分担は、こうです。</p>
+<pre><code>デザイナー役 ── 専用の机で作業する
+                （他の作業は机の上にない）
+
+コーダー役   ── 別の専用の机で作業する
+                （届くのは完成した仕様だけ）</code></pre>
+<p><strong>机そのものを分ける。</strong> これが「役割を持たせる」ということの正体です。</p>
+<p>では、AIが作ったコードのどこで机を分けているのか。ここが面白いところです。</p>
+
+<h3 id="s4b">「AI社員」の本体は15行</h3>
+<p><code>agents.py</code> というファイルを開いてみてください。だいたいこんな内容になっているはずです。</p>
+<pre><code>import os
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+load_dotenv()
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
+
+def agent(role, task, model="gemini-2.5-flash"):
+    """役割と仕事を渡すと、結果が返ってくる"""
+    res = client.models.generate_content(
+        model=model,
+        config=types.GenerateContentConfig(system_instruction=role),
+        contents=task,
+    )
+    return res.text</code></pre>
+<p>読めなくても大丈夫です。<strong>注目してほしいのは1か所だけ</strong>です。</p>
+<pre><code>system_instruction=role</code></pre>
+<p>この <code>system_instruction</code> というのが、<strong>「あなたは誰として振る舞ってください」という指定</strong>です。</p>
+<p>ここに「あなたはデザイナーです」という文章を渡せばデザイナーになり、「あなたはコーダーです」と渡せばコーダーになります。</p>
+<p><strong>これだけです。</strong> 数十万円の講座で教えられている「AI社員」の中核は、この15行に収まっています。</p>
+
+<h3 id="s4c">役割の正体は、ただの文章</h3>
+<p>次に <code>roles.py</code> を開いてみてください。</p>
+<pre><code>DESIGNER = """あなたはUIデザイナーです。
+渡されたテーマから、1枚のWebページの仕様を決めてください。
+
+- ページ全体の構成（どのセクションを、どの順番で置くか）
+- 配色（背景・文字・アクセントの3色を、カラーコードで指定）
+- 各セクションに入れる文言の内容
+
+コードは書かないでください。仕様だけを日本語で書いてください。"""
+
+
+CODER = """あなたはフロントエンドエンジニアです。
+渡された仕様を、1枚のHTMLファイルとして実装してください。
+
+- スマホでも崩れないようにする
+- 仕様にないものは追加しない
+- 出力はHTMLコードのみ。説明文は不要"""</code></pre>
+<p><strong>見てのとおり、ただの日本語の文章です。</strong> プログラムらしいものは何もありません。</p>
+<p>つまり——<strong>「AI社員を作る」というのは、こういう文章を書くことでした。</strong></p>
+<p>そして、ここを書き換えれば、そのまま別の社員になります。「あなたは経理担当です」と書けば経理係に、「あなたは校正者です」と書けば校正係になります。<strong>特別な技術は必要ありません。</strong></p>
+<p>💡 <strong>うまく書くコツ</strong>が3つあります。</p>
+<ol>
+<li><strong>やってほしくないことを書く</strong>——「コードは書かない」「仕様にないものは追加しない」のような線引きが、暴走を防ぎます</li>
+<li><strong>出し方を指定する</strong>——「日本語で」「HTMLだけ」と書かないと、余計な前置きが混ざります</li>
+<li><strong>具体的に書く</strong>——「配色」ではなく「3色をカラーコードで」と書くほうが、精度が上がります</li>
+</ol>
+
+<h3 id="s4d">なぜ机が分かれるのか</h3>
+<p>最後に <code>main.py</code> の、いちばん大事な2行を見てください。</p>
+<pre><code>design = agent(DESIGNER, "このテーマで仕様を作って")
+result = agent(CODER,    "この仕様を実装して" + design)</code></pre>
+<p>ここで机を分ける処理は、どこにも書かれていません。</p>
+<p>実は——<strong>書く必要がないんです。</strong></p>
+<p>AIを呼び出す仕組みは、<strong>前回のやり取りを覚えていません。</strong> 呼び出すたびに、そのとき渡された内容だけを見て応答します。</p>
+<p>つまり<strong>呼び出すたびに、机が自動的にまっさらな状態から始まります。</strong></p>
+<p>デザイナーが迷った過程も、書きかけて消した案も、コーダーの机には乗りません。届くのは、完成した仕様だけです。</p>
+<p>これが、たった15行で役割分担が成立する理由です。<strong>特別な仕組みが分けているのではなく、最初から分かれている</strong>んです。</p>
+<p>裏を返すと、大事な注意点があります。</p>
+<blockquote>
+<p><strong>必要な情報は、毎回きちんと渡す必要があります。</strong><br>
+「さっきの仕様で」は通じません。</p>
+</blockquote>
+<p>だからコードでは、デザイナーの結果を <code>+ design</code> という形で、コーダーへの指示にくっつけて渡しています。<strong>この一手間が、机が分かれていることの証拠</strong>でもあります。</p>
+
+<h2 id="s5">うまくいかないときは</h2>
+<p>基本的には、<strong>エラーの文章をそのままAIに貼って「直してください」と伝えれば解決します。</strong> それが今のやり方です。</p>
+<p>よくあるものだけ、先に挙げておきます。</p>
+<table>
+<tr><th>症状</th><th>どうするか</th></tr>
+<tr><td>「APIキーが見つかりません」と出る</td><td><code>.env</code> に鍵が貼られているか確認してください。「ここにキーを貼ってください」の文字が残っていないかも確認を</td></tr>
+<tr><td>「モデルが見つかりません」と出る</td><td>AIに「モデル名が古いようです。最新のものに直してください」と伝えてください</td></tr>
+<tr><td>「上限に達しました」と出る</td><td>短い時間に呼びすぎています。1分ほど待ってから、もう一度実行してもらってください</td></tr>
+<tr><td>ページに変な記号が表示される</td><td>AIに「HTMLに余計な記号が混ざっています。取り除く処理を確認してください」と伝えてください</td></tr>
+<tr><td>できたページが英語になっている</td><td><code>roles.py</code> に「日本語で書いてください」を追加するよう、AIに頼んでください</td></tr>
+</table>
+<p>💡 <strong>遠慮なくAIに聞いてください。</strong> 「この行は何をしているの？」「もっと簡単にできない？」——そういう質問にも答えてくれます。分からないまま進めるより、その場で聞くほうが早いです。</p>
+
+<h2 id="s6">まとめ</h2>
+<ul>
+<li>プログラミングの知識がなくても、AIチームは作れる</li>
+<li>あなたがやったのは、<strong>文章を貼るのと、鍵を1行書くこと</strong>だけ</li>
+<li>月3,000円のサブスクが1つあれば、最新モデルで快適に作れる</li>
+<li>「AI社員」の本体は、たった15行のプログラム</li>
+<li>「役割」の正体は、<strong>ただの日本語の文章</strong></li>
+<li>役割分担が成立するのは、<strong>呼び出すたびに机がまっさらになる</strong>から</li>
+</ul>
+<p>つまり——<strong>「AI社員」とは、指示する文章を切り替えているだけのものでした。</strong></p>
+<p>次回は、ここに<strong>調べる役・チェックする役・まとめ役</strong>を追加して、5人チームにします。</p>
+<p>特にチェック役は、できあがるものの質を明確に変えます。<strong>「作る人」と「確認する人」を分けると、なぜ品質が上がるのか</strong>——ここも、実際に動かしながら見ていきます ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

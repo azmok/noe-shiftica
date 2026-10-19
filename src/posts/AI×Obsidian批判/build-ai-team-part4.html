@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>初心者でも作れるAI社員の作り方④——フレームワークを導入する</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.7 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.7em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.85rem;
+  line-height:1.4;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.35rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.08rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.68em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.35em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.82em; line-height:1.65; }
+
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.88em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted);
+  padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+.toc-sub{ margin:0.15rem 0 0.35rem; padding-left:1.1rem; list-style:none; }
+.toc-sub li{ margin:0.1em 0; padding-left:0; }
+.toc-sub li::before{ display:none; }
+.toc-sub a{
+  font-size:0.84rem; color:var(--fg-faint);
+  border-left:2px solid var(--line); padding-left:0.7rem;
+}
+.toc-sub a:hover{ border-left-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>初心者でも作れるAI社員の作り方④——フレームワークを導入する</h1>
+
+<div class="tldr">
+<ul>
+<li>CrewAIを入れると、管理コードが消えて役割定義だけが残る</li>
+<li>ただし引き換えに、<strong>何が起きているか見えにくくなる</strong></li>
+<li>先に素で書いたからこそ、抽象化の下が読める</li>
+<li>コストは自分で測れる。測り方まで載せます</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s0">今回やること</a></li>
+      <li><a href="#s1">CrewAIを導入する</a></li>
+      <li><a href="#s2">同じチームを、CrewAIで書き直す</a></li>
+      <li>
+        <a href="#s3">Before / After——何が変わったか</a>
+        <ul class="toc-sub">
+          <li><a href="#s3a">消えたもの</a></li>
+          <li><a href="#s3b">増えたもの</a></li>
+        </ul>
+      </li>
+      <li><a href="#s4">ブラウザで本当に確認させる</a></li>
+      <li><a href="#s5">コストを実測する</a></li>
+      <li><a href="#s6">検証——どこまでできて、どこが限界か</a></li>
+      <li><a href="#s7">まとめ——シリーズ全体を振り返って</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>最終回です。</p>
+<p>前回、素のPythonの限界は<strong>「道具の数ではなく、管理」</strong>にあると分かりました。権限、リトライ、記録、再開——ここが重くなる。</p>
+<p>今回は、その部分を引き受けてくれるフレームワークを入れます。そして<strong>素で書いたものと並べて、何が変わったのかを確かめます。</strong></p>
+
+<h2 id="s0">今回やること</h2>
+<ol>
+<li>CrewAIで、同じ5人チームを書き直す</li>
+<li>素のPython版と比較して、何が消えて何が増えたかを見る</li>
+<li>ブラウザ確認を組み込む</li>
+<li>かかったコストを実測する</li>
+</ol>
+<p>大事なのは、<strong>比較のために先に素で書いておいた</strong>という点です。いきなりフレームワークから始めていたら、何を代わりにやってもらっているのか分からないままでした。</p>
+
+<h2 id="s1">CrewAIを導入する</h2>
+<pre><code>uv add crewai crewai-tools</code></pre>
+<p>APIキーは、これまでと同じ <code>.env</code> の <code>GEMINI_API_KEY</code> をそのまま使えます。</p>
+<p>CrewAIの構成要素は4つだけです。</p>
+<table>
+<tr><th>用語</th><th>意味</th></tr>
+<tr><td><strong>Agent</strong></td><td>チームの一員。役割・目標・経歴・使える道具を持つ</td></tr>
+<tr><td><strong>Task</strong></td><td>仕事。何をするかと、何を出すかを書く</td></tr>
+<tr><td><strong>Crew</strong></td><td>チーム。誰と誰で、どのタスクをこなすか</td></tr>
+<tr><td><strong>Process</strong></td><td>進め方。順番どおり（sequential）か、統括が振り分ける（hierarchical）か</td></tr>
+</table>
+<p>ここまでの記事で作ってきたものと、対応関係がはっきりしています。</p>
+<pre><code>これまでの roles.py の文字列 → Agent の role / goal / backstory
+これまでの main.py の呼び出し → Task
+これまでの main() 関数全体    → Crew + Process</code></pre>
+
+<h2 id="s2">同じチームを、CrewAIで書き直す</h2>
+<pre><code>import os
+from pathlib import Path
+
+from crewai import Agent, Task, Crew, Process
+from crewai.tools import tool
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SMART = "gemini/gemini-2.5-pro"
+FAST = "gemini/gemini-2.5-flash"
+
+THEME = "海の見える個人経営のカフェ。落ち着いた大人向けの雰囲気"
+
+
+# ---- 道具 ----
+@tool("ファイル保存")
+def write_file(path: str, content: str) -&gt; str:
+    """指定されたパスにファイルを保存する。
+
+    Args:
+        path: 保存先のパス（例: output/index.html）
+        content: 書き込む内容
+    """
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(content, encoding="utf-8")
+    return f"{path} に保存しました"
+
+
+# ---- チーム ----
+researcher = Agent(
+    role="リサーチャー",
+    goal="テーマに関する事実と傾向を、5項目以内で整理する",
+    backstory="一次情報を重視し、推測と事実を厳密に区別する。意見は述べない",
+    llm=FAST,
+    allow_delegation=False,
+)
+
+designer = Agent(
+    role="UIデザイナー",
+    goal="実装可能なWebページの仕様を決める",
+    backstory="構成・配色・文言を具体的に決めるが、コードは書かない",
+    llm=SMART,
+    allow_delegation=False,
+)
+
+coder = Agent(
+    role="フロントエンドエンジニア",
+    goal="仕様どおりの1枚のHTMLを実装し、ファイルに保存する",
+    backstory="外部ファイルに依存しない実装を好む。仕様にないものは足さない",
+    llm=SMART,
+    tools=[write_file],
+    allow_delegation=False,
+)
+
+reviewer = Agent(
+    role="QAエンジニア",
+    goal="仕様と実装の食い違いを見つける",
+    backstory="「動く」ではなく「仕様どおりか」を基準にする。自分では直さない",
+    llm=FAST,
+    allow_delegation=False,
+)
+
+
+# ---- 仕事 ----
+research_task = Task(
+    description=f"次のテーマについて調べてください：{THEME}",
+    expected_output="事実と傾向の箇条書き（5項目以内）",
+    agent=researcher,
+)
+
+design_task = Task(
+    description="調査結果をもとに、1枚のWebページの仕様を作ってください",
+    expected_output="構成・配色（カラーコード）・各セクションの文言を含む仕様書",
+    agent=designer,
+    context=[research_task],
+)
+
+code_task = Task(
+    description=(
+        "仕様どおりのHTMLを実装し、write_file で output/index.html に保存してください"
+    ),
+    expected_output="保存したファイルのパス",
+    agent=coder,
+    context=[design_task],
+)
+
+review_task = Task(
+    description=(
+        "仕様と実装を照合してください。"
+        "問題がなければ1行目に PASS、あれば FAIL と書き、指摘を列挙してください"
+    ),
+    expected_output="PASS または FAIL と、指摘の一覧",
+    agent=reviewer,
+    context=[design_task, code_task],
+)
+
+
+# ---- 実行 ----
+crew = Crew(
+    agents=[researcher, designer, coder, reviewer],
+    tasks=[research_task, design_task, code_task, review_task],
+    process=Process.sequential,
+    verbose=True,
+)
+
+if __name__ == "__main__":
+    result = crew.kickoff()
+    print(result)</code></pre>
+<p>⚠️ <strong><code>allow_delegation=False</code> は重要です。</strong> これを <code>True</code> にすると、担当者同士が延々と仕事を押し付け合って止まらなくなることがあります。<strong>委譲を許すのは統括役だけ</strong>にしてください。</p>
+
+<h2 id="s3">Before / After——何が変わったか</h2>
+
+<h3 id="s3a">消えたもの</h3>
+<table>
+<tr><th>素のPython版</th><th>CrewAI版</th></tr>
+<tr><td><code>for attempt in range(...)</code> の差し戻しループ</td><td>Crewが管理</td></tr>
+<tr><td><code>ThreadPoolExecutor</code> での並列化</td><td><code>async_execution=True</code> の指定だけ</td></tr>
+<tr><td><code>extract_code()</code> でコードフェンス除去</td><td>道具で直接保存するので不要</td></tr>
+<tr><td><code>print()</code> での進行表示</td><td><code>verbose=True</code></td></tr>
+<tr><td>前工程の出力を手で埋め込む処理</td><td><code>context=[...]</code> の指定だけ</td></tr>
+</table>
+<p><strong>残ったのは、役割の定義と仕事の定義だけです。</strong> 管理のためのコードが、ほぼ全部消えました。</p>
+<p>特に <code>context=[design_task]</code> は象徴的です。素のPythonでは、こう書いていました。</p>
+<pre><code>f"以下の仕様を実装してください：\n\n{design}"</code></pre>
+<p>「前の出力を、次の指示文に埋め込む」——この手作業が、<strong>1つの引数に置き換わっています。</strong></p>
+
+<h3 id="s3b">増えたもの</h3>
+<p>いいことばかりではありません。正直に書きます。</p>
+<ol>
+<li><strong>何が起きているか見えなくなる</strong>——AIに実際どんな文章が送られているのか、コードから読み取れません</li>
+<li><strong>依存パッケージが一気に増える</strong>——インストールに時間がかかり、バージョンの衝突も起きやすくなります</li>
+<li><strong>デバッグが難しくなる</strong>——うまくいかないとき、自分のコードなのかフレームワーク側なのか切り分けが要ります</li>
+<li><strong>フレームワークの作法を覚える必要がある</strong>——<code>context</code>、<code>expected_output</code>、<code>allow_delegation</code>……独自の概念が増えます</li>
+</ol>
+<p>ここで、このシリーズを素のPythonから始めた理由がはっきりします。</p>
+<blockquote>
+<p><strong>先に手で書いたから、抽象化の下で何が起きているか読める。</strong><br>
+いきなりCrewAIから始めていたら、<code>context=[...]</code> が「前の出力を指示文に埋め込む処理」だと知らないまま使っていたはずです。</p>
+</blockquote>
+<p>そして問題が起きたとき、この差が効きます。<strong>中身を知っていれば、フレームワークを疑うことも、外して確かめることもできます。</strong></p>
+
+<h2 id="s4">ブラウザで本当に確認させる</h2>
+<p>前回、検証役の課題として残していた部分です。コードを読むだけでなく、実際にブラウザで開いて確認させたい。</p>
+<p>方法は2つあります。</p>
+<p><strong>① 自分で組む</strong></p>
+<pre><code>uv add playwright
+uv run playwright install chromium</code></pre>
+<pre><code>from playwright.sync_api import sync_playwright
+
+
+@tool("画面を撮影")
+def screenshot(path: str, width: int = 375) -&gt; str:
+    """HTMLファイルをブラウザで開いてスクリーンショットを撮る。
+
+    Args:
+        path: HTMLファイルのパス
+        width: 画面の横幅（375ならスマホ相当）
+    """
+    out = f"output/shot_{width}.png"
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": width, "height": 800})
+        page.goto(f"file://{Path(path).resolve()}")
+        page.screenshot(path=out, full_page=True)
+        browser.close()
+    return f"{out} に保存しました"</code></pre>
+<p>⚠️ ただし、これだけでは半分です。<strong>撮った画像をAIに見せる処理</strong>が別途必要になります。テキストと画像では渡し方が違うためです。</p>
+<p><strong>② Antigravityのブラウザ機能を使う</strong></p>
+<p>Antigravityには、ブラウザを操作するエージェントが標準で組み込まれています。実際にChromeでページを開いて確認し、その操作が記録として残ります。</p>
+<p>つまり、Pythonのコードで完結させずに、<strong>最終確認だけAntigravity側に任せる</strong>という分担もありえます。</p>
+<pre><code>output/index.html をブラウザで開いて、次を確認してください。
+
+- スマホ幅（375px）で横スクロールが発生しないか
+- 各セクションが仕様どおりの順番で並んでいるか
+- 文字が背景に埋もれて読めない箇所がないか
+
+問題があれば、該当箇所と修正案を教えてください。</code></pre>
+<p><strong>全部を自動化しなくていい</strong>、という判断もあります。最終確認だけ人間の目と対話で済ませるほうが、確実で早い場面は多いです。</p>
+
+<h2 id="s5">コストを実測する</h2>
+<p>「結局いくらかかるのか」は、実際に測るのが一番確実です。<strong>推測より計測</strong>です。</p>
+<p>素のPython版なら、応答に含まれるトークン数を記録できます。</p>
+<pre><code>TOTAL = {"in": 0, "out": 0}
+
+
+def agent(role: str, task: str, model: str = "gemini-2.5-flash") -&gt; str:
+    res = client.models.generate_content(
+        model=model,
+        config=types.GenerateContentConfig(system_instruction=role),
+        contents=task,
+    )
+    u = res.usage_metadata
+    TOTAL["in"] += u.prompt_token_count
+    TOTAL["out"] += u.candidates_token_count
+    return res.text
+
+
+# 実行の最後に
+print(f"入力: {TOTAL['in']:,} トークン / 出力: {TOTAL['out']:,} トークン")</code></pre>
+<p>CrewAIの場合は、実行結果からまとめて取得できます。</p>
+<pre><code>result = crew.kickoff()
+print(result.token_usage)</code></pre>
+<p>あとは<a href="https://ai.google.dev/pricing">公式の料金表</a>で単価を確認して、掛け算するだけです。</p>
+<pre><code>費用 = (入力トークン ÷ 100万 × 入力単価)
+     + (出力トークン ÷ 100万 × 出力単価)</code></pre>
+<p>💡 <strong>実測すると、たいてい予想より安いか、予想より高いかのどちらかで驚きます。</strong> 特に差し戻しが何度も起きると、そこで一気に増えます。無料枠の範囲で試す場合も、まず測る習慣をつけておくと安心です。</p>
+
+<h2 id="s6">検証——どこまでできて、どこが限界か</h2>
+<p>ここは、実際に動かして確かめる部分です。<strong>誇張せずに評価するための観点</strong>を置いておきます。</p>
+<table>
+<tr><th>観点</th><th>見るポイント</th></tr>
+<tr><td>仕様の再現度</td><td><code>design.md</code> に書かれたセクションが、全部実装されているか</td></tr>
+<tr><td>配色の一致</td><td>指定されたカラーコードが、実際に使われているか</td></tr>
+<tr><td>レスポンシブ</td><td>375px幅で横スクロールが出ないか</td></tr>
+<tr><td>検証役の精度</td><td>指摘が的確だったか。見逃した問題はなかったか</td></tr>
+<tr><td>差し戻しの効果</td><td>1回目と2回目で、実際に良くなったか</td></tr>
+<tr><td>実用度</td><td>そのまま公開できるか。手直しが要るなら、どの程度か</td></tr>
+</table>
+<p>特に注目してほしいのが<strong>「検証役が見逃した問題」</strong>です。ここに、この構成の限界がそのまま現れます。</p>
+<!-- TODO: 実際に動かした結果をここに追記する。
+     うまくいった点だけでなく、破綻した点・手直しが必要だった点も含めて、
+     誇張せずに記録すること。スクリーンショットがあるとなお良い。 -->
+
+<h2 id="s7">まとめ——シリーズ全体を振り返って</h2>
+<p>4回かけて作ってきたものを、圧縮します。</p>
+<ul>
+<li><strong>第1回</strong>：役割の正体は、system promptに渡すただの文字列。中核は15行の関数</li>
+<li><strong>第2回</strong>：品質を決めるのは検証役。判定を <code>PASS</code>/<code>FAIL</code> にすると、プログラムが確実に分岐できる</li>
+<li><strong>第3回</strong>：道具を持たせるのは簡単。難しいのは、増えたときの管理</li>
+<li><strong>第4回</strong>：フレームワークは管理を引き受ける代わりに、中身を隠す</li>
+</ul>
+<p>そして、シリーズ全体で使った費用は<strong>APIのトークン代だけ</strong>です。</p>
+<p>CrewAIもLangGraphも無料のオープンソースです。Antigravityにも無料枠があります。Ollamaを使えば、モデルの利用料すらゼロにできます。</p>
+<p><strong>技術要素で有料のものは、1つもありませんでした。</strong></p>
+<p>もちろん、講座やコンサルに価値がないとは言いません。自分の業務に落とし込む伴走や、学習時間の短縮そのものに払う価値はあります。</p>
+<p>ただ、それは<strong>中身を知ったうえで判断すべきこと</strong>です。「知らない」まま買うのと、「知っているが時間を買う」ために買うのとでは、まったく違う買い物になります。</p>
+<p>このシリーズが、その判断材料になっていれば嬉しいです ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

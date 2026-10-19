@@ -1,0 +1,113 @@
+/* ============================================================
+   .memo — 本文中の補足ブロック
+   ini.md.css に追記して使用
+   ============================================================ */
+
+.memo {
+  /* --- 調整はこの3つだけで足ります --- */
+  --memo-accent: #2f6fed;                 /* 既定：情報（青） */
+  --memo-surface: #ffffff;                /* 記事本文の背景色に合わせる */
+  --memo-ink: #263041;                    /* 文字色 */
+
+  position: relative;
+  margin: 2em 0;
+  padding: 1.05em 1.25em 1.05em 1.4em;
+  border-left: 4px solid var(--memo-accent);
+  border-radius: 3px 10px 10px 3px;
+  background: color-mix(in srgb, var(--memo-accent) 6%, var(--memo-surface));
+  color: var(--memo-ink);
+  font-size: 0.93em;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+}
+
+/* color-mix 非対応ブラウザ向けフォールバック */
+@supports not (background: color-mix(in srgb, red 6%, white)) {
+  .memo { background: #f2f6fe; }
+}
+
+/* 内側の余白リセット（<p> でラップされる場合に効きます） */
+.memo > :first-child { margin-top: 0; }
+.memo > :last-child  { margin-bottom: 0; }
+
+/* 強調は同系色で。太字が黒のままだと本文と見分けが付きません */
+.memo strong,
+.memo b {
+  color: color-mix(in srgb, var(--memo-accent) 72%, var(--memo-ink));
+  font-weight: 700;
+}
+
+.memo a {
+  color: var(--memo-accent);
+  text-underline-offset: 0.2em;
+}
+
+.memo code {
+  background: color-mix(in srgb, var(--memo-accent) 12%, var(--memo-surface));
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+/* ------------------------------------------------------------
+   バリアント — <div class="memo memo--warn"> のように併記
+   ------------------------------------------------------------ */
+
+/* ⚠️ 注意・ハマりどころ */
+.memo--warn { --memo-accent: #e0663b; }
+
+/* 💡 ヒント・知っておくと得する仕様 */
+.memo--tip  { --memo-accent: #d9a520; }
+
+/* 📌 用語の補足・免責 */
+.memo--note {
+  --memo-accent: #7b8794;
+  font-size: 0.88em;
+}
+
+/* ------------------------------------------------------------
+   モバイル
+   ------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .memo {
+    margin: 1.6em 0;
+    padding: 0.9em 1em 0.9em 1.1em;
+    font-size: 0.9em;
+    line-height: 1.85;
+  }
+}
+
+/* ------------------------------------------------------------
+   ダークモード
+   ------------------------------------------------------------ */
+
+@media (prefers-color-scheme: dark) {
+  .memo {
+    --memo-surface: #161a22;
+    --memo-ink: #d6dbe4;
+    background: color-mix(in srgb, var(--memo-accent) 14%, var(--memo-surface));
+  }
+
+  .memo strong,
+  .memo b {
+    color: color-mix(in srgb, var(--memo-accent) 55%, #ffffff);
+  }
+
+  .memo--warn { --memo-accent: #f0855c; }
+  .memo--tip  { --memo-accent: #e8bd4a; }
+  .memo--note { --memo-accent: #9aa5b1; }
+}
+
+/* ------------------------------------------------------------
+   印刷
+   ------------------------------------------------------------ */
+
+@media print {
+  .memo {
+    background: none;
+    border: 1px solid #999;
+    border-left-width: 4px;
+    break-inside: avoid;
+  }
+}

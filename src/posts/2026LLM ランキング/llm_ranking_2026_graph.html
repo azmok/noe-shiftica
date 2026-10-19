@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Pop7 ランキング 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060e;
+    --surface: #0d0d1e;
+    --surface2: #13132a;
+    --border: rgba(120,120,255,0.12);
+    --accent: #7c6ffd;
+    --accent2: #00e5c0;
+    --accent3: #ff6b6b;
+    --gold: #ffd166;
+    --silver: #c0c7d6;
+    --bronze: #cd8b6a;
+    --text: #e8e8f5;
+    --muted: #7a7a99;
+    --rank1: rgba(255,209,102,0.08);
+    --rank2: rgba(192,199,214,0.06);
+    --rank3: rgba(205,139,106,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,111,253,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,111,253,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    padding: 56px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    display: block;
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 32px auto 0;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    background: rgba(124,111,253,0.1);
+    border: 1px solid rgba(124,111,253,0.25);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 0%, rgba(124,111,253,0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* Tab nav */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 40px 0 32px;
+  }
+
+  .tab-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 10px 24px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .tab-btn.active {
+    background: rgba(124,111,253,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tab-btn:hover:not(.active) {
+    border-color: rgba(124,111,253,0.3);
+    color: var(--text);
+  }
+
+  /* Section */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .legend-item {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: rgba(124,111,253,0.25);
+    background: var(--surface2);
+  }
+
+  .card.rank-1 { background: var(--rank1); border-color: rgba(255,209,102,0.2); }
+  .card.rank-2 { background: var(--rank2); border-color: rgba(192,199,214,0.18); }
+  .card.rank-3 { background: var(--rank3); border-color: rgba(205,139,106,0.2); }
+
+  /* Glow line for top 3 */
+  .card.rank-1::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--gold); border-radius: 14px 0 0 14px; }
+  .card.rank-2::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--silver); border-radius: 14px 0 0 14px; }
+  .card.rank-3::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--bronze); border-radius: 14px 0 0 14px; }
+
+  .rank-badge {
+    text-align: center;
+  }
+
+  .rank-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .card.rank-1 .rank-num { color: var(--gold); }
+  .card.rank-2 .rank-num { color: var(--silver); }
+  .card.rank-3 .rank-num { color: var(--bronze); }
+  .card:not(.rank-1):not(.rank-2):not(.rank-3) .rank-num { color: var(--muted); }
+
+  .rank-icon { font-size: 14px; display:block; margin-top:2px; }
+
+  .model-info {}
+
+  .model-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .model-maker {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .tag-api { background: rgba(0,229,192,0.12); color: var(--accent2); border: 1px solid rgba(0,229,192,0.2); }
+  .tag-chat { background: rgba(124,111,253,0.12); color: var(--accent); border: 1px solid rgba(124,111,253,0.2); }
+  .tag-open { background: rgba(255,107,107,0.1); color: var(--accent3); border: 1px solid rgba(255,107,107,0.2); }
+  .tag-reasoning { background: rgba(255,209,102,0.1); color: var(--gold); border: 1px solid rgba(255,209,102,0.2); }
+
+  /* Scores */
+  .scores {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 280px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .score-label {
+    width: 80px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .score-bar-wrap {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .bar-intel { background: linear-gradient(90deg, var(--accent), #a89dff); }
+  .bar-code  { background: linear-gradient(90deg, var(--accent2), #00b89a); }
+  .bar-speed { background: linear-gradient(90deg, var(--gold), #ffa640); }
+
+  .score-val {
+    width: 50px;
+    text-align: right;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  /* Methodology box */
+  .method-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .method-box h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .method-box ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .method-box li {
+    padding: 5px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .method-box li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+    top: 7px;
+  }
+
+  /* References */
+  .references {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .references h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+  }
+
+  .ref-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+
+  .ref-item a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .ref-item a:hover { text-decoration: underline; }
+
+  .ref-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 0 32px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .note-box {
+    background: rgba(124,111,253,0.06);
+    border: 1px solid rgba(124,111,253,0.15);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 700px) {
+    .card {
+      grid-template-columns: 40px 1fr;
+      grid-template-rows: auto auto;
+    }
+    .scores {
+      grid-column: 1 / -1;
+      min-width: 0;
+    }
+    .tabs { flex-direction: column; align-items: stretch; }
+    .tab-btn { text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-badge">2026 Edition · March</div>
+    <h1>LLM Pop7 ランキング</h1>
+    <p class="subtitle">独自総合スコアによる最新LLMベンチマーク比較レポート</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('api')">🔌 API版（全モデル含む）</button>
+    <button class="tab-btn" onclick="switchTab('chat')">💬 チャット版（一般ユーザー向け）</button>
+  </div>
+
+  <!-- ===== API Section ===== -->
+  <div id="api" class="section active">
+
+    <div class="note-box">
+      このランキングは <strong>API経由で利用可能な全モデル</strong>（xhigh / max / reasoning サフィックス付きの高性能バリアントを含む）を対象としています。
+      スコアは Artificial Analysis Intelligence Index・Arena.ai コーディングElo・レイテンシ計測から算出した独自加重平均です。<br>
+      ⚠️ <strong>GPT-5.3 について</strong>：OpenAI は「GPT-5.3 Instant」（チャット改善版・3月3日）と「GPT-5.3 Codex (xhigh)」（コーディングエージェント・2月5日）の2モデルをリリース。本API版ランキングでは後者を4位に掲載、チャット版では前者を独立エントリとして追加。
+    </div>
+
+    <div class="section-title">総合ランキング（API対象）</div>
+
+    <div class="legend">
+      <span class="legend-item">INTEL = 総合知性スコア (AA Index)</span>
+      <span class="legend-item">CODE = コーディング Elo (Arena.ai)</span>
+      <span class="legend-item">LATENCY = レイテンシ評価（低いほど高速）</span>
+    </div>
+
+    <!-- Rank 1 -->
+    <div class="card rank-1">
+      <div class="rank-badge"><span class="rank-num">1</span><span class="rank-icon">🥇</span></div>
+      <div class="model-info">
+        <div class="model-name">Gemini 3.1 Pro Preview</div>
+        <div class="model-maker">Google DeepMind</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+          <span class="tag tag-chat">Chat</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:100%"></div></div>
+          <span class="score-val">57 / 57</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:90%"></div></div>
+          <span class="score-val">Elo 1461</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:78%"></div></div>
+          <span class="score-val">中〜低速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 2 -->
+    <div class="card rank-2">
+      <div class="rank-badge"><span class="rank-num">2</span><span class="rank-icon">🥈</span></div>
+      <div class="model-info">
+        <div class="model-name">GPT-5.4 (xhigh)</div>
+        <div class="model-maker">OpenAI</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:100%"></div></div>
+          <span class="score-val">57 / 57</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:91%"></div></div>
+          <span class="score-val">Elo ~1472</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:68%"></div></div>
+          <span class="score-val">中速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 3 -->
+    <div class="card rank-3">
+      <div class="rank-badge"><span class="rank-num">3</span><span class="rank-icon">🥉</span></div>
+      <div class="model-info">
+        <div class="model-name">Claude Opus 4.6 (max / Adaptive Reasoning)</div>
+        <div class="model-maker">Anthropic</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+          <span class="tag tag-chat">Chat</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:93%"></div></div>
+          <span class="score-val">53 / 57</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:100%"></div></div>
+          <span class="score-val">Elo 1555</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:60%"></div></div>
+          <span class="score-val">やや低速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 4 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">4</span></div>
+      <div class="model-info">
+        <div class="model-name">GPT-5.3 Codex (xhigh)</div>
+        <div class="model-maker">OpenAI — Codex / API（2026年2月5日リリース）</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+        <div style="margin-top:6px;font-size:11px;color:var(--muted);">コーディングエージェント特化 · GPT-5.2 + Codex スタック統合 · 25%高速化</div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:95%"></div></div>
+          <span class="score-val">54 / 57</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:87%"></div></div>
+          <span class="score-val">Elo ~1341</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:72%"></div></div>
+          <span class="score-val">中速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 5 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">5</span></div>
+      <div class="model-info">
+        <div class="model-name">Claude Sonnet 4.6 (max / Adaptive Reasoning)</div>
+        <div class="model-maker">Anthropic</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+          <span class="tag tag-chat">Chat</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:91%"></div></div>
+          <span class="score-val">52 / 57</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:98%"></div></div>
+          <span class="score-val">Elo 1523</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:75%"></div></div>
+          <span class="score-val">中速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 6 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">6</span></div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 / Grok 4.1 Fast (Reasoning)</div>
+        <div class="model-maker">xAI</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+          <span class="tag tag-chat">Chat</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:82%"></div></div>
+          <span class="score-val">~47</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:79%"></div></div>
+          <span class="score-val">Elo ~1236</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:88%"></div></div>
+          <span class="score-val">高速 (2M ctx)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 7 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">7</span></div>
+      <div class="model-info">
+        <div class="model-name">DeepSeek V3.2 (Reasoning)</div>
+        <div class="model-maker">DeepSeek</div>
+        <div class="tags">
+          <span class="tag tag-api">API</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+          <span class="tag tag-open">Open Weights</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">INTEL</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:79%"></div></div>
+          <span class="score-val">~45</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:86%"></div></div>
+          <span class="score-val">Elo 1373</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:91%"></div></div>
+          <span class="score-val">高速・低コスト</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-box">
+      <h3>📊 API版 採点基準と注記</h3>
+      <ul>
+        <li><strong>総合知性 (INTEL)</strong>：Artificial Analysis Intelligence Index v4.0 スコア（GDPval-AA・HLE・GPQA Diamond 等 10 評価の合算）</li>
+        <li><strong>コーディング (CODE)</strong>：Arena.ai Code Leaderboard の Elo スコア（2026年3月時点・184,734 票ベース）</li>
+        <li><strong>レイテンシ</strong>：Artificial Analysis の TTFT 計測値（72時間中央値）および出力トークン速度を総合評価</li>
+        <li>xhigh / max / high 等のサフィックスは同ベースモデルの高品質バリアントで、通常 API オプションとして提供される</li>
+        <li>Gemini 3.1 Pro Preview・GPT-5.4 は同点（57点）のため、Arena.ai チャット Elo 差で優劣を判定</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== Chat Section ===== -->
+  <div id="chat" class="section">
+
+    <div class="note-box">
+      このランキングは <strong>一般ユーザーがチャットUIから直接利用可能なモデル</strong>（ChatGPT・Claude.ai・Gemini・Grok 等のサービス経由）を対象にしています。
+      ユーザーレビュー・LMArena Elo・実用性の観点を加味した独自スコアです。
+    </div>
+
+    <div class="section-title">総合ランキング（チャット対象）</div>
+
+    <div class="legend">
+      <span class="legend-item">CHAT ELO = LMArena Text Elo (5.4M+ 票)</span>
+      <span class="legend-item">CODE ELO = Arena.ai Code Elo</span>
+      <span class="legend-item">LATENCY = 体感レイテンシ評価</span>
+    </div>
+
+    <!-- Rank 1 -->
+    <div class="card rank-1">
+      <div class="rank-badge"><span class="rank-num">1</span><span class="rank-icon">🥇</span></div>
+      <div class="model-info">
+        <div class="model-name">Claude Opus 4.6</div>
+        <div class="model-maker">Anthropic — Claude.ai</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-reasoning">Thinking</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:100%"></div></div>
+          <span class="score-val">1504</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:100%"></div></div>
+          <span class="score-val">1555</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:62%"></div></div>
+          <span class="score-val">やや低速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 2 -->
+    <div class="card rank-2">
+      <div class="rank-badge"><span class="rank-num">2</span><span class="rank-icon">🥈</span></div>
+      <div class="model-info">
+        <div class="model-name">Gemini 3.1 Pro <span style="font-size:11px;color:var(--accent2);">← UI表記「Thinking (3 Pro)」</span></div>
+        <div class="model-maker">Google — Gemini app / AI Mode in Search</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.7;">
+          ⚠️ <strong style="color:var(--accent3);">Gemini 3 Pro は2026年3月9日に廃止・シャットダウン済</strong>。後継の 3.1 Pro が実質的に同じ「Thinking (3 Pro)」枠を引き継ぎ。<br>
+          ✅ <strong>米国の無料ユーザーも</strong>「Thinking (3 Pro)」ラベルでデイリー制限付き利用可 · AI Pro（$19.99/月）で拡張枠 · Ultra で最大 1,500 Thinking プロンプト/日<br>
+          ARC-AGI-2スコア 77.1% · 1Mコンテキスト · 3段階 thinking_level 制御（Low / Medium / High）· High モードで「Deep Think Mini」発動
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:99%"></div></div>
+          <span class="score-val">1500 (Arena)</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:94%"></div></div>
+          <span class="score-val">Elo 1461</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:76%"></div></div>
+          <span class="score-val">中速（TTFT ~29s）</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 3 -->
+    <div class="card rank-3">
+      <div class="rank-badge"><span class="rank-num">3</span><span class="rank-icon">🥉</span></div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 / Grok 4.1 (Thinking)</div>
+        <div class="model-maker">xAI — X (旧Twitter)</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:97%"></div></div>
+          <span class="score-val">1473–1491</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:77%"></div></div>
+          <span class="score-val">Elo 1205</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:87%"></div></div>
+          <span class="score-val">高速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 4 NEW: GPT-5.3 Instant -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">4</span></div>
+      <div class="model-info">
+        <div class="model-name">GPT-5.3 Instant</div>
+        <div class="model-maker">OpenAI — ChatGPT（2026年3月3日リリース・全ユーザーデフォルト）</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-api">API: gpt-5.3-chat-latest</span>
+        </div>
+        <div style="margin-top:6px;font-size:11px;color:var(--muted);">幻覚率 -26.8%（Web検索時）・過剰拒否の大幅改善・Web情報の文脈理解向上</div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:95%"></div></div>
+          <span class="score-val">~1455 est.</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:88%"></div></div>
+          <span class="score-val">〜GPT-5.2水準</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:90%"></div></div>
+          <span class="score-val">高速（Instant）</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 5 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">5</span></div>
+      <div class="model-info">
+        <div class="model-name">GPT-5.2 / GPT-5.4 Thinking</div>
+        <div class="model-maker">OpenAI — ChatGPT</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:96%"></div></div>
+          <span class="score-val">1457–1479</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:95%"></div></div>
+          <span class="score-val">Elo ~1472</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:68%"></div></div>
+          <span class="score-val">中速（Thinking）</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 6 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">6</span></div>
+      <div class="model-info">
+        <div class="model-name">Claude Sonnet 4.6</div>
+        <div class="model-maker">Anthropic — Claude.ai</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:95%"></div></div>
+          <span class="score-val">1457</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:98%"></div></div>
+          <span class="score-val">Elo 1523</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:80%"></div></div>
+          <span class="score-val">中〜高速</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank 7 -->
+    <div class="card">
+      <div class="rank-badge"><span class="rank-num">7</span></div>
+      <div class="model-info">
+        <div class="model-name">Gemini 3 Flash</div>
+        <div class="model-maker">Google — Gemini</div>
+        <div class="tags">
+          <span class="tag tag-chat">Chat</span>
+          <span class="tag tag-reasoning">Reasoning</span>
+        </div>
+      </div>
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">CHAT ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:96%"></div></div>
+          <span class="score-val">1473</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">CODE ELO</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:93%"></div></div>
+          <span class="score-val">Elo 1442</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">LATENCY</span>
+          <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:95%"></div></div>
+          <span class="score-val">超高速・無料</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-box">
+      <h3>📊 チャット版 採点基準と注記</h3>
+      <ul>
+        <li><strong>Gemini 3 Pro について</strong>：API版は2026年3月9日に廃止・シャットダウン済み。ただしチャット UI の「Thinking (3 Pro)」ラベルは 3.1 Pro が引き継ぎ継続提供中。米国の無料ユーザーも日次上限付きで「Thinking (3 Pro)」利用可能。AI Pro（$19.99/月）で拡張枠・Ultra で 1,500 プロンプト/日</li>
+        <li><strong>Gemini 3.1 Pro</strong> は2026年2月19日リリース。3段階 thinking_level（Low/Medium/High）を導入し、High モードで「Deep Think Mini」が発動。前世代 3 Pro の high≒3.1 Pro の medium に相当</li>
+        <li><strong>チャット Elo</strong>：LMArena (arena.ai) Text Leaderboard の Elo スコア（5,440,800 票・2026年3月6日時点）</li>
+        <li><strong>コーディング Elo</strong>：Arena.ai Code Leaderboard の Elo スコア（agentic coding, HTML/React タスク）</li>
+        <li><strong>レイテンシ</strong>：体感応答速度（各社公式チャット UI）および Artificial Analysis 計測値を参考</li>
+        <li>Gemini 3 Flash は知性スコアでは Sonnet 4.6 に劣るが、無料提供・超高速で利便性が高いため6位</li>
+        <li>DeepSeek はオープンウェイトで完全無料利用が可能なため、コスパ面から7位に選出</li>
+        <li><strong>GPT-5.3 Instant</strong>（3月3日リリース）は全 ChatGPT ユーザーのデフォルトモデルに昇格。API名 <code>gpt-5.3-chat-latest</code>。幻覚率 -26.8%（Web検索時）を達成</li>
+        <li><strong>GPT-5.3 Codex (xhigh)</strong> はコーディングエージェント特化モデルのため API 版 4位に収録し、チャット版では GPT-5.3 Instant を別エントリとして追加</li>
+        <li>GPT-5.2 Instant は2026年6月3日に退役予定。旧 GPT-5 Instant/Thinking は2月13日に既に退役済み</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- References -->
+  <div class="references">
+    <h2>📚 参考文献 / References</h2>
+    <div class="ref-grid">
+      <div class="ref-item">
+        <a href="https://artificialanalysis.ai/leaderboards/models" target="_blank">Artificial Analysis — LLM Leaderboard</a>
+        <p class="ref-desc">285モデルのインテリジェンス・速度・価格を独立計測。AA Intelligence Index v4.0（GDPval-AA, HLE, GPQA Diamond 他10評価）を採用。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://arena.ai/leaderboard/text" target="_blank">Arena.ai (LMArena) — Text Leaderboard</a>
+        <p class="ref-desc">5,440,800票のクラウドソーシングEloレーティング。323モデルを対象に匿名ブラインドバトル形式で人間評価。2026年3月6日更新。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://arena.ai/leaderboard/code" target="_blank">Arena.ai — Code Leaderboard</a>
+        <p class="ref-desc">184,734票によるコーディングElo。エージェンティックコーディング・WebDev・HTML/Reactタスクを対象。2026年3月4日更新。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://artificialanalysis.ai" target="_blank">Artificial Analysis — Top Page</a>
+        <p class="ref-desc">独立系AI分析プラットフォーム。スピード・レイテンシ（TTFT）・価格・コンテキストウィンドウを8回/日の頻度で計測。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://openlm.ai/chatbot-arena/" target="_blank">OpenLM.ai — Chatbot Arena+</a>
+        <p class="ref-desc">LMSYS Chatbot Arena（6M+票）とAA Intelligence Index v3・ARC-AGIを統合した複合リーダーボード。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/" target="_blank">Google Blog — Gemini 3.1 Pro リリースノート</a>
+        <p class="ref-desc">2026年2月19日公式発表。Gemini app・API・Vertex AI・NotebookLM へのロールアウト詳細。ARC-AGI-2スコア 77.1% を達成。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://support.google.com/gemini/answer/16275805" target="_blank">Google サポート — Gemini Apps プランと利用制限</a>
+        <p class="ref-desc">Gemini 3 Flash・3.1 Pro の各プラン（無料/AI Pro/Ultra）での利用可否・回数制限を公式に説明。</p>
+      </div>
+        <p class="ref-desc">2026年3月3日リリース。日常会話の品質・Web検索精度・幻覚率（-26.8%）の改善を詳述。全 ChatGPT ユーザーのデフォルトモデルに昇格。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://openai.com/index/introducing-gpt-5-3-codex/" target="_blank">OpenAI — Introducing GPT-5.3 Codex</a>
+        <p class="ref-desc">2026年2月5日リリース。GPT-5.2 と Codex スタックを統合し、最強のコーディングエージェントとして約25%高速化。自身のトレーニングにも使用。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://artificialanalysis.ai/methodology/intelligence-benchmarking" target="_blank">Artificial Analysis — Methodology</a>
+        <p class="ref-desc">Intelligence Index の算出方法詳細。各評価の重み・実行方法・独立検証プロセスを公開。</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Compiled by independent analysis · March 2026 · Data sources: Artificial Analysis, Arena.ai (LMArena), OpenLM.ai<br>
+    ※ LLM の性能は急速に変化します。最新情報は各参考文献リンクをご確認ください。
+  </footer>
+
+</div>
+
+<script>
+  function switchTab(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

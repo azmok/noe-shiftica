@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>「AI社員」の正体——それ、全部標準機能です</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+h4{
+  margin:1.5rem auto 0.5rem; font-weight:600; font-size:0.97rem; color:var(--fg);
+}
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+
+/* テーブルのラッパーとスクロール機能 */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+table{
+  border-collapse:collapse;
+  width: 100%;
+  min-width: 32rem;
+  margin: 0;
+  font-size:0.82em;
+}
+
+th, td{
+  border:1px solid var(--line);
+  padding:0.6rem 0.8rem;
+  text-align:center;
+  vertical-align:middle;
+  white-space: nowrap; /* テキストの途中の折返しを防止 */
+}
+
+th{
+  background:var(--bg-elev);
+  color:#fff;
+  font-weight:600;
+  text-align:center;
+  white-space: nowrap;
+}
+
+/* カテゴリセル（結合部分）の中央揃え */
+td.cat-cell {
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 600;
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+}
+
+/* ナンバリングセル */
+td.num-cell {
+  text-align: center;
+  font-weight: 600;
+  color: var(--fg-faint);
+}
+
+/* ハイライト行のスタイリング */
+tr.highlight td {
+  background: rgba(255, 122, 156, 0.12);
+  color: #fff;
+}
+tr.highlight td.cat-cell {
+  background: rgba(255, 122, 156, 0.2);
+  color: #fff;
+}
+tr.highlight td:first-child {
+  border-left: 3px solid var(--accent);
+}
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>「AI社員」の正体——それ、全部標準機能です</h1>
+
+<div class="tldr">
+<ul>
+<li>「AI社員」の実体は、<code>CLAUDE.md</code> と <code>.claude/agents/</code> に置く .mdファイル</li>
+<li>AIへの指示手法は7つある。商材が扱っているのは、そのうち2つだけ</li>
+<li>記憶する仕組みも、100万トークンの文脈保持も、すでに標準搭載</li>
+<li>しかもこれはClaude Code固有ではなく、3社共通の業界標準</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">「AI社員」の実体を分解する</a></li>
+      <li><a href="#s2">指示手法は7つある</a></li>
+      <li><a href="#s3">記憶する仕組みは、すでに標準搭載</a></li>
+      <li><a href="#s4">サブエージェントは本物か</a></li>
+      <li><a href="#s5">ただし、置くだけでは動かない</a></li>
+      <li><a href="#s6">これはClaude Code固有の話ではない</a></li>
+      <li><a href="#s7">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>先に、いちばん都合の悪いことから書きます。</p>
+<p>SNSやYouTubeで見かける「AI社員を作る」という情報。技術的に中身を分解した結果、<strong>そこに出てくる要素は、すべてAIツールの標準機能でした。</strong></p>
+<p>独自のノウハウでも、秘伝の設定でもありません。公式ドキュメントに載っている機能を、名前を変えて呼んでいるだけです。</p>
+<p>今までに申し込もうとしている人には、受け入れがたい話だと思います。ただ、これは印象の話ではありません。順に事実を並べていきます。</p>
+
+<h2 id="s1">「AI社員」の実体を分解する</h2>
+
+<p>まず、実際に何を作っているのかを見ます。</p>
+<p>解説されている手順は、ほぼ例外なくこの2つに集約されます。</p>
+
+<pre><code>0. フォルダ📂をエディタで開けるIDE(VS Code, Antigravity IDEなど)をダウンロード
+	
+1. AIのCLI(Claude Code CLI, ChtaGPT CLI, Antigravity CLIなど)をダウンロード
+
+2. CLAUDE.md というファイルを作る
+   → 「あなたはSEO担当です。こういう方針で…」と書く
+
+3. .claude/agents/ というフォルダに .mdファイルを置く
+   → coder.md、designer.md のように役割ごとに1枚ずつ</code></pre>
+
+<p><strong>以上です。</strong> 2,3は、どちらもテキストファイルで、プログラミングは必要ありません。</p>
+<p>そして重要なのは、<strong>この2つがどちらもAIツール側が最初から用意している仕組みだという点</strong>です。特別なものを導入しているわけではありません。</p>
+<p>海外の開発者コミュニティでは、この構成を「Role-based multi-agent（役割ベースの複数エージェント）」と呼びます。「社員」という言葉は使いません。<strong>新技術の名前ではなく、既存の仕組みに親しみやすい呼び名がついているだけ</strong>ということです。</p>
+
+<h2 id="s2">指示手法は7つある</h2>
+
+<p>ここからが本題です。</p>
+<p>AIに指示を与える方法は、公式に整理されているものだけで<strong>7種類</strong>あります。それぞれ「いつ読み込まれるか」が違い、その違いこそが設計の肝になります。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>No.</th>
+  <th>カテゴリ</th>
+  <th>手法</th>
+  <th>いつ読み込まれるか / 用途</th>
+  <th>Claude Code</th>
+</tr>
+<tr class="highlight">
+  <td class="num-cell">1</td>
+  <td class="cat-cell">基本設定</td>
+  <td><code>CLAUDE.md</code></td>
+  <td>開始時に読まれ、最後まで残る<br><small style="color:var(--fg-muted)">常に守ってほしい方針</small></td>
+  <td><code>CLAUDE.md</code></td>
+</tr>
+<tr>
+  <td class="num-cell">2</td>
+  <td class="cat-cell" rowspan="2">動的制御</td>
+  <td>Skills</td>
+  <td><strong>呼ばれたときだけ</strong><br><small style="color:var(--fg-muted)">特定の作業手順</small></td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">3</td>
+  <td>Hooks</td>
+  <td>コンテキストの外で確実に実行<br><small style="color:var(--fg-muted)">絶対に飛ばせない処理</small></td>
+  <td>⭕</td>
+</tr>
+<tr class="highlight">
+  <td class="num-cell">4</td>
+  <td class="cat-cell">エージェント</td>
+  <td>サブエージェント</td>
+  <td>委譲時に起動し、要約を返す<br><small style="color:var(--fg-muted)">役割分担</small></td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">5</td>
+  <td class="cat-cell" rowspan="2">記憶・永続化</td>
+  <td>Auto Memory</td>
+  <td>毎回、自動で<br><small style="color:var(--fg-muted)">過去セッションの記憶</small></td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">6</td>
+  <td><code>/remember</code></td>
+  <td>実行したとき<br><small style="color:var(--fg-muted)">繰り返しを恒久ルール化</small></td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">7</td>
+  <td class="cat-cell">動的制御</td>
+  <td>スラッシュコマンド</td>
+  <td>呼び出したとき<br><small style="color:var(--fg-muted)">定型作業の短縮</small></td>
+  <td>⭕</td>
+</tr>
+</table>
+</div>
+
+<blockquote>
+<p>「AI社員の作り方」として説明されているのは、上から<strong>1番目と4番目だけ</strong>です。</p>
+</blockquote>
+
+<p>残りの5つには、ほとんど触れられていません。特にSkillsとHooksは、実務では重要度が高い機能です。</p>
+<p>💡 <strong>なぜ「いつ読み込まれるか」が重要なのか</strong>：常に読まれるものに情報を詰め込みすぎると、AIの注意が散ります。逆に、必要なときだけ読み込む仕組みに置けば、普段は軽いまま保てます。この使い分けが、実際の精度を左右します。</p>
+
+<h2 id="s3">記憶する仕組みは、すでに標準搭載</h2>
+
+<p>「AI社員」の価値として、よくこう説明されます。</p>
+<blockquote>
+<p>普通のAIチャットは毎回ゼロから説明し直しだが、AI社員は情報が蓄積されるので、使うほど賢くなる</p>
+</blockquote>
+
+<p>これは事実です。<strong>ただし、それも標準機能です。</strong></p>
+
+<h3>Auto Memory——AIが自分で書く記憶</h3>
+
+<p><code>CLAUDE.md</code> が自分の手で書くものなのに対して、<strong>Auto Memory は何も入力しなくても裏で勝手に動きます。</strong> セッションを閉じても、次に開いたときに前回の内容を覚えています。</p>
+<p>この仕組みの基盤は2025年後半から入っていて、画面に「記憶を思い出しました」と表示されるようになったのは2026年2月頃です。</p>
+
+<h3><code>/remember</code>——繰り返しを恒久ルールにする</h3>
+
+<p>このコマンドを実行すると、AIが過去の記憶を見直して、<strong>繰り返し現れるパターンを見つけて提案してきます。</strong></p>
+<p>たとえば同じ指摘を3回していたら、「これは恒久的なルールにすべきでは」と持ちかけてくる。承認すれば設定ファイルに書き込まれ、以降ずっと守られます。</p>
+<p><strong>「使うほど賢くなる」の実装が、まさにこれです。</strong></p>
+
+<h3>100万トークンの文脈保持</h3>
+
+<p>さらに、一度に扱える情報量も大きく増えています。<strong>現在の上限は100万トークン、日本語でおよそ75万字です。</strong></p>
+<p>個人が数年書き溜めたメモ程度なら、まるごと収まる規模です。</p>
+<p>⚠️ ただし「収まること」と「ちゃんと読まれること」は別問題です。この点は別の記事で詳しく扱います。</p>
+
+<h2 id="s4">サブエージェントは本物か</h2>
+
+<p>ここで疑問が浮かぶかもしれません。</p>
+<blockquote>
+<p><code>.claude/agents/</code> に .mdファイルを置くだけで、本当に役割分担になるのか？<br>
+1つのAIが役柄を切り替えているだけではないのか？</p>
+</blockquote>
+
+<p>この疑問に答えるには、まず<strong>「作業机」</strong>という考え方を押さえる必要があります。</p>
+
+<h3>まず、「作業机」とは何か</h3>
+
+<p>前の章で、AIが一度に扱える情報量には上限がある、と書きました。この<strong>「一度に見渡せる範囲」</strong>を、<strong>作業机の広さ</strong>だと考えてください。</p>
+<p>あなたがAIと会話を始めると、そのやり取りが机の上に積み上がっていきます。</p>
+
+<pre><code>質問した         → 机に載る
+AIが答えた       → 机に載る
+ファイルを読んだ  → その中身も机に載る
+エラーが出た      → それも机に載る</code></pre>
+
+<p>会話が長引くほど、机の上は書類だらけになります。</p>
+<p>そして<strong>ここが重要なのですが、机が散らかると、AIの精度そのものが落ちます。</strong></p>
+<p>AIは机の上の情報のうち、<strong>最初と最後にはよく反応するのに、真ん中に埋もれたものを見落としやすい</strong>という性質があるからです。長い会議の冒頭と結論だけ覚えていて、中盤を忘れてしまう感覚に近いものです。</p>
+<p>💡 <strong>だから「机をきれいに保つ」ことが、そのまま精度を保つことになります。</strong></p>
+
+<h3>「親」とは、誰のことか</h3>
+
+<p>ここで、用語を1つ整理します。</p>
+<p>あなたがAIを起動して、実際に話しかけている相手。<strong>この最初の1体を「親」と呼びます。</strong></p>
+
+<pre><code>あなた
+  ↓ 話しかける
+【親】 ← あなたが直接やり取りする相手。全体を見ている
+  ↓ 仕事を振る
+【サブエージェント】 ← 特定の作業だけを任される</code></pre>
+
+<p>会社でたとえるなら、<strong>親は窓口の担当者</strong>です。あなたの要望を聞いて、必要なら専門の担当者に振り分ける。そして結果をまとめて、あなたに返す。</p>
+<p><strong>あなたが会話しているのは、常に親だけです。</strong> サブエージェントと直接話すことはありません。</p>
+
+<h3>「役柄の切り替え」だと、何が起きるか</h3>
+
+<p>では本題です。</p>
+<p>「今はデザイナーとして考えて」「次はコーダーとして書いて」と<strong>指示を切り替える方式</strong>だと、どうなるでしょうか。</p>
+
+<pre><code>【親の机】
+├── デザイナーとして考えた内容
+├── 途中でやめた案
+├── コーダーとして書いたコード
+├── 動かなかった試行錯誤
+└── チェック役としての指摘</code></pre>
+
+<p><strong>全部、同じ机の上に積み上がります。</strong></p>
+<p>これは役割分担ではありません。<strong>1人のAIが、同じ机の前で服を着替えているだけ</strong>です。机はどんどん散らかり、さきほどの「真ん中を見落とす」現象が起きやすくなります。</p>
+
+<h3>サブエージェントは、机ごと分かれている</h3>
+
+<p>一方、サブエージェントを使うとこうなります。</p>
+
+<pre><code>【親の机】
+└── 「実装完了。3ファイル変更しました」 ← これだけ
+
+【コーダーの机】（別の場所にある）
+├── 仕様を読んだ
+├── 1000行書いた
+├── エラーが出た
+├── 直した
+└── 完成 → 要約だけを親に渡して、机ごと片付く</code></pre>
+
+<p>ここが決定的な性質です。</p>
+
+<blockquote>
+<p><strong>サブエージェントは、作業の過程を親に見せません。要約だけを返します。</strong></p>
+</blockquote>
+
+<p>コーダー役が1000行書いて試行錯誤しても、<strong>親の机に届くのは「実装完了」の1行だけ。</strong> 途中の失敗も、消した案も、親の机には乗りません。</p>
+<p><strong>これは役柄の切り替えでは、絶対に実現できません。</strong> 切り替えなら、試行錯誤が全部同じ机に残ってしまうからです。</p>
+<p>💡 <strong>つまり「机が分かれていること」が、本物の役割分担である証明になっています。</strong> ここは、商材の説明どおりに正しく機能します。</p>
+
+<h2 id="s5">ただし、置くだけでは動かない</h2>
+
+<p>ここが、この記事でいちばん実用的な部分かもしれません。</p>
+<p><strong>ファイルを置くだけでは、役割分担は発動しません。</strong></p>
+<p>明示的に「この作業は誰に任せろ」と指示しない限り、AIは<strong>自分でやってしまいます。</strong> 「わざわざ人を呼ぶより自分でやったほうが早い」と判断するからです。</p>
+
+<pre><code>❌ .claude/agents/coder.md を置いただけ
+   → 親が自分で実装してしまう
+   → 机が1つのまま。分担していない
+
+⭕ CLAUDE.md に「実装は必ず coder に委譲すること」と明記
+   → 初めて机が分かれる</code></pre>
+
+<p><strong>ここに触れている解説を、僕はあまり見かけません。</strong></p>
+<p>「.mdファイルを置けばAI社員の完成」と説明されていると、読者は<strong>分かれていない状態を「分かれている」と思い込んだまま使い続けることになります。</strong></p>
+<p>💡 <strong>確認方法</strong>：画面に「Task(委譲中...)」のような表示が出ていれば、実際に分担が起きています。出ないまま会話が続いている場合は、1つの机で全部やっている状態です。</p>
+
+<h3>では、「AI社員」で教えられているのは、どちらなのか</h3>
+
+<p>ここで、整理しておきたいことがあります。</p>
+<p>「AI社員」と呼ばれているものには、<strong>実は2つのパターン</strong>があります。<strong>見た目は似ていますが、中身がまったく違います。</strong></p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th></th>
+  <th>パターン①</th>
+  <th>パターン②</th>
+</tr>
+<tr>
+  <td>やり方</td>
+  <td>役割ファイルを置き、<br>委譲を明記する</td>
+  <td>指示書に<br>「あなたは◯◯です」と書く</td>
+</tr>
+<tr class="highlight">
+  <td>机</td>
+  <td><strong>役割ごとに分かれる</strong></td>
+  <td><strong>1つのまま</strong></td>
+</tr>
+<tr>
+  <td>実態</td>
+  <td>本物の役割分担</td>
+  <td>役柄の切り替え</td>
+</tr>
+<tr>
+  <td>並列実行</td>
+  <td>できる</td>
+  <td>できない</td>
+</tr>
+</table>
+</div>
+
+<p><strong>パターン①が、本来イメージされている「AI社員」です。</strong></p>
+
+<pre><code>あなた
+  ↓
+【オーケストレーター】＝ メインエージェント
+  ↓ 仕事を振る
+【デザイナー】【コーダー】【チェック役】← サブエージェント
+  → それぞれ別の机で働き、要約だけを返す</code></pre>
+
+<p>会社の組織図そのままです。<strong>これが成立していれば、「AI社員」という呼び方は妥当です。</strong></p>
+
+<h4>ところが、公開されている手順を見ると</h4>
+
+<p>ここからが本題です。</p>
+<p>「AI社員の作り方」として公開されている手順を確認すると、<strong>多くがパターン②でした。</strong></p>
+<p>典型的な流れはこうです。</p>
+
+<pre><code>① フォルダを作る
+② 資料を入れる
+③ 指示書ファイルに「あなたは◯◯担当です」と書く
+④ AIに読ませる</code></pre>
+
+<p><strong>役割ファイルを別に置く工程も、委譲を指示する工程も、出てきません。</strong></p>
+<p>つまり——</p>
+
+<blockquote>
+<p><strong>役割は与えているが、机は1つのまま。</strong><br>
+組織ではなく、1人が服を着替えているだけの状態です。</p>
+</blockquote>
+
+<p>⚠️ もちろん、<strong>すべてがそうだと断定はできません。</strong> 公開されていない部分でパターン①を扱っている可能性もあります。ここで言えるのは<strong>「公開されている手順の範囲では、②が多い」</strong>という事実だけです。</p>
+
+<h4>問題は、買う側が①だと思っていること</h4>
+
+<p>「AI社員」「チームを組む」「並列で動く」——こういった言葉から想像するのは、<strong>間違いなくパターン①</strong>です。</p>
+<p>ですが②では、<strong>並列実行はできません。</strong> 机が1つしかないので、順番にしか進みません。</p>
+<p>そして会話が長引くほど机は散らかり、<strong>前の章で説明した「真ん中を見落とす」現象</strong>が起きやすくなります。</p>
+<p>💡 <strong>だから、この記事でいちばん実用的なのは前の節です。</strong> 委譲を明記しているかどうか。画面に委譲の表示が出ているかどうか。<strong>この2点を確認するだけで、①なのか②なのかが分かります。</strong></p>
+
+<h4>おまけ：無料のほうが正しい構造になる場合がある</h4>
+
+<p>ここは少し皮肉な話です。</p>
+<p>次回の記事で、Pythonを20行ほど書いて役割分担を再現します。そのとき、<strong>机は自動的に分かれます。</strong></p>
+<p>理由は単純で、<strong>AIを呼び出す仕組みが、前回のやり取りを覚えていないから</strong>です。呼ぶたびに机がまっさらになります。</p>
+<p>つまり——</p>
+
+<blockquote>
+<p><strong>無料で書ける20行のほうが、パターン②より構造的に正しい</strong>ということが起こりえます。</p>
+</blockquote>
+
+<p>それを確かめるのが、次回の内容です。</p>
+
+<h2 id="s6">これはClaude Code固有の話ではない</h2>
+
+<p>ここまでClaude Codeを例に説明してきました。では他社ではどうなのか。</p>
+<p>調べた結果、<strong>3社ともほぼ同じ機能セットに収束していました。</strong></p>
+
+<p>以下は、先ほど挙げた7つの指示手法・機能を主要3社のCLIツールで比較した全体図です。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>No.</th>
+  <th>カテゴリ</th>
+  <th>手法</th>
+  <th>いつ読み込まれるか / 用途</th>
+  <th>Claude Code</th>
+  <th>Codex CLI</th>
+  <th>Antigravity CLI</th>
+</tr>
+<tr class="highlight">
+  <td class="num-cell">1</td>
+  <td class="cat-cell">基本設定</td>
+  <td><code>CLAUDE.md</code></td>
+  <td>開始時に読まれ、最後まで残る<br><small style="color:var(--fg-muted)">常に守ってほしい方針</small></td>
+  <td><code>CLAUDE.md</code></td>
+  <td><code>AGENTS.md</code></td>
+  <td><code>GEMINI.md</code></td>
+</tr>
+<tr>
+  <td class="num-cell">2</td>
+  <td class="cat-cell" rowspan="2">動的制御</td>
+  <td>Skills</td>
+  <td><strong>呼ばれたときだけ</strong><br><small style="color:var(--fg-muted)">特定の作業手順</small></td>
+  <td>⭕</td>
+  <td>⭕</td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">3</td>
+  <td>Hooks</td>
+  <td>コンテキストの外で確実に実行<br><small style="color:var(--fg-muted)">絶対に飛ばせない処理</small></td>
+  <td>⭕</td>
+  <td>—</td>
+  <td>⭕</td>
+</tr>
+<tr class="highlight">
+  <td class="num-cell">4</td>
+  <td class="cat-cell">エージェント</td>
+  <td>サブエージェント</td>
+  <td>委譲時に起動し、要約を返す<br><small style="color:var(--fg-muted)">役割分担</small></td>
+  <td>⭕</td>
+  <td>⭕</td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">5</td>
+  <td class="cat-cell" rowspan="2">記憶・永続化</td>
+  <td>Auto Memory</td>
+  <td>毎回、自動で<br><small style="color:var(--fg-muted)">過去セッションの記憶</small></td>
+  <td>⭕</td>
+  <td>⭕</td>
+  <td><strong>❌ 非搭載</strong></td>
+</tr>
+<tr>
+  <td class="num-cell">6</td>
+  <td><code>/remember</code></td>
+  <td>実行したとき<br><small style="color:var(--fg-muted)">繰り返しを恒久ルール化</small></td>
+  <td>⭕</td>
+  <td>⭕</td>
+  <td>⭕</td>
+</tr>
+<tr>
+  <td class="num-cell">7</td>
+  <td class="cat-cell">動的制御</td>
+  <td>スラッシュコマンド</td>
+  <td>呼び出したとき<br><small style="color:var(--fg-muted)">定型作業の短縮</small></td>
+  <td>⭕</td>
+  <td>⭕</td>
+  <td>⭕</td>
+</tr>
+</table>
+</div>
+
+<p><strong>役割分担も、記憶も、スキルも、どこか1社の特別な機能ではありません。</strong> 2026年時点の業界標準です。</p>
+<p>ちなみにOpenAIのものは、記憶の実装がかなり凝っています。<strong>作業フォルダごとに記憶を出し分けたり、古くなった情報を自動で忘れたり、よく使う記憶を優先したり</strong>という処理まで入っています。</p>
+<p>逆に意外だったのがGoogleです。<strong>Antigravity CLIには、セッションを跨ぐ記憶が標準では入っていません。</strong> 毎回ゼロから説明し直しが既定の動作で、記憶が欲しければ外部の仕組みを繋ぐ必要があります。</p>
+<p>つまり——<strong>「AI社員」という言葉で売られている機能は、どの会社を選んでも、契約すれば最初から付いてきます。</strong></p>
+
+<h3>3社それぞれの、役割の作り方</h3>
+
+<p>せっかくなので、<strong>実際にどう書くのか</strong>を3社分まとめておきます。</p>
+<p>置き場所とファイル形式が違うだけで、<strong>やることは同じ</strong>です。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>ツール</th>
+  <th>ファイル形式</th>
+  <th>置き場所（プロジェクト用）</th>
+</tr>
+<tr class="highlight">
+  <td>Claude Code</td>
+  <td>Markdown ＋ YAML</td>
+  <td><code>.claude/agents/</code></td>
+</tr>
+<tr>
+  <td>Codex CLI</td>
+  <td><strong>TOML</strong></td>
+  <td><code>.codex/agents/</code></td>
+</tr>
+<tr>
+  <td>Antigravity CLI</td>
+  <td>Markdown ＋ YAML</td>
+  <td><code>.agents/agents/</code></td>
+</tr>
+</table>
+</div>
+
+<h4>▸ Claude Code</h4>
+
+<p>Markdownファイルの先頭に設定を書き、その下に指示文を書きます。</p>
+
+<pre><code>.claude/agents/reviewer.md
+---
+name: reviewer
+description: コードレビュー担当。実装が終わったら必ず使う
+tools: Read, Grep
+---
+あなたはコードレビュアーです。
+問題があれば該当箇所と理由をセットで指摘してください。
+コードは書かないでください。</code></pre>
+
+<h4>▸ Codex CLI</h4>
+
+<p>こちらだけ<strong>TOML形式</strong>です。書き方は違いますが、指定する内容はほぼ同じです。</p>
+
+<pre><code>.codex/agents/reviewer.toml
+
+name = "reviewer"
+description = "コードレビュー担当。実装が終わったら必ず使う"
+model = "gpt-5.4"
+sandbox_mode = "read-only"
+developer_instructions = """
+あなたはコードレビュアーです。
+問題があれば該当箇所と理由をセットで指摘してください。
+コードは書かないでください。
+"""</code></pre>
+
+<p>💡 Codexには<strong>最初から3つの役割が用意されています。</strong> <code>default</code>（汎用）、<code>worker</code>（実装担当）、<code>explorer</code>（調査担当）。<strong>自分で作らなくても、この3つはすぐ使えます。</strong></p>
+
+<h4>▸ Antigravity CLI</h4>
+
+<p>Claude Codeとほぼ同じ形式です。ただし<strong>1つだけ、他にはない特徴があります。</strong></p>
+
+<pre><code>.agents/agents/reviewer.md
+---
+name: reviewer
+description: コードレビュー担当
+tools:
+  - view_file
+  - grep_search
+subagent: true
+mainAgent: true
+model: pro
+---
+# システムプロンプト
+あなたはコードレビュアーです。
+問題があれば該当箇所と理由をセットで指摘してください。</code></pre>
+
+<p>注目してほしいのは、この2行です。</p>
+
+<pre><code>subagent: true    ← サブとして呼べる
+mainAgent: true   ← メインとしても起動できる</code></pre>
+
+<p><strong>同じ定義ファイルが、「呼ばれる側」にも「話しかける相手」にもなれます。</strong></p>
+<p>他社では、自分で作った役割は<strong>サブとしてしか使えません。</strong> あなたが直接話しかける相手は、常に標準のメインエージェントです。</p>
+<p>Antigravityでは、<strong>起動時に「今日はレビュアーと話す」と指定できます。</strong> 実際、公式もこれを他社との違いとして挙げています。</p>
+
+<h4>3社に共通する、いちばん大事な注意点</h4>
+
+<p><strong>どのツールでも、ファイルを置いただけでは起動しません。</strong></p>
+<p>Codexの公式ドキュメントにも<strong>「ファイルが存在するだけでは自動的に起動しない」</strong>と明記されています。<strong>明示的に頼むか、指示書ファイルに委譲のルールを書く必要があります。</strong></p>
+<p>💡 <strong>これは前の章で書いた内容と同じです。</strong> 会社が変わっても、この落とし穴は共通です。</p>
+
+<h2 id="s7">まとめ</h2>
+
+<ul>
+<li>「AI社員」の実体は、<code>CLAUDE.md</code> と <code>.claude/agents/</code> の .mdファイル</li>
+<li>指示手法は7つあり、商材が扱っているのは<strong>2つだけ</strong></li>
+<li>記憶する仕組みも、恒久ルール化の機能も、<strong>すでに標準搭載</strong></li>
+<li>役割分担は本物。<strong>ただし委譲を明記しないと発動しない</strong></li>
+<li>これはClaude Code固有ではなく、<strong>3社共通の業界標準</strong></li>
+</ul>
+
+<p>ここまでを踏まえると、1つの疑問が残ります。</p>
+
+<blockquote>
+<p><strong>では、数十万円で売られているものの中身は、実際には何なのか。</strong></p>
+</blockquote>
+
+<p>次回は、それを実際に手を動かして確かめます。<strong>Pythonで20行ほど書くだけで、「AI社員」と呼ばれているものが再現できます。</strong></p>
+<p>プログラミングの知識は必要ありません。コードもAIが書きます。読み終わる頃には、その20行が何をしているのかまで理解できているはずです ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

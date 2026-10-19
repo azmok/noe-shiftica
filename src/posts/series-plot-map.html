@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>「AI社員」と第二の脳、全4回シリーズ — Plot Map</title>
+<style>
+  :root{
+    --bg: #0d0e12;
+    --panel: #14151a;
+    --panel-elev: #1c1e26;
+    --fg: #e6e7ea;
+    --fg-muted: #9aa0ac;
+    --fg-faint: #6b7280;
+    --line: #2d2f38;
+    --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic','Segoe UI',sans-serif;
+    padding: 2rem 1rem 4rem;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{ max-width: 42rem; margin: 0 auto; }
+  .eyebrow{
+    text-align:center;
+    font-size:0.72rem;
+    font-weight:600;
+    letter-spacing:0.12em;
+    color: var(--fg-faint);
+    margin-bottom:0.4rem;
+  }
+  h1{
+    text-align:center;
+    font-size:1.5rem;
+    font-weight:700;
+    margin:0 0 0.5rem;
+    line-height:1.4;
+    background: var(--grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+  }
+  .subtitle{
+    text-align:center;
+    color: var(--fg-muted);
+    font-size:0.85rem;
+    margin-bottom:1.6rem;
+  }
+  .controls{
+    display:flex;
+    justify-content:center;
+    gap:0.6rem;
+    margin-bottom:1.8rem;
+  }
+  button.ctrl{
+    display:flex;
+    align-items:center;
+    gap:0.35rem;
+    font-size:0.78rem;
+    font-family:inherit;
+    border-radius:8px;
+    padding:0.45rem 0.8rem;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--fg-muted);
+  }
+  button.ctrl.primary{
+    background: var(--panel-elev);
+    color: var(--fg);
+  }
+  button.ctrl:hover{ opacity:0.85; }
+
+  .node-row{
+    display:flex;
+    align-items:flex-start;
+    gap:0.55rem;
+    cursor:default;
+    padding:0.55rem 0.7rem;
+    margin-bottom:0.4rem;
+    border-radius:10px;
+  }
+  .node-row.has-children{ cursor:pointer; }
+  .node-row.root{
+    padding:0.85rem 1rem;
+    background: var(--panel-elev);
+    border:1px solid var(--line);
+  }
+  .caret{
+    margin-top:0.15rem;
+    color: var(--fg-faint);
+    flex-shrink:0;
+    width:18px;
+    display:inline-flex;
+    justify-content:center;
+    transition: transform 0.15s ease;
+    font-size:0.8rem;
+    user-select:none;
+  }
+  .caret.leaf{
+    margin-top:0.65rem;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background: var(--fg-faint);
+  }
+  .caret.open{ transform: rotate(90deg); }
+  .node-title-wrap{ flex:1; min-width:0; }
+  .node-title-line{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:0.6rem;
+  }
+  .title-root{ font-size:1.05rem; font-weight:700; color:#fff; line-height:1.5; }
+  .title-1{ font-size:0.92rem; font-weight:600; color:var(--fg); line-height:1.5; }
+  .title-2{ font-size:0.85rem; font-weight:400; color:var(--fg-muted); line-height:1.5; }
+  .node-sub{ font-size:0.8rem; color:var(--fg-muted); margin-top:0.15rem; }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:0.3rem;
+    font-size:0.68rem;
+    font-weight:600;
+    letter-spacing:0.04em;
+    padding:0.2rem 0.55rem;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .badge.done{ color:var(--bg); background:var(--grad); }
+  .badge.todo{ color:var(--fg-muted); border:1px solid var(--line); }
+
+  .children{
+    padding-left:1rem;
+    border-left:1.5px solid var(--line);
+    overflow:hidden;
+    max-height:0;
+    transition: max-height 0.2s ease;
+  }
+  .children.open{ max-height: 4000px; }
+  .depth-0 > .children{ margin-left:1.6rem; }
+  .depth-1 > .children, .depth-2 > .children{ margin-left:1.95rem; }
+
+  .footnote{
+    text-align:center;
+    color: var(--fg-faint);
+    font-size:0.75rem;
+    margin-top:2rem;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">SERIES PLOT MAP</div>
+    <h1>「AI社員」と第二の脳、全4回シリーズ</h1>
+    <p class="subtitle">見抜き方 → データ構造の解剖 → 技術の基礎 → 2026年の最適解</p>
+
+    <div class="controls">
+      <button class="ctrl primary" id="expandAll">▾ すべて展開</button>
+      <button class="ctrl" id="collapseAll">▸ すべて閉じる</button>
+    </div>
+
+    <div id="tree"></div>
+
+    <p class="footnote">タイトル・見出しをタップすると開閉します</p>
+  </div>
+
+<script>
+  const DATA = [
+    {
+      id: "p1",
+      title: "「AI社員」のほぼすべてが偽物である理由",
+      sub: "Obsidian社自身が否定している",
+      status: "done",
+      children: [
+        {
+          id: "p1-1",
+          title: "3つの事実",
+          children: [
+            { id: "p1-1-1", title: "① Obsidian社自身が使い方を否定" },
+            { id: "p1-1-2", title: "② 第二の脳を作るなら最悪の選択肢" },
+            { id: "p1-1-3", title: "③ 既存データ体系化・AI社員構築、両方に最適解あり" }
+          ]
+        },
+        { id: "p1-2", title: "AIに聞けば10秒で分かる、という論拠" },
+        { id: "p1-3", title: "スコトーマ（心理的盲点）による再解釈" },
+        { id: "p1-4", title: "見分け方——5つのチェックポイント" },
+        { id: "p1-5", title: "裏技——特定商取引法を1分で確認する" },
+        {
+          id: "p1-6",
+          title: "世界を3層に分けると構造が見える",
+          children: [
+            { id: "p1-6-1", title: "第1層：海外プラグイン（誠実、ただし寄生構造）" },
+            { id: "p1-6-2", title: "第2層：海外PKM商材（同型、批判文化が成熟）" },
+            { id: "p1-6-3", title: "第3層：日本のAI社員（技術空洞＋検証不能な実績）" }
+          ]
+        },
+        { id: "p1-7", title: "決定打——Obsidian社CEOの設計思想" }
+      ]
+    },
+    {
+      id: "p2",
+      title: "Obsidianはなぜ第二の脳になれないのか",
+      sub: "データ構造の解剖",
+      status: "done",
+      children: [
+        { id: "p2-1", title: "[[リンク]]の正体——交差テーブルの手動入力" },
+        { id: "p2-2", title: "手動リンクの認知科学的検証（生成効果・スコトーマ）" },
+        { id: "p2-3", title: "「テキストだから永続する」神話の検証" },
+        { id: "p2-4", title: "寄生の実装証拠（Smart Connections分析）" },
+        { id: "p2-5", title: "公平な検証とObsidianのベストユースケース" },
+        { id: "p2-6", title: "企業の既存データ資産化に不向きな理由" }
+      ]
+    },
+    {
+      id: "p3",
+      title: "ゼロからわかるVector・Graph・GraphRAG",
+      sub: "専門用語ゼロからの土台固め",
+      status: "done",
+      children: [
+        { id: "p3-1", title: "Vector（ベクター）とは何か" },
+        { id: "p3-2", title: "Graph（グラフ構造）とは何か" },
+        { id: "p3-3", title: "RAG（Retrieval Augmented Generation）とは何か" },
+        { id: "p3-4", title: "GraphRAG——LLMが自動でグラフを構築する仕組み" }
+      ]
+    },
+    {
+      id: "p4",
+      title: "2026年の最適解",
+      sub: "ケース別・実装プロンプト",
+      status: "done",
+      children: [
+        { id: "p4-1", title: "DB統合トレンド（Postgres + pgvector + Apache AGE）" },
+        { id: "p4-2", title: "GraphRAGのコスト論（LazyGraphRAG／LightRAG）" },
+        { id: "p4-3", title: "マルチエージェント研究——チームか、シングルか" },
+        { id: "p4-4", title: "まだ埋まってない空白地帯——視覚UI" },
+        { id: "p4-5", title: "ケース別・現在の最適解（表）" },
+        { id: "p4-6", title: "今日から作れるAIエージェント向けプロンプト" }
+      ]
+    }
+  ];
+
+  const DEFAULT_OPEN = ["p1", "p1-6", "p2", "p3", "p4"];
+  const openSet = new Set(DEFAULT_OPEN);
+
+  function collectIds(nodes, acc = []) {
+    for (const n of nodes) {
+      acc.push(n.id);
+      if (n.children) collectIds(n.children, acc);
+    }
+    return acc;
+  }
+  const ALL_IDS = collectIds(DATA);
+
+  function badgeHtml(status) {
+    const done = status === "done";
+    return `<span class="badge ${done ? "done" : "todo"}">${done ? "✓" : "○"} ${done ? "公開準備完了" : "執筆待ち"}</span>`;
+  }
+
+  function titleClass(depth) {
+    if (depth === 0) return "title-root";
+    if (depth === 1) return "title-1";
+    return "title-2";
+  }
+
+  function renderNode(node, depth) {
+    const hasChildren = node.children && node.children.length > 0;
+    const isOpen = openSet.has(node.id);
+    const isRoot = depth === 0;
+
+    const rowClasses = ["node-row", `depth-${depth}`];
+    if (hasChildren) rowClasses.push("has-children");
+    if (isRoot) rowClasses.push("root");
+
+    const caretHtml = hasChildren
+      ? `<span class="caret ${isOpen ? "open" : ""}">${isRoot ? "▸" : "›"}</span>`
+      : `<span class="caret leaf"></span>`;
+
+    const subHtml = node.sub ? `<div class="node-sub">${node.sub}</div>` : "";
+    const badge = isRoot && node.status ? badgeHtml(node.status) : "";
+
+    let html = `
+      <div class="depth-${depth}">
+        <div class="${rowClasses.join(" ")}" ${hasChildren ? `data-toggle="${node.id}"` : ""}>
+          ${caretHtml}
+          <div class="node-title-wrap">
+            <div class="node-title-line">
+              <span class="${titleClass(depth)}">${node.title}</span>
+              ${badge}
+            </div>
+            ${subHtml}
+          </div>
+        </div>
+    `;
+
+    if (hasChildren) {
+      html += `<div class="children ${isOpen ? "open" : ""}" id="children-${node.id}">`;
+      for (const child of node.children) {
+        html += renderNode(child, depth + 1);
+      }
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }
+
+  function render() {
+    document.getElementById("tree").innerHTML = DATA.map(n => renderNode(n, 0)).join("");
+    attachHandlers();
+  }
+
+  function attachHandlers() {
+    document.querySelectorAll("[data-toggle]").forEach(el => {
+      el.addEventListener("click", () => {
+        const id = el.getAttribute("data-toggle");
+        if (openSet.has(id)) openSet.delete(id);
+        else openSet.add(id);
+        render();
+      });
+    });
+  }
+
+  document.getElementById("expandAll").addEventListener("click", () => {
+    ALL_IDS.forEach(id => openSet.add(id));
+    render();
+  });
+  document.getElementById("collapseAll").addEventListener("click", () => {
+    openSet.clear();
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>記憶の設計——何を、どこに置くか</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff; }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>記憶の設計——何を、どこに置くか</h1>
+
+<div class="tldr">
+<ul>
+<li>記憶は3層に分かれています。役割がそれぞれ違います</li>
+<li><strong>過去の全ログが毎回読まれているわけではありません</strong></li>
+<li>自動記憶は便利ですが、意図的に残すものとは別物です</li>
+<li>残すべきは3種類だけ。作業の過程は残してはいけません</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">記憶は3層に分かれている</a></li>
+      <li><a href="#s2">全ログは、毎回読まれていません</a></li>
+      <li><a href="#s3">過去を丸ごと呼び戻す方法</a></li>
+      <li><a href="#s4">3社とも同じ構造です</a></li>
+      <li><a href="#s5">何を残し、何を残さないか</a></li>
+      <li><a href="#s6">知識を資産にする配置</a></li>
+      <li><a href="#s7">つまずきやすい点</a></li>
+      <li><a href="#s8">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>「AIは使うほど賢くなる」——よく聞く言葉です。</p>
+<p>これは事実です。ただし<strong>「何が、どういう仕組みで残っているのか」を知らないと、設計を間違えます。</strong></p>
+<p>今回はそこを正確に押さえます。読み終える頃には、<strong>知識を資産として積み上げる配置</strong>が分かるようになっています。</p>
+
+<h2 id="s1">記憶は3層に分かれている</h2>
+
+<p>まず全体像です。<strong>性質がまったく違う3つが同居しています。</strong></p>
+
+<table>
+<tr><th>層</th><th>誰が書くか</th><th>毎回読まれるか</th></tr>
+<tr><td><strong>指示書ファイル</strong></td><td>あなた（手動）</td><td>⭕ 必ず</td></tr>
+<tr><td><strong>自動記憶</strong></td><td>AI（自動）</td><td>⭕ 必ず</td></tr>
+<tr><td><strong>過去の会話ログ</strong></td><td>自動で保存される</td><td><strong>❌ 読まれない</strong></td></tr>
+</table>
+
+<p>この表の<strong>3行目が、いちばん誤解されている部分</strong>です。順に見ていきます。</p>
+
+<h3>① 指示書ファイル——意図的に残すもの</h3>
+
+<p>前回扱ったものです。<strong>あなたが自分の手で書き、必ず読まれます。</strong></p>
+<p>ここに置くのは「常に守ってほしい方針」だけ。<strong>意図が明確なものだけを置く場所</strong>です。</p>
+
+<h3>② 自動記憶——AIが自分で書くもの</h3>
+
+<p>設定しなくても裏で動いています。<strong>セッションを閉じても、次に開いたときに前回の内容を覚えています。</strong></p>
+<p>この仕組みの基盤は2025年後半から入っていて、画面に「記憶を思い出しました」といった表示が出るようになったのは2026年に入ってからです。</p>
+<p>⚠️ <strong>段階的に展開されているため、まだ有効になっていないアカウントもあります。</strong> 画面に表示が出ない場合は、まだ届いていない可能性があります。</p>
+<p>💡 <strong>指示書との違い</strong>：指示書は「こうしてほしい」という<strong>意図</strong>。自動記憶は「こういうことがあった」という<strong>事実の蓄積</strong>です。混同すると設計を誤ります。</p>
+
+<h3>③ 過去の会話ログ——保存されるが、読まれない</h3>
+
+<p>ここが本題です。</p>
+
+<h2 id="s2">全ログは、毎回読まれていません</h2>
+
+<p>「バグを直して」と頼んだとき、<strong>AIは過去の膨大なやり取りを毎回読み返しているのか。</strong></p>
+<p><strong>答えは、いいえです。</strong></p>
+<p>過去の会話は、ファイルとして保存されています。ただし<strong>それが自動で読み込まれることはありません。</strong> 明示的に呼び出したときだけ開かれます。</p>
+
+<pre><code>【毎回、自動で読まれるもの】
+  指示書ファイル
+  自動記憶（要約された形で）
+
+【保存されているが、読まれないもの】
+  過去のセッションの全会話ログ</code></pre>
+
+<p>これは<strong>良い設計です。</strong> もし全ログが毎回読み込まれたら、使うほど動作が重くなり、しかも前回書いたとおり<strong>「真ん中に埋もれた情報を見落とす」現象</strong>が悪化します。</p>
+<blockquote>
+<p><strong>読まれないからこそ、軽く保てる。</strong></p>
+</blockquote>
+<p>そのうえで「前回の続き」が分かるのは、<strong>自動記憶が要約を持っているから</strong>です。全文ではなく、要点だけが引き継がれています。</p>
+
+<h2 id="s3">過去を丸ごと呼び戻す方法</h2>
+
+<p>では、本当に全部を呼び戻したいときはどうするか。</p>
+<p><strong>専用のコマンドがあります。</strong> 会社によって名前は違いますが、機能は共通です。</p>
+
+<table>
+<tr><th>やりたいこと</th><th>方法</th></tr>
+<tr><td>直前の作業をそのまま再開</td><td>「続きから」のオプションをつけて起動</td></tr>
+<tr><td>過去のどれかを選んで再開</td><td>「再開」のオプションで一覧から選ぶ</td></tr>
+</table>
+
+<p>Claude Codeなら <code>--continue</code> と <code>--resume</code>、Codexなら <code>codex resume</code> がこれにあたります。</p>
+<p>この方法で開くと、<strong>要約ではなく完全な会話履歴が戻ります。</strong> どんなファイルを読んだか、どんなコマンドを実行したかまで、そのまま復元されます。</p>
+<p>💡 <strong>使いどころ</strong>：昨日の複雑な作業を正確に引き継ぎたいとき。逆に、<strong>新しいテーマを始めるときは使わないほうがいい</strong>です。前の文脈が邪魔になります。</p>
+
+<h3>⚠️ 保存場所ごとに分かれています</h3>
+
+<p>ここは実際にハマる人が多い部分です。</p>
+<p>会話ログは<strong>作業フォルダごとに保存されています。</strong> つまり——</p>
+
+<pre><code>フォルダA で「続きから」→ フォルダA での前回が開く
+フォルダB で「続きから」→ フォルダB での前回が開く
+        ↓
+別の場所で実行すると、まったく違う会話が出てくる</code></pre>
+
+<p>「昨日の続きが出てこない」と思ったら、<strong>まず今いる場所を確認してください。</strong></p>
+
+<h2 id="s4">3社とも同じ構造です</h2>
+
+<p>ここまでClaude Codeを例に説明してきましたが、他社も同じ考え方です。</p>
+
+<table>
+<tr><th></th><th>Claude Code</th><th>Codex CLI</th><th>Antigravity CLI</th></tr>
+<tr><td>指示書ファイル</td><td><code>CLAUDE.md</code></td><td><code>AGENTS.md</code></td><td><code>GEMINI.md</code></td></tr>
+<tr><td>自動記憶</td><td>⭕</td><td>⭕</td><td><strong>❌ 非搭載</strong></td></tr>
+<tr><td>過去の再開</td><td>⭕</td><td>⭕</td><td>⭕</td></tr>
+</table>
+
+<p>OpenAIのものは、記憶の実装がかなり凝っています。<strong>作業フォルダごとに記憶を出し分けたり、古くなった情報を自動で忘れたり、よく使う記憶を優先したり</strong>という処理まで入っています。</p>
+<p>設計思想も明確で、<strong>「チーム共通の規約は指示書ファイル、個人の好みは記憶層」</strong>という使い分けが推奨されています。</p>
+<p>⚠️ <strong>逆に注意が必要なのがGoogleです。</strong> Antigravity CLIには、セッションを跨ぐ自動記憶が標準では入っていません。<strong>毎回ゼロから説明し直しが既定の動作</strong>で、記憶が欲しければ外部の仕組みを繋ぐ必要があります。</p>
+
+<h2 id="s5">何を残し、何を残さないか</h2>
+
+<p>ここからが設計の話です。</p>
+<p>自動記憶に任せるだけでは足りません。<strong>「これは後で必ず要る」というものは、自分でファイルに残すべき</strong>です。</p>
+<p>ただし——<strong>全部残すと、すぐに破綻します。</strong></p>
+
+<h3>残すべき3種類</h3>
+
+<table>
+<tr><th>種類</th><th>内容</th><th>例</th></tr>
+<tr><td><strong>判断</strong></td><td>何を、なぜそうしたか</td><td>「余白を広げた。情報密度が高すぎたため」</td></tr>
+<tr><td><strong>好み</strong></td><td>やり取りから見えた傾向</td><td>「彩度の高い配色は却下された」</td></tr>
+<tr><td><strong>失敗</strong></td><td>避けるべきこと</td><td>「この書き方はスマホで崩れる」</td></tr>
+</table>
+
+<h3>残してはいけないもの</h3>
+
+<p><strong>作業の過程です。</strong></p>
+
+<pre><code>❌ 「まず◯◯を検討し、次に△△を試したが、
+     うまくいかなかったので□□に変更した」
+
+⭕ 「□□を採用。理由は△△が動かなかったため」</code></pre>
+
+<p>過程を残すと、<strong>量が膨れ上がるうえに、次回役に立ちません。</strong> 必要なのは結論と理由だけです。</p>
+<p>💡 <strong>コツ</strong>：作業が終わったあと、AIにこう頼んでください。</p>
+<pre><code>今回の作業から、次回の参考になる部分だけを抽出してください。
+- 何を決めたか（1〜2行）
+- なぜそう判断したか（1〜2行）
+- 次回避けるべきこと（あれば）
+作業の過程は書かないでください。</code></pre>
+<p><strong>要約してから保存する</strong>のが肝です。生のまま保存すると、あとで読めなくなります。</p>
+
+<h2 id="s6">知識を資産にする配置</h2>
+
+<p>具体的なフォルダ構成の例です。</p>
+
+<pre><code>プロジェクトのフォルダ/
+├── CLAUDE.md          ← 常に守ってほしい方針
+└── docs/
+    ├── decisions.md   ← 判断の記録
+    ├── preferences.md ← 好みの蓄積
+    └── issues.md      ← 過去の失敗と対処</code></pre>
+
+<p>そして<strong>指示書ファイルに、こう1行書いておきます。</strong></p>
+
+<pre><code>## 作業のルール
+- 作業を始める前に docs/ 配下のファイルを確認すること
+- 重要な判断をしたら decisions.md に追記すること
+- 同じ失敗を繰り返さないよう issues.md も参照すること</code></pre>
+
+<p>これだけで、<strong>セッションが変わっても文脈が引き継がれます。</strong></p>
+<blockquote>
+<p><strong>AIの記憶は消える。でも、記憶の置き場所をファイルに移せる。</strong></p>
+</blockquote>
+<p>この発想が、知識を資産にする核心です。<strong>AIに覚えさせるのではなく、自分の手元に積み上げる。</strong></p>
+
+<h3>量が増えてきたら</h3>
+
+<p>ファイルが長くなってきたら、<strong>目次だけを常駐させる</strong>形に切り替えます。</p>
+
+<pre><code>docs/
+├── INDEX.md           ← ここだけ毎回読ませる
+└── log/
+    ├── 2026-07-01-配色の方針.md
+    └── 2026-07-15-スマホ対応の失敗.md</code></pre>
+
+<p>指示書には「まずINDEX.mdを読み、関係しそうなファイルだけを開くこと」と書いておきます。</p>
+<p><strong>これは前回扱ったSkillsと同じ発想です。</strong> 目次だけ常駐させて、本体は必要なときだけ読む。<strong>常駐する情報を軽く保つ</strong>という原則は、記憶でも同じです。</p>
+
+<h2 id="s7">つまずきやすい点</h2>
+
+<table>
+<tr><th>症状</th><th>原因と対処</th></tr>
+<tr><td>昨日の続きが出てこない</td><td>作業フォルダが違います。今いる場所を確認してください</td></tr>
+<tr><td>記憶が引き継がれている実感がない</td><td>自動記憶がまだ有効になっていない可能性があります。画面の表示を確認してください</td></tr>
+<tr><td>同じ指摘を何度もしている</td><td>指示書ファイルに書かれていません。恒久化のコマンドを試してください</td></tr>
+<tr><td>指示書が長すぎて守られない</td><td>Skillsやdocs/に切り出してください</td></tr>
+<tr><td>過去の記録が読めない量になった</td><td>目次方式に切り替えるタイミングです</td></tr>
+</table>
+
+<h2 id="s8">まとめ</h2>
+
+<ul>
+<li>記憶は3層。<strong>指示書（意図）／自動記憶（事実）／会話ログ（保管のみ）</strong></li>
+<li><strong>過去の全ログは、毎回読まれていない。</strong>だから軽く保てる</li>
+<li>丸ごと呼び戻すには専用のコマンドを使う。<strong>ただし作業フォルダごとに分かれている</strong></li>
+<li>残すべきは<strong>判断・好み・失敗</strong>の3種類だけ。作業の過程は残さない</li>
+<li><strong>記憶の置き場所をファイルに移せば、セッションが変わっても引き継がれる</strong></li>
+<li>量が増えたら目次方式へ。<strong>常駐を軽く保つ原則は共通</strong></li>
+</ul>
+
+<p>ここまでで、指示と記憶——標準機能の中核を押さえました。</p>
+<p>次回は、<strong>実際にどこまで足りるのかを測ります。</strong></p>
+<p>委譲は本当に発動しているのか。並列処理は速くなるのか。費用はいくらかかるのか。<strong>そして、標準機能では作れないものは何なのか。</strong></p>
+<p>推測ではなく、実際に動かした結果を書きます ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

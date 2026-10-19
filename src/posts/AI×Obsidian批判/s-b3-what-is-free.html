@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>無料で手に入るものの全体像——「AI社員」に払う前に</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>無料で手に入るものの全体像——「AI社員」に払う前に</h1>
+
+<div class="tldr">
+<ul>
+<li>技術要素で有料のものは、1つもありませんでした</li>
+<li>正確で無料な日本語の解説記事も、すでに大量にあります</li>
+<li>さらに上位互換のOSSが存在し、それも無料です</li>
+<li>そのうえで、有料である正当な理由が残るかを考えます</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">見分け方——5つのチェックポイント</a></li>
+      <li><a href="#s2">裏技：特定商取引法を1分で確認する</a></li>
+      <li><a href="#s3">正直に書きます：無料の解説記事は充実しています</a></li>
+      <li><a href="#s4">では、この記事の価値はどこにあるのか</a></li>
+      <li><a href="#s5">さらに上位互換のOSSがあります</a></li>
+      <li><a href="#s6">世界を3層に分けると、構造が見える</a></li>
+      <li><a href="#s7">それでも有料に価値がある場合</a></li>
+      <li><a href="#s8">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回、Pythonで「AI社員」を再現しました。中核はたった20行ほどでした。</p>
+<p>今回は、その周辺も含めて<strong>「どこまでが無料で手に入るのか」を全部並べます。</strong></p>
+<p>先に結論を書きます。<strong>技術要素で有料のものは、1つもありませんでした。</strong> 実際に費用がかかるのは、AIを呼び出したときのトークン代だけです。</p>
+
+<h2 id="s1">見分け方——5つのチェックポイント</h2>
+
+<p>まず、誰でも今日から使える判定基準です。「AI活用」「AI社員」を謳う商品に出会ったとき、次の5点を確認してください。</p>
+
+<ol>
+<li><strong>実績数値の出どころ</strong>——「売上◯億円」「生産性◯倍」が自社発信のみになっていないか。第三者の検証や、具体的な導入企業名を伴う事例があるか</li>
+<li><strong>反証できない表現</strong>——「業務の100%をAI化」など、定義が曖昧で確認しようがない言い回しになっていないか</li>
+<li><strong>販売経路の性質</strong>——情報商材の売買プラットフォームでの販売実績を、権威づけに使っていないか</li>
+<li><strong>導線の構造</strong>——無料オファー（無料PDF、無料動画、無料メール講座など）でメールアドレスを集め、高額な講座やコンサルへ誘導する形になっていないか</li>
+<li><strong>特定商取引法に基づく表記の有無</strong>——サイト内にこの表記ページが存在するか</li>
+</ol>
+
+<p>複数に当てはまるほど、慎重になるべき状態です。</p>
+
+<h2 id="s2">裏技：特定商取引法を1分で確認する</h2>
+
+<p>5つ目のチェックポイントは、<strong>最も客観的で、最も速く確認できます。</strong></p>
+<p><strong>特定商取引法</strong>（特商法）は、消費者トラブルが起きやすい取引を規制する法律です。ウェブ広告を出し、インターネット経由で申し込みと決済を受け付ける取引は、原則として「通信販売」に該当します。<strong>物理的な商品でなくても、オンライン講座やコンサルティングも対象です。</strong></p>
+<p>該当する事業者には、次の情報をサイト上に開示する義務があります。</p>
+
+<table>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>販売業者名</td><td>法人なら商号、個人なら本名</td></tr>
+<tr><td>責任者氏名</td><td>代表者または業務責任者</td></tr>
+<tr><td>所在地</td><td>実在する住所（省略不可）</td></tr>
+<tr><td>連絡先</td><td>電話番号</td></tr>
+<tr><td>価格・支払方法</td><td>料金と決済手段</td></tr>
+<tr><td>提供時期</td><td>サービスの提供開始時期</td></tr>
+<tr><td>返品・キャンセル規定</td><td>中途解約の条件</td></tr>
+</table>
+
+<p>申し込む前に、フッターやメニューから「特定商取引法に基づく表記」を探してください。</p>
+<p><strong>見当たらないことだけで詐欺と断定はできません。</strong> ただ、判断材料が1つ増えます。開示を怠れば行政指導の対象にもなり得る、れっきとした法定義務だからです。</p>
+
+<h2 id="s3">正直に書きます：無料の解説記事は充実しています</h2>
+
+<p>ここは、自分にとって都合の悪いことも含めて正直に書きます。</p>
+<p>調べた結果、<strong>「AI社員の作り方」を解説した無料の日本語記事は、すでに大量にありました。</strong> しかも<strong>内容が正確です。</strong></p>
+
+<p>たとえば、こういう水準のことが無料で書かれています。</p>
+
+<blockquote>
+<p>ポイントは「独立している作業かどうか」。前の結果を受けて次を決めるような順序が必要な作業は、並列に向かない。逆に、結果を持ち寄って最後に統合するタイプの作業は、複数エージェントの得意分野</p>
+</blockquote>
+
+<p>これは<strong>技術的にまったく正しい判断基準</strong>です。有料商材の内容と比べても、遜色ありません。</p>
+<p>他にも、実践用のチェックリストまで無料公開されています。</p>
+
+<ul>
+<li>指示書ファイルを作成する</li>
+<li>業務マニュアルをスキルとして切り出す</li>
+<li>役割エージェントを最低1つ作る</li>
+<li>AIに送信してよい情報のガイドラインを決める</li>
+<li>バージョン管理と差分確認で暴走対策をする</li>
+<li>コスト試算と費用対効果の仮説を立てる</li>
+<li>週1回の振り返りでスキルを改善する</li>
+</ul>
+
+<p>企業ブログ、技術ブログ、YouTube解説動画——<strong>いずれも無料で、いずれも正確です。</strong></p>
+<p>つまり——<strong>「日本には情報がないから、高額商材に価値がある」という前提は、成立しません。</strong></p>
+
+<h2 id="s4">では、この記事の価値はどこにあるのか</h2>
+
+<p>ここまで書くと、当然こう思われるはずです。</p>
+
+<blockquote>
+<p>無料の記事が充実しているなら、この記事も要らないのでは？</p>
+</blockquote>
+
+<p><strong>まったくそのとおりです。</strong> だから、差別化がどこにあるのかを明示しておきます。</p>
+
+<p>既存の無料記事が扱っている範囲と、このシリーズが扱っている範囲を並べます。</p>
+
+<table>
+<tr><th>論点</th><th>既存の無料記事</th><th>このシリーズ</th></tr>
+<tr><td>指示書と役割エージェントの作り方</td><td>⭕ 正確に解説</td><td>⭕</td></tr>
+<tr><td>7つある指示手法の全体像</td><td>△ 2つ中心</td><td>⭕ 全体を整理</td></tr>
+<tr><td>自動記憶が標準搭載されている事実</td><td>△ ほぼ言及なし</td><td>⭕</td></tr>
+<tr><td>3社（Google/Anthropic/OpenAI）の比較</td><td>△ 1社中心</td><td>⭕</td></tr>
+<tr><td>委譲を書かないと発動しない罠</td><td>❌ ほぼ言及なし</td><td>⭕</td></tr>
+<tr><td>無料OSSという選択肢</td><td>❌ 言及なし</td><td>⭕</td></tr>
+</table>
+
+<p>つまり僕が足しているのは、<strong>「他が触れていない領域」だけ</strong>です。基礎的な作り方の部分は、正直、無料記事のほうが丁寧なものもあります。</p>
+<p>そして、そのうえで<strong>この記事も無料です。</strong> ここが一番言いたいところかもしれません 💡</p>
+
+<h2 id="s5">さらに上位互換のOSSがあります</h2>
+
+<p>ここからが、既存の記事がほとんど触れていない領域です。</p>
+<p><strong>「AI社員」として売られている機能を、丸ごと上回るオープンソースが存在します。しかも無料です。</strong></p>
+
+<h3>Hermes Agent</h3>
+
+<p>2026年2月に公開された、常駐型のAIエージェントです。<strong>3か月でGitHubのスターが14万を超え</strong>、2026年5月時点では特定の集計で<strong>世界最多の利用量</strong>を記録しています。</p>
+<p>できることを並べます。</p>
+
+<table>
+<tr><th>機能</th><th>内容</th></tr>
+<tr><td>役割ごとの独立</td><td>役割ごとに設定・人格・記憶・定期実行を個別に持てる</td></tr>
+<tr><td>永続的な記憶</td><td>セッションを跨いで記憶が残る（データベースに保存）</td></tr>
+<tr><td><strong>スキルの自己生成</strong></td><td><strong>複雑な作業を終えると、再利用可能な手順を自分で書き出す</strong></td></tr>
+<tr><td>定期実行</td><td>「毎朝8時に日報を送って」のように自然文で登録できる</td></tr>
+<tr><td>配信先</td><td>メール、チャットツールなど20以上に対応</td></tr>
+</table>
+
+<p><strong>3行目が特に重要です。</strong> 使えば使うほどスキルが蓄積され、同種の作業が速くなります。報告されている数字では、<strong>20以上のスキルが溜まった段階で、同じ種類のタスクが40%高速化</strong>したとされています。</p>
+<p>「使うほど賢くなるAI社員」——まさに商材が謳っている内容が、無料で実装されています。</p>
+
+<h3>OpenClaw</h3>
+
+<p>こちらはさらにスターが多く、35万を超えています。<strong>エージェント同士が直接やり取りできる</strong>のが特徴で、「組織」に近い構成を作れます。</p>
+
+<h3>日本語の解説記事も、すでにあります</h3>
+
+<p>これらは「まだ日本で知られていない海外の話」ではありません。</p>
+<p><strong>2026年4月から7月にかけて、複数の日本企業のブログやYouTubeで解説されています。</strong> 検索すれば、日本語の導入手順も見つかります。</p>
+
+<p>ここで、判断材料として1つの事実を挙げておきます。</p>
+
+<blockquote>
+<p><strong>「最新のAI技術」を謳う商材の多くが、これらのOSSに一切言及していません。</strong></p>
+</blockquote>
+
+<p>⚠️ ただし、断定は避けます。<strong>「言及がない」ことは事実として指摘できますが、「意図的に伏せた」ことは証明できません。</strong> 単に知らなかった可能性もあります。</p>
+<p>判断は、読んだ方に委ねます。</p>
+
+<p>📌 <strong>補足</strong>：OSSにも弱点はあります。Hermesはサブエージェント同士が会話できません。OpenClawはセキュリティ上の指摘が複数出ています。<strong>「無料だから最善」ではありません。</strong> この点は実装編で詳しく扱います。</p>
+
+<h2 id="s6">世界を3層に分けると、構造が見える</h2>
+
+<p>「AIエージェントの自動化」を紹介するコンテンツは、海外にも大量にあります。では海外のそれと、日本の高額商材は同じものなのか。</p>
+<p>調べた結果、<strong>3つの層に分けると構造がはっきりしました。</strong></p>
+
+<h3>第1層：海外の開発者コミュニティ——技術的に誠実</h3>
+
+<p>オープンソースで、コードも公開されていて、誇大な業績主張もありません。弱点も自分から書きます。技術的には真っ当です。</p>
+
+<h3>第2層：海外の高額コース——日本と同型。ただし批判が成熟している</h3>
+
+<p>海外にも「セカンドブレイン」を教える高額コースは存在します。最も有名なものは受講者2万人超と公表されています。</p>
+<p>ただし、これに対する批判も痛烈です。「その運動が実際に残した記録可能な成果物は、その手法で作られた仕事の集積ではなく、コースビジネスそのものだった」という指摘があります。</p>
+<p><strong>重要なのは、この批判が英語圏では当たり前に流通していること</strong>です。「生産性の演劇」という言葉も定着しています。準備や整理に時間を溶かし、仕事をした感覚だけが残る現象を指します。</p>
+
+<h3>第3層：日本の「AI社員」——第2層に、2つが上乗せされる</h3>
+
+<ol>
+<li><strong>技術的な空洞</strong>——標準機能の一部だけを扱い、独自ノウハウとして提示する</li>
+<li><strong>検証不能な業績主張</strong>——第三者検証も導入企業名もない売上数字</li>
+</ol>
+
+<p>海外は同じ問題を抱えながら、<strong>自浄的な批判言論がセットで存在します。</strong> 日本はその批判層が薄いまま、「AI社員」という新語だけが先に流通している——これが現在の構図です。</p>
+
+<h2 id="s7">それでも有料に価値がある場合</h2>
+
+<p>ここまで批判的に書いてきましたが、<strong>「講座やコンサルに価値がない」とは言いません。</strong></p>
+<p>正当な価値は、確かにあります。</p>
+
+<ul>
+<li><strong>自分の業務に落とし込む伴走</strong>——一般論を、自分の仕事の形に翻訳してもらう</li>
+<li><strong>学習時間の短縮そのもの</strong>——調べる時間を買う</li>
+<li><strong>詰まったときに聞ける相手</strong>——独学の最大の壁はここ</li>
+</ul>
+
+<p>これらは、無料の記事では埋まりません。<strong>お金を払う理由として、まったく正当です。</strong></p>
+<p>問題は、そこが値段に見合っているかどうかで、それは中身を見ないと判断できません。</p>
+
+<blockquote>
+<p><strong>「知らない」まま買うのと、「知っているが、時間を買う」ために買うのとでは、まったく違う買い物になります。</strong></p>
+</blockquote>
+
+<p>この記事が目指しているのは、後者の状態を作ることだけです。</p>
+
+<h2 id="s8">まとめ</h2>
+
+<ul>
+<li>技術要素で有料のものは<strong>1つもない</strong>。かかるのはトークン代だけ</li>
+<li>正確で無料な日本語の解説記事も、<strong>すでに大量にある</strong></li>
+<li>さらに<strong>上位互換のOSS</strong>が存在し、日本語の解説もある</li>
+<li>ただし<strong>「無料だから最善」ではない</strong>。OSSにも弱点はある</li>
+<li>伴走や時間の短縮に払う価値は<strong>正当にある</strong></li>
+<li>大事なのは、<strong>中身を知ったうえで判断すること</strong></li>
+</ul>
+
+<p>ここまでが、批判編です。</p>
+<p>次のシリーズからは、<strong>実際に作る側に回ります。</strong></p>
+<p>まず標準機能を徹底的に使い倒し、<strong>どこまでが標準で足りて、どこから足りなくなるのかを実測します。</strong> そのうえで、必要なら次の手段に進む。この順番でしか、本当の判断基準は手に入りません ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

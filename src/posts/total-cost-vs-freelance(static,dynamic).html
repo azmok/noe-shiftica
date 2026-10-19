@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フリーランスに頼むと結局いくらかかる？2026年のリアルな比較 | Noe Shiftica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+  /* ── BASE ── */
+  :root {
+    --bg: #09090f;
+    --surface: #111118;
+    --surface2: #1a1a28;
+    --ink: #e8e8f0;
+    --ink2: #b0b0c4;
+    --muted: #6b6b80;
+    --border: rgba(255,255,255,0.07);
+    --noe: #7c6af7;
+    --teal: #4fd1c5;
+    --g: #22c55e;
+    --amber: #f59e0b;
+    --r: #ef4444;
+    --c-init: #7c6af7;
+    --c-run: #3b82f6;
+    --c-maint: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+    line-height: 1.85;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: #0d0d18;
+    border-bottom: 1px solid var(--border);
+    padding: 80px 24px 72px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute;
+    top: -100px; right: -100px;
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(124,106,247,0.14) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 720px; margin: 0 auto; position: relative; }
+  .hero-series {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-series::before {
+    content: ''; display: inline-block;
+    width: 24px; height: 1px; background: var(--noe);
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--noe);
+    background: rgba(124,106,247,0.12);
+    border: 1px solid rgba(124,106,247,0.3);
+    padding: 4px 12px; border-radius: 4px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(22px, 4vw, 38px);
+    font-weight: 600; line-height: 1.35;
+    color: #fff; margin-bottom: 20px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(130deg, #7c6af7, #4fd1c5);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-lead { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.8; max-width: 560px; margin-bottom: 28px; }
+  .hero-meta {
+    display: flex; align-items: center; gap: 16px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: rgba(255,255,255,0.25); letter-spacing: 1px;
+  }
+
+  /* ── ARTICLE ── */
+  .article { max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; }
+
+  /* TOC */
+  .toc {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--noe);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 56px;
+  }
+  .toc-title {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .toc ol { list-style: none; counter-reset: toc; }
+  .toc li {
+    counter-increment: toc;
+    display: flex; align-items: baseline; gap: 10px;
+    font-size: 13px; color: var(--ink2);
+    padding: 5px 0; border-bottom: 1px dashed var(--border);
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: var(--noe); min-width: 22px;
+  }
+
+  /* SECTION */
+  .section { margin-bottom: 64px; }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--noe); opacity: 0.8; margin-bottom: 10px;
+  }
+  h2 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(19px, 3vw, 25px); font-weight: 600;
+    line-height: 1.4; color: var(--ink);
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 28px 0 10px; }
+  p { color: var(--ink2); margin-bottom: 16px; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 12px; padding: 18px 22px;
+    margin: 24px 0; font-size: 14px; line-height: 1.75;
+  }
+  .callout.info {
+    background: rgba(124,106,247,0.1);
+    border: 1px solid rgba(124,106,247,0.25);
+    border-left: 3px solid var(--noe); color: var(--ink2);
+  }
+  .callout.warn {
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-left: 3px solid var(--amber); color: var(--ink2);
+  }
+  .callout.good {
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-left: 3px solid var(--g); color: var(--ink2);
+  }
+  .callout-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 8px; font-weight: 500;
+  }
+  .callout.info .callout-label { color: var(--noe); }
+  .callout.warn .callout-label { color: var(--amber); }
+  .callout.good .callout-label { color: var(--g); }
+
+  /* CHART EMBED WRAPPER */
+  .chart-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; margin: 32px 0;
+  }
+  .chart-wrap-label {
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 14px 22px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  }
+  .chart-wrap-inner { padding: 4px 0 8px; }
+
+  /* ── EMBEDDED CHART STYLES ── */
+  .chart-legend {
+    display: flex; gap: 16px; padding: 12px 22px;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink2); }
+  .chart-legend-dot { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+
+  .bars-group { padding: 14px 22px; display: flex; flex-direction: column; gap: 11px; }
+  .bar-row { display: grid; grid-template-columns: 140px 1fr 80px; align-items: center; gap: 10px; }
+
+  .bl { font-size: 12px; font-weight: 500; }
+  .bl.noe { color: var(--noe); }
+  .bl.fl  { color: var(--ink2); opacity: 0.75; }
+  .bl.flm { color: var(--ink2); opacity: 0.5; }
+
+  .sbar { height: 18px; background: rgba(255,255,255,0.04); border-radius: 5px; overflow: hidden; display: flex; }
+  .sg { height: 100%; }
+  .si-noe { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+  .si-fl  { background: var(--c-init); opacity: 0.5; }
+  .sr     { background: var(--c-run); opacity: 0.7; border-left: 1px solid rgba(0,0,0,0.12); }
+  .sm     { background: var(--c-maint); opacity: 0.65; border-left: 1px solid rgba(0,0,0,0.12); }
+
+  .dbar { height: 14px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; }
+  .dfill { height: 100%; border-radius: 4px; }
+  .d-noe { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+  .d-fl  { background: rgba(255,255,255,0.2); }
+
+  .bval { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; text-align: right; white-space: nowrap; }
+  .bval.nv { color: var(--teal); }
+  .bval.fv { color: var(--ink2); }
+  .bval.fdv { color: var(--muted); }
+
+  .scale-sep {
+    display: flex; align-items: center; gap: 8px; padding: 8px 22px 2px;
+  }
+  .scale-sep-text {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap;
+  }
+  .scale-sep-line { flex: 1; height: 1px; background: var(--border); }
+  .hr { height: 1px; background: var(--border); margin: 2px 0; }
+
+  .savings-strip {
+    margin: 2px 22px 14px;
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+  }
+  .savings-strip span:first-child { font-size: 11px; color: var(--ink2); }
+  .savings-strip span:last-child { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; color: var(--g); }
+
+  /* STRENGTH CARDS */
+  .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0; }
+  .strength-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 18px;
+    position: relative; overflow: hidden;
+  }
+  .strength-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: linear-gradient(90deg, var(--noe), var(--teal));
+  }
+  .strength-icon { font-size: 22px; margin-bottom: 10px; }
+  .strength-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .strength-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; margin: 28px 0;
+  }
+  .ct-header {
+    display: grid; grid-template-columns: 1.8fr 1fr 1fr;
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 12px 20px; gap: 8px;
+  }
+  .ct-h {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  }
+  .ct-h.noe-h { color: var(--noe); }
+  .ct-row {
+    display: grid; grid-template-columns: 1.8fr 1fr 1fr;
+    padding: 12px 20px; gap: 8px;
+    border-bottom: 1px solid var(--border); align-items: center;
+  }
+  .ct-row:last-child { border-bottom: none; }
+  .ct-row:hover { background: rgba(255,255,255,0.015); }
+  .ct-label { font-size: 13px; color: var(--ink2); display: flex; align-items: center; gap: 8px; }
+  .ct-noe { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .ct-fl  { font-size: 12px; color: var(--muted); }
+  .ct-badge {
+    display: inline-block; font-family: 'DM Mono', monospace;
+    font-size: 9px; padding: 2px 7px; border-radius: 20px;
+    background: rgba(124,106,247,0.12); color: var(--noe);
+    border: 1px solid rgba(124,106,247,0.2);
+  }
+
+  /* VERDICT */
+  .verdict {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px 32px; margin: 40px 0;
+  }
+  .verdict-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--noe); margin-bottom: 14px;
+  }
+  .verdict h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(17px, 2.5vw, 22px); font-weight: 600;
+    color: var(--ink); margin: 0 0 14px; line-height: 1.4;
+  }
+  .verdict p { color: var(--ink2); font-size: 14px; line-height: 1.8; margin-bottom: 12px; }
+  .verdict-choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+  .choose-box { border-radius: 12px; padding: 18px 16px; }
+  .choose-box.noe { background: rgba(124,106,247,0.1); border: 1px solid rgba(124,106,247,0.25); }
+  .choose-box.fl  { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+  .choose-title {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .choose-box.noe .choose-title { color: var(--noe); }
+  .choose-box.fl  .choose-title { color: var(--muted); }
+  .choose-list { list-style: none; }
+  .choose-list li {
+    font-size: 12px; color: var(--ink2); padding: 4px 0;
+    display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+  }
+  .choose-list li::before { content: '—'; color: var(--muted); flex-shrink: 0; }
+  .choose-box.noe .choose-list li::before { content: '✓'; color: var(--noe); }
+
+  .footnote {
+    text-align: center; font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--muted); opacity: 0.35; letter-spacing: 0.5px;
+    margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .strength-grid, .verdict-choose { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 100px 1fr 70px; }
+    .ct-header, .ct-row { grid-template-columns: 1.5fr 1fr 1fr; padding: 10px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-series">Web制作会社選びシリーズ · vol.03</div>
+    <div class="hero-tag">📊 2026年 ファクトベース</div>
+    <h1>フリーランスに頼むと<br><em>結局いくらかかる？</em></h1>
+    <p class="hero-lead">「安そうだから」でフリーランスを選ぶ前に。初期費用だけでなく、3年間のランニングコストまで含めたリアルな数字を見てください。</p>
+    <div class="hero-meta">
+      <span>2026.03</span><span>·</span>
+      <span>Noe Shiftica</span><span>·</span>
+      <span>約10分で読めます</span>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE -->
+<div class="article">
+
+  <div class="toc">
+    <div class="toc-title">目次</div>
+    <ol>
+      <li>「初期費用が安い」の落とし穴</li>
+      <li>静的サイト：3年トータルコストと納期の比較</li>
+      <li>動的CMSサイト：3年トータルコストと納期の比較</li>
+      <li>グラフから読み取れる3つのポイント</li>
+      <li>価格以外で差がつく3つのこと</li>
+      <li>どちらを選ぶべきか</li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <div class="section" id="intro">
+    <div class="section-eyebrow">01 · はじめに</div>
+    <h2>「初期費用が安い」の落とし穴</h2>
+    <p>Webサイトを作るとき、多くの方が「フリーランスの方が安い」と感じます。確かに初期費用だけを見ればその通りです。フリーランスへの依頼は静的サイトで5〜20万円、動的CMSサイトでも15〜50万円程度から始まります。</p>
+    <p>しかしWebサイトは、完成した後も<strong>毎月お金がかかり続けます</strong>。サーバー代・ドメイン代・セキュリティ更新・保守費用——これらを3年分合計すると、初期費用の安さは消えてなくなることがほとんどです。</p>
+    <div class="callout warn">
+      <div class="callout-label">よくある失敗</div>
+      「10万円で作ってもらった！」と喜んでいたら、3年後に合計50万円以上払っていた——というケースは珍しくありません。初期費用だけで比べるのは、月額料金を無視してスマホを選ぶのと同じです。
+    </div>
+  </div>
+
+  <!-- 02 静的サイト -->
+  <div class="section" id="static">
+    <div class="section-eyebrow">02 · 静的サイト比較</div>
+    <h2>静的サイト：3年トータルコストと納期の比較</h2>
+    <p>まずは<strong>静的サイト（HTML/CSSで作られたシンプルなサイト）</strong>の比較です。会社概要・サービス紹介・お問い合わせフォームだけのサイトがこれに該当します。</p>
+    <p>グラフの見方：バーが短いほど優秀です。色の積み上げで「どの費用がどれだけ占めているか」が一目でわかります。</p>
+
+    <!-- 静的 コストグラフ -->
+    <div class="chart-wrap">
+      <div class="chart-wrap-label">静的サイト · Chart 01 · 3年トータルコスト比較</div>
+      <div class="chart-wrap-inner">
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--noe);"></div>Noe Shiftica</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:rgba(255,255,255,0.3);"></div>フリーランス</div>
+          <div class="chart-legend-item" style="margin-left:8px;"><div class="chart-legend-dot" style="background:var(--c-init);"></div>🟣 初期費用</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--c-run);"></div>🔵 ランニング</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--c-maint);opacity:0.7;"></div>🔴 保守費用</div>
+        </div>
+        <div class="bars-group">
+          <div class="scale-sep"><span class="scale-sep-text">Small 小規模（1〜5P）</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="sbar"><div class="sg si-noe" style="width:12.5%"></div></div><span class="bval nv">15万円</span></div>
+          <div class="bar-row"><span class="bl fl">FL・保守なし</span><div class="sbar"><div class="sg si-fl" style="width:8.3%"></div><div class="sg sr" style="width:22.5%"></div></div><span class="bval fv">約37万円</span></div>
+          <div class="bar-row"><span class="bl flm">FL・保守あり</span><div class="sbar"><div class="sg si-fl" style="width:8.3%"></div><div class="sg sr" style="width:22.5%"></div><div class="sg sm" style="width:35.8%"></div></div><span class="bval fv">約80万円</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Medium 中規模（5〜15P）</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="sbar"><div class="sg si-noe" style="width:20.8%"></div></div><span class="bval nv">25万円</span></div>
+          <div class="bar-row"><span class="bl fl">FL・保守なし</span><div class="sbar"><div class="sg si-fl" style="width:20.8%"></div><div class="sg sr" style="width:22.5%"></div></div><span class="bval fv">約52万円</span></div>
+          <div class="bar-row"><span class="bl flm">FL・保守あり</span><div class="sbar"><div class="sg si-fl" style="width:20.8%"></div><div class="sg sr" style="width:22.5%"></div><div class="sg sm" style="width:35.8%"></div></div><span class="bval fv">約95万円</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Large 大規模（15P〜）</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="sbar"><div class="sg si-noe" style="width:29.2%"></div></div><span class="bval nv">35万円</span></div>
+          <div class="bar-row"><span class="bl fl">FL・保守なし</span><div class="sbar"><div class="sg si-fl" style="width:41.7%"></div><div class="sg sr" style="width:22.5%"></div></div><span class="bval fv">約77万円</span></div>
+          <div class="bar-row"><span class="bl flm">FL・保守あり</span><div class="sbar"><div class="sg si-fl" style="width:41.7%"></div><div class="sg sr" style="width:22.5%"></div><div class="sg sm" style="width:35.8%"></div></div><span class="bval fv">約120万円</span></div>
+        </div>
+        <div class="savings-strip">
+          <span>最大差額（FL大規模・保守あり vs Noe大規模）</span>
+          <span>▲ 85万円の節約</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 静的 納期グラフ -->
+    <div class="chart-wrap">
+      <div class="chart-wrap-label">静的サイト · Chart 02 · 納期比較（基準値=FL大規模中央値 45日）</div>
+      <div class="chart-wrap-inner">
+        <div class="bars-group">
+          <div class="scale-sep"><span class="scale-sep-text">Small 小規模</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="dbar"><div class="dfill d-noe" style="width:15.6%"></div></div><span class="bval nv">7日</span></div>
+          <div class="bar-row"><span class="bl fl">フリーランス</span><div class="dbar"><div class="dfill d-fl" style="width:23.3%"></div></div><span class="bval fdv">約10日</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Medium 中規模</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="dbar"><div class="dfill d-noe" style="width:31.1%"></div></div><span class="bval nv">14日</span></div>
+          <div class="bar-row"><span class="bl fl">フリーランス</span><div class="dbar"><div class="dfill d-fl" style="width:46.7%"></div></div><span class="bval fdv">約21日</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Large 大規模</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="dbar"><div class="dfill d-noe" style="width:46.7%"></div></div><span class="bval nv">21日</span></div>
+          <div class="bar-row"><span class="bl fl">フリーランス</span><div class="dbar"><div class="dfill d-fl" style="width:100%"></div></div><span class="bval fdv">約45日</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-label">グラフの読み方</div>
+      🟣青いバーが「初期費用」、🔵青が「毎月のサーバー代など」、🔴赤が「保守・更新費用」です。Noeのバーが短いのは、<strong>月額コストがほぼゼロ</strong>だからです。フリーランスは初期費用が安くても、毎月の積み上げで逆転します。
+    </div>
+  </div>
+
+  <!-- 03 動的CMS -->
+  <div class="section" id="dynamic">
+    <div class="section-eyebrow">03 · 動的CMSサイト比較</div>
+    <h2>動的CMSサイト：3年トータルコストと納期の比較</h2>
+    <p>次に<strong>動的CMSサイト（WordPressなどで記事更新や会員機能が使えるサイト）</strong>の比較です。ブログ・採用ページ・ECサイトなどがこれに該当します。</p>
+    <p>WordPressはプラグインのセキュリティ更新が必要なため、静的サイトより保守コストが高くなります。その差がより大きく出るのがこのグラフです。</p>
+
+    <!-- 動的 コストグラフ -->
+    <div class="chart-wrap">
+      <div class="chart-wrap-label">動的CMSサイト · Chart 01 · 3年トータルコスト比較</div>
+      <div class="chart-wrap-inner">
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--noe);"></div>Noe Shiftica</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:rgba(255,255,255,0.3);"></div>フリーランス（WP系）</div>
+          <div class="chart-legend-item" style="margin-left:8px;"><div class="chart-legend-dot" style="background:var(--c-init);"></div>🟣 初期費用</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--c-run);"></div>🔵 ランニング</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--c-maint);opacity:0.7;"></div>🔴 保守費用</div>
+        </div>
+        <div class="bars-group">
+          <div class="scale-sep"><span class="scale-sep-text">Small 小規模（1〜10P）</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="sbar"><div class="sg si-noe" style="width:13.6%"></div></div><span class="bval nv">35万円</span></div>
+          <div class="bar-row"><span class="bl fl">FL・保守なし</span><div class="sbar"><div class="sg si-fl" style="width:5.8%"></div><div class="sg sr" style="width:14.0%"></div></div><span class="bval fv">約51万円</span></div>
+          <div class="bar-row"><span class="bl flm">FL・保守あり</span><div class="sbar"><div class="sg si-fl" style="width:5.8%"></div><div class="sg sr" style="width:14.0%"></div><div class="sg sm" style="width:35.0%"></div></div><span class="bval fv">約141万円</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Medium 中規模（10〜30P）</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="sbar"><div class="sg si-noe" style="width:17.5%"></div></div><span class="bval nv">45万円</span></div>
+          <div class="bar-row"><span class="bl fl">FL・保守なし</span><div class="sbar"><div class="sg si-fl" style="width:19.5%"></div><div class="sg sr" style="width:14.0%"></div></div><span class="bval fv">約86万円</span></div>
+          <div class="bar-row"><span class="bl flm">FL・保守あり</span><div class="sbar"><div class="sg si-fl" style="width:19.5%"></div><div class="sg sr" style="width:14.0%"></div><div class="sg sm" style="width:35.0%"></div></div><span class="bval fv">約176万円</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Large 大規模（30P〜 EC・高機能）</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="sbar"><div class="sg si-noe" style="width:21.4%"></div></div><span class="bval nv">55万円</span></div>
+          <div class="bar-row"><span class="bl fl">FL・保守なし</span><div class="sbar"><div class="sg si-fl" style="width:38.9%"></div><div class="sg sr" style="width:14.0%"></div></div><span class="bval fv">約136万円</span></div>
+          <div class="bar-row"><span class="bl flm">FL・保守あり</span><div class="sbar"><div class="sg si-fl" style="width:38.9%"></div><div class="sg sr" style="width:14.0%"></div><div class="sg sm" style="width:35.0%"></div></div><span class="bval fv">約226万円</span></div>
+        </div>
+        <div class="savings-strip">
+          <span>最大差額（FL大規模・保守あり 226万 vs Noe大規模 55万）</span>
+          <span>▲ 171万円の節約</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 動的 納期グラフ -->
+    <div class="chart-wrap">
+      <div class="chart-wrap-label">動的CMSサイト · Chart 02 · 納期比較（基準値=FL大規模中央値 3ヶ月）</div>
+      <div class="chart-wrap-inner">
+        <div class="bars-group">
+          <div class="scale-sep"><span class="scale-sep-text">Small 小規模</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="dbar"><div class="dfill d-noe" style="width:15%"></div></div><span class="bval nv">14日</span></div>
+          <div class="bar-row"><span class="bl fl">フリーランス</span><div class="dbar"><div class="dfill d-fl" style="width:50%"></div></div><span class="bval fdv">2〜4週間</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Medium 中規模</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="dbar"><div class="dfill d-noe" style="width:24%"></div></div><span class="bval nv">21日</span></div>
+          <div class="bar-row"><span class="bl fl">フリーランス</span><div class="dbar"><div class="dfill d-fl" style="width:67%"></div></div><span class="bval fdv">1〜2ヶ月</span></div>
+          <div class="hr"></div>
+          <div class="scale-sep"><span class="scale-sep-text">Large 大規模</span><div class="scale-sep-line"></div></div>
+          <div class="bar-row"><span class="bl noe">Noe Shiftica</span><div class="dbar"><div class="dfill d-noe" style="width:33%"></div></div><span class="bval nv">1ヶ月</span></div>
+          <div class="bar-row"><span class="bl fl">フリーランス</span><div class="dbar"><div class="dfill d-fl" style="width:100%"></div></div><span class="bval fdv">2〜3ヶ月</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-label">動的CMSで差が大きい理由</div>
+      WordPressはプラグインのセキュリティ更新・バージョン管理が月1〜2回必要です。これを外注すると月2〜3万円が3年で<strong>72〜108万円</strong>にのぼります。Noe ShifticaはプラグインなしのNext.js構成のため、この費用が構造的に発生しません。
+    </div>
+  </div>
+
+  <!-- 04 グラフの見どころ -->
+  <div class="section" id="points">
+    <div class="section-eyebrow">04 · グラフの見どころ</div>
+    <h2>グラフから読み取れる3つのポイント</h2>
+
+    <h3>① 🔵 青いバー（ランニングコスト）がじわじわ効いてくる</h3>
+    <p>フリーランスのサイトは毎月のサーバー代・ドメイン代が7,500円〜1万円かかります。「月1万円くらい」と思うかもしれませんが、36ヶ月で27〜36万円。これだけで初期費用の差がほぼ消えます。</p>
+
+    <h3>② 🔴 赤いバー（保守費用）が決定的な差をつける</h3>
+    <p>特に動的CMSサイトで顕著です。WordPressはプラグインのセキュリティパッチ・更新対応が定期的に必要で、放置するとサイトが乗っ取られるリスクがあります。この保守を外注すると月2.5万円、3年で90万円になります。<strong>Noe Shifticaにはこの赤バーが存在しません。</strong></p>
+
+    <h3>③ 納期グラフ：バーの長さが「待ち時間」そのまま</h3>
+    <p>フリーランスは1人で全工程をこなすため、他の案件が入ると後回しになることがあります。Noe ShifticaはAIと最新ツールを組み合わせた制作体制で、全規模でフリーランスの半分以下の納期を実現しています。<strong>サイトが早く公開されるほど、早く集客が始まります。</strong></p>
+  </div>
+
+  <!-- 05 価格以外の差 -->
+  <div class="section" id="quality">
+    <div class="section-eyebrow">05 · 価格以外の差</div>
+    <h2>価格以外で差がつく3つのこと</h2>
+    <p>コストと納期だけが差ではありません。サイトが完成した後に「本当に効果があるか」を左右する3点を解説します。</p>
+
+    <div class="strength-grid">
+      <div class="strength-card">
+        <div class="strength-icon">🔍</div>
+        <div class="strength-title">SEO・集客力の設計品質</div>
+        <div class="strength-desc">多くのフリーランスはSEO対策を「後から追加するオプション」として扱います。Noe ShifticaはNext.jsの構造上、メタデータ・構造化データ・OGPが最初から設計に組み込まれています。検索で見つけてもらえるサイトが、最初から納品されます。</div>
+      </div>
+      <div class="strength-card">
+        <div class="strength-icon">⚡</div>
+        <div class="strength-title">表示速度がSEOと直結</div>
+        <div class="strength-desc">Googleは表示速度（Core Web Vitals）を検索順位の評価基準にしています。Next.js + Cloudflare CDNの構成は、WordPressベースのフリーランス制作サイトと比べてPageSpeedスコアで大幅に高い数値が出ます。速いサイトは離脱率も低くなります。</div>
+      </div>
+      <div class="strength-card">
+        <div class="strength-icon">🤝</div>
+        <div class="strength-title">公開後のサポート体制</div>
+        <div class="strength-desc">フリーランスへの依頼でよくあるトラブルが「公開後に連絡が取れなくなる」ことです。Noe Shifticaは修正2回まで無料・3回目以降1回6,000円で対応しています。また発生したバグはAIが記録・蓄積するため、同じ問題は二度と繰り返しません。</div>
+      </div>
+      <div class="strength-card">
+        <div class="strength-icon">✨</div>
+        <div class="strength-title">デザイン品質の均一性</div>
+        <div class="strength-desc">フリーランスはスキルに個人差があり、ポートフォリオと実際の納品物が異なるケースがあります。Noe Shifticaはすべての制作物で同じ品質基準・同じ技術構成を維持しており、依頼のたびに品質が変わることがありません。</div>
+      </div>
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div class="compare-table">
+      <div class="ct-header">
+        <div class="ct-h">比較項目</div>
+        <div class="ct-h noe-h">Noe Shiftica</div>
+        <div class="ct-h">フリーランス</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-label">🔍 SEO設計</div>
+        <div class="ct-noe">設計に最初から組込み <span class="ct-badge">優位</span></div>
+        <div class="ct-fl">後付けオプションが多い</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-label">⚡ 表示速度</div>
+        <div class="ct-noe">Next.js + CDN構成 <span class="ct-badge">優位</span></div>
+        <div class="ct-fl">WP依存・プラグイン影響あり</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-label">🤝 公開後サポート</div>
+        <div class="ct-noe">2回無料・3回目〜6,000円 <span class="ct-badge">明確</span></div>
+        <div class="ct-fl">対応まちまち・途絶リスクあり</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-label">🛡️ セキュリティ</div>
+        <div class="ct-noe">プラグイン不要の構成 <span class="ct-badge">優位</span></div>
+        <div class="ct-fl">WPプラグイン脆弱性あり</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-label">💰 月額コスト</div>
+        <div class="ct-noe">≒ ¥0 <span class="ct-badge">圧勝</span></div>
+        <div class="ct-fl">月7,500円〜2.5万円</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-label">📅 初期費用（小規模静的）</div>
+        <div class="ct-noe">15万円〜</div>
+        <div class="ct-fl">5〜20万円 ← ここだけ安い</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 VERDICT -->
+  <div class="section" id="verdict">
+    <div class="section-eyebrow">06 · 結論</div>
+    <h2>どちらを選ぶべきか</h2>
+    <p>正直に言います。<strong>小規模な静的サイトを1枚だけ、短期間だけ使えればいい</strong>なら、フリーランスの初期費用の安さは本物です。</p>
+    <p>でも、<strong>集客に使う・長く使う・更新していく</strong>サイトを作るなら、3年間のトータルコストと品質の安定性でNoe Shifticaの方が合理的な選択です。</p>
+
+    <div class="verdict">
+      <div class="verdict-label">まとめ</div>
+      <h3>「初期費用が安い」より「3年後に何を得ているか」で選ぶ</h3>
+      <p>Webサイトはオープンした翌日から集客ツールとして機能し始めます。表示速度・SEO設計・公開後のサポートが揃っているかどうかが、3年後の差になります。</p>
+      <div class="verdict-choose">
+        <div class="choose-box noe">
+          <div class="choose-title">Noe Shifticaが向いている</div>
+          <ul class="choose-list">
+            <li>集客・SEOを最初から重視したい</li>
+            <li>3年以上使い続けるサイトを作りたい</li>
+            <li>月額コストをゼロに抑えたい</li>
+            <li>公開後のサポートに安心感が欲しい</li>
+            <li>速い納期で早く公開したい</li>
+          </ul>
+        </div>
+        <div class="choose-box fl">
+          <div class="choose-title">フリーランスが向いている</div>
+          <ul class="choose-list">
+            <li>初期費用をとにかく抑えたい</li>
+            <li>1〜2年の短期利用で十分</li>
+            <li>信頼できる知人エンジニアがいる</li>
+            <li>シンプルな1枚ページのみ必要</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    DATA: Web幹事 · LISKUL · ferret One · NT CREATION · ペライチ大学 · クロスデザイナー · Medicalgrits · 2026<br>
+    フリーランス費用・納期は中央値。ランニング：静的月7,500円、動的月1万円×36ヶ月。保守：静的月1.2万、動的月2.5万×36ヶ月。Noe Shiftica価格は確定値。<br>
+    Web制作会社選びシリーズ vol.03 / Noe Shiftica Blog
+  </div>
+
+</div>
+</body>
+</html>

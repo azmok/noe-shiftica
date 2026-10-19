@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年版 LLM Pop7 ランキング ― 開発者が今すぐ知るべきAIモデルの実力比較 | Noe Shiftica</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DESIGN SYSTEM — Light Professional Theme
+   ================================================================ */
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-alt: #f5f4f1;
+  --border: #e5e3de;
+  --border-light: #edecea;
+  --text: #1a1a1a;
+  --text-secondary: #555550;
+  --muted: #8a8a82;
+  --accent: #4f46e5;
+  --accent-light: #eef2ff;
+  --accent-border: #c7d2fe;
+  --teal: #0d9488;
+  --teal-light: #f0fdfa;
+  --teal-border: #99f6e4;
+  --gold: #b45309;
+  --gold-bg: #fffbeb;
+  --gold-border: #fde68a;
+  --rank1-bg: #fffbeb;
+  --rank1-border: #fcd34d;
+  --rank1-accent: #b45309;
+  --rank2-bg: #f8fafc;
+  --rank2-border: #cbd5e1;
+  --rank2-accent: #64748b;
+  --rank3-bg: #fdf4ef;
+  --rank3-border: #fdba74;
+  --rank3-accent: #c2410c;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 17px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Nav ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: rgba(250,250,249,0.92);
+  backdrop-filter: blur(16px);
+  padding: 0 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+/* ── Page Layout ── */
+.page-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 72px 32px 120px;
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 48px;
+}
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--text); }
+.breadcrumb span { margin: 0 8px; opacity: 0.4; }
+
+/* ── Article Header ── */
+.article-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.article-sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Body Text ── */
+p {
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--muted); }
+
+a { color: var(--accent); }
+
+/* ── Headings ── */
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 64px 0 20px;
+  padding-top: 12px;
+}
+
+h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin: 40px 0 14px;
+}
+
+/* ── Data Badge ── */
+.data-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.data-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   RANKING SECTION — Inline (no iframe)
+   ================================================================ */
+.ranking-section {
+  margin: 48px -20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.ranking-header {
+  padding: 28px 28px 8px;
+  text-align: center;
+}
+
+.ranking-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ranking-title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 900;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.ranking-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Tab Nav */
+.tabs {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 20px 28px 0;
+}
+
+.tab-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 9px 22px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.tab-btn:hover:not(.active) {
+  border-color: var(--accent-border);
+  color: var(--text);
+  background: var(--accent-light);
+}
+
+/* Ranking Content */
+.ranking-content {
+  padding: 24px 28px 32px;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+.note-box {
+  background: var(--gold-bg);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 20px;
+  line-height: 1.65;
+}
+
+.note-box strong { color: var(--gold); }
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.legend-item {
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--surface-alt);
+  border: 1px solid var(--border-light);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+/* ── Ranking Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.card.rank-1 {
+  background: var(--rank1-bg);
+  border-color: var(--rank1-border);
+}
+.card.rank-2 {
+  background: var(--rank2-bg);
+  border-color: var(--rank2-border);
+}
+.card.rank-3 {
+  background: var(--rank3-bg);
+  border-color: var(--rank3-border);
+}
+
+.card.rank-1::before,
+.card.rank-2::before,
+.card.rank-3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+.card.rank-1::before { background: var(--rank1-accent); }
+.card.rank-2::before { background: var(--rank2-accent); }
+.card.rank-3::before { background: var(--rank3-accent); }
+
+.rank-badge { text-align: center; }
+
+.rank-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+.card.rank-1 .rank-num { color: var(--rank1-accent); }
+.card.rank-2 .rank-num { color: var(--rank2-accent); }
+.card.rank-3 .rank-num { color: var(--rank3-accent); }
+.card:not(.rank-1):not(.rank-2):not(.rank-3) .rank-num { color: var(--muted); }
+
+.rank-icon { font-size: 13px; display: block; margin-top: 2px; }
+
+.model-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.model-maker {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.tags { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.tag {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tag-api { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.tag-chat { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
+.tag-open { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.tag-reasoning { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+
+/* Scores */
+.scores {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 260px;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.score-label {
+  width: 72px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.score-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.bar-intel { background: linear-gradient(90deg, #6366f1, #a5b4fc); }
+.bar-code  { background: linear-gradient(90deg, #0d9488, #5eead4); }
+.bar-speed { background: linear-gradient(90deg, #d97706, #fbbf24); }
+
+.score-val {
+  width: 50px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+/* Method Box */
+.method-box {
+  background: var(--surface-alt);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-top: 28px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.method-box h4 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+}
+
+.method-box ul { list-style: none; padding: 0; }
+
+.method-box li {
+  padding: 4px 0 4px 16px;
+  position: relative;
+  font-size: 11px;
+}
+
+.method-box li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 9px;
+  top: 6px;
+}
+
+/* ================================================================
+   ARTICLE BODY COMPONENTS
+   ================================================================ */
+
+/* Pull Quote */
+.pull-quote {
+  margin: 56px 0;
+  padding: 28px 32px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-light);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.pull-quote p {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--text);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Insight Box */
+.insight-box {
+  background: var(--teal-light);
+  border: 1px solid var(--teal-border);
+  border-radius: var(--radius);
+  padding: 22px 26px;
+  margin: 40px 0;
+}
+
+.insight-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--teal);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.insight-box p {
+  font-size: 14px;
+  color: #374151;
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* Use Case Grid */
+.usecase-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 24px 0 48px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.usecase-row {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  border-bottom: 1px solid var(--border-light);
+}
+.usecase-row:last-child { border-bottom: none; }
+
+.usecase-model {
+  background: var(--surface-alt);
+  padding: 14px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.usecase-maker {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.usecase-desc {
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Cost Table */
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 28px 0 48px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.cost-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
+  font-weight: 600;
+}
+
+.cost-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.cost-table tr:hover td { background: rgba(0,0,0,0.01); }
+
+.cost-table .model-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tier-free { color: var(--teal); font-weight: 700; }
+.tier-mid { color: var(--gold); font-weight: 700; }
+.tier-high { color: #dc2626; font-weight: 700; }
+
+/* References */
+.references {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.references h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.ref-item {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.ref-item a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.ref-item a:hover { text-decoration: underline; }
+
+.ref-desc {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* Tags */
+.article-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+.article-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Footer */
+footer {
+  background: var(--surface-alt);
+  border-top: 1px solid var(--border);
+  padding: 56px 40px 36px;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+.footer-brand {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.footer-tagline {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.footer-nav h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.footer-nav ul { list-style: none; }
+.footer-nav li { margin-bottom: 8px; }
+.footer-nav a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-nav a:hover { color: var(--text); }
+
+.footer-bottom {
+  max-width: 1100px;
+  margin: 36px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .page-wrap { padding: 48px 18px 80px; }
+  .ranking-section { margin: 40px -8px; }
+  .ranking-content { padding: 20px 16px 28px; }
+  .card {
+    grid-template-columns: 38px 1fr;
+    grid-template-rows: auto auto;
+  }
+  .scores {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .tabs { flex-direction: column; align-items: stretch; }
+  .tab-btn { text-align: center; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .usecase-row { grid-template-columns: 1fr; }
+  .usecase-model { border-right: none; border-bottom: 1px solid var(--border-light); }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://noe-shiftica.com/" class="nav-logo">NOE SHIFTICA</a>
+  <ul class="nav-links">
+    <li><a href="https://noe-shiftica.com/about">About</a></li>
+    <li><a href="https://noe-shiftica.com/#services">Services</a></li>
+    <li><a href="https://noe-shiftica.com/blog">Blog</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="https://noe-shiftica.com/">Home</a>
+    <span>/</span>
+    <a href="https://noe-shiftica.com/blog">Blog</a>
+    <span>/</span>
+    2026年版 LLM ランキング
+  </div>
+
+  <div class="article-meta">Journal &nbsp;·&nbsp; 2026年3月11日</div>
+
+  <h1>2026年、本当に使えるAIはどれか。<br>LLM Pop7 ランキング</h1>
+
+  <p class="article-sub">
+    ベンチマークとEloレーティングをもとに、開発・ビジネス用途別で整理した独自分析。<br>
+    「なんとなく話題のAI」ではなく、データが示す実力を比べた。
+  </p>
+
+  <div class="data-badge">
+    <span class="data-badge-dot"></span>
+    Artificial Analysis Intelligence Index v4.0
+    <span style="opacity:0.3">|</span>
+    Arena.ai Text Elo&nbsp; 5,440,800 票
+    <span style="opacity:0.3">|</span>
+    Arena.ai Code Elo&nbsp; 184,734 票
+    <span style="opacity:0.3">|</span>
+    2026年3月時点
+  </div>
+
+  <p>
+    AIツールの話題は尽きない。毎月のように「最強モデル」が登場し、気づけば何が本当に優れているのかわからなくなっている。そういう状況が続いています。
+  </p>
+
+  <p>
+    Noe Shiftica では、実際の開発・制作業務でAIを日常的に使っています。その経験と、複数の独立系ベンチマーク機関のデータを組み合わせて、<strong>2026年3月時点の「本当に使えるLLM」を独自にまとめました。</strong>
+  </p>
+
+  <p>
+    ランキングの指標は3つ。<em>総合知性スコア（AA Intelligence Index）</em>、<em>コーディング性能（Arena.ai Code Elo）</em>、そして<em>レイテンシ（応答速度）</em>です。どれも一社のPRではなく、複数組織が独立して計測したデータです。
+  </p>
+
+  <!-- ================================================================
+       INLINE RANKING (formerly iframe)
+       ================================================================ -->
+  <div class="ranking-section">
+    <div class="ranking-header">
+      <div class="ranking-badge">2026 Edition · March</div>
+      <div class="ranking-title">LLM Pop7 ランキング</div>
+      <p class="ranking-subtitle">独自総合スコアによる最新LLMベンチマーク比較レポート</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('chat')">💬 チャット版（一般ユーザー向け）</button>
+      <button class="tab-btn" onclick="switchTab('api')">🔌 API版（全モデル含む）</button>
+    </div>
+
+    <div class="ranking-content">
+
+      <!-- ===== CHAT Section (DEFAULT) ===== -->
+      <div id="chat" class="section active">
+
+        <div class="note-box">
+          このランキングは <strong>一般ユーザーがチャットUIから直接利用可能なモデル</strong>（ChatGPT・Claude.ai・Gemini・Grok 等のサービス経由）を対象にしています。
+          ユーザーレビュー・LMArena Elo・実用性の観点を加味した独自スコアです。
+        </div>
+
+        <div class="section-label">総合ランキング（チャット対象）</div>
+
+        <div class="legend">
+          <span class="legend-item">CHAT ELO = LMArena Text Elo (5.4M+ 票)</span>
+          <span class="legend-item">CODE ELO = Arena.ai Code Elo</span>
+          <span class="legend-item">LATENCY = 体感レイテンシ評価</span>
+        </div>
+
+        <!-- Chat Rank 1 -->
+        <div class="card rank-1">
+          <div class="rank-badge"><span class="rank-num">1</span><span class="rank-icon">🥇</span></div>
+          <div class="model-info">
+            <div class="model-name">Claude Opus 4.6</div>
+            <div class="model-maker">Anthropic — Claude.ai</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-reasoning">Thinking</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:100%"></div></div>
+              <span class="score-val">1504</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:100%"></div></div>
+              <span class="score-val">1555</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:62%"></div></div>
+              <span class="score-val">やや低速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Rank 2 -->
+        <div class="card rank-2">
+          <div class="rank-badge"><span class="rank-num">2</span><span class="rank-icon">🥈</span></div>
+          <div class="model-info">
+            <div class="model-name">Gemini 3.1 Pro</div>
+            <div class="model-maker">Google — Gemini app / AI Mode in Search</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+            <div style="margin-top:6px;font-size:10px;color:var(--muted);line-height:1.65;">
+              ⚠️ <strong style="color:#dc2626;">Gemini 3 Pro は2026年3月9日に廃止済</strong>。後継 3.1 Pro が「Thinking (3 Pro)」枠を継続。<br>
+              ✅ 米国の無料ユーザーもデイリー制限付き利用可 · AI Pro（$19.99/月）で拡張枠<br>
+              ARC-AGI-2 77.1% · 1Mコンテキスト · 3段階 thinking_level
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:99%"></div></div>
+              <span class="score-val">1500</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:94%"></div></div>
+              <span class="score-val">1461</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:76%"></div></div>
+              <span class="score-val">中速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Rank 3 -->
+        <div class="card rank-3">
+          <div class="rank-badge"><span class="rank-num">3</span><span class="rank-icon">🥉</span></div>
+          <div class="model-info">
+            <div class="model-name">Grok 4 / Grok 4.1 (Thinking)</div>
+            <div class="model-maker">xAI — X (旧Twitter)</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:97%"></div></div>
+              <span class="score-val">1473–1491</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:77%"></div></div>
+              <span class="score-val">1205</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:87%"></div></div>
+              <span class="score-val">高速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Rank 4 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">4</span></div>
+          <div class="model-info">
+            <div class="model-name">GPT-5.3 Instant</div>
+            <div class="model-maker">OpenAI — ChatGPT（2026年3月3日リリース・全ユーザーデフォルト）</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-api">API: gpt-5.3-chat-latest</span>
+            </div>
+            <div style="margin-top:5px;font-size:10px;color:var(--muted);">幻覚率 -26.8%（Web検索時）・過剰拒否の大幅改善・Web情報の文脈理解向上</div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:95%"></div></div>
+              <span class="score-val">~1455</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:88%"></div></div>
+              <span class="score-val">〜GPT-5.2水準</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:90%"></div></div>
+              <span class="score-val">高速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Rank 5 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">5</span></div>
+          <div class="model-info">
+            <div class="model-name">GPT-5.2 / GPT-5.4 Thinking</div>
+            <div class="model-maker">OpenAI — ChatGPT</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:96%"></div></div>
+              <span class="score-val">1457–1479</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:95%"></div></div>
+              <span class="score-val">~1472</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:68%"></div></div>
+              <span class="score-val">中速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Rank 6 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">6</span></div>
+          <div class="model-info">
+            <div class="model-name">Claude Sonnet 4.6</div>
+            <div class="model-maker">Anthropic — Claude.ai</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:95%"></div></div>
+              <span class="score-val">1457</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:98%"></div></div>
+              <span class="score-val">1523</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:80%"></div></div>
+              <span class="score-val">中〜高速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Rank 7 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">7</span></div>
+          <div class="model-info">
+            <div class="model-name">Gemini 3 Flash</div>
+            <div class="model-maker">Google — Gemini</div>
+            <div class="tags">
+              <span class="tag tag-chat">Chat</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">CHAT ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:96%"></div></div>
+              <span class="score-val">1473</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE ELO</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:93%"></div></div>
+              <span class="score-val">1442</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:95%"></div></div>
+              <span class="score-val">超高速・無料</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="method-box">
+          <h4>📊 チャット版 採点基準と注記</h4>
+          <ul>
+            <li><strong>Gemini 3 Pro について</strong>：API版は2026年3月9日に廃止済み。チャットUIの「Thinking (3 Pro)」ラベルは 3.1 Pro が引き継ぎ継続提供中。米国の無料ユーザーも日次上限付きで利用可能</li>
+            <li><strong>Gemini 3.1 Pro</strong> は2026年2月19日リリース。3段階 thinking_level（Low/Medium/High）を導入し、High モードで「Deep Think Mini」が発動</li>
+            <li><strong>チャット Elo</strong>：LMArena (arena.ai) Text Leaderboard の Elo スコア（5,440,800 票・2026年3月6日時点）</li>
+            <li><strong>コーディング Elo</strong>：Arena.ai Code Leaderboard の Elo スコア（agentic coding, HTML/React タスク）</li>
+            <li><strong>GPT-5.3 Instant</strong>（3月3日リリース）は全 ChatGPT ユーザーのデフォルトモデルに昇格。幻覚率 -26.8%</li>
+            <li>GPT-5.2 Instant は2026年6月3日に退役予定。旧 GPT-5 Instant/Thinking は2月13日に既に退役済み</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ===== API Section ===== -->
+      <div id="api" class="section">
+
+        <div class="note-box">
+          このランキングは <strong>API経由で利用可能な全モデル</strong>（xhigh / max / reasoning サフィックス付きの高性能バリアントを含む）を対象としています。<br>
+          ⚠️ <strong>GPT-5.3 について</strong>：「GPT-5.3 Instant」（チャット改善版）と「GPT-5.3 Codex (xhigh)」（コーディングエージェント）の2モデルあり。本API版では後者を4位に掲載。
+        </div>
+
+        <div class="section-label">総合ランキング（API対象）</div>
+
+        <div class="legend">
+          <span class="legend-item">INTEL = 総合知性スコア (AA Index)</span>
+          <span class="legend-item">CODE = コーディング Elo (Arena.ai)</span>
+          <span class="legend-item">LATENCY = レイテンシ評価（低いほど高速）</span>
+        </div>
+
+        <!-- API Rank 1 -->
+        <div class="card rank-1">
+          <div class="rank-badge"><span class="rank-num">1</span><span class="rank-icon">🥇</span></div>
+          <div class="model-info">
+            <div class="model-name">Gemini 3.1 Pro Preview</div>
+            <div class="model-maker">Google DeepMind</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+              <span class="tag tag-chat">Chat</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:100%"></div></div>
+              <span class="score-val">57 / 57</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:90%"></div></div>
+              <span class="score-val">Elo 1461</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:78%"></div></div>
+              <span class="score-val">中〜低速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Rank 2 -->
+        <div class="card rank-2">
+          <div class="rank-badge"><span class="rank-num">2</span><span class="rank-icon">🥈</span></div>
+          <div class="model-info">
+            <div class="model-name">GPT-5.4 (xhigh)</div>
+            <div class="model-maker">OpenAI</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:100%"></div></div>
+              <span class="score-val">57 / 57</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:91%"></div></div>
+              <span class="score-val">Elo ~1472</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:68%"></div></div>
+              <span class="score-val">中速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Rank 3 -->
+        <div class="card rank-3">
+          <div class="rank-badge"><span class="rank-num">3</span><span class="rank-icon">🥉</span></div>
+          <div class="model-info">
+            <div class="model-name">Claude Opus 4.6 (max / Adaptive Reasoning)</div>
+            <div class="model-maker">Anthropic</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+              <span class="tag tag-chat">Chat</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:93%"></div></div>
+              <span class="score-val">53 / 57</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:100%"></div></div>
+              <span class="score-val">Elo 1555</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:60%"></div></div>
+              <span class="score-val">やや低速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Rank 4 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">4</span></div>
+          <div class="model-info">
+            <div class="model-name">GPT-5.3 Codex (xhigh)</div>
+            <div class="model-maker">OpenAI — Codex / API（2026年2月5日リリース）</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+            </div>
+            <div style="margin-top:5px;font-size:10px;color:var(--muted);">コーディングエージェント特化 · GPT-5.2 + Codex スタック統合 · 25%高速化</div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:95%"></div></div>
+              <span class="score-val">54 / 57</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:87%"></div></div>
+              <span class="score-val">Elo ~1341</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:72%"></div></div>
+              <span class="score-val">中速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Rank 5 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">5</span></div>
+          <div class="model-info">
+            <div class="model-name">Claude Sonnet 4.6 (max / Adaptive Reasoning)</div>
+            <div class="model-maker">Anthropic</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+              <span class="tag tag-chat">Chat</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:91%"></div></div>
+              <span class="score-val">52 / 57</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:98%"></div></div>
+              <span class="score-val">Elo 1523</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:75%"></div></div>
+              <span class="score-val">中速</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Rank 6 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">6</span></div>
+          <div class="model-info">
+            <div class="model-name">Grok 4 / Grok 4.1 Fast (Reasoning)</div>
+            <div class="model-maker">xAI</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+              <span class="tag tag-chat">Chat</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:82%"></div></div>
+              <span class="score-val">~47</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:79%"></div></div>
+              <span class="score-val">Elo ~1236</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:88%"></div></div>
+              <span class="score-val">高速 (2M ctx)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Rank 7 -->
+        <div class="card">
+          <div class="rank-badge"><span class="rank-num">7</span></div>
+          <div class="model-info">
+            <div class="model-name">DeepSeek V3.2 (Reasoning)</div>
+            <div class="model-maker">DeepSeek</div>
+            <div class="tags">
+              <span class="tag tag-api">API</span>
+              <span class="tag tag-reasoning">Reasoning</span>
+              <span class="tag tag-open">Open Weights</span>
+            </div>
+          </div>
+          <div class="scores">
+            <div class="score-row">
+              <span class="score-label">INTEL</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-intel" style="width:79%"></div></div>
+              <span class="score-val">~45</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">CODE</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-code" style="width:86%"></div></div>
+              <span class="score-val">Elo 1373</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">LATENCY</span>
+              <div class="score-bar-wrap"><div class="score-bar bar-speed" style="width:91%"></div></div>
+              <span class="score-val">高速・低コスト</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="method-box">
+          <h4>📊 API版 採点基準と注記</h4>
+          <ul>
+            <li><strong>総合知性 (INTEL)</strong>：Artificial Analysis Intelligence Index v4.0 スコア（GDPval-AA・HLE・GPQA Diamond 等 10 評価の合算）</li>
+            <li><strong>コーディング (CODE)</strong>：Arena.ai Code Leaderboard の Elo スコア（2026年3月時点・184,734 票ベース）</li>
+            <li><strong>レイテンシ</strong>：Artificial Analysis の TTFT 計測値（72時間中央値）および出力トークン速度を総合評価</li>
+            <li>xhigh / max / high 等のサフィックスは同ベースモデルの高品質バリアントで、通常 API オプションとして提供される</li>
+            <li>Gemini 3.1 Pro Preview・GPT-5.4 は同点（57点）のため、Arena.ai チャット Elo 差で優劣を判定</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /ranking-content -->
+  </div><!-- /ranking-section -->
+
+  <p style="font-size:13px;color:var(--muted);margin-top:16px;margin-bottom:48px;">
+    ※ タブ切り替えで「チャット版」「API版」の両ランキングを確認できます。
+  </p>
+
+  <!-- ================================================================
+       ARTICLE BODY
+       ================================================================ -->
+
+  <h2>なぜ今、モデル選定が重要なのか</h2>
+
+  <p>
+    2025年末から2026年前半にかけて、LLMの世代交代が急速に進みました。Gemini 3系・Claude 4系・GPT-5系が相次いでリリースされ、半年前のモデル比較はすでに古くなっています。
+  </p>
+
+  <p>
+    重要なのは、<strong>「どのモデルが一番賢いか」よりも「どのモデルが自分の用途に合っているか」</strong>です。総合スコアが高くても、実際の業務では別のモデルが活躍することは珍しくない。
+  </p>
+
+  <div class="pull-quote">
+    <p>ベンチマーク上の1位と、業務で「一番使いやすい」モデルは、必ずしも一致しない。選定の基準は、スコアではなくユースケースで決まる。</p>
+  </div>
+
+
+  <h2>各モデルの使い所</h2>
+
+  <h3>Chat版 — 一般ユーザー・ビジネス向け</h3>
+
+  <div class="usecase-grid">
+    <div class="usecase-row">
+      <div class="usecase-model">Claude Opus 4.6<span class="usecase-maker">Anthropic / Claude.ai</span></div>
+      <div class="usecase-desc">Chat Elo・Code Elo ともに最高水準。長文の読解・複雑なロジック整理・コード生成まで幅広く対応。「とにかく最高精度が必要」な作業に。有料プラン限定。</div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">Gemini 3.1 Pro<span class="usecase-maker">Google / Gemini app</span></div>
+      <div class="usecase-desc">チャットUIでは「Thinking (3 Pro)」として選択可能。米国ユーザーは無料でも日次制限付きで利用可。Googleサービスとの連携・大容量コンテキスト（1M tokens）が強み。</div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">Grok 4 / 4.1 Thinking<span class="usecase-maker">xAI / X</span></div>
+      <div class="usecase-desc">X（旧Twitter）のプレミアム会員向け。速度と推論のバランスが良く、リアルタイム情報との連携が得意。ソーシャル文脈での情報収集・分析に向く。</div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">GPT-5.3 Instant<span class="usecase-maker">OpenAI / ChatGPT</span></div>
+      <div class="usecase-desc">全ChatGPTユーザーのデフォルトモデル（2026年3月〜）。Web検索時の幻覚率を大幅改善。「毎日使う汎用AI」として最もバランスが取れている現時点での選択肢。</div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">Claude Sonnet 4.6<span class="usecase-maker">Anthropic / Claude.ai</span></div>
+      <div class="usecase-desc">Opus より軽量・高速で、コードEloはOpusに迫る水準。スピードとクオリティのバランスを求めるなら Sonnet が現実解。APIコストも抑えやすい。</div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">Gemini 3 Flash<span class="usecase-maker">Google / Gemini</span></div>
+      <div class="usecase-desc">無料・超高速。軽い調査・要約・翻訳などの繰り返し作業に最適。「とりあえず試す」「量をこなす」用途に圧倒的コスパ。</div>
+    </div>
+  </div>
+
+  <h3>API版 — 開発者・事業者向け</h3>
+
+  <div class="usecase-grid">
+    <div class="usecase-row">
+      <div class="usecase-model">GPT-5.3 Codex (xhigh)<span class="usecase-maker">OpenAI API</span></div>
+      <div class="usecase-desc">コーディングエージェント特化。GPT-5.2とCodexスタックを統合し25%高速化。エージェント型の自動開発・CI/CDパイプラインへの組み込みに向く。</div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">DeepSeek V3.2<span class="usecase-maker">DeepSeek / オープンウェイト</span></div>
+      <div class="usecase-desc">オープンウェイトで自社サーバーにデプロイ可能。APIコストを極限まで抑えたい・データをクラウドに渡したくない用途に。性能も上位に匹敵する水準。</div>
+    </div>
+  </div>
+
+
+  <h2>コスト比較：無料〜有料の現実</h2>
+
+  <p>
+    性能だけでなく、コストも重要な判断軸です。特にチャット版での利用では、どのプランで何が使えるかが変わってきました。
+  </p>
+
+  <table class="cost-table">
+    <thead>
+      <tr>
+        <th>モデル</th>
+        <th>チャット利用</th>
+        <th>コスト感</th>
+        <th>メモ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="model-cell">Gemini 3 Flash</td>
+        <td><span class="tier-free">無料</span></td>
+        <td>$0</td>
+        <td>Gemini app デフォルト</td>
+      </tr>
+      <tr>
+        <td class="model-cell">GPT-5.3 Instant</td>
+        <td><span class="tier-free">無料（全員）</span></td>
+        <td>$0〜</td>
+        <td>ChatGPTデフォルト化済み</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Gemini 3.1 Pro<br><span style="font-size:10px;opacity:0.6;">Thinking (3 Pro)</span></td>
+        <td><span class="tier-mid">制限付き無料〜</span></td>
+        <td>米国無料 / AI Pro $19.99/月</td>
+        <td>日次上限あり・Ultra で 1,500回/日</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Grok 4 / 4.1</td>
+        <td><span class="tier-mid">X Premium</span></td>
+        <td>$8〜/月</td>
+        <td>X（旧Twitter）加入が前提</td>
+      </tr>
+      <tr>
+        <td class="model-cell">GPT-5.2 / 5.4 Thinking</td>
+        <td><span class="tier-mid">ChatGPT Plus</span></td>
+        <td>$20/月〜</td>
+        <td>Pro（$200/月）でフル利用</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Claude Sonnet 4.6</td>
+        <td><span class="tier-high">Claude.ai 有料</span></td>
+        <td>$20/月〜</td>
+        <td>Pro プランから利用可</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Claude Opus 4.6</td>
+        <td><span class="tier-high">Claude.ai 有料</span></td>
+        <td>$20/月〜</td>
+        <td>Pro / Team / Enterprise</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-box">
+    <div class="insight-label">Noe Shiftica の視点</div>
+    <p>
+      無料で最も「使えるモデル」が増えた点は2026年の大きな変化です。GPT-5.3 Instant は全ユーザーのデフォルトになり、Gemini 3 Flash は高速かつ無料。「とりあえず有料プランに入らないとAIが使えない」という時代はほぼ終わっています。有料プランが活きるのは、<strong>上位モデルの推論精度が実際に仕事の品質差を生む場面</strong>に限られてきました。
+    </p>
+  </div>
+
+
+  <h2>Noe Shiftica が実際に使っている構成</h2>
+
+  <p>
+    Noe Shiftica では、用途に応じてモデルを使い分けています。現時点での構成は次の通りです。
+  </p>
+
+  <p>
+    コード生成・レビュー・エージェント的な作業は <strong>Claude Sonnet/Opus または Gemini 3.1 Pro/Gemini 3 Flash</strong>。Code Eloが飛び抜けており、長いコンテキストを扱う場面での精度が安定しています。構造化文書の生成・提案書起草なども同様。
+  </p>
+
+  <p>
+    日常的な調査・情報整理・アイデアの壁打ちは <strong>Gemini Thinking Mode（3 Flash Preview）</strong>。早さより正確性や一貫性を重視しています。Googleの場合は独自のTPUをハードウェアとして持っているため、遅いと言っても慣れればそこまで遅くは感じません。
+  </p>
+
+  <p>
+    精度が特に求められる推論タスク・複雑な分析は <strong>Gemini 3.1 Pro Mode</strong> や <strong>Claude 4.6 Sonnet/Opus Extended Thinking</strong> を使用しています。
+  </p>
+
+  <p>時々ネタや最新の利用可能なモデルなどの正確性や速報性を求める場合はPerplexityを利用しています。</p>
+
+  <p>また王道ですが翻訳や要約、またブログ記事の大まかなプロットはChatGPTに頼むことが多いです。</p>
+
+  <div class="pull-quote">
+    <p>「最強のAI」を一つ選ぶより、用途に応じて使い分ける設計の方が、最終的なアウトプットの質も、コストも最適化できる。これは繰り返し使用することでどの使用者もたどり着く最適化だと思います。</p>
+  </div>
+
+
+  <h2>ランキングは手段、目的は成果</h2>
+
+  <p>
+    このランキングは、AIモデルを選ぶための地図です。地図は更新され続けます。今後も四半期ごとに見直しを行い、実態に即した比較を続けていきます。
+  </p>
+
+  <p>
+    AI選定に迷っている方、開発や制作への導入を検討している方は、<a href="https://noe-shiftica.com/#concept">Noe Shiftica の取り組み</a>もあわせてご覧ください。
+  </p>
+
+
+  <!-- References -->
+  <div class="references">
+    <h2>📚 参考文献 / References</h2>
+    <div class="ref-grid">
+      <div class="ref-item">
+        <a href="https://artificialanalysis.ai/leaderboards/models" target="_blank">Artificial Analysis — LLM Leaderboard</a>
+        <p class="ref-desc">285モデルのインテリジェンス・速度・価格を独立計測。AA Intelligence Index v4.0 を採用。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://arena.ai/leaderboard/text" target="_blank">Arena.ai — Text Leaderboard</a>
+        <p class="ref-desc">5,440,800票のクラウドソーシングEloレーティング。323モデル対象。2026年3月6日更新。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://arena.ai/leaderboard/code" target="_blank">Arena.ai — Code Leaderboard</a>
+        <p class="ref-desc">184,734票によるコーディングElo。エージェンティックコーディング・WebDevタスク対象。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://artificialanalysis.ai" target="_blank">Artificial Analysis — Top Page</a>
+        <p class="ref-desc">独立系AI分析プラットフォーム。スピード・レイテンシ・価格を8回/日の頻度で計測。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://openlm.ai/chatbot-arena/" target="_blank">OpenLM.ai — Chatbot Arena+</a>
+        <p class="ref-desc">LMSYS Chatbot Arena（6M+票）とAA Intelligence Indexを統合した複合リーダーボード。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/" target="_blank">Google Blog — Gemini 3.1 Pro</a>
+        <p class="ref-desc">2026年2月19日公式発表。ARC-AGI-2スコア 77.1% を達成。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://support.google.com/gemini/answer/16275805" target="_blank">Google サポート — Gemini プランと利用制限</a>
+        <p class="ref-desc">各プランでの利用可否・回数制限を公式に説明。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://openai.com/index/introducing-gpt-5-3-codex/" target="_blank">OpenAI — Introducing GPT-5.3 Codex</a>
+        <p class="ref-desc">2026年2月5日リリース。GPT-5.2 と Codex スタックを統合し25%高速化。</p>
+      </div>
+      <div class="ref-item">
+        <a href="https://artificialanalysis.ai/methodology/intelligence-benchmarking" target="_blank">Artificial Analysis — Methodology</a>
+        <p class="ref-desc">Intelligence Index の算出方法詳細。各評価の重み・独立検証プロセスを公開。</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Tags -->
+  <div class="article-tags">
+    <span class="article-tag">Journal</span>
+    <span class="article-tag">AI</span>
+    <span class="article-tag">LLM</span>
+    <span class="article-tag">Development</span>
+    <span class="article-tag">2026</span>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Noe Shiftica</div>
+      <p class="footer-tagline">Design the Shift.<br>最新技術と本質の追求で、<br>ビジネスの世界観を転換します。</p>
+    </div>
+    <div class="footer-nav">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="https://noe-shiftica.com/about">About</a></li>
+        <li><a href="https://noe-shiftica.com/#services">Services</a></li>
+        <li><a href="https://noe-shiftica.com/#pricing">Pricing</a></li>
+        <li><a href="https://noe-shiftica.com/blog">Blog</a></li>
+      </ul>
+    </div>
+    <div class="footer-nav">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="https://noe-shiftica.com/privacy">Privacy Policy</a></li>
+        <li><a href="https://noe-shiftica.com/terms">Terms of Service</a></li>
+      </ul>
+      <div style="margin-top:18px;font-size:12px;color:var(--muted);">info@noe-shiftica.com</div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Noe Shiftica &nbsp;·&nbsp; JP / English coming soon</div>
+</footer>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>

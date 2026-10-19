@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>初心者でも作れるAI社員の作り方②——5人チームに拡張する</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.7 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.7em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.85rem;
+  line-height:1.4;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.35rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.08rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.68em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.35em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.82em; line-height:1.65; }
+
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.88em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted);
+  padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+.toc-sub{ margin:0.15rem 0 0.35rem; padding-left:1.1rem; list-style:none; }
+.toc-sub li{ margin:0.1em 0; padding-left:0; }
+.toc-sub li::before{ display:none; }
+.toc-sub a{
+  font-size:0.84rem; color:var(--fg-faint);
+  border-left:2px solid var(--line); padding-left:0.7rem;
+}
+.toc-sub a:hover{ border-left-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>初心者でも作れるAI社員の作り方②——5人チームに拡張する</h1>
+
+<div class="tldr">
+<ul>
+<li>リサーチャー・検証役・統括を追加して、5人チームにする</li>
+<li>品質を決めるのは、実は<strong>検証役</strong>。ここが一番効く</li>
+<li>差し戻しループはプログラムで書くと100%そのとおり動く</li>
+<li>判断する役に賢いモデル、作業する役に速いモデル。コストが数倍変わる</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s0">今回作るもの</a></li>
+      <li><a href="#s1">セットアップ（差分を追加する）</a></li>
+      <li>
+        <a href="#s2">3つの役を追加する</a>
+        <ul class="toc-sub">
+          <li><a href="#s2a">リサーチャー</a></li>
+          <li><a href="#s2b">検証役——ここが品質を決める</a></li>
+          <li><a href="#s2c">統括——差し戻しループ</a></li>
+        </ul>
+      </li>
+      <li><a href="#s3">モデルの使い分けでコストを下げる</a></li>
+      <li><a href="#s4">並列化できる工程、できない工程</a></li>
+      <li><a href="#s5">完成したコード全文</a></li>
+      <li><a href="#s6">実行してみる</a></li>
+      <li><a href="#s7">つまずいたときは</a></li>
+      <li><a href="#s8">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回、デザイナーとコーダーの2人チームを動かしました。<code>agent()</code> という15行の関数だけで、役割分担が成立することを確認しました。</p>
+<p>今回は、そこに3人を追加します。<strong>リサーチャー・検証役・統括</strong>です。</p>
+<p>結論を先に書くと、<strong>いちばん効くのは検証役</strong>です。ここを入れるかどうかで、出来上がるものの質が明確に変わります。</p>
+
+<h2 id="s0">今回作るもの</h2>
+<pre><code>              統括（Pythonの関数）
+                    │
+   ┌────────┬───────┴───────┬────────┐
+   ↓        ↓               ↓        ↓
+リサーチャー×3  デザイナー    コーダー   検証役
+（並列で調査）      ↓            ↓        ↓
+   └────────→  仕様 ────→ 実装 ──→ 検証
+                                    │
+                          FAIL なら差し戻し ↑</code></pre>
+<p>前回との違いは3つです。</p>
+<ol>
+<li>調査が入ることで、仕様の中身が具体的になる</li>
+<li>検証役が実装をチェックし、問題があれば<strong>自動で書き直させる</strong></li>
+<li>調査は3つ同時に走らせるので、時間が短縮される</li>
+</ol>
+
+<h2 id="s1">セットアップ（差分を追加する）</h2>
+<p>前回のプロジェクトをそのまま使います。CLIを使う場合は、次を貼り付けてください。</p>
+<pre><code>既存の ai-team プロジェクトを拡張してください。
+
+## roles.py に追加
+RESEARCHER と REVIEWER という文字列定数を追加する
+- RESEARCHER: リサーチャー。渡されたテーマと観点について、
+  要点を5項目以内の箇条書きで整理する。意見や提案は書かない
+- REVIEWER: QAエンジニア。仕様と実装を照合し、
+  問題なければ1行目に PASS、問題があれば1行目に FAIL と書き、
+  2行目以降に指摘を列挙する。コードは書かない
+
+## main.py を書き換え
+- SMART と FAST という2つのモデル名の定数を用意する
+- research() 関数を追加する
+  - 3つの観点をリストで持ち、ThreadPoolExecutor で並列に
+    RESEARCHER を呼び出す
+  - 結果を結合して返す
+- main() の流れを次のようにする
+  1. research() で調査
+  2. 調査結果を含めて DESIGNER に仕様を作らせる
+  3. CODER に実装させる
+  4. REVIEWER に検証させる
+  5. FAIL なら指摘を添えて CODER に再実装させる（最大3回）
+  6. output/index.html に保存
+- 各工程の進行状況を print で表示する
+
+## 注意
+- agents.py の agent() は model 引数を受け取れるようにする
+- 判断する役には SMART、作業する役には FAST を割り当てる</code></pre>
+<p>手動で作る場合は、この記事の<a href="#s5">コード全文</a>をコピーしてください。</p>
+
+<h2 id="s2">3つの役を追加する</h2>
+
+<h3 id="s2a">リサーチャー</h3>
+<p>まず、調べる役です。</p>
+<pre><code>RESEARCHER = """あなたはリサーチャーです。
+渡されたテーマと観点について、要点を整理してください。
+
+- 箇条書きで、5項目以内にまとめる
+- 一般論ではなく、このテーマに固有の内容を書く
+- 確信が持てないことは「推測」と明記する
+- 意見や提案は書かない。事実と傾向だけを書く"""</code></pre>
+<p>ポイントは最後の行です。<strong>「意見や提案は書かない」と明記しています。</strong></p>
+<p>これを書かないと、リサーチャーが勝手にデザインの提案まで始めます。そうなると次のデザイナーの仕事と重複して、<strong>両方が中途半端になります。</strong> 役割を分ける以上、境界線もはっきり書く必要があります。</p>
+<p>⚠️ <strong>正直に書いておくべき制限があります。</strong> 現段階のリサーチャーは、<strong>実際にWebを検索していません。</strong> AIがもともと知っていることを整理しているだけです。</p>
+<p>本当に調べさせるには「ツールを使わせる」仕組みが必要で、これは次回のテーマです。ただ、今の段階でも仕様の具体性は明確に上がるので、まずはこのまま進めます。</p>
+
+<h3 id="s2b">検証役——ここが品質を決める</h3>
+<p>今回の主役です。</p>
+<pre><code>REVIEWER = """あなたはQAエンジニアです。
+仕様と実装を照らし合わせて検証してください。
+
+【判定ルール】
+- 問題がなければ、1行目に「PASS」とだけ書く
+- 問題があれば、1行目に「FAIL」と書き、
+  2行目以降に指摘を列挙する
+
+【チェック項目】
+- 仕様にあるセクションが、すべて実装されているか
+- 指定された配色が、実際に使われているか
+- スマホ幅（375px）で崩れる箇所がないか
+- HTMLとして構文的に正しいか
+
+指摘は「どこが」「なぜ問題か」をセットで書いてください。
+コードは書かないでください。指摘だけを返してください。"""</code></pre>
+<p>設計上の工夫が2つあります。</p>
+<p><strong>① 1行目を PASS / FAIL に固定する</strong></p>
+<p>これは、あとでプログラムが判定を読み取るためです。「だいたい良さそうですが、いくつか気になる点が…」という自然な文章だと、<strong>プログラム側が合否を判断できません。</strong></p>
+<p>AIに仕事をさせるときは、<strong>人間が読みやすい形より、プログラムが処理しやすい形を優先する</strong>場面があります。ここがその一例です。</p>
+<p><strong>② コードを書かせない</strong></p>
+<p>検証役に修正までさせると、指摘の質が下がります。「直せるから、まあいいか」と甘くなるんです。<strong>見つける仕事と直す仕事は、分けたほうが厳しくなります。</strong></p>
+<p>これは人間のコードレビューでも同じで、実装者本人がレビューすると見落としが増えるのと同じ構造です。</p>
+
+<h3 id="s2c">統括——差し戻しループ</h3>
+<p>統括役は、AIではありません。<strong>Pythonの関数です。</strong></p>
+<pre><code>passed = False
+
+for attempt in range(1, MAX_RETRIES + 1):
+    print(f"④ 検証役がチェック中...（{attempt}回目）")
+    review = agent(REVIEWER, f"【仕様】\n{design}\n\n【実装】\n{html}", model=FAST)
+
+    if review.strip().startswith("PASS"):
+        print("   → 合格")
+        passed = True
+        break
+
+    print("   → 差し戻し")
+    html = extract_code(agent(
+        CODER,
+        f"【仕様】\n{design}\n\n【現在の実装】\n{html}\n\n"
+        f"【指摘事項】\n{review}\n\n"
+        "指摘を修正した、完全なHTMLを出力してください。",
+        model=SMART,
+    ))
+
+if not passed:
+    print(f"   → {MAX_RETRIES}回試しましたが合格しませんでした")</code></pre>
+<p>ここで注目してほしいのが、この行です。</p>
+<pre><code>if review.strip().startswith("PASS"):</code></pre>
+<p><strong>この条件分岐は、100%そのとおりに動きます。</strong> AIの気分で「まあ軽微だから進めていいか」と判断されることは、絶対にありません。</p>
+<p>前のシリーズで、自然言語の指示だけで組んだ場合は「だいたい動くが保証はない」と書きました。<strong>その差が、この1行です。</strong></p>
+<p>もう1つ大事なのが、差し戻すときの指示文です。</p>
+<pre><code>f"【仕様】\n{design}\n\n【現在の実装】\n{html}\n\n【指摘事項】\n{review}"</code></pre>
+<p><strong>仕様・現在の実装・指摘の3点セットを、毎回すべて渡しています。</strong></p>
+<p>コーダーは前回の会話を覚えていません。「さっきの指摘を直して」では通じないので、必要な材料を全部同封する必要があります。前回説明した「机が分かれている」ことの、実践的な帰結です。</p>
+
+<h2 id="s3">モデルの使い分けでコストを下げる</h2>
+<p>5人全員に高性能なモデルを使うと、費用が跳ね上がります。<strong>役割によって、必要な賢さが違います。</strong></p>
+<pre><code>SMART = "gemini-2.5-pro"    # 判断する役
+FAST  = "gemini-2.5-flash"  # 作業する役</code></pre>
+<p>割り当ての考え方はこうです。</p>
+<table>
+<tr><th>役割</th><th>モデル</th><th>理由</th></tr>
+<tr><td>リサーチャー</td><td>FAST</td><td>量をこなす作業。判断は求められない</td></tr>
+<tr><td>デザイナー</td><td><strong>SMART</strong></td><td>ここの判断が、最終的な質を決める</td></tr>
+<tr><td>コーダー</td><td><strong>SMART</strong></td><td>仕様の解釈を誤ると全部やり直しになる</td></tr>
+<tr><td>検証役</td><td>FAST</td><td>照合作業。基準は仕様書に書いてある</td></tr>
+</table>
+<p>原則は<strong>「判断するところに賢いモデル、作業するところに速いモデル」</strong>です。</p>
+<p>特にリサーチャーは3回呼ばれるので、ここをFASTにするだけで効きます。逆にデザイナーは1回しか呼ばれないので、賢いモデルを使ってもコストへの影響は小さい。<strong>呼ばれる回数を考えて配分する</strong>のがコツです。</p>
+<p>💡 費用が気になる場合は、まず全部FASTで試してください。それで十分なことも多く、<strong>不満が出た箇所だけSMARTに上げる</strong>のが無駄がありません。</p>
+
+<h2 id="s4">並列化できる工程、できない工程</h2>
+<p>「役割分担すると速くなる」——これは<strong>条件付きで正しい</strong>話です。</p>
+<p>今回の流れを見てください。</p>
+<pre><code>調査 → 仕様 → 実装 → 検証
+</code></pre>
+<p>これは<strong>鎖</strong>です。調査結果がないと仕様は書けないし、実装がないと検証できません。<strong>どんな仕組みを使っても、順番にしか進みません。</strong></p>
+<p>一方、調査そのものは違います。</p>
+<pre><code>「構成の傾向」を調べる  ┐
+「配色の方向性」を調べる ├─ 互いに独立している
+「来訪者の関心」を調べる ┘</code></pre>
+<p>この3つは、お互いの結果を必要としません。だから<strong>同時に走らせられます。</strong></p>
+<pre><code>from concurrent.futures import ThreadPoolExecutor
+
+
+def research(theme: str) -> str:
+    topics = [
+        "同ジャンルのWebサイトによくある構成",
+        "この雰囲気に合う配色の方向性",
+        "想定される来訪者が知りたい情報",
+    ]
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        results = list(ex.map(
+            lambda t: agent(RESEARCHER, f"テーマ：{theme}\n\n観点：{t}", model=FAST),
+            topics,
+        ))
+    return "\n\n---\n\n".join(results)</code></pre>
+<p><code>ThreadPoolExecutor</code> は、Pythonに標準で入っている並列処理の仕組みです。<strong>追加のインストールは不要</strong>です。</p>
+<p>3つ順番に呼ぶと待ち時間も3倍かかりますが、同時に投げれば<strong>いちばん遅い1つ分の時間で済みます。</strong></p>
+<p>判断基準はシンプルです。</p>
+<table>
+<tr><th>並列化できる</th><th>できない</th></tr>
+<tr><td>複数の観点を同時に調べる</td><td>調査 → 仕様 → 実装 → 検証</td></tr>
+<tr><td>複数ページを同時に作る</td><td>前の出力が次の入力になる工程</td></tr>
+<tr><td>複数案を同時に出す</td><td>承認を挟む手順</td></tr>
+</table>
+<p><strong>「互いの結果を必要としない作業か」</strong>——これだけで判断できます。</p>
+
+<h2 id="s5">完成したコード全文</h2>
+<p><code>roles.py</code> には、前回のDESIGNER・CODERに加えて、上のRESEARCHERとREVIEWERを追加してください。</p>
+<p><code>main.py</code> は全面的に書き換えます。</p>
+<pre><code>import re
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+from agents import agent
+from roles import RESEARCHER, DESIGNER, CODER, REVIEWER
+
+THEME = "海の見える個人経営のカフェ。落ち着いた大人向けの雰囲気"
+MAX_RETRIES = 3
+
+SMART = "gemini-2.5-pro"
+FAST = "gemini-2.5-flash"
+
+
+def extract_code(text: str) -> str:
+    """AIの返答からコードフェンスの中身だけを取り出す"""
+    m = re.search(r"```(?:html)?\s*\n(.*?)```", text, re.DOTALL)
+    return m.group(1).strip() if m else text.strip()
+
+
+def research(theme: str) -> str:
+    """3つの観点を並列で調査する"""
+    topics = [
+        "同ジャンルのWebサイトによくある構成",
+        "この雰囲気に合う配色の方向性",
+        "想定される来訪者が知りたい情報",
+    ]
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        results = list(ex.map(
+            lambda t: agent(RESEARCHER, f"テーマ：{theme}\n\n観点：{t}", model=FAST),
+            topics,
+        ))
+    return "\n\n---\n\n".join(results)
+
+
+def main():
+    Path("output").mkdir(exist_ok=True)
+
+    print("① リサーチャー3名が並列で調査中...")
+    findings = research(THEME)
+    Path("output/research.md").write_text(findings, encoding="utf-8")
+
+    print("② デザイナーが仕様を作成中...")
+    design = agent(
+        DESIGNER,
+        f"テーマ：{THEME}\n\n以下の調査結果を踏まえて仕様を作ってください：\n\n{findings}",
+        model=SMART,
+    )
+    Path("output/design.md").write_text(design, encoding="utf-8")
+
+    print("③ コーダーが実装中...")
+    html = extract_code(agent(
+        CODER, f"以下の仕様を実装してください：\n\n{design}", model=SMART
+    ))
+
+    passed = False
+    for attempt in range(1, MAX_RETRIES + 1):
+        print(f"④ 検証役がチェック中...（{attempt}回目）")
+        review = agent(
+            REVIEWER, f"【仕様】\n{design}\n\n【実装】\n{html}", model=FAST
+        )
+
+        if review.strip().startswith("PASS"):
+            print("   → 合格")
+            passed = True
+            break
+
+        print("   → 差し戻し")
+        Path(f"output/review_{attempt}.md").write_text(review, encoding="utf-8")
+        html = extract_code(agent(
+            CODER,
+            f"【仕様】\n{design}\n\n【現在の実装】\n{html}\n\n"
+            f"【指摘事項】\n{review}\n\n"
+            "指摘を修正した、完全なHTMLを出力してください。",
+            model=SMART,
+        ))
+
+    if not passed:
+        print(f"   → {MAX_RETRIES}回試しましたが合格しませんでした。現状のまま保存します")
+
+    Path("output/index.html").write_text(html, encoding="utf-8")
+    print("完了: output/index.html")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+<p><code>agents.py</code> は前回のままで動きます。<code>model</code> 引数を受け取れる形になっているからです。</p>
+
+<h2 id="s6">実行してみる</h2>
+<pre><code>uv run main.py</code></pre>
+<p>こんな表示が流れれば成功です。</p>
+<pre><code>① リサーチャー3名が並列で調査中...
+② デザイナーが仕様を作成中...
+③ コーダーが実装中...
+④ 検証役がチェック中...（1回目）
+   → 差し戻し
+④ 検証役がチェック中...（2回目）
+   → 合格
+完了: output/index.html</code></pre>
+<p><code>output/</code> フォルダの中身も見てみてください。</p>
+<table>
+<tr><th>ファイル</th><th>中身</th></tr>
+<tr><td><code>research.md</code></td><td>3人のリサーチャーが集めた情報</td></tr>
+<tr><td><code>design.md</code></td><td>デザイナーが書いた仕様</td></tr>
+<tr><td><code>review_1.md</code></td><td>検証役の指摘（差し戻しが発生した場合）</td></tr>
+<tr><td><code>index.html</code></td><td>完成したページ</td></tr>
+</table>
+<p><strong>特に <code>review_1.md</code> を読んでみてください。</strong> 検証役が何を見つけたのかが分かります。ここが、今回いちばん面白い部分です。</p>
+<p>💡 1回目で合格してしまう場合は、検証役のチェック項目を厳しくしてみてください。逆に3回とも落ちる場合は、仕様が曖昧すぎる可能性があります。</p>
+
+<h2 id="s7">つまずいたときは</h2>
+<table>
+<tr><th>症状</th><th>原因と対処</th></tr>
+<tr><td>毎回3回とも FAIL になる</td><td>検証役の基準が厳しすぎるか、仕様が曖昧です。<code>design.md</code> を読んで、具体性が足りているか確認してください</td></tr>
+<tr><td>PASSと書いてあるのに合格しない</td><td>1行目に説明文が混ざっています。役割定義の「1行目に PASS とだけ書く」を強調してください</td></tr>
+<tr><td><code>429 RESOURCE_EXHAUSTED</code></td><td>並列で3回同時に呼ぶため、上限に当たりやすくなります。<code>max_workers=1</code> にすると回避できます</td></tr>
+<tr><td>実行が遅い</td><td>SMARTモデルは応答が遅めです。まず全部FASTで試してください</td></tr>
+<tr><td>差し戻し後に内容が減る</td><td>「完全なHTMLを出力してください」の指示が効いていません。より強く書いてください</td></tr>
+</table>
+
+<h2 id="s8">まとめ</h2>
+<ul>
+<li>役割を増やすときは、<strong>境界線</strong>も一緒に書く（「意見は書かない」など）</li>
+<li>品質を決めるのは検証役。<strong>見つける役と直す役は分ける</strong></li>
+<li>判定は <code>PASS</code> / <code>FAIL</code> のような、プログラムが読める形にする</li>
+<li>差し戻しループをPythonで書けば、<strong>100%そのとおりに動く</strong></li>
+<li>判断する役に賢いモデル、作業する役に速いモデル</li>
+<li>並列化できるのは、<strong>互いの結果を必要としない作業</strong>だけ</li>
+</ul>
+<p>これで5人チームが動くようになりました。ただし、まだ大きな制限が残っています。</p>
+<p><strong>リサーチャーは、実際には何も調べていません。</strong> コーダーはファイルを直接書けませんし、検証役もブラウザで実際の表示を見ているわけではありません。</p>
+<p>次回は、そこに踏み込みます。<strong>AIに「道具」を持たせる</strong>——Web検索、ファイル操作、ブラウザ確認。ここで初めて、素のPythonの限界が見えてきます ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

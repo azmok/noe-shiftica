@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>初心者でも作れるAI社員の作り方③——AIに「道具」を持たせる</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.7 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.7em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.85rem;
+  line-height:1.4;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.35rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.08rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.68em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.35em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.82em; line-height:1.65; }
+
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.88em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted);
+  padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+.toc-sub{ margin:0.15rem 0 0.35rem; padding-left:1.1rem; list-style:none; }
+.toc-sub li{ margin:0.1em 0; padding-left:0; }
+.toc-sub li::before{ display:none; }
+.toc-sub a{
+  font-size:0.84rem; color:var(--fg-faint);
+  border-left:2px solid var(--line); padding-left:0.7rem;
+}
+.toc-sub a:hover{ border-left-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>初心者でも作れるAI社員の作り方③——AIに「道具」を持たせる</h1>
+
+<div class="tldr">
+<ul>
+<li>Web検索は組み込みツールで解決する。数行で本当に調べられるようになる</li>
+<li>自作の道具も、Pythonの関数をそのまま渡すだけで使わせられる</li>
+<li>つまり<strong>道具を1つ持たせるのは、思ったより簡単</strong></li>
+<li>難しいのは道具そのものではなく、増えたときの<strong>管理</strong>のほう</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s0">前回残した宿題</a></li>
+      <li>
+        <a href="#s1">道具を持たせてみる</a>
+        <ul class="toc-sub">
+          <li><a href="#s1a">① Web検索——組み込みで解決する</a></li>
+          <li><a href="#s1b">② ファイル操作——関数をそのまま渡す</a></li>
+          <li><a href="#s1c">③ ブラウザ確認——ここが本当に面倒</a></li>
+        </ul>
+      </li>
+      <li><a href="#s2">裏で何が起きているのか</a></li>
+      <li><a href="#s3">では、限界はどこにあるのか</a></li>
+      <li><a href="#s4">フレームワークを入れるべき条件</a></li>
+      <li><a href="#s5">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回、5人チームを動かしました。ただし正直に書いたとおり、大きな制限が残っています。</p>
+<p><strong>リサーチャーは、実際には何も調べていません。</strong> AIがもともと知っていることを整理しているだけです。</p>
+<p>今回は、そこを解決します。AIに「道具」を持たせる——専門用語では<strong>ツール使用（function calling）</strong>と呼ばれる仕組みです。</p>
+
+<h2 id="s0">前回残した宿題</h2>
+<p>やらせたいことは3つあります。</p>
+<table>
+<tr><th>誰に</th><th>何を</th><th>今の状態</th></tr>
+<tr><td>リサーチャー</td><td>本当にWebを検索する</td><td>知識だけで答えている</td></tr>
+<tr><td>コーダー</td><td>ファイルを自分で書く</td><td>文字列を返すだけ</td></tr>
+<tr><td>検証役</td><td>ブラウザで実際の表示を見る</td><td>コードを読んでいるだけ</td></tr>
+</table>
+<p>先に結論を書くと、<strong>①と②は驚くほど簡単に解決します。</strong> ③だけが、本当に面倒です。</p>
+<p>そして<strong>「じゃあ何が限界なのか」</strong>という問いの答えは、道具そのものではないところにありました。</p>
+
+<h2 id="s1">道具を持たせてみる</h2>
+
+<h3 id="s1a">① Web検索——組み込みで解決する</h3>
+<p>これは自分で実装する必要がありません。<strong>検索機能が最初から用意されています。</strong></p>
+<pre><code>from google import genai
+from google.genai import types
+
+client = genai.Client()
+
+
+def agent_with_search(role: str, task: str, model: str = "gemini-2.5-flash") -> str:
+    res = client.models.generate_content(
+        model=model,
+        contents=task,
+        config=types.GenerateContentConfig(
+            system_instruction=role,
+            tools=[types.Tool(google_search=types.GoogleSearch())],
+        ),
+    )
+    return res.text</code></pre>
+<p><strong>追加したのは <code>tools=</code> の1行だけです。</strong></p>
+<p>これでリサーチャーは、必要だと判断したときに自分で検索し、その結果を踏まえて答えるようになります。検索するかどうかも、何を検索するかも、AIが決めます。</p>
+<p>前回の役割定義も、あわせて更新しておきます。</p>
+<pre><code>RESEARCHER = """あなたはリサーチャーです。
+渡されたテーマと観点について、Webで調べて要点を整理してください。
+
+- 必ず検索してから答える。知識だけで答えない
+- 箇条書きで、5項目以内にまとめる
+- 情報の出どころが分かるものは、それも書く
+- 意見や提案は書かない。事実と傾向だけを書く"""</code></pre>
+<p>「必ず検索してから答える」を明記するのがポイントです。これがないと、AIは「知っているから検索しなくていい」と判断してしまいます。</p>
+<p>⚠️ 検索を使うとトークン消費が増えます。無料枠で回す場合は、リサーチャーの並列数を減らすことも検討してください。</p>
+
+<h3 id="s1b">② ファイル操作——関数をそのまま渡す</h3>
+<p>自分で作った道具を持たせる場合も、拍子抜けするほど簡単です。</p>
+<pre><code>from pathlib import Path
+
+
+def write_file(path: str, content: str) -&gt; str:
+    """ファイルを保存する。
+
+    Args:
+        path: 保存先のパス（例: output/index.html）
+        content: 書き込む内容
+    """
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(content, encoding="utf-8")
+    return f"{path} に保存しました"
+
+
+res = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=f"以下の仕様を実装し、output/index.html に保存してください：\n\n{design}",
+    config=types.GenerateContentConfig(
+        system_instruction=CODER,
+        tools=[write_file],
+    ),
+)</code></pre>
+<p><strong>Pythonの関数を、そのまま <code>tools=</code> に渡すだけです。</strong></p>
+<p>ここで重要なのが<strong>docstring（関数の説明文）</strong>です。AIはこれを読んで「この道具は何ができて、どんな引数が必要か」を理解します。</p>
+<p>つまり——<strong>docstringは、人間へのメモではなく、AIへの説明書になります。</strong> 適当に書くと、AIが道具を正しく使えません。</p>
+<p>この方式の副産物として、前回書いた <code>extract_code()</code> が不要になります。AIが直接ファイルに書き込むので、コードフェンスを取り除く処理が要らなくなるからです。</p>
+
+<h3 id="s1c">③ ブラウザ確認——ここが本当に面倒</h3>
+<p>3つ目だけ、事情が違います。</p>
+<p>検証役に「ブラウザで開いて、実際に崩れていないか見て」とやらせたい。ところがこれには、次のものが必要になります。</p>
+<ul>
+<li>ブラウザを自動操作する仕組み（Playwrightなど）</li>
+<li>ページを開いて、スクリーンショットを撮る処理</li>
+<li>撮った画像をAIに渡す処理（テキストではなく画像なので、渡し方が変わる）</li>
+<li>スマホ幅・PC幅など、複数の条件で撮り直す処理</li>
+</ul>
+<p>1つずつは難しくありません。ただ、<strong>合計するとそれなりの量のコードになります。</strong></p>
+<p>そしてここが分岐点です。<strong>この部分を自分で書くか、すでに用意されているものを使うか。</strong></p>
+<p>実は、Antigravityにはブラウザを操作するエージェントが標準で組み込まれています。実際にChromeでページを開いて確認し、その様子が記録として残ります。<strong>自分で書かずに済む道があるわけです。</strong></p>
+<p>これは次回、実際に組み込んで試します。</p>
+
+<h2 id="s2">裏で何が起きているのか</h2>
+<p>「関数を渡すだけ」と書きましたが、内部では何が起きているのでしょうか。</p>
+<p>実際のやり取りは、こうなっています。</p>
+<pre><code>① プログラム → AI
+   「これが仕事です。あと、使える道具はこれです」
+   （道具の名前・説明・必要な引数の一覧を渡す）
+        ↓
+② AI → プログラム
+   「write_file という道具を、この引数で呼んでください」
+   （AIは道具を実行できない。依頼するだけ）
+        ↓
+③ プログラムが、実際に関数を実行する
+        ↓
+④ プログラム → AI
+   「実行しました。結果はこうです」
+        ↓
+⑤ AIが続きを考える（必要ならまた②に戻る）</code></pre>
+<p><strong>重要なのは②です。AIは道具を実行できません。</strong> 「これを呼んで」と依頼するだけで、実際に動かすのはプログラムの側です。</p>
+<p>これは安全設計でもあります。AIが勝手にファイルを消したりできない構造になっているわけです。<strong>何を実行させるかの最終的な決定権は、常に人間が書いたコードにあります。</strong></p>
+<p>そして先ほどのコードでは、<strong>この②〜⑤のやり取りをSDKが自動でやってくれています。</strong> 関数を渡すだけで済んだのは、そのためです。</p>
+<p>📌 SDKによっては、このやり取りを自分で書く必要があります。その場合はもう少し長いコードになりますが、考え方は同じです。</p>
+
+<h2 id="s3">では、限界はどこにあるのか</h2>
+<p>ここまでで、道具を持たせること自体は難しくないと分かりました。</p>
+<p>では、素のPythonで書き続けると何が起きるのか。<strong>問題は道具そのものではなく、増えたときに現れます。</strong></p>
+<p>今回のチームを、道具つきで完成させると想像してください。</p>
+<pre><code>リサーチャー → 検索ツール
+デザイナー   → （道具なし）
+コーダー     → ファイル書き込み、ファイル読み込み
+検証役       → ブラウザ操作、スクリーンショット、画像解析</code></pre>
+<p>ここで、次のような要求が出てきます。</p>
+<ol>
+<li><strong>誰にどの道具を持たせるか</strong>を管理したい。検証役にファイル書き込みを持たせたくない</li>
+<li>道具の実行が<strong>失敗したとき</strong>、リトライしたい</li>
+<li>AIが道具を<strong>無限に呼び続ける</strong>のを止めたい（実際に起きます）</li>
+<li>どの道具がいつ呼ばれたか<strong>記録</strong>したい</li>
+<li>途中で落ちても<strong>続きから再開</strong>したい</li>
+</ol>
+<p><strong>1つずつは書けます。でも全部書くと、本来の仕事より管理コードのほうが長くなります。</strong></p>
+<p>これが、素のPythonの限界です。<strong>道具が使えないのではなく、道具が増えたときの管理が重くなる</strong>——ここが正確な表現です。</p>
+<p>そしてフレームワークが引き受けてくれるのは、まさにこの部分です。</p>
+
+<h2 id="s4">フレームワークを入れるべき条件</h2>
+<p>判断基準を表にまとめます。</p>
+<table>
+<tr><th>状況</th><th>判断</th></tr>
+<tr><td>順番に処理を流すだけ</td><td>不要。関数を呼ぶだけで足りる</td></tr>
+<tr><td>モデルを差し替えたい</td><td>不要。むしろ素のほうが楽</td></tr>
+<tr><td>独立作業を並列化したい</td><td>不要。標準の <code>ThreadPoolExecutor</code> で十分</td></tr>
+<tr><td>道具を1〜2個持たせたい</td><td>不要。ここまで見たとおり簡単</td></tr>
+<tr><td><strong>役ごとに違う道具を割り当てたい</strong></td><td><strong>検討する価値あり</strong></td></tr>
+<tr><td><strong>失敗時のリトライ・記録が必要</strong></td><td><strong>入れたほうが早い</strong></td></tr>
+<tr><td><strong>途中で落ちても再開したい</strong></td><td><strong>必要</strong></td></tr>
+<tr><td><strong>統括が「誰に振るか」を動的に決める</strong></td><td><strong>必要</strong></td></tr>
+</table>
+<p>境界線はここです。</p>
+<blockquote>
+<p><strong>作りたいものが増えるうちは不要。<br>管理したいことが増えたら、導入を考える。</strong></p>
+</blockquote>
+<p>💡 逆に言えば、<strong>ここまでの3回で作ってきたものは、フレームワークなしで十分だった</strong>ということです。最初からCrewAIやLangGraphを入れていたら、何が起きているのか分からないまま動かしていたはずです。</p>
+
+<h2 id="s5">まとめ</h2>
+<ul>
+<li>Web検索は組み込みツールで解決する。<code>tools=</code> に1行足すだけ</li>
+<li>自作の道具は、Pythonの関数をそのまま渡せる。docstringがAIへの説明書になる</li>
+<li>AIは道具を実行しない。<strong>「呼んで」と依頼するだけ</strong>で、実行するのはプログラム</li>
+<li>ブラウザ操作だけは自前だと重い。既製の仕組みを使う道がある</li>
+<li>限界は道具の数ではなく、<strong>権限・リトライ・記録・再開といった管理</strong>にある</li>
+</ul>
+<p>次回は最終回です。<strong>CrewAIを導入して、素のPythonで書いたものと並べて比較</strong>します。何が消えて、何が増えるのか。</p>
+<p>そしてAntigravityのブラウザ確認を組み込んで、<strong>実際にできたサイトがどの程度のものなのか</strong>を、誇張なしで検証します。うまくいかなかった部分も、そのまま書きます ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

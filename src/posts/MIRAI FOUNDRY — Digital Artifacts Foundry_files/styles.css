@@ -1,0 +1,70 @@
+/* Shared Global Styles */
+
+body {
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background-color: #fcf8f8;
+}
+
+.font-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Typography & Labels */
+
+.text-huge {
+    font-size: 12vw;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-weight: 900;
+}
+
+.label-razor {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 400;
+}
+
+.label-technical {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+}
+
+/* Shadows */
+
+.hard-shadow {
+    box-shadow: 16px 16px 0px #0B0B0B;
+}
+
+.hard-shadow-white {
+    box-shadow: 16px 16px 0px #FFFFFF;
+}
+
+.hard-cut-shadow {
+    box-shadow: 16px 16px 0px 0px #0B0B0B;
+}
+
+/* Scrollbar Utilities */
+
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Form Elements */
+
+input:focus,
+textarea:focus {
+    outline: none;
+}

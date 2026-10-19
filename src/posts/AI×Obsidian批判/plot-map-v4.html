@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>全3シリーズ構成 — Plot Map v4</title>
+<style>
+  :root{
+    --bg:#0d0e12; --panel:#14151a; --panel-elev:#1c1e26;
+    --fg:#e6e7ea; --fg-muted:#9aa0ac; --fg-faint:#6b7280;
+    --line:#2d2f38; --amber:#ffb347; --cyan:#5ec8d8; --pink:#ff5f9e;
+    --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic','Segoe UI',sans-serif;
+    padding:2rem 1rem 4rem; -webkit-text-size-adjust:100%;
+  }
+  .wrap{ max-width:47rem; margin:0 auto; }
+  .eyebrow{ text-align:center; font-size:0.72rem; font-weight:600;
+    letter-spacing:0.12em; color:var(--fg-faint); margin-bottom:0.4rem; }
+  h1{ text-align:center; font-size:1.5rem; font-weight:700; margin:0 0 0.5rem;
+    line-height:1.4; background:var(--grad);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent; }
+  .subtitle{ text-align:center; color:var(--fg-muted); font-size:0.85rem;
+    margin-bottom:1.6rem; line-height:1.7; }
+
+  .core{
+    max-width:40rem; margin:0 auto 1.4rem; padding:1.1rem 1.2rem;
+    background:var(--panel-elev); border:1px solid transparent; border-radius:12px;
+    background: linear-gradient(var(--panel-elev), var(--panel-elev)) padding-box,
+                var(--grad) border-box;
+  }
+  .core-label{
+    display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em;
+    padding:0.18em 0.6em; border-radius:999px;
+    background:var(--grad); color:var(--bg); margin-bottom:0.7rem;
+  }
+  .core h3{ font-size:0.95rem; color:#fff; margin:0.9rem 0 0.4rem; font-weight:600; }
+  .core h3:first-of-type{ margin-top:0; }
+
+  .verb-table{ width:100%; border-collapse:collapse; font-size:0.8rem; margin:0.5rem 0; }
+  .verb-table th, .verb-table td{
+    border:1px solid var(--line); padding:0.45rem 0.6rem; text-align:left; vertical-align:top;
+  }
+  .verb-table th{ background:rgba(255,255,255,0.04); color:#fff; font-weight:600; font-size:0.76rem; }
+  .verb-table .key{ color:#fff; font-weight:600; white-space:nowrap; }
+  .verb-table tr.star td{ background:rgba(255,95,158,0.07); }
+  .verb-table tr.star .key{ color:var(--pink); }
+
+  .note{
+    max-width:40rem; margin:0 auto 2rem; padding:0.95rem 1.15rem;
+    background:var(--panel-elev); border:1px solid var(--line);
+    border-radius:10px; font-size:0.79rem; color:var(--fg-muted); line-height:1.85;
+  }
+  .note b{ color:#fff; font-weight:600; }
+  .note .hl{ color:var(--amber); font-weight:600; }
+
+  .controls{ display:flex; justify-content:center; gap:0.6rem; margin-bottom:1.8rem; }
+  button.ctrl{ display:flex; align-items:center; gap:0.35rem; font-size:0.78rem;
+    font-family:inherit; border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--fg-muted); }
+  button.ctrl.primary{ background:var(--panel-elev); color:var(--fg); }
+  button.ctrl:hover{ opacity:0.85; }
+
+  .series-head{ margin:2.4rem 0 0.5rem; padding-bottom:0.6rem; border-bottom:1px solid var(--line); }
+  .series-head:first-of-type{ margin-top:0; }
+  .series-name{ font-size:1.06rem; font-weight:700; color:#fff; }
+  .series-role{ font-size:0.79rem; color:var(--fg-muted); margin-top:0.3rem; line-height:1.75; }
+
+  .node-row{ display:flex; align-items:flex-start; gap:0.55rem;
+    padding:0.55rem 0.7rem; margin-bottom:0.35rem; border-radius:10px; }
+  .node-row.root{ padding:0.8rem 1rem; background:var(--panel-elev);
+    border:1px solid var(--line); cursor:pointer; }
+  .caret{ margin-top:0.15rem; color:var(--fg-faint); flex-shrink:0; width:18px;
+    display:inline-flex; justify-content:center; transition:transform 0.15s ease;
+    font-size:0.8rem; user-select:none; }
+  .caret.leaf{ margin-top:0.62rem; width:5px; height:5px; border-radius:50%;
+    background:var(--fg-faint); }
+  .caret.open{ transform:rotate(90deg); }
+  .node-title-wrap{ flex:1; min-width:0; }
+  .title-root{ font-size:1rem; font-weight:700; color:#fff; line-height:1.5; }
+  .title-1{ font-size:0.87rem; font-weight:400; color:var(--fg); line-height:1.65; }
+  .node-sub{ font-size:0.77rem; color:var(--fg-muted); margin-top:0.2rem; line-height:1.75; }
+
+  .children{ padding-left:1rem; border-left:1.5px solid var(--line);
+    overflow:hidden; max-height:0; transition:max-height 0.25s ease; margin-left:1.5rem; }
+  .children.open{ max-height:8000px; }
+
+  .tag{ display:inline-block; font-size:0.64rem; font-weight:600;
+    padding:0.1rem 0.42rem; border-radius:4px; margin-right:0.45rem;
+    vertical-align:0.08em; white-space:nowrap; }
+  .tag.new{ color:var(--pink); border:1px solid rgba(255,95,158,0.45); }
+  .tag.fix{ color:var(--amber); border:1px solid rgba(255,179,71,0.45); }
+  .tag.keep{ color:var(--fg-faint); border:1px solid var(--line); }
+  .tag.warn{ color:var(--cyan); border:1px solid rgba(94,200,216,0.45); }
+
+  .footnote{ text-align:center; color:var(--fg-faint); font-size:0.75rem;
+    margin-top:2.4rem; line-height:2; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PLOT MAP v4 — 4分類を背骨に</div>
+    <h1>全3シリーズ構成</h1>
+    <p class="subtitle">データ資産化編 ／ 情報商材批判編 ／ 実装編</p>
+
+    <div class="core">
+      <span class="core-label">シリーズの背骨</span>
+
+      <h3>1.1 用途——4つの動詞</h3>
+      <p style="font-size:0.78rem; color:var(--fg-muted); line-height:1.8; margin:0 0 0.6rem;">
+        <b>束ねる／見つけるの境界線：</b>
+        <span class="hl">答えの形が予測できるか</span>で切る。<br>
+        「要約が返る」と分かっているなら<b>束ねる</b>。何が出るか分からないなら<b>見つける</b>。
+      </p>
+      <table class="verb-table">
+        <tr><th>動詞</th><th>用途</th><th>必要な技術</th></tr>
+        <tr>
+          <td class="key">取り出す</td>
+          <td>リファレンス（QA・参照）</td>
+          <td>索引 ／ 全文検索 ／ RDB ／ <b>Vector</b></td>
+        </tr>
+        <tr>
+          <td class="key">束ねる</td>
+          <td>要約・俯瞰・<b>集計</b><br><small>「7月は技術記事が多かった」</small></td>
+          <td><b>LLM要約</b> ／ クラスタリング ／ RDB集計</td>
+        </tr>
+        <tr class="star">
+          <td class="key">見つける ★</td>
+          <td><b>関係の発見・気づき</b><br><small>「体調が悪い日は記事が短い」</small></td>
+          <td><b>Graph</b> ／ クラスタリング ／ GraphRAG</td>
+        </tr>
+        <tr>
+          <td class="key">作る</td>
+          <td>生成の材料・壁打ち・戦略立案</td>
+          <td><b>RAG</b>（上3つの成果＋LLM生成）</td>
+        </tr>
+      </table>
+      <p style="font-size:0.78rem; color:var(--fg-muted); line-height:1.8; margin:0.6rem 0 0;">
+        ⚠️ <b>「統計分析」は2つに割れる。</b>
+        集計（答えの形が既知）は<b>束ねる</b>、相関の発見（未知）は<b>見つける</b>。
+        1つの枠に入れない。
+      </p>
+
+      <h3>1.2 加工形式——どの動詞に効くか</h3>
+      <table class="verb-table">
+        <tr><th>動詞</th><th>形式</th><th>コスト</th></tr>
+        <tr>
+          <td class="key" rowspan="4" style="vertical-align:middle; text-align:center;">取り出す</td>
+          <td>索引<small>（一行要約の部分は束ねる）</small></td>
+          <td>ほぼゼロ</td>
+        </tr>
+        <tr>
+          <td>全文検索<small>（語を覚えている前提）</small></td>
+          <td>ゼロ</td>
+        </tr>
+        <tr>
+          <td>RDB<small>（集計クエリなら束ねるも）</small></td>
+          <td>低</td>
+        </tr>
+        <tr>
+          <td><b>Vector</b><small>（意味で探せる。発見は限定的）</small></td>
+          <td>中</td>
+        </tr>
+        <tr>
+          <td class="key">束ねる</td>
+          <td><b>要約生成</b></td>
+          <td>低</td>
+        </tr>
+        <tr>
+          <td class="key">束ねる＋<br>見つける</td>
+          <td>クラスタリング<small>（操作は束ねる、結果は見つける）</small></td>
+          <td>中</td>
+        </tr>
+        <tr class="star">
+          <td class="key">見つける</td>
+          <td><b>Graph</b></td>
+          <td>高</td>
+        </tr>
+      </table>
+      <p style="font-size:0.78rem; color:var(--fg-muted); line-height:1.8; margin:0.6rem 0 0;">
+        ⚠️ <b>「作る」に対応する加工形式はない。</b>
+        生成はLLM側の仕事。前3つの成果を生成に繋ぐ仕組みが<b>RAG</b>。<br>
+        ⚠️ <b>技術と動詞は1対1ではない。</b>
+        1つの技術が複数の動詞に効き、1つの動詞に複数の技術が要る。
+      </p>
+
+      <h3>結論の型</h3>
+      <p style="font-size:0.82rem; color:var(--fg-muted); line-height:1.85; margin:0.3rem 0 0;">
+        Obsidianができるのは<b>「取り出す」のキーワード検索だけ</b>。<br>
+        <b>「見つける」に至っては、人間が手で張ったリンクしかない</b>——
+        つまり<span class="hl">すでに知っているものしか出てこない</span>。<br><br>
+        そして<span class="hl">Vectorを入れても「見つける」は解決しない</span>。
+        Graphが要る——これがA3の段階論の根拠になる。
+      </p>
+    </div>
+
+    <div class="note">
+      <b>v3からの変更点</b><br>
+      ① <span class="hl">4つの動詞を、A1〜A3の共通の軸に。</span>用途→技術の対応が一直線になる<br>
+      ② <span class="hl">「見つける」を新設。</span>旧構成は全て「取り出す」系に寄っており、
+      「第二の脳」の核心が抜けていた<br>
+      ③ <span class="hl">加工形式に3つ追加</span>（索引・全文検索・ハイブリッド）。
+      「加工＝DB導入」という誤解を防ぐ<br>
+      ④ <span class="hl">Obsidianの定義を最初に置く。</span>
+      定義 → 用途と照合 → どちらにも最適でない、という順序へ<br>
+      ⑤ <span class="hl">A1を大幅に圧縮。</span>テーマ（2用途への適性）に直接関係しない章を削除し、
+      根拠となる部分だけを照合③・④に吸収<br>
+      ⑥ <span class="hl">「統計分析」を2つに分割。</span>集計は束ねる、相関の発見は見つける。
+      境界線は「答えの形が予測できるか」<br>
+      ⑦ <span class="hl">Vectorの分類を訂正。</span>見つける→<b>取り出す</b>。
+      Vectorは「似ている」までしか出せず、「なぜ関係あるか」は出せない<br>
+      ⑧ <span class="hl">要約の分類を訂正。</span>取り出す→<b>束ねる</b>。要約は圧縮操作であり、取り出していない</div>
+
+    <div class="controls">
+      <button class="ctrl primary" id="expandAll">▾ すべて展開</button>
+      <button class="ctrl" id="collapseAll">▸ すべて閉じる</button>
+    </div>
+
+    <div id="tree"></div>
+
+    <p class="footnote">
+      タイトルをタップすると開閉します<br>
+      <span style="color:var(--pink)">■</span> 新規執筆 ／
+      <span style="color:var(--amber)">■</span> 要修正 ／
+      <span style="color:var(--fg-faint)">■</span> ほぼ流用 ／
+      <span style="color:var(--cyan)">■</span> リスク注記
+    </p>
+  </div>
+
+<script>
+const SERIES = [
+  {
+    name: "シリーズA：データ資産化編（全3本）",
+    role: "「4つの動詞」を軸に、Obsidianを定義 → 用途と照合 → どちらにも最適でない、という順序で組む",
+    items: [
+      {
+        id:"a1", title:"A1：Obsidianとは何か——4つの用途と照合する",
+        sub:"定義してから、用途ごとに適性を判定する",
+        children:[
+          { t:"導入：SNSで見かける「Obsidian×AIで既存の知識を資産化」", tag:"keep" },
+          { t:"第1部：Obsidianとは何か（定義を先に置く）", tag:"fix",
+            note:"①.md特化のノートアプリ ②[[記事名]]で交差テーブルを作れる ③グラフビューで可視化できる ④プラグインが豊富。この4点だけが本体" },
+          { t:"[[リンク]]の正体——交差テーブルへの手動入力", tag:"keep",
+            note:"未経験者向けの説明はそのまま維持（クラス名簿のたとえ）" },
+          { t:"第2部：4つの用途と照合する", tag:"new",
+            note:"取り出す／束ねる／見つける／作る。それぞれにObsidianが応えられるかを1つずつ判定" },
+          { t:"照合①【取り出す】——キーワードのみ。△", tag:"new" },
+          { t:"照合②【束ねる】——機能なし。プラグイン頼み。×", tag:"new" },
+          { t:"照合③【見つける】——手で張ったリンクのみ。×", tag:"new",
+            note:"★最重要。①注意のフィルター（1〜2文）で根拠を示す ②Karpathy氏の事例（3〜4文）で裏付ける。どちらも独立セクションにせず、ここに埋め込む" },
+          { t:"照合④【作る】——テキスト置き場としては機能する。○", tag:"new",
+            note:"旧「公平な検証」を1段落に圧縮して吸収。書き心地・疎結合・同期の3点" },
+          { t:"【本題】既存文書の資産化に向かない4つの理由", tag:"keep",
+            note:"①リンクがゼロ ②生成効果の前提が消える ③4つの壁が初日から ④AI検索はObsidianの外側で動く" },
+          { t:"結論：書く道具と、活かす道具は別レイヤー", tag:"keep" }
+        ]
+      },
+      {
+        id:"a2", title:"A2：4つの用途を支える技術",
+        sub:"Vector・Graph・RAG・GraphRAGをゼロから",
+        children:[
+          { t:"導入：4つの動詞と、対応する技術の地図", tag:"new",
+            note:"最初に対応表を出す。⚠️「技術と動詞は1対1ではない」も明記する" },
+          { t:"【取り出す】Vector——意味を座標に変換する", tag:"fix",
+            note:"★訂正あり。Vectorは「取り出す」の強化であって「見つける」ではない。似ているまでは出せるが、なぜ関係あるかは出せない" },
+          { t:"【見つける】Graph——点と線で関係をたどる", tag:"fix",
+            note:"動詞と紐づける。ここが第二の脳の核心。Vectorでは代替できないことを明示" },
+          { t:"【作る】RAG——答える前に調べる仕組み", tag:"fix",
+            note:"「作る」だけは加工形式で解決できない。前3つの成果を生成に繋ぐ仕組みがRAG、と定義する" },
+          { t:"【束ねる】要約とクラスタリング", tag:"new",
+            note:"新規。要約は圧縮操作＝束ねる。クラスタリングは操作が束ねるで結果が見つける、という二重性も扱う" },
+          { t:"GraphRAG——4つ全部をAIが自動でつなぐ", tag:"fix" },
+          { t:"どこにコストがかかるのか（AIとプログラムの分担表）", tag:"keep" },
+          { t:"⚠️ Graphは万能ではない", tag:"warn",
+            note:"精度80%対51%、3.4倍向上の一方、単純な問い合わせでは純RAGに13〜17%劣る" }
+        ]
+      },
+      {
+        id:"a3", title:"A3：個人のための2026年最適解",
+        sub:"用途と蓄積量から、必要な加工形式を選ぶ",
+        children:[
+          { t:"判断は2軸——「どの動詞が必要か」×「蓄積量」", tag:"fix",
+            note:"旧版は蓄積量のみ。用途の軸を足すと『取り出すだけなら索引で十分』が言える" },
+          { t:"加工形式の階段（動詞つき）", tag:"new",
+            note:"索引・全文検索・RDB・Vector＝取り出す／要約＝束ねる／Graph＝見つける。★段階が上がるほど新しい動詞が解禁される、という構造" },
+          { t:"★Vectorを入れても「見つける」は解決しない", tag:"new",
+            note:"第2段階（Vector）と第3段階（Graph）を分ける根拠。用途の軸からも裏付けられる" },
+          { t:"第1段階：索引の仕組みを作る（設定は数行）", tag:"keep" },
+          { t:"【チャット利用】索引は不要——プロジェクト機能に内蔵", tag:"keep",
+            note:"Gemini 10件／ChatGPT 20件／Claude容量制。上限が先に来る" },
+          { t:"【ターミナル利用】索引システムのセットアップ手順", tag:"keep" },
+          { t:"Karpathy方式の実装（raw/ wiki/ agents.md）", tag:"keep" },
+          { t:"文字数とファイル数の目安", tag:"keep",
+            note:"基準は総量ではなくファイル数。約200件で索引が限界" },
+          { t:"Lost in the Middle——収まることと読まれることは別問題", tag:"keep" },
+          { t:"⚠️ 導入の現実——大半が失敗する", tag:"new",
+            note:"ナレッジグラフを試験段階の先に進めた企業は15%未満、67%が放棄。段階を踏む根拠として使う" },
+          { t:"純正GraphRAGは個人には過剰（コストの実数字）", tag:"keep" },
+          { t:"「テキストだから永続する」という懸念への回答", tag:"new",
+            note:"A1から移設。SQLiteは米国議会図書館の推奨形式・2050年サポート宣言。DB選択の文脈でこそ効く" },
+          { t:"実装の落とし穴3つ", tag:"keep" },
+          { t:"実装プロンプト（個人スケール版）", tag:"keep" },
+          { t:"全体像——軸が2本ある（検索精度／自動化）", tag:"keep",
+            note:"フレームワークは検索精度の続きではない、という注意" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "シリーズB：情報商材批判編（全3本）",
+    role: "「AI社員」＝2つ目の用途。標準機能との照合で、有料である必然性を検証する",
+    items: [
+      {
+        id:"b1", title:"B1：「AI社員」の正体——それ、全部標準機能です",
+        sub:"CLI標準機能との照合",
+        children:[
+          { t:"実体＝CLAUDE.md ＋ .claude/agents/ の .mdファイル", tag:"keep" },
+          { t:"Anthropicが公開している7つの指示手法", tag:"keep",
+            note:"商材が触れているのは2つだけ" },
+          { t:"Auto Memory・100万トークンも標準搭載", tag:"keep" },
+          { t:"「作業机」とは何か／「親」とは誰か", tag:"keep",
+            note:"追記済み。役柄の切り替えと机の分離の違いを図で対比" },
+          { t:"⚠️ ただし委譲指示がないと発火しない", tag:"warn" },
+          { t:"3社比較——業界標準であることの証明", tag:"keep" }
+        ]
+      },
+      {
+        id:"b2", title:"B2：【実演】20行のPythonで再現する",
+        sub:"商材の中身が何であるかの物証",
+        children:[
+          { t:"準備編（Antigravity IDE ／ 各社CLI ／ APIキー）", tag:"keep" },
+          { t:"プロンプト1つで環境が揃う", tag:"keep" },
+          { t:"コード解説：役割の正体は、ただの日本語の文章", tag:"keep" },
+          { t:"なぜ机が分かれるのか——APIはステートレス", tag:"keep" },
+          { t:"正直な補足：これは実用品ではない", tag:"keep",
+            note:"記憶も持たず、繰り返しても賢くならない。目的は「中身の確認」" }
+        ]
+      },
+      {
+        id:"b3", title:"B3：無料で手に入るものの全体像",
+        sub:"判断材料をすべて開示する",
+        children:[
+          { t:"見分け方——5つのチェックポイント", tag:"keep" },
+          { t:"裏技：特定商取引法を1分で確認する", tag:"keep" },
+          { t:"正直に書きます：無料の日本語記事は充実している", tag:"keep" },
+          { t:"では、この記事の差別化はどこか（比較表）", tag:"keep" },
+          { t:"OSS上位互換の存在——Hermes・OpenClaw", tag:"keep" },
+          { t:"世界を3層に分けると構造が見える", tag:"keep" },
+          { t:"それでも有料に価値がある場合", tag:"keep" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "シリーズC：実装編（全4本）",
+    role: "「使い倒す → 限界を測る → その先」。既存構成をそのまま使用",
+    items: [
+      {
+        id:"c1", title:"C1：標準機能を使い倒す——7つの指示手法",
+        sub:"違いは「いつ読み込まれるか」",
+        children:[
+          { t:"なぜ標準機能から始めるのか", tag:"keep" },
+          { t:"7つの全体像（常に／呼ばれたとき／読まれない／別の場所）", tag:"keep" },
+          { t:"Hooks——お願いではなく仕組みで強制する", tag:"keep" },
+          { t:"3つの問いで振り分ける判断フロー", tag:"keep" },
+          { t:"テーブルをB1と同じ形式に統一", tag:"fix",
+            note:"No.列・カテゴリ列・横スクロール対応。読者体験の一貫性" }
+        ]
+      },
+      {
+        id:"c2", title:"C2：記憶の設計——何を、どこに置くか",
+        sub:"3層の記憶を使い分ける",
+        children:[
+          { t:"記憶は3層（指示書／自動記憶／会話ログ）", tag:"keep" },
+          { t:"全ログは毎回読まれていない、という事実", tag:"keep" },
+          { t:"--resume と --continue の違い", tag:"keep" },
+          { t:"残すべきは判断・好み・失敗の3種類だけ", tag:"keep" },
+          { t:"量が増えたら目次方式へ", tag:"keep" }
+        ]
+      },
+      {
+        id:"c3", title:"C3：限界を測る",
+        sub:"★実測が入る。他の記事が持っていない一次情報",
+        children:[
+          { t:"委譲が発火する条件を確かめる", tag:"new" },
+          { t:"並列できる作業／できない作業の見極め", tag:"new" },
+          { t:"コストの実測方法", tag:"new" },
+          { t:"⚠️ 役割ごとの独立記憶は、標準では作れない", tag:"warn" },
+          { t:"実測結果——実際に動かして分かったこと", tag:"new",
+            note:"★ここが未着手。実機検証の結果を入れる" }
+        ]
+      },
+      {
+        id:"c4", title:"C4：その先——組み合わせるという発想",
+        sub:"1つ選ぶのではなく、並列配置する",
+        children:[
+          { t:"標準機能で足りないのは2つだけ", tag:"keep",
+            note:"スキルの自己生成／役割ごとの独立記憶" },
+          { t:"Hermes——記憶とスキルが育つ", tag:"keep" },
+          { t:"⚠️ ただしサブエージェント同士は会話できない", tag:"warn" },
+          { t:"OpenClaw——協働が必要なら", tag:"keep" },
+          { t:"実務の答えは「並べて使う」", tag:"keep" },
+          { t:"⚠️ 3つのリスク（規約・インジェクション・暴走）", tag:"warn" },
+          { t:"段階的な進め方＋シリーズ全体のまとめ", tag:"keep" }
+        ]
+      }
+    ]
+  }
+];
+
+const TAGLABEL = { new:"新規", fix:"修正", keep:"流用", warn:"注意" };
+const openSet = new Set(["a1","a2"]);
+
+function renderChild(c){
+  const tag = c.tag ? `<span class="tag ${c.tag}">${TAGLABEL[c.tag]}</span>` : "";
+  const note = c.note ? `<div class="node-sub">${c.note}</div>` : "";
+  return `<div class="node-row">
+    <span class="caret leaf"></span>
+    <div class="node-title-wrap">
+      <span class="title-1">${tag}${c.t}</span>
+      ${note}
+    </div>
+  </div>`;
+}
+
+function renderItem(item){
+  const isOpen = openSet.has(item.id);
+  return `<div>
+    <div class="node-row root" data-toggle="${item.id}">
+      <span class="caret ${isOpen?"open":""}">▸</span>
+      <div class="node-title-wrap">
+        <span class="title-root">${item.title}</span>
+        <div class="node-sub">${item.sub}</div>
+      </div>
+    </div>
+    <div class="children ${isOpen?"open":""}">
+      ${item.children.map(renderChild).join("")}
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("tree").innerHTML = SERIES.map(s => `
+    <div class="series-head">
+      <div class="series-name">${s.name}</div>
+      <div class="series-role">${s.role}</div>
+    </div>
+    ${s.items.map(renderItem).join("")}
+  `).join("");
+
+  document.querySelectorAll("[data-toggle]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const id = el.getAttribute("data-toggle");
+      openSet.has(id) ? openSet.delete(id) : openSet.add(id);
+      render();
+    });
+  });
+}
+
+const ALL = SERIES.flatMap(s=>s.items.map(i=>i.id));
+document.getElementById("expandAll").addEventListener("click",()=>{
+  ALL.forEach(i=>openSet.add(i)); render();
+});
+document.getElementById("collapseAll").addEventListener("click",()=>{
+  openSet.clear(); render();
+});
+
+render();
+</script>
+</body>
+</html>

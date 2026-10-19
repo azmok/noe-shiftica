@@ -1,0 +1,40 @@
+├── 2026LLM ランキング
+│   ├── llm_ranking_2026_graph.html
+│   └── llm-ranking-2026.html
+├── ai-strategic-entrepreneurship-2026.md
+├── ai-timeline-v3-zoom-v2.html
+├── ai-timeline-v3.html
+├── Cloud-terms-Visual.html
+├── llm-ranking-2026.html
+├── screenshot-tool
+│   ├── .gitignore
+│   ├── .python-version
+│   ├── .venv
+│   │   ├── .gitignore
+│   │   ├── .lock
+│   │   ├── CACHEDIR.TAG
+│   │   ├── include
+│   │   │   └── site
+│   │   ├── Lib
+│   │   │   └── site-packages
+│   │   ├── pyvenv.cfg
+│   │   └── Scripts
+│   │       ├── activate
+│   │       ├── activate_this.py
+│   │       ├── activate.bat
+│   │       ├── activate.csh
+│   │       ├── activate.fish
+│   │       ├── activate.nu
+│   │       ├── activate.ps1
+│   │       ├── deactivate.bat
+│   │       ├── playwright.exe
+│   │       ├── pydoc.bat
+│   │       ├── python.exe
+│   │       └── pythonw.exe
+│   ├── main.py
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── pyproject.toml
+│   ├── README.md
+│   └── uv.lock
+└── vs-freelance.html

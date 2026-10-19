@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>その先——組み合わせるという発想</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff; }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>その先——組み合わせるという発想</h1>
+
+<div class="tldr">
+<ul>
+<li>標準機能で足りない部分は、大きく2つだけです</li>
+<li>それを埋めるOSSは存在し、しかも無料です</li>
+<li>ただし<strong>1つを選ぶのではなく、並べて使うのが実務の答え</strong>です</li>
+<li>導入前に知っておくべきリスクが3つあります</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">標準機能で足りないのは、2つだけ</a></li>
+      <li><a href="#s2">Hermes——記憶とスキルが育つ</a></li>
+      <li><a href="#s3">ただし「会社」にはならない</a></li>
+      <li><a href="#s4">OpenClaw——協働が必要なら</a></li>
+      <li><a href="#s5">実務の答えは「並べて使う」</a></li>
+      <li><a href="#s6">導入前に知っておくべき3つのリスク</a></li>
+      <li><a href="#s7">段階的な進め方</a></li>
+      <li><a href="#s8">シリーズ全体のまとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>ここまで、標準機能を使い倒す方法を見てきました。</p>
+<p>指示の手法は7つ。記憶は3層。<strong>多くの人が「AI社員」として求めているものは、この範囲で足ります。</strong></p>
+<p>では、足りない部分は何なのか。そして、それを埋める手段はあるのか。<strong>最終回は、その先の話です。</strong></p>
+
+<h2 id="s1">標準機能で足りないのは、2つだけ</h2>
+
+<p>結論から書きます。<strong>標準機能で実現できないのは、次の2つです。</strong></p>
+
+<table>
+<tr><th>足りないもの</th><th>どういうことか</th></tr>
+<tr><td><strong>スキルの自己生成</strong></td><td>作業を終えるたびに、AIが自分で手順を書き出して蓄積する</td></tr>
+<tr><td><strong>役割ごとの独立した記憶</strong></td><td>デザイナーはデザインの記憶だけ、コーダーはコードの記憶だけを持つ</td></tr>
+</table>
+
+<p>逆に言えば、<strong>これ以外は標準機能で足ります。</strong></p>
+<p>ここは正直に書いておきたいところです。<strong>少し前まで、記憶を持つこと自体がOSSの優位性でした。</strong> ですが自動記憶が標準搭載されたことで、その差はほぼ消えました。</p>
+<p>💡 <strong>だから最初に「使い倒す」を置いたんです。</strong> 標準機能を知らないまま外部ツールを入れると、すでに持っているものを二重に導入することになります。</p>
+
+<h2 id="s2">Hermes——記憶とスキルが育つ</h2>
+
+<p>その2つを埋めるOSSとして、最も注目されているのが<strong>Hermes Agent</strong>です。</p>
+<p>2026年2月に公開され、<strong>3か月でGitHubのスターが14万を超えました。</strong> 2026年5月時点の集計では、世界最多の利用量を記録しています。</p>
+
+<h3>できること</h3>
+
+<table>
+<tr><th>機能</th><th>内容</th></tr>
+<tr><td>役割ごとの独立</td><td>役割ごとに設定・人格・記憶・定期実行を個別に持てる</td></tr>
+<tr><td>永続的な記憶</td><td>データベースに保存され、セッションを跨いで残る</td></tr>
+<tr><td><strong>スキルの自己生成</strong></td><td><strong>複雑な作業を終えると、再利用可能な手順を自分で書き出す</strong></td></tr>
+<tr><td>定期実行</td><td>「毎朝8時に日報を送って」のように自然文で登録できる</td></tr>
+<tr><td>配信先</td><td>メール、チャットツールなど20以上に対応</td></tr>
+</table>
+
+<p><strong>3行目が本体です。</strong> 使えば使うほどスキルが蓄積され、同じ種類の作業が速くなります。報告されている数字では、<strong>20以上のスキルが溜まった段階で、同種のタスクが40%高速化</strong>したとされています。</p>
+<p>「使うほど賢くなる」——まさに商材が謳っていた内容が、無料で実装されています。</p>
+
+<h3>記憶の実装が、実は保守的</h3>
+
+<p>面白いのはここです。<strong>Hermesの記憶は、Vector検索を使っていません。</strong></p>
+<p>データベースと全文検索の組み合わせ——つまり<strong>キーワード検索</strong>です。</p>
+<p>これは、データ資産化のシリーズで書いた結論とまったく同じです。<strong>「個人規模ならキーワード検索で十分。意味検索は数千件を超えてから」</strong>——世界で最も使われているエージェントも、同じ判断をしています。</p>
+<p>📌 必要になれば、記憶の仕組みは差し替えられる設計になっています。<strong>最初は軽く、必要になったら拡張する</strong>という思想が一貫しています。</p>
+
+<h2 id="s3">ただし「会社」にはならない</h2>
+
+<p>ここは、期待しすぎないために書いておきます。</p>
+<p><strong>Hermesのサブエージェント同士は、会話できません。</strong></p>
+
+<pre><code>親が仕事を振る
+  ↓
+サブエージェントが作業する
+  ↓
+報告して、消える
+  ↓
+別のサブエージェントとは、一度も口をきかない</code></pre>
+
+<p>比較記事の評価が的確でした。</p>
+<blockquote>
+<p>OpenClawは「会社」のように感じられた。<br>
+<strong>Hermesは「1人の運用者と、その場限りの外注先」</strong>のように感じられた</p>
+</blockquote>
+
+<p>つまりHermesは<strong>「1人の賢い相棒が育つ」ツール</strong>であって、<strong>「組織を作る」ツールではありません。</strong></p>
+<p>ここを勘違いすると、期待と実物がずれます。</p>
+
+<h2 id="s4">OpenClaw——協働が必要なら</h2>
+
+<p>「エージェント同士が連携する組織を作りたい」——そこまで求めるなら、選択肢は変わります。</p>
+<p><strong>OpenClaw</strong>はスターが35万を超える、さらに規模の大きいプロジェクトです。</p>
+<p>特徴は<strong>永続的なエージェントチーム</strong>。エージェント同士が通信し、状態を保持し、セッションを跨いで協働できます。</p>
+<p>⚠️ ただし<strong>セキュリティ上の指摘が複数出ています。</strong> 2026年3月には、わずか4日間で9件の脆弱性が公開されました。うち1件は最高レベルに近い深刻度です。</p>
+<p>対照的に、Hermesは同時期にエージェント固有の脆弱性がゼロでした。<strong>プロンプトインジェクション（外部の文章に悪意ある指示を仕込む攻撃）の検出機能を標準搭載している</strong>ためとされています。</p>
+<p><strong>「機能が多い＝良い」ではありません。</strong> 何を優先するかの問題です。</p>
+
+<h2 id="s5">実務の答えは「並べて使う」</h2>
+
+<p>ここまで3つのツールを見てきました。<strong>では、どれを選ぶべきか。</strong></p>
+<p>実務での答えは、意外なものでした。</p>
+<blockquote>
+<p><strong>1つを選ぶのではなく、役割ごとに並べて使う。</strong></p>
+</blockquote>
+
+<table>
+<tr><th>ツール</th><th>向いている役割</th></tr>
+<tr><td>Claude Code / Codex</td><td><strong>コードを書く。</strong>手元での開発作業</td></tr>
+<tr><td>Hermes</td><td><strong>常駐して育つ。</strong>24時間動く自動化と記憶の蓄積</td></tr>
+<tr><td>OpenClaw</td><td><strong>承認と監査。</strong>人の確認を挟む業務フロー</td></tr>
+</table>
+
+<p>実際に提案されている構成はこうです。</p>
+
+<pre><code>手元のパソコン → Claude Code（コーディング）
+常時稼働のサーバー → Hermes（受け口・記憶の蓄積）
+別のサーバー → OpenClaw（承認が必要な業務）</code></pre>
+
+<p><strong>上下関係ではなく、役割別の配置です。</strong> そのうえで、相互に呼び出せます。</p>
+<p>実例として挙がっている流れがこれです。<strong>Hermesがチャットでタスクを受信 → コーディング作業をClaude Codeに委譲 → 結果を別の層に戻す → やり取りをHermesの学習に記録。</strong></p>
+<p>💡 <strong>ここが重要な視点の転換です。</strong> 「どれが一番いいか」ではなく「どこに何を置くか」。<strong>層が違うものを比べても、答えは出ません。</strong></p>
+
+<h2 id="s6">導入前に知っておくべき3つのリスク</h2>
+
+<p>無料だからといって、コストがゼロなわけではありません。</p>
+
+<h3>リスク① 規約違反の可能性</h3>
+
+<p>⚠️ <strong>これが最も重要です。</strong></p>
+<p>「月額プランの認証を使い回して、API料金を節約する」という機能や手法が紹介されていることがあります。<strong>これは各社が規約で禁止しています。</strong></p>
+<p>実際に、対象ツールの利用者が<strong>予告なくブロックされた事例</strong>も報告されています。しかも関連する他のサービスまで巻き込まれ、料金は請求され続けた、というケースまであります。</p>
+<blockquote>
+<p><strong>機能として存在することと、使っていいことは別です。</strong><br>
+必ず正規のAPIキーで動かしてください。</p>
+</blockquote>
+
+<h3>リスク② プロンプトインジェクション</h3>
+
+<p>外部のWebページやメールに、<strong>悪意ある指示を仕込む攻撃</strong>です。</p>
+
+<pre><code>エージェントが外部の文章を読む（攻撃者が内容を仕込める）
+        ＋
+エージェントがファイル操作やメール送信の権限を持つ
+        ↓
+「この内容を◯◯に送信せよ」という埋め込み指示に
+従ってしまう可能性</code></pre>
+
+<p><strong>自動化するほど、この危険は上がります。</strong> 人が見ていないからです。</p>
+<p>💡 <strong>対策</strong>：読み取り専用から始める。送信先を自分だけに固定する。アクセスできる範囲を広げない。業務で使うなら<strong>専用のアカウントを用意して、必要最小限だけ共有する</strong>のが安全です。</p>
+
+<h3>リスク③ 暴走とコスト</h3>
+
+<p>実際に報告されている例です。<strong>自動化の初回、47分間動き続けて、誰も頼んでいない作業に18ドルを消費した</strong>——というものがあります。</p>
+<p>💡 <strong>対策</strong>：試行回数の上限を設ける。触れる範囲を絞る。<strong>まず調査だけさせて、実行は人の承認を挟む</strong>形にする。</p>
+
+<h3>おまけ：データの扱い</h3>
+
+<p>📌 Hermesは実務ツールであると同時に、<strong>開発元にとって次のAIモデルを鍛えるための実験場でもある</strong>と公式に明記されています。</p>
+<p>個人の実験なら問題ありませんが、<strong>業務データを扱うなら確認が必要な点</strong>です。</p>
+
+<h2 id="s7">段階的な進め方</h2>
+
+<p>いきなり全部を目指さないでください。<strong>各段階で必ず動作を確認しながら進めます。</strong></p>
+
+<pre><code>STEP 1：標準機能を使い倒す
+  指示書・Skills・Hooks・サブエージェント・記憶
+  → ここで足りるなら、以降は不要
+
+STEP 2：足りない点を特定する
+  「スキルが育たない」「役割ごとに記憶を分けたい」
+  → 具体的に言語化できてから次へ
+
+STEP 3：1つだけ導入する
+  いきなり全部繋がない。まず1つ
+
+STEP 4：定期実行を付ける
+  最初は週1など低頻度で。ログを必ず残す
+
+STEP 5：外部サービスと繋ぐ
+  読み取り専用から。送信は最後</code></pre>
+
+<p>⚠️ <strong>自動化の失敗は、静かに起きます。</strong> 動いているつもりで何もしていない状態に気づけないことがあるので、<strong>ログの確認は必ず習慣にしてください。</strong></p>
+
+<h2 id="s8">シリーズ全体のまとめ</h2>
+
+<p>3つのシリーズを通して書いてきたことを、最後に圧縮します。</p>
+
+<h3>データ資産化について</h3>
+<ul>
+<li>書く道具と、溜めたものを活かす道具は<strong>別レイヤー</strong></li>
+<li>判断基準は<strong>蓄積量だけ</strong>。数百件までは何もしなくていい</li>
+<li>最も高機能な選択肢が、最も適切であることは<strong>まずない</strong></li>
+</ul>
+
+<h3>「AI社員」について</h3>
+<ul>
+<li>実体は<strong>指示書ファイルと役割ファイル</strong>。標準機能である</li>
+<li>技術要素で<strong>有料のものは1つもない</strong></li>
+<li>無料で正確な解説も、<strong>上位互換のOSSも、すでに存在する</strong></li>
+</ul>
+
+<h3>実装について</h3>
+<ul>
+<li>指示手法は7つ。違いは<strong>「いつ読み込まれるか」</strong></li>
+<li>記憶は3層。<strong>全ログは毎回読まれていない</strong></li>
+<li>標準機能で足りないのは<strong>2つだけ</strong></li>
+<li>そして、<strong>1つを選ぶのではなく並べて使う</strong></li>
+</ul>
+
+<p>最後に、シリーズ全体で最も伝えたかったことを書きます。</p>
+<blockquote>
+<p><strong>「知らない」まま買うのと、「知っているが、時間を買う」ために買うのとでは、まったく違う買い物になります。</strong></p>
+</blockquote>
+
+<p>講座やコンサルに価値がないとは言いません。自分の業務への翻訳や、学習時間の短縮に払う価値は正当にあります。</p>
+<p>ただ、それは<strong>中身を知ったうえで判断すべきこと</strong>です。</p>
+<p>このシリーズが、その判断材料になっていれば嬉しいです ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

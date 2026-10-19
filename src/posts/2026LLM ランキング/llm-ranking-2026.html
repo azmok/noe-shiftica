@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年版 LLM Pop7 ランキング ― 開発者が今すぐ知るべきAIモデルの実力比較 | Noe Shiftica</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: rgba(255,255,255,0.07);
+    --text: #e2e2ea;
+    --muted: #7a7a8c;
+    --accent: #c8b8ff;
+    --accent-dim: rgba(200,184,255,0.12);
+    --gold: #f0c84a;
+    --teal: #4affd4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--text);
+    text-decoration: none;
+    opacity: 0.85;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── Layout ── */
+  .page-wrap {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 80px 32px 120px;
+  }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 48px;
+  }
+  .breadcrumb a { color: var(--muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--text); }
+  .breadcrumb span { margin: 0 8px; opacity: 0.4; }
+
+  /* ── Article Header ── */
+  .article-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .article-sub {
+    font-size: 16px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Body text ── */
+  p {
+    color: #c8c8d8;
+    margin-bottom: 28px;
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  em {
+    color: var(--muted);
+  }
+
+  /* ── Headings ── */
+  h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 60px 0 20px;
+    padding-top: 12px;
+  }
+
+  h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 40px 0 14px;
+  }
+
+  /* ── Data badge ── */
+  .data-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(200,184,255,0.2);
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .data-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+  }
+
+  /* ── Ranking embed ── */
+  .ranking-embed-wrap {
+    margin: 48px -20px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: #0d0d18;
+  }
+
+  .ranking-embed-label {
+    padding: 14px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .embed-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .ranking-embed-wrap iframe {
+    width: 100%;
+    height: 100vh;
+    border: none;
+    display: block;
+  }
+
+  /* ── Model use case table ── */
+  .usecase-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 32px 0 48px;
+  }
+
+  .usecase-row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .usecase-row:first-child { border-radius: 10px 10px 0 0; }
+  .usecase-row:last-child { border-radius: 0 0 10px 10px; }
+
+  .usecase-model {
+    background: #111118;
+    padding: 14px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .usecase-maker {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .usecase-desc {
+    background: #0d0d16;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: #b8b8cc;
+    line-height: 1.6;
+  }
+
+  /* ── Cost table ── */
+  .cost-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0 48px;
+    font-size: 13px;
+  }
+
+  .cost-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: #0d0d16;
+  }
+
+  .cost-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #b8b8cc;
+    vertical-align: top;
+  }
+
+  .cost-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .cost-table .model-cell {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+
+  .tier-free { color: var(--teal); font-weight: 600; }
+  .tier-mid { color: var(--gold); font-weight: 600; }
+  .tier-high { color: #ff9a9a; font-weight: 600; }
+
+  /* ── Pull quote ── */
+  .pull-quote {
+    margin: 56px 0;
+    padding: 32px 36px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-dim);
+    border-radius: 0 10px 10px 0;
+  }
+
+  .pull-quote p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.75;
+    color: #ddd8f8;
+    margin: 0;
+    font-style: italic;
+  }
+
+  /* ── Insight box ── */
+  .insight-box {
+    background: rgba(74,255,212,0.05);
+    border: 1px solid rgba(74,255,212,0.15);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 40px 0;
+  }
+
+  .insight-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .insight-box p {
+    font-size: 14px;
+    color: #b8d8d0;
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* ── Tags ── */
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 64px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 60px 40px 40px;
+    margin-top: 80px;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+  }
+
+  .footer-brand {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .footer-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .footer-nav h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .footer-nav ul { list-style: none; }
+  .footer-nav li { margin-bottom: 10px; }
+  .footer-nav a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-nav a:hover { color: var(--text); }
+
+  .footer-bottom {
+    max-width: 1100px;
+    margin: 40px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 680px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .page-wrap { padding: 48px 20px 80px; }
+    .ranking-embed-wrap { margin: 40px 0; }
+    .ranking-embed-wrap iframe { height: 1000px; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .usecase-row { grid-template-columns: 1fr; }
+    .usecase-model { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+	
+
+<div class="page-wrap">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="https://noe-shiftica.com/">Home</a>
+    <span>/</span>
+    <a href="https://noe-shiftica.com/blog">Blog</a>
+    <span>/</span>
+    2026年版 LLM ランキング
+  </div>
+
+  <!-- Header -->
+  <div class="article-meta">Journal &nbsp;·&nbsp; 2026年3月11日</div>
+
+  <h1>2026年、本当に使えるAIはどれか。<br>LLM Pop7 ランキング</h1>
+
+  <p class="article-sub">
+    ベンチマークとEloレーティングをもとに、開発・ビジネス用途別で整理した独自分析。<br>
+    「なんとなく話題のAI」ではなく、データが示す実力を比べた。
+  </p>
+
+  <!-- Data badge -->
+  <div class="data-badge">
+    <span class="data-badge-dot"></span>
+    Artificial Analysis Intelligence Index v4.0
+    <span style="opacity:0.3">|</span>
+    Arena.ai Text Elo&nbsp; 5,440,800 票
+    <span style="opacity:0.3">|</span>
+    Arena.ai Code Elo&nbsp; 184,734 票
+    <span style="opacity:0.3">|</span>
+    2026年3月時点
+  </div>
+
+  <!-- Intro -->
+  <p>
+    AIツールの話題は尽きない。毎月のように「最強モデル」が登場し、気づけば何が本当に優れているのかわからなくなっている。そういう状況が続いています。
+  </p>
+
+  <p>
+    Noe Shiftica では、実際の開発・制作業務でAIを日常的に使っています。その経験と、複数の独立系ベンチマーク機関のデータを組み合わせて、<strong>2026年3月時点の「本当に使えるLLM」を独自にまとめました。</strong>
+  </p>
+
+  <p>
+    ランキングの指標は3つ。<em>総合知性スコア（AA Intelligence Index）</em>、<em>コーディング性能（Arena.ai Code Elo）</em>、そして<em>レイテンシ（応答速度）</em>です。どれも一社のPRではなく、複数組織が独立して計測したデータです。
+  </p>
+
+  <!-- Ranking embed -->
+  <div class="ranking-embed-wrap">
+    <div class="ranking-embed-label">
+      <span class="embed-dot"></span>
+      LLM Pop7 Ranking 2026 — Interactive
+    </div>
+    <iframe src="llm_ranking_2026_graph.html" title="LLM Pop7 Ranking 2026"></iframe>
+  </div>
+
+  <p style="font-size:13px;color:var(--muted);margin-top:-24px;margin-bottom:48px;">
+    ※ タブ切り替えで「API版」「チャット版」の両ランキングを確認できます。
+  </p>
+
+
+  <!-- Section: Why it matters -->
+  <h2>なぜ今、モデル選定が重要なのか</h2>
+
+  <p>
+    2025年末から2026年前半にかけて、LLMの世代交代が急速に進みました。Gemini 3系・Claude 4系・GPT-5系が相次いでリリースされ、半年前のモデル比較はすでに古くなっています。
+  </p>
+
+  <p>
+    重要なのは、<strong>「どのモデルが一番賢いか」よりも「どのモデルが自分の用途に合っているか」</strong>です。総合スコアが高くても、実際の業務では別のモデルが活躍することは珍しくない。
+  </p>
+
+  <div class="pull-quote">
+    <p>ベンチマーク上の1位と、業務で「一番使いやすい」モデルは、必ずしも一致しない。選定の基準は、スコアではなくユースケースで決まる。</p>
+  </div>
+
+
+  <!-- Section: Use cases -->
+  <h2>各モデルの使い所</h2>
+
+  <h3>Chat版 — 一般ユーザー・ビジネス向け</h3>
+
+  <div class="usecase-grid">
+    <div class="usecase-row">
+      <div class="usecase-model">
+        Claude Opus 4.6
+        <span class="usecase-maker">Anthropic / Claude.ai</span>
+      </div>
+      <div class="usecase-desc">
+        Chat Elo・Code Elo ともに最高水準。長文の読解・複雑なロジック整理・コード生成まで幅広く対応。「とにかく最高精度が必要」な作業に。有料プラン限定。
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">
+        Gemini 3.1 Pro
+        <span class="usecase-maker">Google / Gemini app</span>
+      </div>
+      <div class="usecase-desc">
+        チャットUIでは「Thinking (3 Pro)」として選択可能。米国ユーザーは無料でも日次制限付きで利用可。Googleサービスとの連携・大容量コンテキスト（1M tokens）が強み。
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">
+        Grok 4 / 4.1 Thinking
+        <span class="usecase-maker">xAI / X</span>
+      </div>
+      <div class="usecase-desc">
+        X（旧Twitter）のプレミアム会員向け。速度と推論のバランスが良く、リアルタイム情報との連携が得意。ソーシャル文脈での情報収集・分析に向く。
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">
+        GPT-5.3 Instant
+        <span class="usecase-maker">OpenAI / ChatGPT</span>
+      </div>
+      <div class="usecase-desc">
+        全ChatGPTユーザーのデフォルトモデル（2026年3月〜）。Web検索時の幻覚率を大幅改善。「毎日使う汎用AI」として最もバランスが取れている現時点での選択肢。
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">
+        Claude Sonnet 4.6
+        <span class="usecase-maker">Anthropic / Claude.ai</span>
+      </div>
+      <div class="usecase-desc">
+        Opus より軽量・高速で、コードEloはOpusに迫る水準。スピードとクオリティのバランスを求めるなら Sonnet が現実解。APIコストも抑えやすい。
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">
+        Gemini 3 Flash
+        <span class="usecase-maker">Google / Gemini</span>
+      </div>
+      <div class="usecase-desc">
+        無料・超高速。軽い調査・要約・翻訳などの繰り返し作業に最適。「とりあえず試す」「量をこなす」用途に圧倒的コスパ。
+      </div>
+    </div>
+  </div>
+
+  <h3>API版 — 開発者・事業者向け</h3>
+
+  <div class="usecase-grid">
+    <div class="usecase-row">
+      <div class="usecase-model">
+        GPT-5.3 Codex (xhigh)
+        <span class="usecase-maker">OpenAI API</span>
+      </div>
+      <div class="usecase-desc">
+        コーディングエージェント特化。GPT-5.2とCodexスタックを統合し25%高速化。エージェント型の自動開発・CI/CDパイプラインへの組み込みに向く。
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-model">
+        DeepSeek V3.2
+        <span class="usecase-maker">DeepSeek / オープンウェイト</span>
+      </div>
+      <div class="usecase-desc">
+        オープンウェイトで自社サーバーにデプロイ可能。APIコストを極限まで抑えたい・データをクラウドに渡したくない用途に。性能も上位に匹敵する水準。
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Section: Cost -->
+  <h2>コスト比較：無料〜有料の現実</h2>
+
+  <p>
+    性能だけでなく、コストも重要な判断軸です。特にチャット版での利用では、どのプランで何が使えるかが変わってきました。
+  </p>
+
+  <table class="cost-table">
+    <thead>
+      <tr>
+        <th>モデル</th>
+        <th>チャット利用</th>
+        <th>コスト感</th>
+        <th>メモ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="model-cell">Gemini 3 Flash</td>
+        <td><span class="tier-free">無料</span></td>
+        <td>$0</td>
+        <td>Gemini app デフォルト</td>
+      </tr>
+      <tr>
+        <td class="model-cell">GPT-5.3 Instant</td>
+        <td><span class="tier-free">無料（全員）</span></td>
+        <td>$0〜</td>
+        <td>ChatGPTデフォルト化済み</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Gemini 3.1 Pro<br><span style="font-size:10px;opacity:0.6;">Thinking (3 Pro)</span></td>
+        <td><span class="tier-mid">制限付き無料〜</span></td>
+        <td>米国無料 / AI Pro $19.99/月</td>
+        <td>日次上限あり・Ultra で 1,500回/日</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Grok 4 / 4.1</td>
+        <td><span class="tier-mid">X Premium</span></td>
+        <td>$8〜/月</td>
+        <td>X（旧Twitter）加入が前提</td>
+      </tr>
+      <tr>
+        <td class="model-cell">GPT-5.2 / 5.4 Thinking</td>
+        <td><span class="tier-mid">ChatGPT Plus</span></td>
+        <td>$20/月〜</td>
+        <td>Pro（$200/月）でフル利用</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Claude Sonnet 4.6</td>
+        <td><span class="tier-high">Claude.ai 有料</span></td>
+        <td>$20/月〜</td>
+        <td>Pro プランから利用可</td>
+      </tr>
+      <tr>
+        <td class="model-cell">Claude Opus 4.6</td>
+        <td><span class="tier-high">Claude.ai 有料</span></td>
+        <td>$20/月〜</td>
+        <td>Pro / Team / Enterprise</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-box">
+    <div class="insight-label">Noe Shiftica の視点</div>
+    <p>
+      無料で最も「使えるモデル」が増えた点は2026年の大きな変化です。GPT-5.3 Instant は全ユーザーのデフォルトになり、Gemini 3 Flash は高速かつ無料。「とりあえず有料プランに入らないとAIが使えない」という時代はほぼ終わっています。有料プランが活きるのは、<strong>上位モデルの推論精度が実際に仕事の品質差を生む場面</strong>に限られてきました。
+    </p>
+  </div>
+
+
+  <!-- Section: Noe view -->
+  <h2>Noe Shiftica が実際に使っている構成</h2>
+
+  <p>
+    Noe Shiftica では、用途に応じてモデルを使い分けています。現時点での構成は次の通りです。
+  </p>
+
+  <p>
+    コード生成・レビュー・エージェント的な作業は <strong>Claude Sonnet/Opus または Gemini 3.1 Pro/Gemini 3 Falsh</strong>。Code Eloが飛び抜けており、長いコンテキストを扱う場面での精度が安定しています。構造化文書の生成・提案書起草なども同様。
+  </p>
+
+  <p>
+    日常的な調査・情報整理・アイデアの壁打ちは <strong>Gemini Thinking Mode(3 Flash Preview)</strong>。僕の場合は、早さより正確性や一貫性を重視しています。Googleの場合は独自のCPUをハードウェアとして持っているため遅いと言っても慣れればそこまで遅くは感じません。
+  </p>
+
+  <p>
+    精度が特に求められる推論タスク・複雑な分析は <strong>Gemini 3.1 Pro Mode</strong> や　<strong>Claude 4.6 Sonnet/Opus Extended Thinking</strong>を使用しています。
+  </p>
+	
+	<p>時々ネタや最新の利用可能なモデルなどの正確性や速報性を求める場合はPerplexityを利用しています。</p>
+	<p>また王道ですが翻訳やようやくまたブログ記事の大まかなプロットはChatGPTに頼むことが多いです。</p>
+  
+  <div class="pull-quote">
+    <p>「最強のAI」を一つ選ぶより、用途に応じて使い分ける設計の方が、最終的なアウトプットの質も、コストも最適化できますこれは繰り返し使用することでどの使用者もたどり着く最適化だと思います。</p>
+  </div>
+
+
+  <!-- Section: closing -->
+  <h2>ランキングは手段、目的は成果</h2>
+
+  <p>
+    このランキングは、AIモデルを選ぶための地図です。地図は更新され続けます。今後も四半期ごとに見直しを行い、実態に即した比較を続けていきます。
+  </p>
+
+  <p>
+    AI選定に迷っている方、開発や制作への導入を検討している方は、<a href="https://noe-shiftica.com/#concept" style="color:var(--accent);">Noe Shiftica の取り組み</a>もあわせてご覧ください。
+  </p>
+
+  <!-- Tags -->
+  <div class="tags">
+    <span class="tag">Journal</span>
+    <span class="tag">AI</span>
+    <span class="tag">LLM</span>
+    <span class="tag">Development</span>
+    <span class="tag">2026</span>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Noe Shiftica</div>
+      <p class="footer-tagline">Design the Shift.<br>最新技術と本質の追求で、<br>ビジネスの世界観を転換します。</p>
+    </div>
+    <div class="footer-nav">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="https://noe-shiftica.com/about">About</a></li>
+        <li><a href="https://noe-shiftica.com/#services">Services</a></li>
+        <li><a href="https://noe-shiftica.com/#pricing">Pricing</a></li>
+        <li><a href="https://noe-shiftica.com/blog">Blog</a></li>
+      </ul>
+    </div>
+    <div class="footer-nav">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="https://noe-shiftica.com/privacy">Privacy Policy</a></li>
+        <li><a href="https://noe-shiftica.com/terms">Terms of Service</a></li>
+      </ul>
+      <div style="margin-top:20px;font-size:12px;color:var(--muted);">info@noe-shiftica.com</div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Noe Shiftica &nbsp;·&nbsp; JP / English coming soon</div>
+</footer>
+
+</body>
+</html>

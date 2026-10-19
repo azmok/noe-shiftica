@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web制作 業界比較データ 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0f;
+  --surface: #161619;
+  --surface2: #1e1e23;
+  --border: #2a2a30;
+  --text: #e8e8ec;
+  --text2: #9898a4;
+  --accent-green: #22c55e;
+  --accent-green-dim: #166534;
+  --accent-red: #ef4444;
+  --accent-red-dim: #7f1d1d;
+  --accent-amber: #f59e0b;
+  --accent-blue: #3b82f6;
+  --accent-purple: #a855f7;
+  --noe: #8b5cf6;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  padding: 40px 20px 80px;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 0%, #a0a0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 40px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 48px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: var(--accent-blue);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.section-desc {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 20px;
+}
+
+/* TABLE STYLES */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 900px;
+}
+thead th {
+  background: var(--surface2);
+  padding: 12px 14px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th:first-child {
+  text-align: left;
+  min-width: 140px;
+}
+thead th.static-h { color: var(--accent-blue); }
+thead th.dynamic-h { color: var(--accent-purple); }
+
+tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+tbody td:first-child {
+  text-align: left;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  background: var(--surface2);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+tbody tr:hover td:first-child { background: var(--surface2); }
+
+.label-sub {
+  display: block;
+  font-size: 10px;
+  color: var(--text2);
+  font-weight: 300;
+}
+.val-low { color: var(--accent-green); }
+.val-mid { color: var(--accent-amber); }
+.val-high { color: var(--accent-red); }
+.val-noe { color: var(--noe); font-weight: 700; }
+
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.chip-green { background: var(--accent-green-dim); color: var(--accent-green); }
+.chip-red { background: var(--accent-red-dim); color: var(--accent-red); }
+.chip-amber { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
+
+/* NOE ROW HIGHLIGHT */
+.noe-row td {
+  background: rgba(139,92,246,0.06) !important;
+  border-bottom-color: rgba(139,92,246,0.2);
+}
+.noe-row td:first-child {
+  background: rgba(139,92,246,0.12) !important;
+  color: var(--noe);
+}
+
+/* INSIGHTS SECTION */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.insight-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.insight-card .ic-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.insight-card .ic-label {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.footnote {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  line-height: 1.8;
+}
+.footnote a { color: var(--accent-blue); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Web制作 業界比較データ 2026</h1>
+<p class="subtitle">依頼先規模 × サイト種別（静的 / 動的CMS）── ファクトベース集計</p>
+
+<!-- ===== TABLE 1: 制作費用 ===== -->
+<div class="section-title"><span class="num">01</span>制作費用（税別）</div>
+<p class="section-desc">コーポレートサイト相当（5〜15ページ）の場合。静的＝HTML/CSS、動的＝WordPress等CMS。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="static-h" colspan="3">静的サイト（HTML/CSS）</th>
+    <th class="dynamic-h" colspan="3">動的サイト（CMS）</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="static-h">最低</th><th class="static-h">最高</th><th class="static-h">平均</th>
+    <th class="dynamic-h">最低</th><th class="dynamic-h">最高</th><th class="dynamic-h">平均</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス<span class="label-sub">個人・副業</span></td>
+    <td class="val-low">¥5万</td><td>¥30万</td><td>¥15万</td>
+    <td class="val-low">¥15万</td><td>¥50万</td><td>¥30万</td>
+  </tr>
+  <tr>
+    <td>小規模制作会社<span class="label-sub">3〜10人</span></td>
+    <td>¥15万</td><td>¥80万</td><td>¥40万</td>
+    <td>¥50万</td><td>¥200万</td><td>¥100万</td>
+  </tr>
+  <tr>
+    <td>中規模制作会社<span class="label-sub">10〜50人</span></td>
+    <td>¥30万</td><td>¥200万</td><td>¥100万</td>
+    <td>¥100万</td><td>¥400万</td><td>¥200万</td>
+  </tr>
+  <tr>
+    <td>大手制作会社<span class="label-sub">50人以上</span></td>
+    <td>¥80万</td><td class="val-high">¥300万</td><td>¥180万</td>
+    <td>¥200万</td><td class="val-high">¥1,000万+</td><td>¥500万</td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica<span class="label-sub">AI×1人</span></td>
+    <td class="val-noe" colspan="3">一律 ¥15万</td>
+    <td class="val-noe">¥35万〜</td><td class="val-noe">¥40万+<span class="label-sub" style="color:var(--noe)">プレミアム</span></td><td class="val-noe">¥35万</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== TABLE 2: 納品期間 ===== -->
+<div class="section-title"><span class="num">02</span>納品までの期間</div>
+<p class="section-desc">初回打ち合わせ〜本番公開まで。要件定義・デザイン確認含む。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="static-h" colspan="3">静的サイト</th>
+    <th class="dynamic-h" colspan="3">動的サイト（CMS）</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="static-h">最速</th><th class="static-h">最長</th><th class="static-h">平均</th>
+    <th class="dynamic-h">最速</th><th class="dynamic-h">最長</th><th class="dynamic-h">平均</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス</td>
+    <td class="val-low">1週間</td><td>1ヶ月</td><td>2〜3週間</td>
+    <td>2週間</td><td>3ヶ月</td><td>1.5ヶ月</td>
+  </tr>
+  <tr>
+    <td>小規模制作会社</td>
+    <td>2週間</td><td>1.5ヶ月</td><td>1ヶ月</td>
+    <td>1ヶ月</td><td>3ヶ月</td><td>2ヶ月</td>
+  </tr>
+  <tr>
+    <td>中規模制作会社</td>
+    <td>1ヶ月</td><td>2ヶ月</td><td>1.5ヶ月</td>
+    <td>2ヶ月</td><td>4ヶ月</td><td>3ヶ月</td>
+  </tr>
+  <tr>
+    <td>大手制作会社</td>
+    <td>1ヶ月</td><td class="val-high">3ヶ月</td><td>2ヶ月</td>
+    <td>3ヶ月</td><td class="val-high">8ヶ月</td><td>5ヶ月</td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica</td>
+    <td class="val-noe">3日</td><td class="val-noe">1週間</td><td class="val-noe">5日</td>
+    <td class="val-noe">1週間</td><td class="val-noe">18日</td><td class="val-noe">10日</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== TABLE 3: 保守プラン付帯率 ===== -->
+<div class="section-title"><span class="num">03</span>保守プラン付帯率</div>
+<p class="section-desc">制作プランに月額保守が「セット or 強く推奨」で含まれる割合。Web幹事・アイミツ等の相場データより推計。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="static-h">静的サイト<br>保守セット率</th>
+    <th class="dynamic-h">動的サイト<br>保守セット率</th>
+    <th>備考</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス</td>
+    <td><span class="chip chip-green">20〜30%</span></td>
+    <td><span class="chip chip-amber">40〜50%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">保守契約なしが主流。サーバー・ドメインはクライアント自己管理が多い</td>
+  </tr>
+  <tr>
+    <td>小規模制作会社</td>
+    <td><span class="chip chip-amber">50〜70%</span></td>
+    <td><span class="chip chip-red">70〜85%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">「保守なしも可」だが契約時に強く勧められるケースが多い</td>
+  </tr>
+  <tr>
+    <td>中規模制作会社</td>
+    <td><span class="chip chip-red">70〜85%</span></td>
+    <td><span class="chip chip-red">85〜95%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">制作費に1年分の保守が含まれるパッケージも多い</td>
+  </tr>
+  <tr>
+    <td>大手制作会社</td>
+    <td><span class="chip chip-red">90〜100%</span></td>
+    <td><span class="chip chip-red">95〜100%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">保守なし納品はほぼ不可。年間契約が前提</td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica</td>
+    <td><span class="chip chip-green">なし</span></td>
+    <td><span class="chip chip-green">完全任意</span></td>
+    <td style="font-size:11px;color:var(--noe);font-family:'Noto Sans JP';font-weight:600">静的は保守不要。動的も任意で月¥6,000〜から選択可</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== TABLE 4: 保守費用 ===== -->
+<div class="section-title"><span class="num">04</span>保守プラン月額費用（税別）</div>
+<p class="section-desc">保守プランが付帯する場合の月額費用。Web幹事データでは5,000〜20,000円帯が約6割を占める。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="static-h" colspan="3">静的サイトの保守費</th>
+    <th class="dynamic-h" colspan="3">動的サイト（CMS）の保守費</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="static-h">最低</th><th class="static-h">最高</th><th class="static-h">平均</th>
+    <th class="dynamic-h">最低</th><th class="dynamic-h">最高</th><th class="dynamic-h">平均</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス</td>
+    <td class="val-low">¥0</td><td>¥5,000</td><td>¥2,000</td>
+    <td>¥3,000</td><td>¥10,000</td><td>¥5,000</td>
+  </tr>
+  <tr>
+    <td>小規模制作会社</td>
+    <td>¥3,000</td><td>¥10,000</td><td>¥5,000</td>
+    <td>¥5,000</td><td>¥20,000</td><td>¥11,000</td>
+  </tr>
+  <tr>
+    <td>中規模制作会社</td>
+    <td>¥5,000</td><td>¥20,000</td><td>¥10,000</td>
+    <td>¥10,000</td><td>¥50,000</td><td>¥25,000</td>
+  </tr>
+  <tr>
+    <td>大手制作会社</td>
+    <td>¥10,000</td><td class="val-high">¥50,000</td><td>¥25,000</td>
+    <td>¥30,000</td><td class="val-high">¥100,000+</td><td>¥50,000</td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica</td>
+    <td class="val-noe" colspan="3">¥0<span class="label-sub" style="color:var(--noe)">都度改修 ¥6,000〜</span></td>
+    <td class="val-noe" colspan="3">¥6,000〜/月<span class="label-sub" style="color:var(--noe)">完全任意</span></td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== TABLE 5: 3年間トータルコスト ===== -->
+<div class="section-title"><span class="num">05</span>3年間トータルコスト試算（追加項目）</div>
+<p class="section-desc">「制作費 ＋ 保守費36ヶ月分」の合計。クライアントが実際に負担する総額。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="static-h" colspan="3">静的サイト 3年総額</th>
+    <th class="dynamic-h" colspan="3">動的サイト 3年総額</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="static-h">最低</th><th class="static-h">平均</th><th class="static-h">最高</th>
+    <th class="dynamic-h">最低</th><th class="dynamic-h">平均</th><th class="dynamic-h">最高</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス<span class="label-sub">制作+保守36ヶ月</span></td>
+    <td class="val-low">¥5万</td><td>¥22万</td><td>¥48万</td>
+    <td>¥26万</td><td>¥48万</td><td>¥86万</td>
+  </tr>
+  <tr>
+    <td>小規模制作会社<span class="label-sub">制作+保守36ヶ月</span></td>
+    <td>¥26万</td><td>¥58万</td><td>¥116万</td>
+    <td>¥68万</td><td>¥140万</td><td>¥272万</td>
+  </tr>
+  <tr>
+    <td>中規模制作会社<span class="label-sub">制作+保守36ヶ月</span></td>
+    <td>¥48万</td><td>¥136万</td><td>¥272万</td>
+    <td>¥136万</td><td>¥290万</td><td class="val-high">¥580万</td>
+  </tr>
+  <tr>
+    <td>大手制作会社<span class="label-sub">制作+保守36ヶ月</span></td>
+    <td>¥116万</td><td>¥270万</td><td class="val-high">¥480万</td>
+    <td>¥308万</td><td class="val-high">¥680万</td><td class="val-high">¥1,360万</td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica<span class="label-sub">制作+任意保守</span></td>
+    <td class="val-noe">¥15万<span class="label-sub" style="color:var(--noe)">改修0回</span></td>
+    <td class="val-noe">¥19万<span class="label-sub" style="color:var(--noe)">年2回改修</span></td>
+    <td class="val-noe">¥37万<span class="label-sub" style="color:var(--noe)">月1回改修</span></td>
+    <td class="val-noe">¥35万<span class="label-sub" style="color:var(--noe)">保守なし</span></td>
+    <td class="val-noe">¥57万<span class="label-sub" style="color:var(--noe)">¥6,000×36</span></td>
+    <td class="val-noe">¥62万<span class="label-sub" style="color:var(--noe)">プレミアム+保守</span></td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== TABLE 6: CMS利用実態 ===== -->
+<div class="section-title"><span class="num">06</span>CMS納品後のクライアント利用実態（追加項目）</div>
+<p class="section-desc">「クライアントが実際にCMS管理画面を触る割合」の推計。開発者証言・業界調査より。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>サイト種別</th>
+    <th>自分で触る割合</th>
+    <th>実態</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>コーポレート・名刺代わり</td>
+    <td><span class="chip chip-green">5〜15%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">ほぼ触らない。1年後にログインすらしてないケースが大半</td>
+  </tr>
+  <tr>
+    <td>ブログ・ニュース付き</td>
+    <td><span class="chip chip-amber">30〜50%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">最初の数ヶ月だけ触り、その後は制作会社にメールで依頼に戻る</td>
+  </tr>
+  <tr>
+    <td>EC・予約系（業務直結）</td>
+    <td><span class="chip chip-red">60〜80%</span></td>
+    <td style="font-size:11px;color:var(--text2);font-family:'Noto Sans JP'">日常業務に直結するため継続利用率は高い</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== INSIGHTS ===== -->
+<div class="section-title"><span class="num">★</span>この表から読み取れること</div>
+<div class="insights-grid">
+  <div class="insight-card">
+    <div class="ic-num" style="color:var(--accent-red)">¥1,360万</div>
+    <div class="ic-label">大手に動的サイトを頼んだ場合の<br><strong>3年間最大コスト</strong></div>
+  </div>
+  <div class="insight-card">
+    <div class="ic-num" style="color:var(--noe)">¥35万</div>
+    <div class="ic-label">Noe Shiftica 動的サイト<br><strong>3年間最低コスト</strong>（保守なし時）</div>
+  </div>
+  <div class="insight-card">
+    <div class="ic-num" style="color:var(--accent-amber)">85〜95%</div>
+    <div class="ic-label">静的サイトを納品された<br>クライアントがCMSを<strong>触らない割合</strong></div>
+  </div>
+  <div class="insight-card">
+    <div class="ic-num" style="color:var(--accent-red)">約6割</div>
+    <div class="ic-label">保守費用 月5,000〜20,000円帯の<br><strong>業界占有率</strong>（Web幹事調べ）</div>
+  </div>
+</div>
+
+<div class="footnote">
+  <strong>DATA SOURCES:</strong><br>
+  <a href="https://web-kanji.com/posts/hp-runningcost">Web幹事 – ホームページ管理費の相場</a> ／
+  <a href="https://web-kanji.com/posts/market-price">Web幹事 – ホームページ制作費用の料金相場 2026</a> ／
+  <a href="https://imitsu.jp/cost/hp-design/">PRONIアイミツ – ホームページ作成費用の相場</a> ／
+  <a href="https://imitsu.jp/cost/hp-design/website-maintenance-cost">PRONIアイミツ – ホームページ保守費用相場</a> ／
+  <a href="https://ntcreation-web.com/column/2355/">NT CREATION – WordPress制作費用相場 2026</a> ／
+  <a href="https://ferret-one.com/blog/home-page-cost">ferret One – ホームページ作成費用の相場</a> ／
+  <a href="https://dev.to/dailydevtips1/you-dont-always-need-a-cms-ch">DEV Community – You don't always need a CMS</a> ／
+  <a href="https://webdesignerdepot.com/9-reasons-you-should-never-use-a-cms/">Web Designer Depot – 9 reasons you should never use a CMS</a> ／
+  <a href="https://www.storyblok.com/mp/cms-statistics">Storyblok – CMS Usage Statistics 2025</a> ／
+  <a href="https://www.edgeoftheweb.co.uk/blog/24-cms-statistics-to-guide-your-content-management-decision">Edge of the Web – 24 CMS Statistics</a> ／
+  <a href="https://lichtos.co.jp/faq/hoshuhiyou/">リヒトス – 保守管理費用とは</a> ／
+  <a href="https://funfairfanfare.com/%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E4%BF%9D%E5%AE%88%E8%B2%BB%E7%94%A8/">ファンフェアファンファーレ – 不透明なサーバー費用</a> ／
+  <a href="https://www.pluscad.jp/howto/1480/">プラスバイプラス – ホームページの保守費用</a> ／
+  <a href="https://www.g2.com/articles/how-often-should-you-update-your-website">G2 – How Often Should You Update Your Website</a> ／
+  <a href="https://payloadcms.com/docs/getting-started/what-is-payload">PayloadCMS – What is Payload?</a><br><br>
+  ※ Noe Shiftica価格はあずま確定値。業界推計は複数ソースの中央値・加重平均から算出。CMS利用実態は開発者証言・業界調査から推計。
+</div>
+
+</div>
+</body>
+</html>

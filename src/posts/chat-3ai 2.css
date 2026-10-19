@@ -1,0 +1,575 @@
+/* ============================================================
+   chat-3ai.css — 3AI横スクロール比較 & SVGロゴ & フィルタタブ
+   ============================================================ */
+
+/* --- 比較セクション全体 --- */
+.chat-compare-section {
+  margin: 2.8em 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2em;
+}
+
+.chat-compare-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+}
+
+/* ターン見出しバッジ */
+.chat-compare-turn__header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.88em;
+  font-weight: 700;
+  color: #4a463e;
+  padding: 0.35em 0.85em;
+  background: #ede9df;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+/* 共通ユーザー発言ボックス */
+.chat-common-user {
+  background: #edebe4;
+  border-left: 4px solid #8a8579;
+  padding: 0.85em 1.15em;
+  border-radius: 4px 12px 12px 4px;
+  font-size: 0.93em;
+  line-height: 1.75;
+  color: #2d2a26;
+}
+
+.chat-common-user__label {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #736e64;
+  margin-bottom: 0.3em;
+}
+
+/* --- 表示切り替えタブ（フィルタバー） --- */
+.chat-filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  padding: 0.85em 1.2em;
+  background: #f4f2eb;
+  border-radius: 12px;
+  margin: 1.5em 0 1.2em;
+  border: 1px solid #e5e0d5;
+}
+
+.chat-filter-label {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #635f55;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.chat-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.chat-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.45em 0.9em;
+  font-size: 0.86em;
+  font-weight: 600;
+  border-radius: 20px;
+  border: 1px solid #dcd6c9;
+  background: #ffffff;
+  color: #8c867a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.chat-filter-btn .chat__logo {
+  width: 17px;
+  height: 17px;
+  opacity: 0.45;
+  transition: opacity 0.2s ease;
+}
+
+/* キーボード操作時のフォーカス表示 */
+.chat-filter-btn:focus-visible,
+.chat-nav-btn:focus-visible {
+  outline: 2px solid #d97757;
+  outline-offset: 2px;
+}
+
+/* アクティブ（選択中）状態 */
+.chat-filter-btn.is-active {
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.chat-filter-btn.is-active[data-target="claude"] {
+  border-color: #d97757;
+  color: #b54a27;
+}
+
+.chat-filter-btn.is-active[data-target="gemini"] {
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.chat-filter-btn.is-active[data-target="chatgpt"] {
+  border-color: #10a37f;
+  color: #0d8466;
+}
+
+.chat-filter-btn.is-active .chat__logo {
+  opacity: 1;
+}
+
+/* 最後の1社を消そうとした時の振動演出 */
+@keyframes filterShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.chat-filter-btn.is-shaking {
+  animation: filterShake 0.25s ease-in-out;
+}
+
+/* --- 横スクロール補助ラッパー --- */
+.chat-scroll-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 左右フェードシャドウ */
+.chat-scroll-wrapper::before,
+.chat-scroll-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 8px;
+  width: 32px;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+
+.chat-scroll-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.12), transparent);
+}
+
+.chat-scroll-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.12), transparent);
+}
+
+.chat-scroll-wrapper.has-overflow-left::before { opacity: 1; }
+.chat-scroll-wrapper.has-overflow-right::after { opacity: 1; }
+
+/* 横スクロールコンテナ */
+.chat-scroll-container {
+  display: flex;
+  gap: 1.1em;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.8em;
+  scrollbar-width: thin;
+  scrollbar-color: #d1cbbf transparent;
+  cursor: grab;
+  user-select: none;
+}
+
+.chat-scroll-container.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none; /* ドラッグ中はスナップを無効化して滑らかにする */
+  user-select: none;
+}
+
+.chat-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.chat-scroll-container::-webkit-scrollbar-thumb {
+  background: #d1cbbf;
+  border-radius: 4px;
+}
+
+/* 左右送りボタン（PC・iPad向け） */
+.chat-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #d8d3c7;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  color: #555;
+}
+
+.chat-nav-btn:hover {
+  background: #f7f5f0;
+  color: #111;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.chat-nav-btn.prev { left: -16px; }
+.chat-nav-btn.next { right: -16px; }
+
+.chat-nav-btn[disabled] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- チャットカード本体 --- */
+.chat {
+  /* テーマクラス未指定でも壊れないようフォールバックを定義 */
+  --chat-bg: #faf9f5;
+  --chat-panel: #f0eee6;
+  --chat-line: #e5e1d6;
+  --chat-ink: #2d2a26;
+  --chat-sub: #8a8579;
+  --chat-accent: #d97757;
+
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+  margin: 0;
+  border: 1px solid var(--chat-line);
+  border-radius: 14px;
+  background: var(--chat-bg);
+  color: var(--chat-ink);
+  font-size: 0.91em;
+  line-height: 1.82;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 非表示設定 */
+.chat.is-hidden {
+  display: none !important;
+}
+
+/* レスポンシブ幅（通常時：3列） */
+@media (min-width: 1024px) {
+  .chat {
+    flex: 1 1 calc(33.333% - 0.8em);
+    min-width: 290px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .chat {
+    flex: 0 0 calc(46% - 0.5em);
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .chat {
+    flex: 0 0 62%;
+  }
+}
+
+/* スマホ縦画面：Peekチラ見せ */
+@media (max-width: 640px) and (orientation: portrait) {
+  .chat {
+    flex: 0 0 84%;
+  }
+  .chat-nav-btn { display: none; }
+}
+
+/* 表示数が減った時の自動レイアウト（PC・タブレット） */
+@media (min-width: 641px) {
+  /* 2社のみ表示の場合：50%ずつにフィット */
+  .chat-scroll-container[data-visible-count="2"] .chat:not(.is-hidden) {
+    flex: 1 1 calc(50% - 0.6em);
+    max-width: calc(50% - 0.6em);
+  }
+  /* 1社のみ表示の場合：全幅フィット */
+  .chat-scroll-container[data-visible-count="1"] .chat:not(.is-hidden) {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+
+/* --- テーマ別カラー --- */
+
+/* Claude */
+.chat--claude {
+  --chat-bg: #faf9f5;
+  --chat-panel: #f0eee6;
+  --chat-line: #e5e1d6;
+  --chat-ink: #2d2a26;
+  --chat-sub: #8a8579;
+  --chat-accent: #d97757;
+}
+
+/* Gemini */
+.chat--gemini {
+  --chat-bg: #f8fafd;
+  --chat-panel: #edf2fa;
+  --chat-line: #d8e2ee;
+  --chat-ink: #1f1f1f;
+  --chat-sub: #5f6368;
+  --chat-accent: #1a73e8;
+}
+
+/* ChatGPT (chat--chatgpt と chat--gpt の両方に対応) */
+.chat--chatgpt,
+.chat--gpt {
+  --chat-bg: #f7f9f8;
+  --chat-panel: #edf3f0;
+  --chat-line: #d5e2dc;
+  --chat-ink: #202123;
+  --chat-sub: #596761;
+  --chat-accent: #10a37f;
+}
+
+/* --- ヘッダー --- */
+.chat__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65em 1em;
+  border-bottom: 1px solid var(--chat-line);
+  background: color-mix(in srgb, var(--chat-line) 30%, var(--chat-bg));
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--chat-sub);
+}
+
+.chat__head-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  color: var(--chat-ink);
+}
+
+.chat__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.chat__logo svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chat__head-tag {
+  font-size: 0.82em;
+  font-weight: 600;
+  padding: 0.15em 0.55em;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--chat-accent) 15%, transparent);
+  color: var(--chat-accent);
+  white-space: nowrap;
+}
+
+/* --- チャット本体 --- */
+.chat__body {
+  padding: 1.1em 1em 1.3em;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  flex: 1;
+}
+
+.chat__user {
+  align-self: flex-end;
+  max-width: 88%;
+  padding: 0.7em 0.95em;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--chat-panel);
+}
+
+.chat__ai {
+  position: relative;
+  align-self: stretch;
+  padding-left: 2.2em;
+}
+
+/* AI発言左端のSVGロゴアイコン */
+.chat__ai-icon {
+  position: absolute;
+  top: 0.2em;
+  left: 0;
+  width: 19px;
+  height: 19px;
+}
+
+.chat__ai-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chat p { margin: 0 0 0.5em; }
+.chat p:last-child { margin-bottom: 0; }
+.chat ul { margin: 0.4em 0 0.6em; padding-left: 1.25em; }
+.chat li { margin: 0.2em 0; }
+
+.chat strong {
+  font-weight: 700;
+  color: color-mix(in srgb, var(--chat-accent) 65%, var(--chat-ink));
+}
+
+.chat-compare-note {
+  font-size: 0.82em;
+  color: #8a8579;
+  text-align: right;
+  margin-top: -1em;
+  margin-bottom: 2em;
+}
+
+/* --- アニメーションを抑制する設定への配慮 --- */
+@media (prefers-reduced-motion: reduce) {
+  .chat,
+  .chat-filter-btn,
+  .chat-nav-btn,
+  .chat-scroll-wrapper::before,
+  .chat-scroll-wrapper::after {
+    transition: none;
+  }
+  .chat-filter-btn.is-shaking {
+    animation: none;
+  }
+  .chat-scroll-container {
+    scroll-behavior: auto;
+  }
+}
+
+/* --- ダークモード --- */
+@media (prefers-color-scheme: dark) {
+  .chat-compare-turn__header { background: #2a2825; color: #c2bcb1; }
+  .chat-common-user { background: #252320; border-left-color: #5c5850; color: #ddd8cf; }
+  .chat-common-user__label { color: #a8a296; }
+  .chat-nav-btn { background: #252320; border-color: #444; color: #ccc; }
+  .chat-nav-btn:hover { background: #32302b; color: #fff; }
+  .chat-filter-bar { background: #23211e; border-color: #38352f; }
+  .chat-filter-label { color: #a8a296; }
+  .chat-filter-btn { background: #1b1a18; border-color: #3e3a33; color: #888; }
+  .chat-filter-btn.is-active { background: #2a2825; color: #eee; }
+  .chat-compare-note { color: #908a7e; }
+
+  .chat-scroll-wrapper::before {
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+  }
+  .chat-scroll-wrapper::after {
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.4), transparent);
+  }
+
+  .chat {
+    --chat-bg: #1b1a18; --chat-panel: #2a2825; --chat-line: #38352f;
+    --chat-ink: #ddd8cf; --chat-sub: #908a7e; --chat-accent: #e08a69;
+  }
+  .chat--claude {
+    --chat-bg: #1b1a18; --chat-panel: #2a2825; --chat-line: #38352f;
+    --chat-ink: #ddd8cf; --chat-sub: #908a7e; --chat-accent: #e08a69;
+  }
+  .chat--gemini {
+    --chat-bg: #13171f; --chat-panel: #1e2533; --chat-line: #2d3748;
+    --chat-ink: #e2e8f0; --chat-sub: #94a3b8; --chat-accent: #60a5fa;
+  }
+  .chat--chatgpt,
+  .chat--gpt {
+    --chat-bg: #141a17; --chat-panel: #1e2723; --chat-line: #2d3b34;
+    --chat-ink: #e0e8e4; --chat-sub: #8ea198; --chat-accent: #2dd4bf;
+  }
+}
+
+/* ============================================================
+   .table-scroll — 横スクロールテーブル対応
+   ============================================================ */
+.table-scroll {
+  position: relative;
+  margin: 1.8em 0;
+  width: 100%;
+}
+
+.table-scroll__inner {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #d1cbbf transparent;
+  cursor: grab;
+  user-select: none;
+}
+
+.table-scroll__inner.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.table-scroll__inner::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll__inner::-webkit-scrollbar-thumb {
+  background: #d1cbbf;
+  border-radius: 4px;
+}
+
+.table-scroll__inner table {
+  margin: 0;
+  min-width: 100%;
+}
+
+.table-scroll td.cell-wide,
+.table-scroll th.cell-wide {
+  min-width: 10em;
+}
+
+/* テーブルのフェードシャドウ */
+.table-scroll::before,
+.table-scroll::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.table-scroll::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.12), transparent);
+}
+
+.table-scroll::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.12), transparent);
+}
+
+.table-scroll.has-scroll-left::before { opacity: 1; }
+.table-scroll.has-scroll-right::after { opacity: 1; }
+

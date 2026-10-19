@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.25, maximum-scale=1.0, user-scalable=yes">
+<meta name="format-detection" content="telephone=no">
+<title>Frontier AI モデル全比較 — OpenAI · Anthropic · Google（2026年6月）</title>
+<style>
+  :root {
+    --bg: #0c0f13;
+    --panel: #141a21;
+    --panel-2: #1a2129;
+    --ink: #e9eef3;
+    --ink-dim: #9aa7b4;
+    --ink-faint: #5d6975;
+    --line: #273039;
+    --line-soft: #1d242d;
+    --openai: #10a37f;
+    --anthropic: #d97757;
+    --google: #4d8bf0;
+    --deepseek: #7c6ff0;
+    --kimi: #e0518a;
+    --new: #ffd23f;
+    --lead: #ffd23f;
+    --rank1: #ffd23f;
+    --rank2: #c7d0d9;
+    --rank3: #d9925b;
+    --mono: "SF Mono","JetBrains Mono","Roboto Mono",ui-monospace,Menlo,monospace;
+    --sans: "Inter",-apple-system,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--sans);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; padding-bottom: 70px;
+  }
+  .wrap { max-width: 1300px; margin: 0 auto; padding: 0 22px; }
+
+  header.hero {
+    border-bottom: 1px solid var(--line); padding: 48px 0 30px;
+    background:
+      radial-gradient(820px 280px at 12% -10%, rgba(16,163,127,0.09), transparent),
+      radial-gradient(820px 280px at 50% -16%, rgba(217,119,87,0.10), transparent),
+      radial-gradient(820px 280px at 88% -10%, rgba(77,139,240,0.10), transparent);
+  }
+  .eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 15px; }
+  h1 { font-size: clamp(25px,4.2vw,40px); line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 13px; }
+  h1 .grad { background: linear-gradient(100deg,var(--openai),var(--anthropic) 55%,var(--google)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { color: var(--ink-dim); font-size: 15px; max-width: 800px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 9px 22px; margin-top: 20px; font-family: var(--mono); font-size: 12px; color: var(--ink-faint); align-items: center; }
+  .legend b { color: var(--ink-dim); font-weight: 500; }
+  .key { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .sw-o { background: var(--openai); } .sw-a { background: var(--anthropic); } .sw-g { background: var(--google); }
+  .scroll-hint { margin-top: 14px; font-size: 12px; color: var(--ink-faint); font-family: var(--mono); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .scroll-hint .pill { border: 1px solid var(--line); border-radius: 20px; padding: 3px 11px; color: var(--ink-dim); }
+
+  .table-wrap { margin-top: 26px; position: relative; }
+  /* Horizontal scroll lives inside the table box. Vertical scroll is the normal page.
+     overflow-y: clip (NOT auto/visible) avoids creating a vertical scroll container,
+     so the thead's native position:sticky pins to the VIEWPORT top on page scroll —
+     giving a normal webpage feel with no iframe-like inner box. */
+  .table-scroll {
+    border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
+    overflow-x: auto; overflow-y: clip;
+    -webkit-overflow-scrolling: touch; position: relative;
+  }
+  table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
+
+  /* Floating header bar: fixed to viewport top, mirrors the table's horizontal scroll.
+     Shown only while the table body is in view but its real header has scrolled past the top. */
+  .float-head {
+    position: fixed; top: 0; left: 0; z-index: 40;
+    overflow: hidden; pointer-events: none;
+    opacity: 0; visibility: hidden; transition: opacity .12s;
+    box-shadow: 0 6px 16px -8px rgba(0,0,0,0.6);
+    border-radius: 0 0 4px 4px;
+  }
+  .float-head.show { opacity: 1; visibility: visible; }
+  .float-head.zoom-off { display: none !important; }
+  .float-head table { background: var(--panel-2); border-collapse: separate; border-spacing: 0; }
+  .float-head thead th { box-shadow: none; }
+
+  /* filter tabs */
+  .filters {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px;
+    margin-top: 26px; padding: 14px 16px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 11px;
+  }
+  .filter-group { display: flex; align-items: center; gap: 10px; }
+  .filter-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+  .seg { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 2px; }
+  .seg-btn {
+    border: none; background: transparent; color: var(--ink-dim);
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+    transition: background .14s, color .14s;
+  }
+  .seg-btn:hover { color: var(--ink); }
+  .seg-btn.active { background: var(--lead); color: #0c0f13; }
+  .filter-count { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); margin-left: auto; }
+
+  /* model select panel */
+  .model-select { margin-top: 12px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; }
+  .ms-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .ms-title { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+  .ms-actions { display: flex; gap: 6px; }
+  .ms-btn { border: 1px solid var(--line); background: var(--bg); color: var(--ink-dim); font-family: var(--sans); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: background .12s, color .12s; }
+  .ms-btn:hover { background: var(--panel-2); color: var(--ink); }
+  .ms-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+  .ms-item { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; cursor: pointer; transition: background .12s, border-color .12s; user-select: none; }
+  .ms-item:hover { background: var(--panel-2); }
+  .ms-item.on { border-color: var(--msc); background: color-mix(in srgb, var(--msc) 10%, transparent); }
+  .ms-check { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid var(--line-soft); flex: none; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #0c0f13; }
+  .ms-item.on .ms-check { background: var(--msc); border-color: var(--msc); }
+  .ms-item.on .ms-check::after { content: "✓"; }
+  .ms-name { font-size: 12.5px; color: var(--ink); font-weight: 600; }
+  .ms-vend { font-size: 9px; font-family: var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--msc); }
+  .ms-item .ms-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  @media (max-width: 560px) {
+    .filters { gap: 12px 16px; }
+    .filter-count { margin-left: 0; width: 100%; }
+  }
+
+  /* sticky first column */
+  th.bm-head, td.bm-cell {
+    position: sticky; left: 0; z-index: 3;
+    background: var(--panel); min-width: 232px; max-width: 232px;
+    border-right: 2px solid var(--line);
+  }
+  thead th.bm-head { z-index: 6; background: var(--panel-2); }
+
+  /* header cells pin to the top of the VIEWPORT on normal page scroll (native sticky) */
+  thead th {
+    position: sticky; top: 0; z-index: 4;
+    background: var(--panel-2); text-align: center; padding: 12px 13px;
+    border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: bottom;
+    box-shadow: 0 1px 0 var(--line), 0 6px 14px -8px rgba(0,0,0,0.55);
+  }
+  thead th.bm-head { text-align: left; }
+
+  .vlabel { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; }
+  .vlabel.o { color: var(--openai); } .vlabel.a { color: var(--anthropic); } .vlabel.g { color: var(--google); }
+  .vlabel.d { color: var(--deepseek); } .vlabel.k { color: var(--kimi); }
+  .mname { display: block; font-size: 13.5px; color: var(--ink); font-weight: 700; }
+  .mtag { display: inline-block; font-size: 8.5px; font-family: var(--mono); letter-spacing: 0.05em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; margin-top: 4px; }
+  .mtag.new { background: rgba(255,210,63,0.16); color: var(--new); border: 1px solid rgba(255,210,63,0.32); }
+  .mtag.old { color: var(--ink-faint); border: 1px solid var(--line); }
+  .mdate { display: block; font-size: 10px; color: var(--ink-faint); font-weight: 400; font-family: var(--mono); margin-top: 4px; }
+
+  th.col-o { border-top: 3px solid var(--openai); }
+  th.col-d { border-top: 3px solid var(--deepseek); }
+  th.col-k { border-top: 3px solid var(--kimi); }
+  th.col-a { border-top: 3px solid var(--anthropic); }
+  th.col-g { border-top: 3px solid var(--google); }
+
+  /* sortable row label */
+  td.bm-cell { cursor: pointer; transition: background .12s; user-select: none; }
+  td.bm-cell:hover { background: #1b232c; }
+  td.bm-cell.sorted-row { background: #1d2630; box-shadow: inset 3px 0 0 var(--lead); }
+  .sort-ic { display: inline-block; font-size: 10px; color: var(--ink-faint); margin-left: 6px; font-family: var(--mono); vertical-align: middle; }
+  td.bm-cell:hover .sort-ic { color: var(--ink-dim); }
+  td.bm-cell.sorted-row .sort-ic { color: var(--lead); }
+
+  tbody td { padding: 12px 13px; border-bottom: 1px solid var(--line-soft); text-align: center; position: relative; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+  tbody tr:hover td.bm-cell { background: #1b232c; }
+  tbody tr:hover td.bm-cell.sorted-row { background: #1d2630; }
+
+  /* section divider row */
+  tr.section-row td.section-cell {
+    position: sticky; left: 0;
+    text-align: left; padding: 9px 16px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--lead); background: #11161d;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    font-weight: 600;
+  }
+  tr.section-row:hover td.section-cell { background: #11161d; }
+
+  .bm-name { font-weight: 600; font-size: 13px; text-align: left; }
+  .bm-tag { display: inline-block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.04em; color: var(--ink-faint); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; margin-top: 5px; text-transform: uppercase; }
+  .bm-plain { font-size: 11.5px; color: var(--ink-dim); margin-top: 7px; line-height: 1.5; text-align: left; }
+
+  /* score cell content */
+  .cell-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .vdot { width: 7px; height: 7px; border-radius: 50%; position: absolute; top: 9px; left: 9px; opacity: .85; }
+  .vdot.o { background: var(--openai); } .vdot.a { background: var(--anthropic); } .vdot.g { background: var(--google); }
+  .vdot.d { background: var(--deepseek); } .vdot.k { background: var(--kimi); }
+  .score { font-family: var(--mono); font-size: 14px; font-weight: 600; white-space: nowrap; color: var(--ink); }
+  .score .unit { font-size: 10px; color: var(--ink-faint); margin-left: 1px; }
+  .score.lead { color: var(--lead); }
+  .score.na { color: var(--ink-faint); font-weight: 400; }
+
+  /* rank badge (shown only when a row is sorted) */
+  .rank { display: none; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 20px; letter-spacing: .02em; }
+  td.is-sorted .rank { display: inline-block; }
+  td.is-sorted.r1 { background: rgba(255,210,63,0.10); box-shadow: inset 0 0 0 1px rgba(255,210,63,.4); }
+  td.is-sorted.r2 { background: rgba(199,208,217,0.07); }
+  td.is-sorted.r3 { background: rgba(217,146,91,0.08); }
+  .rank.r1 { background: var(--rank1); color: #1a1400; }
+  .rank.r2 { background: var(--rank2); color: #14181c; }
+  .rank.r3 { background: var(--rank3); color: #1a0e00; }
+  .rank.rN { background: var(--line); color: var(--ink-dim); }
+  td.is-sorted.dimmed { opacity: .82; }
+
+  td.col-a, th.col-a { background-image: linear-gradient(rgba(217,119,87,0.035),rgba(217,119,87,0.035)); }
+  td.col-d, th.col-d { background-image: linear-gradient(rgba(124,111,240,0.045),rgba(124,111,240,0.045)); }
+  td.col-k, th.col-k { background-image: linear-gradient(rgba(224,81,138,0.045),rgba(224,81,138,0.045)); }
+  td.col-g, th.col-g { background-image: linear-gradient(rgba(77,139,240,0.035),rgba(77,139,240,0.035)); }
+  td.bm-cell { background-image: none; }
+
+  .notes { margin-top: 34px; padding: 20px 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; }
+  .notes h3 { font-size: 12.5px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 11px; }
+  .notes ul { list-style: none; }
+  .notes li { font-size: 12.5px; color: var(--ink-dim); padding-left: 17px; position: relative; margin-bottom: 8px; line-height: 1.55; }
+  .notes li::before { content: "—"; position: absolute; left: 0; color: var(--ink-faint); }
+  footer { margin-top: 40px; text-align: center; font-size: 11.5px; color: var(--ink-faint); font-family: var(--mono); }
+
+  /* ===== modal ===== */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(6,8,11,0.72); backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 50;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    max-width: 380px; width: 100%; padding: 26px 24px 22px; text-align: center;
+    transform: translateY(10px) scale(.98); transition: transform .25s;
+    box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  }
+  .modal-overlay.show .modal { transform: translateY(0) scale(1); }
+  .modal .m-ic { font-size: 26px; margin-bottom: 10px; }
+  .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .modal p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.65; margin-bottom: 8px; }
+  .modal .m-step { display: flex; align-items: flex-start; gap: 9px; text-align: left; font-size: 13px; color: var(--ink-dim); margin: 9px 0; }
+  .modal .m-step .n { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line); font-family: var(--mono); font-size: 11px; color: var(--lead); display: flex; align-items: center; justify-content: center; font-weight: 700; margin-top: 1px; }
+  .modal .m-step b { color: var(--ink); font-weight: 600; }
+  .modal button {
+    margin-top: 16px; width: 100%; padding: 11px; border-radius: 9px; border: none;
+    background: var(--lead); color: #1a1400; font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: filter .15s;
+  }
+  .modal button:hover { filter: brightness(1.07); }
+
+  @media (max-width: 720px) {
+    header.hero { padding: 36px 0 26px; }
+    th.bm-head, td.bm-cell { min-width: 180px; max-width: 180px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .modal-overlay, .modal { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ----- rotate-to-landscape overlay (phones in portrait only) ----- */
+  .rotate-note { display: none; }
+  /* Phones only: narrow portrait screens. iPad portrait (~768px) is excluded, so iPad
+     shows the table in both orientations. */
+  @media (max-width: 600px) and (orientation: portrait) {
+    .rotate-note {
+      display: flex; position: fixed; inset: 0; z-index: 200;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 18px; padding: 32px;
+      background: radial-gradient(120% 80% at 50% 30%, #161d26, var(--bg));
+      text-align: center;
+    }
+    /* hide page content behind overlay so portrait users only see the prompt */
+    body > header.hero, body > .wrap { filter: blur(2px); }
+    .rotate-note .phone {
+      width: 64px; height: 64px; color: var(--lead);
+      animation: rot 2.4s ease-in-out infinite;
+    }
+    @keyframes rot {
+      0%, 30% { transform: rotate(0deg); }
+      55%, 80% { transform: rotate(-90deg); }
+      100% { transform: rotate(-90deg); }
+    }
+    .rotate-note h2 { font-size: 19px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
+    .rotate-note p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.7; max-width: 320px; }
+    .rotate-note .hint {
+      margin-top: 4px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint);
+      border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; line-height: 1.6;
+    }
+  }
+  /* in landscape on phones, keep the table comfortable; let pinch-zoom do the rest */
+  @media (max-width: 920px) and (orientation: landscape) {
+    .scroll-hint .pill:first-child::after { content: " · ピンチで縮小して俯瞰"; }
+  }
+  /* ----- page zoom (all devices) -----
+     scale() shrinks the visual size, and width is expanded inversely (1/zoom) so the
+     content occupies the full viewport width at any zoom — i.e. zooming out fits more
+     across the screen instead of leaving a horizontal scroll. origin top-left keeps the
+     width math simple (no offset drift). */
+  #zoomRoot {
+    transform: scale(var(--zoom, 1));
+    transform-origin: top left;
+    width: calc(100% / var(--zoom, 1));
+    transition: transform .14s ease, width .14s ease;
+  }
+  /* zoomed-out: let content use the full expanded width (no centered max-width cap),
+     so the table fits across the viewport and horizontal scroll disappears */
+  body.zoomed-out .wrap { max-width: none; }
+  body.zoomed-out header.hero > .wrap { max-width: none; }
+  .zoom-ctl {
+    position: fixed; right: 16px; bottom: 16px; z-index: 120;
+    display: flex; align-items: center; gap: 4px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 5px; box-shadow: 0 8px 24px -8px rgba(0,0,0,0.6);
+    touch-action: manipulation; /* prevent double-tap-to-zoom; rapid taps = clicks */
+  }
+  .zoom-ctl button {
+    width: 34px; height: 34px; border-radius: 8px; border: none;
+    background: var(--panel); color: var(--ink); cursor: pointer;
+    font-size: 17px; font-weight: 700; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s;
+    font-family: var(--sans);
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .zoom-ctl button:hover { background: var(--lead); color: #0c0f13; }
+  .zoom-ctl button:active { transform: translateY(1px); }
+  .zoom-ctl button:disabled { opacity: .35; cursor: default; }
+  .zoom-ctl button:disabled:hover { background: var(--panel); color: var(--ink); }
+  .zoom-val {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+    min-width: 42px; text-align: center; user-select: none;
+  }
+  /* suppress double-tap-to-zoom across interactive UI so rapid taps register as taps */
+  .seg-btn, td.bm-cell, .modal button, .scroll-hint { touch-action: manipulation; }
+  /* when zoomed out for overview, the JS-positioned float header is hidden (handled in JS) */
+
+  @media (max-width: 720px) {
+    .zoom-ctl { right: 10px; bottom: 10px; }
+    .zoom-ctl button { width: 38px; height: 38px; font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="rotate-note" aria-hidden="true">
+  <svg class="phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="2" width="10" height="20" rx="2.2"></rect>
+    <line x1="11" y1="18" x2="13" y2="18"></line>
+  </svg>
+  <h2>スマホを横にしてください</h2>
+  <p>このベンチマーク表は列が多いため、横向き（ランドスケープ）での閲覧をおすすめします。</p>
+  <div class="hint">横向きにしたあと、指でピンチイン（縮める）すると<br>表全体を縮小して俯瞰できます ✨</div>
+</div>
+
+<!-- zoom controls (all devices) -->
+<div class="zoom-ctl" id="zoomCtl" role="group" aria-label="ページの拡大縮小">
+  <button id="zoomOut" aria-label="縮小">−</button>
+  <span class="zoom-val" id="zoomVal">100%</span>
+  <button id="zoomIn" aria-label="拡大">＋</button>
+  <button id="zoomReset" aria-label="リセット">⟲</button>
+</div>
+
+<div id="zoomRoot">
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Frontier Model Comparison · 2026/06/12 更新</div>
+    <h1><span class="grad">AIモデル全比較</span> — OpenAI · Anthropic · Google</h1>
+    <p class="sub">3社の現行モデルを1つの表に横並び。左端のベンチ列とモデル名ヘッダーは固定。<b>各ベンチマーク名をクリック/タップすると、その行の高スコア順に列が並び替わり、順位バッジが付きます。</b></p>
+    <div class="legend">
+      <span class="key"><span class="swatch sw-o"></span><b>OpenAI</b></span>
+      <span class="key"><span class="swatch sw-a"></span><b>Anthropic</b></span>
+      <span class="key"><span class="swatch sw-g"></span><b>Google</b></span>
+      <span>数値 = 各社の自己申告値</span>
+    </div>
+    <div class="scroll-hint">
+      <span class="pill">⟷ 横スクロールで全9モデル</span>
+      <span class="pill">ベンチ名クリックで並び替え</span>
+      <span class="pill">もう一度クリックでリセット</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="filters" id="filters">
+    <div class="filter-group">
+      <span class="filter-label">表示量</span>
+      <div class="seg" data-axis="depth">
+        <button class="seg-btn active" data-val="simple">シンプル</button>
+        <button class="seg-btn" data-val="full">フル</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">用途</span>
+      <div class="seg" data-axis="aud">
+        <button class="seg-btn active" data-val="all">すべて</button>
+        <button class="seg-btn" data-val="dev">開発者向け</button>
+        <button class="seg-btn" data-val="gen">一般使用者向け</button>
+      </div>
+    </div>
+    <span class="filter-count" id="filterCount"></span>
+  </div>
+
+  <div class="model-select" id="modelSelect">
+    <div class="ms-head">
+      <span class="ms-title">モデル選択</span>
+      <div class="ms-actions">
+        <button class="ms-btn" id="msAll">全選択</button>
+        <button class="ms-btn" id="msNone">全解除</button>
+        <button class="ms-btn" id="msReset">既定に戻す</button>
+      </div>
+    </div>
+    <div class="ms-list" id="msList"></div>
+  </div>
+
+  <div class="table-wrap" id="tableTop">
+    <div class="table-scroll" id="tableScroll">
+      <table id="cmp">
+        <thead>
+          <tr id="headRow">
+            <th class="bm-head">ベンチマーク <span style="font-weight:400;color:var(--ink-faint);font-size:11px">／ 何を測るか</span></th>
+          </tr>
+        </thead>
+        <tbody id="body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>補足・注意</h3>
+    <ul>
+      <li>全スコアは各社の<b>公式ベンチマーク発表</b>（Anthropic / OpenAI / Google の公式ページ）に基づく自己申告値。第三者の再現テストでは前後する例があり、絶対値より傾向で読むのが安全。</li>
+      <li><b>ソートは「—（未公表）」を最下位扱い</b>にします。順位はスコアが高い順に1位→2位…。同点は元の並び順を維持。</li>
+      <li><b>Humanity's Last Exam は「ツールなし／ツールあり」で別行</b>にしています。ツールありは検索・コード実行を許可した実運用に近い条件で、数値が大きく上がります。</li>
+      <li><b>Terminal-Bench 2.1</b> はエージェントの足回り（harness）が各社で異なります。GPT-5.5はCodex CLI、Gemini系は各自のCLI上の値。OSWorld・SWE系も同様に条件差で前後し、ベンダー間の厳密な同条件比較ではありません。</li>
+      <li><b>GDPval-AA は単位が異なる</b>（OpenAIは%（wins/ties）、Anthropic・GoogleはElo）。ソートしても単位混在のため順位は参考扱い。</li>
+      <li><b>ExploitBench（サイバー）・BioMystery 等の危険領域</b>は、Anthropicが安全性の観点でFable 5系のみ高スコアを公開。他社は未公開または低めに出ます。</li>
+      <li><b>Sonnet 5</b>（2026/06/30）は公式ブログの表が画像のみのため、SWE-bench Verified 85.2% と BrowseComp 84.7% は<b>System Card を引用した二次ソース</b>由来。GPQA・MCP Atlas・CharXiv・MMMU-Pro は Anthropic 未公表のため「—」。価格は標準の $3/$15 表記（2026/08/31 までは導入価格 $2/$10）。</li>
+      <li><b>Gemini 3.1 Pro はコンテキスト2M</b>（業界最大級）。<b>Gemini 3.5 Pro</b> は6月GA予定でベンチ未公開のため未掲載。Fable 5の一部数値はMythos 5との1〜3ポイント差の高い方を公式表が掲載しています。</li>
+    </ul>
+  </div>
+
+  <footer>
+    Data: 各社公式ベンチマーク発表（2026年2〜6月） · 数値は自己申告 · harness/scaffold依存で変動 · Updated 2026/06/14
+  </footer>
+</div>
+</div><!-- /#zoomRoot -->
+
+<!-- reset-notice modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="m-ic">↕️</div>
+    <h3 id="modalTitle">並び替えの使い方</h3>
+    <div class="m-step"><span class="n">1</span><span><b>ベンチマーク名をクリック/タップ</b>すると、その行のスコアが高い順に列が左から並び替わります。</span></div>
+    <div class="m-step"><span class="n">2</span><span>各セルに<b>順位バッジ（1位・2位…）</b>が付きます。1位は金、2位は銀、3位は銅。</span></div>
+    <div class="m-step"><span class="n">3</span><span><b>もう一度クリック/タップするとリセット</b>され、元の並び順（社ごと）に戻ります。</span></div>
+    <button id="modalOk">わかった👍</button>
+  </div>
+</div>
+
+<script>
+// ---------- data ----------
+const MODELS = [
+  { id:'gpt55',   vendor:'o', label:'OpenAI',    name:'GPT-5.5',          tag:'new', tagtxt:'最新',         meta:'2026/04/23 · $5/$30' },
+  { id:'gpt54',   vendor:'o', label:'OpenAI',    name:'GPT-5.4',          tag:'old', tagtxt:'前世代',       meta:'2026/03/05 · $2.5/$15' },
+  { id:'fable5',  vendor:'a', label:'Anthropic', name:'Fable 5',          tag:'new', tagtxt:'最上位',       meta:'2026/06/09 · $10/$50' },
+  { id:'opus48',  vendor:'a', label:'Anthropic', name:'Opus 4.8',         tag:'new', tagtxt:'フラッグシップ', meta:'2026/05/28 · $5/$25' },
+  { id:'opus47',  vendor:'a', label:'Anthropic', name:'Opus 4.7',         tag:'old', tagtxt:'前世代',       meta:'2026/04/16 · $5/$25' },
+  { id:'opus46',  vendor:'a', label:'Anthropic', name:'Opus 4.6',         tag:'old', tagtxt:'前々世代',     meta:'2026/02/05 · $5/$25' },
+  { id:'son5',    vendor:'a', label:'Anthropic', name:'Sonnet 5',         tag:'new', tagtxt:'最新Sonnet',   meta:'2026/06/30 · $3/$15' },
+  { id:'son46',   vendor:'a', label:'Anthropic', name:'Sonnet 4.6',       tag:'old', tagtxt:'コスパ型',     meta:'2026/02/17 · $3/$15' },
+  { id:'g35f',    vendor:'g', label:'Google',    name:'Gemini 3.5 Flash', tag:'new', tagtxt:'最新',         meta:'2026/05/19 · $1.5/$9' },
+  { id:'g31p',    vendor:'g', label:'Google',    name:'Gemini 3.1 Pro',   tag:'old', tagtxt:'推論旗艦',     meta:'2026/02/19 · $2/$12' },
+  { id:'dsv4p',   vendor:'d', label:'DeepSeek',  name:'V4-Pro',           tag:'new', tagtxt:'OSS最上位',    meta:'2026/04/24 · $0.44/$0.87' },
+  { id:'dsv4f',   vendor:'d', label:'DeepSeek',  name:'V4-Flash',         tag:'new', tagtxt:'OSS高速',      meta:'2026/04/24 · $0.14/$0.28' },
+  { id:'k26',     vendor:'k', label:'Kimi',      name:'K2.6',             tag:'new', tagtxt:'OSS最新',      meta:'2026/04/20 · $0.6/$2.5' },
+  { id:'k25',     vendor:'k', label:'Kimi',      name:'K2.5',             tag:'old', tagtxt:'前世代',       meta:'2026/01/27 · $0.6/$3' },
+];
+
+// v = numeric value for sorting (null = N/A → last). d = display. u = unit. sortable: false (mixed) → no rank badges.
+// section = category grouping label shown on the row.
+// Values verified against official benchmark tables (Anthropic Fable5/Opus4.8, OpenAI GPT-5.5, Google Gemini 3.5 pages).
+const ROWS = [
+  // ===== Coding =====
+  { name:'SWE-bench Verified', tag:'Coding', section:'コーディング', d:'s', a:['dev','gen'],
+    plain:'実際のGitHub課題をコード修正で直しきれるか。現場プログラマーの仕事をどれだけ自動でこなせるかの代表指標。',
+ cells:{gpt55:[88.7,'88.7','%'],gpt54:[85.0,'85.0','%'],fable5:[95.0,'95.0','%'],opus48:[88.6,'88.6','%'],opus47:[87.6,'87.6','%'],opus46:[80.8,'80.8','%'],son5:[85.2,'85.2','%'],son46:[79.6,'79.6','%'],g35f:[null,'—',''],g31p:[80.6,'80.6','%'],dsv4p:[80.6,'80.6','%'],dsv4f:[79.0,'79.0','%'],k26:[80.2,'80.2','%'],k25:[76.8,'76.8','%']} },
+  { name:'SWE-bench Pro', tag:'Coding · Hard', section:'コーディング', d:'s', a:['dev'],
+    plain:'上の難関版。活発に開発中のリポジトリで複数ファイルにまたがる修正が必要。本番のエンジニア業務に最も近い。',
+ cells:{gpt55:[58.6,'58.6','%'],gpt54:[59.1,'59.1','%'],fable5:[80.3,'80.3','%'],opus48:[69.2,'69.2','%'],opus47:[64.3,'64.3','%'],opus46:[53.4,'53.4','%'],son5:[63.2,'63.2','%'],son46:[null,'—',''],g35f:[55.1,'55.1','%'],g31p:[54.2,'54.2','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[58.6,'58.6','%'],k25:[50.7,'50.7','%']} },
+  { name:'Terminal-Bench 2.1', tag:'Agentic Coding', section:'コーディング', d:'s', a:['dev'],
+    plain:'ターミナル（黒い画面）で計画→実行→ツール連携を自律的にこなせるか。DevOps/エージェント作業の代理指標。※GPT-5.5はCodex CLI、Gemini系はそのCLI上の値。',
+ cells:{gpt55:[83.4,'83.4','%'],gpt54:[null,'—',''],fable5:[88.0,'88.0','%'],opus48:[82.7,'82.7','%'],opus47:[66.1,'66.1','%'],opus46:[null,'—',''],son5:[80.4,'80.4','%'],son46:[null,'—',''],g35f:[76.2,'76.2','%'],g31p:[70.7,'70.7','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[66.7,'66.7','%'],k25:[50.8,'50.8','%']} },
+  { name:'FrontierMath Tier 1–3', tag:'Math', section:'コーディング', a:['dev','gen'],
+    plain:'研究者が作った超難問数学。Tier1–3は大学〜大学院レベル。多段の数学的推論力を測る。',
+ cells:{gpt55:[51.7,'51.7','%'],gpt54:[47.6,'47.6','%'],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[43.8,'43.8','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[null,'—',''],g35f:[null,'—',''],g31p:[36.9,'36.9','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+
+  // ===== Agentic / Tool use =====
+  { name:'MCP Atlas', tag:'Tool Use', section:'エージェント', d:'s', a:['dev'],
+    plain:'複数の外部ツール（API）を正しい順番で呼び出し連携させられるか。道具を使い分けて段取りよく仕事する力。',
+ cells:{gpt55:[75.3,'75.3','%'],gpt54:[null,'—',''],fable5:[null,'—',''],opus48:[82.2,'82.2','%'],opus47:[79.1,'79.1','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[69.5,'69.5','%'],g35f:[83.6,'83.6','%'],g31p:[78.2,'78.2','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+  { name:'Toolathlon', tag:'Tool Use', section:'エージェント', a:['dev'],
+    plain:'実世界の汎用ツール操作。多様なアプリ/サービスを横断して目的を達成できるかを測る。',
+ cells:{gpt55:[55.6,'55.6','%'],gpt54:[54.6,'54.6','%'],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[null,'—',''],opus46:[null,'—',''],son5:[null,'—',''],son46:[null,'—',''],g35f:[56.5,'56.5','%'],g31p:[48.8,'48.8','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[50.0,'50.0','%'],k25:[27.8,'27.8','%']} },
+  { name:'BrowseComp', tag:'Web Research', section:'エージェント', a:['dev','gen'],
+    plain:'ウェブを自分で検索・閲覧して、答えにくい調べ物をやり遂げられるか。リサーチ系エージェントの代理指標。',
+ cells:{gpt55:[84.4,'84.4','%'],gpt54:[82.7,'82.7','%'],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[79.3,'79.3','%'],opus46:[null,'—',''],son5:[84.7,'84.7','%'],son46:[null,'—',''],g35f:[null,'—',''],g31p:[85.9,'85.9','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[86.3,'86.3','%'],k25:[74.9,'74.9','%']} },
+
+  // ===== Computer use =====
+  { name:'OSWorld-Verified', tag:'Computer Use', section:'PC操作', d:'s', a:['dev','gen'],
+    plain:'実際のPC画面を見てマウス・キーボードを操作し、アプリ横断のタスクを完了できるか。人の代わりにPCを操作する力。',
+ cells:{gpt55:[78.7,'78.7','%'],gpt54:[75.0,'75.0','%'],fable5:[85.4,'85.4','%'],opus48:[83.4,'83.4','%'],opus47:[82.8,'82.8','%'],opus46:[72.7,'72.7','%'],son5:[81.2,'81.2','%'],son46:[72.5,'72.5','%'],g35f:[78.4,'78.4','%'],g31p:[76.2,'76.2','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+
+  // ===== Multimodal =====
+  { name:'CharXiv Reasoning', tag:'Multimodal', section:'マルチモーダル', a:['gen'],
+    plain:'複雑なグラフ・チャートから情報を読み取り推論できるか。図表理解の力（ツールなし）。',
+ cells:{gpt55:[84.1,'84.1','%'],gpt54:[null,'—',''],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[82.1,'82.1','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[72.4,'72.4','%'],g35f:[84.2,'84.2','%'],g31p:[83.3,'83.3','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+  { name:'MMMU-Pro', tag:'Multimodal', section:'マルチモーダル', d:'s', a:['gen'],
+    plain:'画像＋テキストを統合して大学レベルの問題を解けるか。総合的なマルチモーダル理解（ツールなし）。',
+ cells:{gpt55:[81.2,'81.2','%'],gpt54:[null,'—',''],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[75.2,'75.2','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[74.5,'74.5','%'],g35f:[83.6,'83.6','%'],g31p:[80.5,'80.5','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[78.5,'78.5','%']} },
+  { name:'Blueprint-Bench 2', tag:'Spatial Reasoning', section:'マルチモーダル', a:['gen'],
+    plain:'図面・間取りなどから空間構造を読み解くエージェント的空間推論。正規化スコア。',
+ cells:{gpt55:[36.2,'36.2','%'],gpt54:[null,'—',''],fable5:[38.6,'38.6','%'],opus48:[14.5,'14.5','%'],opus47:[24.5,'24.5','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[6.7,'6.7','%'],g35f:[33.6,'33.6','%'],g31p:[26.5,'26.5','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+
+  // ===== Reasoning / Knowledge =====
+  { name:'GPQA Diamond', tag:'Science', section:'推論・知識', d:'s', a:['dev','gen'],
+    plain:'物理・化学・生物の大学院レベルの難問。検索では答えにくく専門家でも苦戦。深い科学的推論力を測る。',
+ cells:{gpt55:[92.4,'92.4','%'],gpt54:[91.3,'91.3','%'],fable5:[null,'—',''],opus48:[93.6,'93.6','%'],opus47:[94.2,'94.2','%'],opus46:[91.3,'91.3','%'],son5:[null,'—',''],son46:[89.9,'89.9','%'],g35f:[null,'—',''],g31p:[94.3,'94.3','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+  { name:"Humanity's Last Exam（ツールなし）", tag:'Expert', section:'推論・知識', d:'s', a:['dev','gen'],
+    plain:'あらゆる分野の専門家が作った超難問集。AIの知識と推論の上限を測る。ツールを使わず純粋な実力で解く版。',
+ cells:{gpt55:[41.4,'41.4','%'],gpt54:[null,'—',''],fable5:[59.0,'59.0','%'],opus48:[49.8,'49.8','%'],opus47:[46.9,'46.9','%'],opus46:[null,'—',''],son5:[43.2,'43.2','%'],son46:[34.6,'34.6','%'],g35f:[33.7,'33.7','%'],g31p:[44.4,'44.4','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[31.5,'31.5','%']} },
+  { name:"Humanity's Last Exam（ツールあり）", tag:'Expert', section:'推論・知識', a:['dev','gen'],
+    plain:'同じ超難問集を、検索やコード実行などのツールを使って解く版。実運用に近い条件での到達点。',
+ cells:{gpt55:[52.2,'52.2','%'],gpt54:[null,'—',''],fable5:[64.5,'64.5','%'],opus48:[57.9,'57.9','%'],opus47:[54.7,'54.7','%'],opus46:[null,'—',''],son5:[57.4,'57.4','%'],son46:[46.8,'46.8','%'],g35f:[40.2,'40.2','%'],g31p:[51.4,'51.4','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[54.0,'54.0','%'],k25:[50.2,'50.2','%']} },
+  { name:'ARC-AGI-2', tag:'Abstract Reasoning', section:'推論・知識', a:['gen'],
+    plain:'未知のルールをその場で見つけて当てはめる図形パズル。暗記では解けず「応用力（流動的知性）」に近いものを測る。',
+ cells:{gpt55:[84.6,'84.6','%'],gpt54:[83.3,'83.3','%'],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[75.8,'75.8','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[58.3,'58.3','%'],g35f:[72.1,'72.1','%'],g31p:[77.1,'77.1','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+
+  // ===== Long context =====
+  { name:'MRCR v2（128k）', tag:'Long Context', section:'長文脈', a:['dev'],
+    plain:'長い文章の中から必要な情報を正確に拾えるか（干し草から針探し）。128kトークン時の平均スコア。',
+ cells:{gpt55:[94.8,'94.8','%'],gpt54:[null,'—',''],fable5:[null,'—',''],opus48:[null,'—',''],opus47:[59.3,'59.3','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[84.9,'84.9','%'],g35f:[77.3,'77.3','%'],g31p:[84.9,'84.9','%'],dsv4p:[83.5,'83.5','%'],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+
+  // ===== Expert / Domain =====
+  { name:'Finance Agent v2', tag:'Finance', section:'専門業務', a:['gen'],
+    plain:'財務分析と意思決定をエージェントとして遂行できるか。金融実務の代理指標。',
+ cells:{gpt55:[51.8,'51.8','%'],gpt54:[null,'—',''],fable5:[null,'—',''],opus48:[53.9,'53.9','%'],opus47:[51.5,'51.5','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[51.0,'51.0','%'],g35f:[57.9,'57.9','%'],g31p:[43.0,'43.0','%'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+  { name:'GDPval-AA', tag:'Knowledge Work', section:'専門業務', d:'s', a:['dev','gen'], mixed:true,
+    plain:'実在する職種の実務タスクを人間の専門家と比較。※OpenAIは%（wins/ties）、Anthropic・GoogleはElo方式で単位が異なるため順位は参考。',
+ cells:{gpt55:[84.9,'84.9','%'],gpt54:[83.0,'83.0','%'],fable5:[1932,'1932',' Elo'],opus48:[1890,'1890',' Elo'],opus47:[1753,'1753',' Elo'],opus46:[null,'—',''],son5:[1618,'1618',' Elo'],son46:[1676,'1676',' Elo'],g35f:[1656,'1656',' Elo'],g31p:[1314,'1314',' Elo'],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+  { name:'ExploitBench（サイバー）', tag:'Cybersecurity', section:'専門業務', a:['dev'],
+    plain:'脆弱性の発見・悪用といったセキュリティ攻撃タスクの能力（Cap%）。攻防自動化の指標。※安全性の観点でFable5のみ公開。',
+ cells:{gpt55:[34.0,'34.0','%'],gpt54:[null,'—',''],fable5:[78.0,'78.0','%'],opus48:[40.0,'40.0','%'],opus47:[73.1,'73.1','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[null,'—',''],g35f:[null,'—',''],g31p:[null,'—',''],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+  { name:'HealthBench Professional', tag:'Health', section:'専門業務', a:['gen'],
+    plain:'医療専門家向けの健康・臨床タスクの正確さ。ヘルスケア領域での信頼性の代理指標。',
+ cells:{gpt55:[51.8,'51.8','%'],gpt54:[null,'—',''],fable5:[66.0,'66.0','%'],opus48:[56.9,'56.9','%'],opus47:[64.7,'64.7','%'],opus46:[null,'—',''],son5:[null,'—',''],son46:[null,'—',''],g35f:[null,'—',''],g31p:[null,'—',''],dsv4p:[null,'—',''],dsv4f:[null,'—',''],k26:[null,'—',''],k25:[null,'—','']} },
+
+  // ===== Capacity / Price =====
+  { name:'コンテキストウィンドウ', tag:'Capacity', section:'基本仕様', d:'s', a:['dev','gen'], mixed:true,
+    plain:'一度に読み込める情報量（入力トークン数）。大きいほど長い資料やコードベース全体を丸ごと渡せる。',
+ cells:{gpt55:[1,'1M',''],gpt54:[1,'1M',''],fable5:[1,'1M',''],opus48:[1,'1M',''],opus47:[1,'1M',''],opus46:[1,'1M',''],son5:[1,'1M',''],son46:[1,'1M',''],g35f:[1,'1M',''],g31p:[2,'2M',''],dsv4p:[1,'1M',''],dsv4f:[1,'1M',''],k26:[0.256,'256K',''],k25:[0.256,'256K','']} },
+  { name:'料金（入力 / 出力）', tag:'Price · per 1M tok', section:'基本仕様', d:'s', a:['dev','gen'], lowerBetter:true,
+    plain:'100万トークンあたりの単価（USD）。安いほど大量処理のコストが下がる。性能とのバランスで選ぶ。',
+ cells:{gpt55:[5,'$5/$30',''],gpt54:[2.5,'$2.5/$15',''],fable5:[10,'$10/$50',''],opus48:[5,'$5/$25',''],opus47:[5,'$5/$25',''],opus46:[5,'$5/$25',''],son5:[3,'$3/$15',''],son46:[3,'$3/$15',''],g35f:[1.5,'$1.5/$9',''],g31p:[2,'$2/$12',''],dsv4p:[0.44,'$0.44/$0.87',''],dsv4f:[0.14,'$0.14/$0.28',''],k26:[0.6,'$0.6/$2.5',''],k25:[0.6,'$0.6/$3','']} },
+];
+
+// ---------- render ----------
+const headRow = document.getElementById('headRow');
+const body = document.getElementById('body');
+const tableScroll=document.getElementById('tableScroll');
+const tableEl=document.getElementById('cmp');
+const DEFAULT_MODELS=['gpt55','opus48','son5','g35f']; // 各社最新の代表4モデル
+let selectedModels=new Set(DEFAULT_MODELS);
+let baseOrder = MODELS.map(m=>m.id);           // full vendor order
+let order = baseOrder.filter(id=>selectedModels.has(id)); // visible columns
+let sortedRowIdx = null;             // which row is currently sorting
+let filterDepth = 'simple';          // 'simple' | 'full'
+let filterAud = 'all';               // 'all' | 'dev' | 'gen'
+let floatHead=null, floatTable=null; // floating header refs (defined here to avoid TDZ)
+let zoomPct=100;                     // current zoom % (declared early; float header reads it)
+
+// does a row pass the current filters?
+function rowVisible(row){
+  if(filterDepth==='simple' && row.d!=='s') return false;
+  if(filterAud!=='all'){
+    if(!row.a || !row.a.includes(filterAud)) return false;
+  }
+  return true;
+}
+
+function buildHead(){
+  // remove existing model th (keep first bm-head)
+  [...headRow.querySelectorAll('th.modcol')].forEach(e=>e.remove());
+  order.forEach(id=>{
+    const m = MODELS.find(x=>x.id===id);
+    const th = document.createElement('th');
+    th.className = 'modcol col-'+m.vendor;
+    th.dataset.id = id;
+    th.innerHTML =
+      `<span class="vlabel ${m.vendor}">${m.label}</span>`+
+      `<span class="mname">${m.name}</span>`+
+      `<span class="mtag ${m.tag}">${m.tagtxt}</span>`+
+      `<span class="mdate">${m.meta}</span>`;
+    headRow.appendChild(th);
+  });
+}
+
+function buildBody(){
+  body.innerHTML='';
+  let lastSection=null;
+  let nVisible=0;
+  ROWS.forEach((row,ri)=>{
+    if(!rowVisible(row)) return;       // filter
+    nVisible++;
+    // section divider row (only when section changes among VISIBLE rows)
+    if(row.section && row.section!==lastSection){
+      lastSection=row.section;
+      const sr=document.createElement('tr');
+      sr.className='section-row';
+      const sc=document.createElement('td');
+      sc.className='section-cell';
+      sc.setAttribute('colspan', MODELS.length+1);
+      sc.textContent=row.section;
+      sr.appendChild(sc);
+      body.appendChild(sr);
+    }
+    const tr=document.createElement('tr');
+    // label cell
+    const td0=document.createElement('td');
+    td0.className='bm-cell'+(sortedRowIdx===ri?' sorted-row':'');
+    td0.dataset.ri=ri;
+    const ic = sortedRowIdx===ri ? '⟲ リセット' : '⇅ 並替';
+    td0.innerHTML=`<div class="bm-name">${row.name}<span class="sort-ic">${ic}</span></div>`+
+                  `<span class="bm-tag">${row.tag}</span>`+
+                  `<div class="bm-plain">${row.plain}</div>`;
+    td0.addEventListener('click',()=>onSort(ri));
+    tr.appendChild(td0);
+
+    // ranks for this row (if sorted)
+    let rankMap={};
+    if(sortedRowIdx===ri && !row.mixed){
+      const ranked = order
+        .map(id=>({id, v:row.cells[id][0]}))
+        .filter(x=>x.v!==null)
+        .sort((a,b)=> row.lowerBetter ? a.v-b.v : b.v-a.v);
+      let r=0, prev=null, shown=0;
+      ranked.forEach((x,i)=>{ shown=i+1; if(x.v!==prev){r=i+1;prev=x.v;} rankMap[x.id]=r; });
+    }
+
+    order.forEach(id=>{
+      const m=MODELS.find(x=>x.id===id);
+      const c=row.cells[id];
+      const td=document.createElement('td');
+      td.className='col-'+m.vendor;
+      const isNA = c[0]===null;
+      const lead = !isNA && !row.mixed && isRowLeader(row,id);
+      let rankBadge='';
+      if(sortedRowIdx===ri){
+        td.classList.add('is-sorted');
+        if(!row.mixed){
+          if(isNA){ rankBadge=`<span class="rank rN">—</span>`; td.classList.add('dimmed'); }
+          else {
+            const rk=rankMap[id];
+            const cls = rk===1?'r1':rk===2?'r2':rk===3?'r3':'rN';
+            if(rk<=3) td.classList.add(cls);
+            rankBadge=`<span class="rank ${cls}">${rk}位</span>`;
+          }
+        }
+      }
+      td.innerHTML=
+        `<span class="vdot ${m.vendor}"></span>`+
+        `<div class="cell-inner">`+
+          `<span class="score ${isNA?'na':''} ${lead&&sortedRowIdx!==ri?'lead':''}">${c[1]}${c[2]?`<span class="unit">${c[2]}</span>`:''}</span>`+
+          rankBadge+
+        `</div>`;
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+  const cl=document.getElementById('filterCount');
+  if(cl) cl.textContent=`${nVisible} 指標を表示`;
+  syncFloatHead();
+}
+
+function isRowLeader(row,id){
+  if(row.mixed) return false;
+  const vals=Object.values(row.cells).map(c=>c[0]).filter(v=>v!==null);
+  if(!vals.length) return false;
+  const best = row.lowerBetter ? Math.min(...vals) : Math.max(...vals);
+  return row.cells[id][0]===best;
+}
+
+function onSort(ri){
+  if(sortedRowIdx===ri){           // second click → reset
+    sortedRowIdx=null;
+    order=baseOrder.filter(id=>selectedModels.has(id));
+  } else {
+    sortedRowIdx=ri;
+    const row=ROWS[ri];
+    if(row.mixed){
+      // mixed units: don't reorder, just mark (keep order)
+    } else {
+      order=[...order].sort((a,b)=>{
+        const va=row.cells[a][0], vb=row.cells[b][0];
+        if(va===null && vb===null) return 0;
+        if(va===null) return 1;
+        if(vb===null) return -1;
+        return row.lowerBetter ? va-vb : vb-va;
+      });
+    }
+  }
+  buildHead();
+  buildBody();
+}
+
+buildHead();
+buildBody();
+
+// ---------- model select panel ----------
+const VENDCOL={o:'var(--openai)',a:'var(--anthropic)',g:'var(--google)',d:'var(--deepseek)',k:'var(--kimi)'};
+const msList=document.getElementById('msList');
+function renderModelSelect(){
+  msList.innerHTML='';
+  MODELS.forEach(m=>{
+    const on=selectedModels.has(m.id);
+    const el=document.createElement('div');
+    el.className='ms-item'+(on?' on':'');
+    el.style.setProperty('--msc', VENDCOL[m.vendor]||'var(--lead)');
+    el.dataset.id=m.id;
+    el.innerHTML=`<span class="ms-check"></span><span class="ms-meta"><span class="ms-vend">${m.label}</span><span class="ms-name">${m.name}</span></span>`;
+    el.addEventListener('click',()=>toggleModel(m.id));
+    msList.appendChild(el);
+  });
+}
+function applySelection(){
+  // preserve current sort order among still-selected; else base order
+  if(sortedRowIdx!==null){
+    order=order.filter(id=>selectedModels.has(id));
+    baseOrder.forEach(id=>{ if(selectedModels.has(id)&&!order.includes(id)) order.push(id); });
+  } else {
+    order=baseOrder.filter(id=>selectedModels.has(id));
+  }
+  renderModelSelect();
+  buildHead();
+  buildBody();
+}
+function toggleModel(id){
+  if(selectedModels.has(id)){
+    if(selectedModels.size<=1) return;   // keep at least 1
+    selectedModels.delete(id);
+  } else selectedModels.add(id);
+  applySelection();
+}
+document.getElementById('msAll').addEventListener('click',()=>{ MODELS.forEach(m=>selectedModels.add(m.id)); applySelection(); });
+document.getElementById('msNone').addEventListener('click',()=>{ selectedModels=new Set([MODELS[0].id]); applySelection(); });
+document.getElementById('msReset').addEventListener('click',()=>{ selectedModels=new Set(DEFAULT_MODELS); sortedRowIdx=null; applySelection(); });
+renderModelSelect();
+document.getElementById('filters').addEventListener('click', e=>{
+  const btn=e.target.closest('.seg-btn'); if(!btn) return;
+  const axis=btn.closest('.seg').dataset.axis;
+  const val=btn.dataset.val;
+  // toggle active within this seg
+  btn.closest('.seg').querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  if(axis==='depth') filterDepth=val;
+  if(axis==='aud')   filterAud=val;
+  // if the currently-sorted row is now hidden, reset sorting
+  if(sortedRowIdx!==null && !rowVisible(ROWS[sortedRowIdx])){
+    sortedRowIdx=null; order=baseOrder.filter(id=>selectedModels.has(id)); buildHead();
+  }
+  buildBody();
+});
+
+// ---------- floating header (viewport-pinned during vertical page scroll) ----------
+function syncFloatHead(){
+  if(!tableScroll||!tableEl) return;
+  if(!floatHead){
+    floatHead=document.createElement('div');
+    floatHead.className='float-head';
+    floatTable=document.createElement('table');
+    floatHead.appendChild(floatTable);
+    document.body.appendChild(floatHead);
+  }
+  const z=(typeof zoomPct==='number'?zoomPct:100)/100;
+  // Build the clone at UNSCALED size: original fonts + UNSCALED column widths
+  // (on-screen width ÷ z = the real un-zoomed width). Then scale(z) on floatHead shrinks
+  // the whole thing — widths AND font size — exactly like the zoomed real header.
+  floatTable.innerHTML='';
+  floatTable.appendChild(tableEl.querySelector('thead').cloneNode(true));
+  const srcThs=tableEl.querySelectorAll('thead th');
+  const dstThs=floatTable.querySelectorAll('thead th');
+  let total=0;
+  srcThs.forEach((th,i)=>{ const w=th.getBoundingClientRect().width/z; total+=w; if(dstThs[i]){ dstThs[i].style.width=w+'px'; dstThs[i].style.minWidth=w+'px'; dstThs[i].style.maxWidth=w+'px'; }});
+  floatTable.style.width=total+'px';
+  positionFloatHead();
+}
+function positionFloatHead(){
+  if(!floatHead) return;
+  const z=(typeof zoomPct==='number'?zoomPct:100)/100;
+  const r=tableScroll.getBoundingClientRect();        // on-screen (scaled) rect of the table viewport
+  floatHead.style.left=r.left+'px';
+  floatHead.style.top='0px';
+  floatHead.style.overflow='hidden';
+  floatHead.style.transformOrigin='top left';
+  floatHead.style.transform=`scale(${z})`;            // scale whole clone once (fonts + widths shrink together)
+  floatHead.style.width=(r.width / z)+'px';           // unscaled clip width; scale(z) renders it to r.width
+  // scrollLeft is unscaled px; clone is unscaled too, so no z multiplier here
+  floatTable.style.transform=`translateX(${-tableScroll.scrollLeft}px)`;
+}
+function updateFloatVisibility(){
+  if(!floatHead) return;
+  const r=tableScroll.getBoundingClientRect();
+  const theadH=tableEl.querySelector('thead').getBoundingClientRect().height;
+  // show when the real header has scrolled above the viewport top but the table body is still visible
+  const show = r.top < 1 && r.bottom > theadH+60;
+  const wasShown=floatHead.classList.contains('show');
+  floatHead.classList.toggle('show', show);
+  // re-measure widths only on the transition into view (cheap on plain scroll otherwise)
+  if(show && !wasShown) syncFloatHead();
+  else if(show) positionFloatHead();
+}
+window.addEventListener('scroll', updateFloatVisibility, {passive:true});
+window.addEventListener('resize', ()=>{ syncFloatHead(); updateFloatVisibility(); }, {passive:true});
+tableScroll.addEventListener('scroll', ()=>{
+  if(floatTable) floatTable.style.transform=`translateX(${-tableScroll.scrollLeft}px)`;
+}, {passive:true});
+
+// ---------- reset-notice modal: show once after user scrolls to table ----------
+const modal=document.getElementById('modal');
+const tableTop=document.getElementById('tableTop');
+let shown=false;
+function showModal(){ if(shown)return; shown=true; modal.classList.add('show'); }
+function closeModal(){ modal.classList.remove('show'); }
+document.getElementById('modalOk').addEventListener('click',closeModal);
+modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{ if(en.isIntersecting){ showModal(); io.disconnect(); } });
+},{threshold:0.25});
+io.observe(tableTop);
+
+// ---------- page zoom (all devices) ----------
+const ZMIN=50, ZMAX=100, ZSTEP=10;  // percent
+const zoomRoot=document.getElementById('zoomRoot');
+const zoomVal=document.getElementById('zoomVal');
+const zInBtn=document.getElementById('zoomIn');
+const zOutBtn=document.getElementById('zoomOut');
+const zResetBtn=document.getElementById('zoomReset');
+function applyZoom(){
+  zoomPct=Math.min(ZMAX, Math.max(ZMIN, zoomPct));
+  const z=zoomPct/100;
+  zoomRoot.style.setProperty('--zoom', z);
+  zoomVal.textContent=zoomPct+'%';
+  zInBtn.disabled = zoomPct>=ZMAX;
+  zOutBtn.disabled = zoomPct<=ZMIN;
+  // when zoomed out, let the content span the expanded width (fills viewport, removes h-scroll)
+  document.body.classList.toggle('zoomed-out', zoomPct<100);
+  // keep the floating header working at any zoom: rebuild widths then re-evaluate
+  // update float header now and again after the width transition (.14s) settles
+  if(floatHead){ updateFloatVisibility(); setTimeout(()=>{ if(floatHead && floatHead.classList.contains('show')) syncFloatHead(); }, 180); }
+}
+zInBtn.addEventListener('click', ()=>{ zoomPct+=ZSTEP; applyZoom(); });
+zOutBtn.addEventListener('click', ()=>{ zoomPct-=ZSTEP; applyZoom(); });
+zResetBtn.addEventListener('click', ()=>{ zoomPct=100; applyZoom(); });
+// keyboard: Ctrl/Cmd + / - / 0
+document.addEventListener('keydown', e=>{
+  if(!(e.ctrlKey||e.metaKey)) return;
+  if(e.key==='='||e.key==='+'){ e.preventDefault(); zoomPct+=ZSTEP; applyZoom(); }
+  else if(e.key==='-'){ e.preventDefault(); zoomPct-=ZSTEP; applyZoom(); }
+  else if(e.key==='0'){ e.preventDefault(); zoomPct=100; applyZoom(); }
+});
+applyZoom();
+</script>
+</body>
+</html>

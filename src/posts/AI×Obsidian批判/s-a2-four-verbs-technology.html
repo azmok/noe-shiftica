@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>4つの用途を支える技術——Vector・Graph・GraphRAG</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.72rem;
+  line-height:1.5; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.3rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem; line-height:1.5;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.05rem; color:#fff; line-height:1.6; }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+h4{ margin:1.5rem auto 0.5rem; font-weight:600; font-size:0.97rem; color:var(--fg); }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+table{
+  border-collapse:collapse;
+  width: 100%;
+  min-width: 30rem;
+  margin: 0;
+  font-size:0.82em;
+}
+th, td{
+  border:1px solid var(--line);
+  padding:0.6rem 0.8rem;
+  text-align:center;
+  vertical-align:middle;
+}
+th{
+  background:var(--bg-elev);
+  color:#fff;
+  font-weight:600;
+  text-align:center;
+  white-space: nowrap;
+}
+td.verb-cell {
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  background: var(--bg-elev);
+}
+td.left { text-align: left; }
+tr.highlight td { background: rgba(255, 122, 156, 0.12); color: #fff; }
+tr.highlight td.verb-cell { background: rgba(255, 122, 156, 0.2); color: #fff; }
+tr.highlight td:first-child { border-left: 3px solid var(--accent); }
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>4つの用途を支える技術<br>——Vector・Graph・GraphRAG</h1>
+
+<div class="tldr">
+<ul>
+<li>4つの動詞には、それぞれ違う技術が対応します</li>
+<li><strong>Vectorは「取り出す」の強化。「見つける」は解決しません</strong></li>
+<li>「見つける」に必要なのはGraph。ここが決定的な違いです</li>
+<li>そして「作る」だけは、技術ではなく組み合わせで実現します</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">まず、全体の地図</a></li>
+      <li><a href="#s2">【取り出す】Vector——意味を座標に変換する</a></li>
+      <li><a href="#s3">【束ねる】要約とクラスタリング</a></li>
+      <li><a href="#s4">【見つける】Graph——点と線で関係をたどる</a></li>
+      <li><a href="#s5">【作る】RAG——3つの成果を生成につなぐ</a></li>
+      <li><a href="#s6">GraphRAG——全部をAIが自動で組み立てる</a></li>
+      <li><a href="#s7">どこにコストがかかるのか</a></li>
+      <li><a href="#s8">⚠️ Graphは万能ではない</a></li>
+      <li><a href="#s9">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回、Obsidianを4つの用途と照合しました。応えられたのは1.5個。<strong>特に【見つける】は構造的に不可能</strong>でした。</p>
+<p>では、その「活かす層」はどんな技術でできているのか。</p>
+<p>今回はそこを解説します。<strong>専門用語は一切前提にしません。</strong></p>
+
+<h2 id="s1">まず、全体の地図</h2>
+
+<p>最初に対応関係を出しておきます。<strong>この地図を、これから1つずつ埋めていきます。</strong></p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>動詞</th>
+  <th>対応する技術</th>
+  <th>ひとことで言うと</th>
+</tr>
+<tr>
+  <td class="verb-cell">取り出す</td>
+  <td class="left"><strong>Vector</strong>（意味検索）</td>
+  <td class="left">言葉を覚えていなくても探せる</td>
+</tr>
+<tr>
+  <td class="verb-cell">束ねる</td>
+  <td class="left">要約 ／ クラスタリング</td>
+  <td class="left">大量のものを、短くまとめる</td>
+</tr>
+<tr class="highlight">
+  <td class="verb-cell">見つける</td>
+  <td class="left"><strong>Graph</strong>（関係の構造）</td>
+  <td class="left"><strong>探していないものが出てくる</strong></td>
+</tr>
+<tr>
+  <td class="verb-cell">作る</td>
+  <td class="left">RAG（上3つ＋AIの生成）</td>
+  <td class="left">集めた材料で、新しく書く</td>
+</tr>
+</table>
+</div>
+
+<p>⚠️ <strong>1つだけ、先に注意しておきます。</strong></p>
+
+<blockquote>
+<p><strong>技術と動詞は、1対1ではありません。</strong><br>
+1つの技術が複数の動詞に効くこともあれば、1つの動詞に複数の技術が必要なこともあります。</p>
+</blockquote>
+
+<p>この表は「代表的な対応」であって、<strong>「Vectorを入れれば取り出すが完璧になる」という話ではありません。</strong> ここを誤解すると、必要のないものを導入することになります。</p>
+
+<h2 id="s2">【取り出す】Vector——意味を座標に変換する</h2>
+
+<p>文章を、地図の上の1点だと考えてください。</p>
+<p>「犬」という文章と「猫」という文章は、地図上でとても近い場所に置かれます。どちらも身近な動物の話だからです。一方「確定申告」は、まったく離れた場所に置かれます。</p>
+<p><strong>Vector</strong>とは、この「地図上の座標」そのものです（<strong>embedding</strong>とも呼ばれます）。</p>
+<p>文章をAIに読み込ませると、その意味に応じた座標（数字の並び）が出力されます。<strong>意味が近い文章ほど、座標同士の距離が近くなる。</strong> これがVectorの正体です。</p>
+
+<h3>何が解決するのか</h3>
+
+<p>前回、【取り出す】の判定は△でした。理由は<strong>「書いた言葉を覚えていないと探せない」</strong>からです。</p>
+<p>Vectorは、ここを解決します。</p>
+
+<pre><code>キーワード検索の場合
+  「愛犬」で検索 → 「ペットの世話」は出てこない
+  （文字が1つも一致しないため）
+
+Vector検索の場合
+  「愛犬」で検索 → 「ペットの世話」も出てくる
+  （意味が近い場所に座標があるため）</code></pre>
+
+<p><strong>言葉を正確に覚えていなくても、意味が近ければ見つかります。</strong> これは大きな進歩です。</p>
+
+<h3>⚠️ ただし、これは「見つける」ではありません</h3>
+
+<p><strong>ここが、この記事でいちばん重要な区別です。</strong></p>
+<p>Vectorを導入すると「賢くなった」と感じます。ですが、<strong>できるようになったのは【取り出す】の強化だけ</strong>です。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th></th>
+  <th>Vectorが出せるもの</th>
+  <th>Vectorが出せないもの</th>
+</tr>
+<tr>
+  <td class="verb-cell">内容</td>
+  <td class="left">「この2つは似ている」</td>
+  <td class="left"><strong>「なぜ関係があるのか」</strong></td>
+</tr>
+<tr>
+  <td class="verb-cell">きっかけ</td>
+  <td class="left">あなたが探しにいく</td>
+  <td class="left"><strong>向こうから出てくる</strong></td>
+</tr>
+</table>
+</div>
+
+<p>つまり——<strong>探す精度は上がりますが、探す行為そのものは変わりません。</strong></p>
+<p>「知らなかった関係に気づく」ためには、<strong>あなたが質問すらしていないものが、システム側から提示される</strong>必要があります。Vectorにはその仕組みがありません。</p>
+<p>💡 <strong>この違いが、あとで費用の判断を左右します。</strong> 「Vectorを入れたのに、期待した発見が起きない」——これは失敗ではなく、<strong>そもそも用途が違う</strong>だけです。</p>
+
+<h2 id="s3">【束ねる】要約とクラスタリング</h2>
+
+<p>次は、大量のものを短くまとめる技術です。</p>
+
+<h3>要約——AIが読んで、圧縮する</h3>
+
+<p>仕組みとしては単純で、<strong>AIに文書を読ませて、短く書き直させる</strong>だけです。</p>
+<p>ただし、ここに1つ重要な性質があります。</p>
+
+<blockquote>
+<p><strong>要約は「取り出して」いません。圧縮しています。</strong></p>
+</blockquote>
+
+<p>検索は、たくさんの中から<strong>該当するものを選ぶ</strong>作業です。要約は、複数の内容を<strong>読んで、混ぜて、短くする</strong>作業です。<strong>方向が逆です。</strong></p>
+<p>💡 前回説明した「索引ファイル」を思い出してください。<strong>あの中には、2つの動詞が同居しています。</strong></p>
+
+<pre><code>「どこに何があるか」の一覧  → 取り出す
+各行についた一行の説明      → 束ねる</code></pre>
+
+<h3>クラスタリング——似たものを自動でまとめる</h3>
+
+<p><strong>クラスタリング</strong>とは、大量のものを<strong>似たもの同士のグループに自動で分ける</strong>技術です。</p>
+<p>Vectorで座標にしてあれば、<strong>近い場所にある点を機械的にまとめられます。</strong> 人間が分類基準を決める必要はありません。</p>
+<p>そして、ここが面白いところです。</p>
+
+<blockquote>
+<p><strong>操作としては「束ねる」。結果としては「見つける」になることがあります。</strong></p>
+</blockquote>
+
+<p>まとめる作業自体は圧縮です。ですが出てきた結果を見て、<strong>「こんな塊があったのか」と気づくことがあります。</strong></p>
+<p>自分では意識していなかった関心が、グループとして浮かび上がる。<strong>これは立派な発見です。</strong></p>
+<p>📌 <strong>だから技術と動詞は1対1ではない</strong>と最初に書きました。クラスタリングは、その代表例です。</p>
+
+<h2 id="s4">【見つける】Graph——点と線で関係をたどる</h2>
+
+<p><strong>ここが「第二の脳」の核心です。</strong></p>
+<p>友人関係を思い浮かべてください。</p>
+<p>あなたには友人がいて、その友人にはまた別の友人がいます。直接の友人は「1手先」、友人の友人は「2手先」です。</p>
+<p>この「人」を点（<strong>ノード</strong>）、「友人関係」を線（<strong>エッジ</strong>）として表したものが、<strong>Graph</strong>（グラフ構造）です。</p>
+
+<h3>Vectorとの決定的な違い</h3>
+
+<p>2つ、大きな違いがあります。</p>
+
+<h4>違い①：関係に「名前」がつく</h4>
+
+<pre><code>Vector
+  A と B は近い（0.87）
+  → なぜ近いのかは分からない
+
+Graph
+  A ──[使っている]── B
+  → 関係の内容が記録されている</code></pre>
+
+<p><strong>「似ている」ではなく「どう関係しているか」が残ります。</strong></p>
+
+<h4>違い②：多段階をたどれる</h4>
+
+<p>これが決定的です。</p>
+
+<pre><code>Aから2手先にあるものは？
+  A ──> B ──> C
+  → Cが出てくる
+
+このとき、AとCは「似ていない」かもしれない
+  → Vector検索では絶対に出てこない
+  → でも、Bを介して確かに関係している</code></pre>
+
+<p><strong>ここに「探していないものが出てくる」の正体があります。</strong></p>
+<p>あなたはAについて調べていました。<strong>Cのことは、頭にすらありませんでした。</strong> それでも線をたどれば、Cが出てくる。</p>
+<blockquote>
+<p><strong>これが、あなたの想定の外にあるものを引き当てるということです。</strong></p>
+</blockquote>
+
+<h3>前回の話とつながる部分</h3>
+
+<p>前回、Obsidianのグラフビューについてこう書きました。<strong>「その線は、あなたが手で張ったものです」</strong>と。</p>
+<p>技術としてのGraphが違うのは、<strong>その線をAIが自動で引く</strong>点です。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th></th>
+  <th>Obsidianの[[リンク]]</th>
+  <th>技術としてのGraph</th>
+</tr>
+<tr>
+  <td class="verb-cell">誰が引くか</td>
+  <td class="left">人間</td>
+  <td class="left"><strong>AI</strong></td>
+</tr>
+<tr>
+  <td class="verb-cell">関係の名前</td>
+  <td class="left">なし</td>
+  <td class="left">あり</td>
+</tr>
+<tr class="highlight">
+  <td class="verb-cell">出てくるもの</td>
+  <td class="left">知っている関係だけ</td>
+  <td class="left"><strong>知らなかった関係も</strong></td>
+</tr>
+</table>
+</div>
+
+<p><strong>形は似ていますが、中身が違います。</strong></p>
+
+<h2 id="s5">【作る】RAG——3つの成果を生成につなぐ</h2>
+
+<p>最後の動詞です。ここだけ、少し性質が違います。</p>
+
+<h3>まず、RAGとは何か</h3>
+
+<p>AIには知識の限界があります。学習した時点までの情報しか持っておらず、<strong>あなたの手元の資料は知りません。</strong></p>
+<p>これを補うのが<strong>RAG</strong>（検索拡張生成）です。仕組みは単純です。</p>
+
+<blockquote>
+<p><strong>AIが答えを作る前に、関連しそうな資料を検索し、その内容を読んでから回答を生成する</strong></p>
+</blockquote>
+
+<p>試験で言えば、<strong>持ち込みが許可されたカンニングペーパー</strong>のようなものです。</p>
+
+<h3>そして、ここが重要な発見です</h3>
+
+<p>4つの動詞を整理していて、1つ気づいたことがあります。</p>
+
+<blockquote>
+<p><strong>「作る」に対応する専用の技術は、存在しません。</strong></p>
+</blockquote>
+
+<p>【取り出す】にはVector、【束ねる】には要約、【見つける】にはGraphがありました。<strong>ですが【作る】には、専用のデータベースも保存形式もありません。</strong></p>
+<p>理由は単純で、<strong>生成はAI本体の仕事</strong>だからです。</p>
+
+<pre><code>取り出す・束ねる・見つける
+  → 材料を用意する工程
+
+作る
+  → 材料をAIに渡して、書かせる工程</code></pre>
+
+<p><strong>RAGという言葉の正体は、これです。</strong> 前3つの成果を、生成につなぐ仕組み。それ自体が新しい検索技術なのではありません。</p>
+<p>💡 <strong>だから「RAGを導入する」と言ったとき、実際に選んでいるのは前3つのほう</strong>です。何を材料として集めるか——そこが設計の中身になります。</p>
+
+<h2 id="s6">GraphRAG——全部をAIが自動で組み立てる</h2>
+
+<p>ここまでの4つを、まとめて自動化したものが<strong>GraphRAG</strong>です。Microsoft Researchが2024年に発表した手法で、現在では企業向けの主流の考え方になっています。</p>
+<p>核心はここです。</p>
+
+<blockquote>
+<p><strong>つながりの構造そのものを、人間ではなくAIが作ります。</strong></p>
+</blockquote>
+
+<p>処理の流れは、4つの動詞にきれいに対応しています。</p>
+
+<pre><code>① 文書を読んで、登場する人物・概念を抜き出す
+② それらの関係を判定し、線を引く      →【見つける】の土台
+③ かたまりごとに要約を作る            →【束ねる】
+④ 質問が来たら、意味の近さと線の両方から集める
+                                      →【取り出す】＋【見つける】
+⑤ 集めた材料でAIが回答を書く          →【作る】</code></pre>
+
+<p><strong>前回書いたObsidianの限界——「人間が手で線を引くしかない」——を、根本から解消する設計</strong>になっています。</p>
+
+<h2 id="s7">どこにコストがかかるのか</h2>
+
+<p>仕組みは理解できたと思います。もう1つだけ、次回のために知っておくと役立つことがあります。</p>
+<p><strong>どこがAIの仕事で、どこが普通のプログラムの仕事なのか。</strong> ここを知ると、「なぜGraphRAGは高いのか」が一発でわかります。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>工程</th>
+  <th>担当</th>
+  <th>コスト</th>
+</tr>
+<tr>
+  <td class="left">文章の分割</td>
+  <td>プログラム</td>
+  <td>ほぼゼロ</td>
+</tr>
+<tr>
+  <td class="left">意味の座標化</td>
+  <td>AIモデル</td>
+  <td>中</td>
+</tr>
+<tr class="highlight">
+  <td class="left">人物・概念の抽出</td>
+  <td><strong>AI</strong></td>
+  <td><strong>高</strong></td>
+</tr>
+<tr class="highlight">
+  <td class="left">関係の判定と命名</td>
+  <td><strong>AI</strong></td>
+  <td><strong>高</strong></td>
+</tr>
+<tr>
+  <td class="left">つながりの強さの計算</td>
+  <td>プログラム</td>
+  <td>低</td>
+</tr>
+<tr>
+  <td class="left">かたまりの検出</td>
+  <td>プログラム</td>
+  <td>低</td>
+</tr>
+<tr class="highlight">
+  <td class="left">かたまりごとの要約</td>
+  <td><strong>AI</strong></td>
+  <td><strong>高</strong></td>
+</tr>
+<tr>
+  <td class="left">書き込み</td>
+  <td>プログラム</td>
+  <td>ほぼゼロ</td>
+</tr>
+</table>
+</div>
+
+<p><strong>AIが関わる工程だけが、費用の主犯</strong>だとわかります。</p>
+<p>そして注目してほしいのは、<strong>高コストな3工程のうち2つが【見つける】のための処理</strong>だという点です。</p>
+
+<blockquote>
+<p><strong>「見つける」は、いちばん価値が高く、いちばん高い。</strong></p>
+</blockquote>
+
+<p>だからこそ、<strong>本当にそれが必要かを見極める必要があります。</strong> ここが次回の主題です。</p>
+
+<h2 id="s8">⚠️ Graphは万能ではない</h2>
+
+<p>ここまでGraphの価値を書いてきましたが、<strong>公平に限界も書いておきます。</strong></p>
+<p>比較検証では、こういう結果が報告されています。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>条件</th>
+  <th>結果</th>
+</tr>
+<tr>
+  <td class="left">複雑な質問・関係をたどる問い</td>
+  <td class="left"><strong>Graphが優勢</strong>（精度80%対51%という報告も）</td>
+</tr>
+<tr class="highlight">
+  <td class="left">単純な質問・最新情報の照会</td>
+  <td class="left"><strong>Graphのほうが劣る</strong>（13〜17%の差）</td>
+</tr>
+</table>
+</div>
+
+<p>理由は分かりやすいものです。<strong>「昨日の売上は？」に答えるのに、関係の構造をたどる必要はありません。</strong> むしろ遠回りになります。</p>
+<p>💡 <strong>つまり——高機能なほうが常に良いわけではありません。</strong> 用途に合っているかどうかが、すべてです。</p>
+<p>これは、このシリーズを通しての結論とも一致します。</p>
+
+<h2 id="s9">まとめ</h2>
+
+<ul>
+<li><strong>Vector</strong>は【取り出す】の強化。言葉を覚えていなくても探せる</li>
+<li><strong>ただし【見つける】は解決しない。</strong>「似ている」までしか出せない</li>
+<li><strong>要約・クラスタリング</strong>は【束ねる】。ただしクラスタリングは発見にもつながる</li>
+<li><strong>Graph</strong>は【見つける】。関係に名前がつき、多段階をたどれる</li>
+<li><strong>RAG</strong>は【作る】。専用技術ではなく、前3つを生成につなぐ仕組み</li>
+<li>費用の主犯はAIが関わる工程。<strong>とくに【見つける】が高い</strong></li>
+<li><strong>高機能なほうが常に良いわけではない</strong></li>
+</ul>
+
+<p>ここまでで、技術の地図は埋まりました。</p>
+<p>残る問いは1つです。</p>
+
+<blockquote>
+<p><strong>では、自分はどこまで必要なのか。</strong></p>
+</blockquote>
+
+<p>次回は、その判断基準を扱います。結論を先に言うと——<strong>多くの人は、まだ何も作り込まなくて大丈夫です。</strong></p>
+<p>判断は2つの軸で決まります。<strong>「どの動詞が必要か」と「どれだけ溜まっているか」。</strong> 段階ごとの具体的な手順まで、実際に動かせる形で用意します 💡</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>全3シリーズ構成 — Plot Map v6</title>
+<style>
+  :root{
+    --bg:#0d0e12; --panel:#14151a; --panel-elev:#1c1e26;
+    --fg:#e6e7ea; --fg-muted:#9aa0ac; --fg-faint:#6b7280;
+    --line:#2d2f38; --amber:#ffb347; --cyan:#5ec8d8; --pink:#ff5f9e;
+    --green:#7ddba0;
+    --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic','Segoe UI',sans-serif;
+    padding:2rem 1rem 4rem; -webkit-text-size-adjust:100%;
+  }
+  .wrap{ max-width:47rem; margin:0 auto; }
+  .eyebrow{ text-align:center; font-size:0.72rem; font-weight:600;
+    letter-spacing:0.12em; color:var(--fg-faint); margin-bottom:0.4rem; }
+  h1{ text-align:center; font-size:1.5rem; font-weight:700; margin:0 0 0.5rem;
+    line-height:1.4; background:var(--grad);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent; }
+  .subtitle{ text-align:center; color:var(--fg-muted); font-size:0.85rem;
+    margin-bottom:1.6rem; line-height:1.7; }
+
+  .core{
+    max-width:40rem; margin:0 auto 1.2rem; padding:1.1rem 1.2rem;
+    background:var(--panel-elev); border:1px solid transparent; border-radius:12px;
+    background: linear-gradient(var(--panel-elev), var(--panel-elev)) padding-box,
+                var(--grad) border-box;
+  }
+  .core.discovery{
+    background: linear-gradient(var(--panel-elev), var(--panel-elev)) padding-box,
+                linear-gradient(100deg, #5ec8d8 0%, #7ddba0 100%) border-box;
+  }
+  .core-label{
+    display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em;
+    padding:0.18em 0.6em; border-radius:999px;
+    background:var(--grad); color:var(--bg); margin-bottom:0.7rem;
+  }
+  .core.discovery .core-label{
+    background: linear-gradient(100deg, #5ec8d8 0%, #7ddba0 100%);
+  }
+  .core h3{ font-size:0.95rem; color:#fff; margin:1rem 0 0.4rem; font-weight:600; }
+  .core h3:first-of-type{ margin-top:0; }
+  .core p{ font-size:0.78rem; color:var(--fg-muted); line-height:1.85; margin:0.5rem 0 0; }
+  .core b{ color:#fff; font-weight:600; }
+  .core .hl{ color:var(--amber); font-weight:600; }
+  .core .cy{ color:var(--cyan); font-weight:600; }
+  .core pre{
+    background:rgba(0,0,0,0.28); border:1px solid var(--line); border-radius:8px;
+    padding:0.8rem; margin:0.6rem 0; overflow-x:auto;
+    font-size:0.72rem; line-height:1.7; color:var(--fg-muted);
+    font-family:'Roboto Mono',monospace;
+  }
+
+  .verb-table{ width:100%; border-collapse:collapse; font-size:0.79rem; margin:0.5rem 0; }
+  .verb-table th, .verb-table td{
+    border:1px solid var(--line); padding:0.45rem 0.6rem; text-align:left; vertical-align:middle;
+  }
+  .verb-table th{ background:rgba(255,255,255,0.04); color:#fff; font-weight:600; font-size:0.75rem; }
+  .verb-table .key{ color:#fff; font-weight:600; white-space:nowrap; text-align:center; }
+  .verb-table tr.star td{ background:rgba(255,95,158,0.07); }
+  .verb-table tr.star .key{ color:var(--pink); }
+  .verb-table tr.pre td{ background:rgba(94,200,216,0.07); }
+  .verb-table tr.pre .key{ color:var(--cyan); }
+  .verb-table small{ color:var(--fg-faint); }
+
+  .note{
+    max-width:40rem; margin:0 auto 2rem; padding:0.95rem 1.15rem;
+    background:var(--panel-elev); border:1px solid var(--line);
+    border-radius:10px; font-size:0.79rem; color:var(--fg-muted); line-height:1.85;
+  }
+  .note b{ color:#fff; font-weight:600; }
+  .note .hl{ color:var(--amber); font-weight:600; }
+
+  .controls{ display:flex; justify-content:center; gap:0.6rem; margin-bottom:1.8rem; }
+  button.ctrl{ display:flex; align-items:center; gap:0.35rem; font-size:0.78rem;
+    font-family:inherit; border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--fg-muted); }
+  button.ctrl.primary{ background:var(--panel-elev); color:var(--fg); }
+  button.ctrl:hover{ opacity:0.85; }
+
+  .series-head{ margin:2.4rem 0 0.5rem; padding-bottom:0.6rem; border-bottom:1px solid var(--line); }
+  .series-head:first-of-type{ margin-top:0; }
+  .series-name{ font-size:1.06rem; font-weight:700; color:#fff; }
+  .series-role{ font-size:0.79rem; color:var(--fg-muted); margin-top:0.3rem; line-height:1.75; }
+
+  .node-row{ display:flex; align-items:flex-start; gap:0.55rem;
+    padding:0.55rem 0.7rem; margin-bottom:0.35rem; border-radius:10px; }
+  .node-row.root{ padding:0.8rem 1rem; background:var(--panel-elev);
+    border:1px solid var(--line); cursor:pointer; }
+  .node-row.root.done{ border-color:rgba(125,219,160,0.4); }
+  .caret{ margin-top:0.15rem; color:var(--fg-faint); flex-shrink:0; width:18px;
+    display:inline-flex; justify-content:center; transition:transform 0.15s ease;
+    font-size:0.8rem; user-select:none; }
+  .caret.leaf{ margin-top:0.62rem; width:5px; height:5px; border-radius:50%;
+    background:var(--fg-faint); }
+  .caret.open{ transform:rotate(90deg); }
+  .node-title-wrap{ flex:1; min-width:0; }
+  .node-title-line{ display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem; }
+  .title-root{ font-size:1rem; font-weight:700; color:#fff; line-height:1.5; }
+  .title-1{ font-size:0.87rem; font-weight:400; color:var(--fg); line-height:1.65; }
+  .node-sub{ font-size:0.77rem; color:var(--fg-muted); margin-top:0.2rem; line-height:1.75; }
+
+  .children{ padding-left:1rem; border-left:1.5px solid var(--line);
+    overflow:hidden; max-height:0; transition:max-height 0.25s ease; margin-left:1.5rem; }
+  .children.open{ max-height:8000px; }
+
+  .tag{ display:inline-block; font-size:0.64rem; font-weight:600;
+    padding:0.1rem 0.42rem; border-radius:4px; margin-right:0.45rem;
+    vertical-align:0.08em; white-space:nowrap; }
+  .tag.new{ color:var(--pink); border:1px solid rgba(255,95,158,0.45); }
+  .tag.fix{ color:var(--amber); border:1px solid rgba(255,179,71,0.45); }
+  .tag.keep{ color:var(--fg-faint); border:1px solid var(--line); }
+  .tag.warn{ color:var(--cyan); border:1px solid rgba(94,200,216,0.45); }
+
+  .status{ display:inline-flex; align-items:center; font-size:0.66rem; font-weight:600;
+    padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; }
+  .status.done{ color:var(--bg); background:var(--green); }
+  .status.todo{ color:var(--fg-muted); border:1px solid var(--line); }
+
+  .footnote{ text-align:center; color:var(--fg-faint); font-size:0.75rem;
+    margin-top:2.4rem; line-height:2; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PLOT MAP v6 — 階層的検索の等価性を追加</div>
+    <h1>全3シリーズ構成</h1>
+    <p class="subtitle">データ資産化編 ／ 情報商材批判編 ／ 実装編</p>
+
+    <div class="core">
+      <span class="core-label">シリーズの背骨</span>
+
+      <h3>4つの動詞——ただし、その手前にもう1つある</h3>
+      <p style="margin-top:0;">
+        <b>境界線：</b><span class="hl">答えの形が予測できるか</span>で束ねる／見つけるを切る。
+      </p>
+      <table class="verb-table">
+        <tr><th>段階</th><th>やること</th><th>技術</th></tr>
+        <tr class="pre">
+          <td class="key">整える<br><small>前提</small></td>
+          <td><b>使える形にする</b><br><small>PDF/Word → テキスト化 → 構造保持 → 分割 → メタデータ</small></td>
+          <td>parsing／chunking</td>
+        </tr>
+        <tr>
+          <td class="key">取り出す</td>
+          <td>必要な情報を引く</td>
+          <td>索引／全文検索／RDB／Vector</td>
+        </tr>
+        <tr>
+          <td class="key">束ねる</td>
+          <td>要約・集計する</td>
+          <td>要約生成／クラスタリング</td>
+        </tr>
+        <tr class="star">
+          <td class="key">見つける ★</td>
+          <td><b>気づいていない関係を発見する</b></td>
+          <td><b>Graph</b>／GraphRAG</td>
+        </tr>
+        <tr>
+          <td class="key">作る</td>
+          <td>材料にして新しく生み出す</td>
+          <td>RAG（上3つ＋LLM生成）</td>
+        </tr>
+      </table>
+      <p>
+        ⚠️ <b>「整える」は5つ目の動詞ではなく、前提条件。</b><br>
+        ⚠️ <b>Vectorは取り出すの強化。</b><span class="hl">見つけるは解決しない</span>。
+      </p>
+    </div>
+
+    <div class="core discovery">
+      <span class="core-label">★ v6の新発見</span>
+
+      <h3>索引方式とVector方式は、同じことをしている</h3>
+      <p style="margin-top:0;">
+        どちらも<b>3層構造</b>で「全部読まずに、必要な部分へ絞り込む」を実現している。
+        これは<span class="cy">hierarchical retrieval（階層的検索）</span>という確立した分野。
+      </p>
+      <pre>【圧縮された目録】 ← 全体を俯瞰する
+        ↓ 絞り込む
+【中間の要約】     ← 領域を特定する
+        ↓ 絞り込む
+【本体】           ← 必要な部分だけ読む</pre>
+
+      <h3>研究での裏付け</h3>
+      <p style="margin-top:0;">
+        <b>RAPTOR</b>（Stanford, 2024）＝索引階層をクラスタリングで自動生成したもの。
+        QuALITYで<b>絶対精度20%向上</b>。<br>
+        <b>LATTICE</b>＝埋め込みではなく<b>LLMの推論で構造をナビゲート</b>。
+        文書数に対して<span class="cy">対数的な計算量</span>を達成。<br>
+        <b>PageIndex</b>＝<b>埋め込みを一切持たず</b>、LLMの推論だけで階層をたどる設計。
+      </p>
+
+      <h3>では、何が違うのか</h3>
+      <table class="verb-table">
+        <tr><th></th><th>索引方式</th><th>Vector方式</th></tr>
+        <tr>
+          <td class="key">絞り込む主体</td>
+          <td><b>LLMの推論</b></td>
+          <td><b>数値計算</b></td>
+        </tr>
+        <tr>
+          <td class="key">判断の根拠</td>
+          <td>言語で書かれた説明文</td>
+          <td>座標の距離</td>
+        </tr>
+        <tr class="pre">
+          <td class="key">計算場所</td>
+          <td><b>コンテキストの中</b></td>
+          <td><b>DBの中（外部）</b></td>
+        </tr>
+      </table>
+      <p>
+        💡 <b>段階が上がる＝新しいことを始める、ではない。</b><br>
+        <span class="cy">同じことを、違う場所でやるようになる</span>——これが移行の本質。<br><br>
+        ⚠️ <b>だから「約200件で限界」はコンテキストウィンドウから逆算された数字。</b>
+        索引方式は絞り込みをLLMにやらせるので、索引自体を毎回読ませる必要がある。
+        Vectorは絞り込みを外部に追い出すので、索引が何万件でもプロンプトは膨らまない。
+      </p>
+
+      <h3>⚠️ ただしGraphだけは軸が違う</h3>
+      <pre>索引・RAPTOR → 抽象度の階層（上から下へ降りる）
+Vector       → 類似度（近いものを引く）
+Graph        → 関係（AからBへ、BからCへ横に辿る）</pre>
+      <p style="margin-top:0.4rem;">
+        前2つは「今の質問に近いものを探す」。
+        <b>Graphだけが「質問に含まれていないものに到達できる」</b>。<br>
+        実際RAPTORの弱点として<span class="hl">「異なる枝にまたがる関係を捉えられない」</span>と指摘されている。
+      </p>
+    </div>
+
+    <div class="note">
+      <b>v5からの変更点</b><br>
+      ① <span class="hl">階層的検索の等価性を発見。</span>
+      索引方式とVector方式は同じ3層構造。違いは「誰が絞り込むか」と「どこで計算するか」<br>
+      ② <span class="hl">A2に「索引も検索技術である」という位置づけを追加。</span>
+      Vectorから始めるのではなく、索引から連続的につなぐ<br>
+      ③ <span class="hl">A3に「なぜ段階が上がるのか」を新設。</span>
+      200件という数字の根拠が、コンテキストウィンドウにあることを明示<br>
+      ④ 研究の裏付けを取得（RAPTOR／LATTICE／PageIndex）
+    </div>
+
+    <div class="controls">
+      <button class="ctrl primary" id="expandAll">▾ すべて展開</button>
+      <button class="ctrl" id="collapseAll">▸ すべて閉じる</button>
+    </div>
+
+    <div id="tree"></div>
+
+    <p class="footnote">
+      タイトルをタップすると開閉します<br>
+      <span style="color:var(--pink)">■</span> 新規執筆 ／
+      <span style="color:var(--amber)">■</span> 要修正 ／
+      <span style="color:var(--fg-faint)">■</span> 流用 ／
+      <span style="color:var(--cyan)">■</span> 注意
+    </p>
+  </div>
+
+<script>
+const SERIES = [
+  {
+    name: "シリーズA：データ資産化編（全3本）",
+    role: "「整える＋4動詞」を軸に、Obsidianを定義 → 用途と照合 → 既存データには不向き、という順序で組む",
+    items: [
+      {
+        id:"a1", title:"A1：Obsidianとは何か——4つの用途と照合してみた",
+        sub:"定義してから、用途ごとに適性を判定する",
+        status:"done",
+        children:[
+          { t:"導入：SNSで見かける「Obsidian×AIで既存の知識を資産化」", tag:"keep" },
+          { t:"第1部：Obsidianとは何か（特徴は5つ）", tag:"keep",
+            note:"①.md特化 ②[[記事名]] ③#タグ ④グラフビュー ⑤プラグイン。⑤に伏線" },
+          { t:"[[リンク]]の正体／タグも実は同じもの", tag:"keep",
+            note:"中核機能は実質1つ、に収束させる" },
+          { t:"第2部：4つの用途と照合する（技術の対応表つき）", tag:"keep" },
+          { t:"照合①〜④（△×××○ → 1.5個）", tag:"keep",
+            note:"照合③が重心。主張→根拠→実例（Karpathy）を縦に並べる" },
+          { t:"【本題】根本問題——そもそも入り口ですらない", tag:"keep",
+            note:"★変換工程を担わない。「変換が終わった時点で、もうObsidianである必要があるか」" },
+          { t:"入れた後も出番がない（帰結3つ）", tag:"keep" },
+          { t:"結論：整える前も、整えた後も出番がない", tag:"keep" }
+        ]
+      },
+      {
+        id:"a2", title:"A2：4つの用途を支える技術",
+        sub:"整える → 取り出す → 束ねる → 見つける → 作る",
+        status:"todo",
+        children:[
+          { t:"導入：全体の地図（⚠️技術と動詞は1対1ではない）", tag:"new" },
+          { t:"【整える】前処理——4動詞の手前にある工程", tag:"new",
+            note:"A1の「Obsidianは整えない」をここで回収。parsing／構造保持／chunking／メタデータ。失敗の多くは前処理に起因" },
+          { t:"★【取り出す】まず、索引も立派な検索技術である", tag:"new",
+            note:"★v6の新規。Vectorから始めず、索引から入る。3層構造（目録→中間→本体）を先に示し、これが hierarchical retrieval という確立した分野だと位置づける" },
+          { t:"【取り出す】Vector——意味を座標に変換する", tag:"fix",
+            note:"索引と同じ3層構造の別実装として紹介する。似ているまでは出せるが、なぜ関係あるかは出せない" },
+          { t:"★索引とVectorは、同じことをしている", tag:"new",
+            note:"★v6の新規。RAPTOR＝索引階層の自動生成版（QuALITYで20%向上）。LATTICE＝LLMが構造をナビゲート、対数的計算量。PageIndex＝埋め込みなしで階層をたどる" },
+          { t:"【束ねる】要約とクラスタリング", tag:"new",
+            note:"要約は圧縮＝束ねる。クラスタリングは操作が束ねるで結果が見つける、という二重性" },
+          { t:"【見つける】Graph——点と線で関係をたどる", tag:"fix",
+            note:"⚠️Graphだけは軸が違う。階層でも類似度でもなく「関係」。質問に含まれていないものに到達できる" },
+          { t:"【作る】RAG——3つの成果を生成につなぐ", tag:"new",
+            note:"★作るだけ専用技術がない。「RAGを導入する」とき実際に選んでいるのは前3つ" },
+          { t:"GraphRAG——全部をAIが自動で組み立てる", tag:"fix" },
+          { t:"どこにコストがかかるのか", tag:"keep",
+            note:"高コスト3工程のうち2つが見つけるのため。いちばん価値が高く、いちばん高い" },
+          { t:"⚠️ Graphは万能ではない", tag:"warn",
+            note:"精度80%対51%の一方、単純な問い合わせでは純RAGに13〜17%劣る。RAPTORも枝をまたぐ関係は苦手" }
+        ]
+      },
+      {
+        id:"a3", title:"A3：個人のための2026年最適解",
+        sub:"どの動詞が必要か × どれだけ溜まっているか",
+        status:"todo",
+        children:[
+          { t:"判断は2軸——動詞 × 蓄積量", tag:"fix" },
+          { t:"★なぜ段階が上がるのか——同じことを、違う場所でやる", tag:"new",
+            note:"★v6の核心。段階が上がる＝新しいことを始める、ではない。絞り込みをLLMにやらせるか、外部に追い出すかの選択。この理解があると移行の判断が変わる" },
+          { t:"★「約200件で限界」の根拠", tag:"new",
+            note:"★v6の新規。索引はコンテキストに載せて読ませるので、索引自体が肥大するとLost in the Middleが起きる。つまり限界はコンテキストウィンドウから逆算された数字" },
+          { t:"加工形式の階段（動詞つき）", tag:"new",
+            note:"索引・全文検索・RDB・Vector＝取り出す／要約＝束ねる／Graph＝見つける" },
+          { t:"★Vectorを入れても「見つける」は解決しない", tag:"new",
+            note:"第2段階と第3段階を分ける根拠" },
+          { t:"第1段階：索引の仕組みを作る（設定は数行）", tag:"keep" },
+          { t:"【チャット利用】索引は不要——プロジェクト機能に内蔵", tag:"keep",
+            note:"Gemini 10件／ChatGPT 20件／Claude容量制。上限が先に来る" },
+          { t:"【ターミナル利用】索引システムのセットアップ手順", tag:"keep" },
+          { t:"Karpathy方式の実装（raw/ wiki/ agents.md）", tag:"keep" },
+          { t:"文字数とファイル数の目安", tag:"keep",
+            note:"基準は総量ではなくファイル数" },
+          { t:"Lost in the Middle", tag:"keep" },
+          { t:"⚠️ 導入の現実——大半が失敗する", tag:"new",
+            note:"試験段階を超えた企業は15%未満、67%が放棄" },
+          { t:"純正GraphRAGは個人には過剰", tag:"keep" },
+          { t:"「テキストだから永続する」という懸念への回答", tag:"new",
+            note:"A1から移設。SQLiteは議会図書館の推奨形式・2050年サポート宣言" },
+          { t:"実装の落とし穴3つ／実装プロンプト", tag:"keep" },
+          { t:"全体像——軸が2本ある（検索精度／自動化）", tag:"keep" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "シリーズB：情報商材批判編（全3本）",
+    role: "「AI社員」＝2つ目の用途。標準機能との照合で、有料である必然性を検証する",
+    items: [
+      {
+        id:"b1", title:"B1：「AI社員」の正体——それ、全部標準機能です",
+        sub:"CLI標準機能との照合",
+        status:"done",
+        children:[
+          { t:"実体＝指示書ファイル＋役割ファイル", tag:"keep" },
+          { t:"7つの指示手法（商材が触れているのは2つだけ）", tag:"keep" },
+          { t:"Auto Memory・100万トークンも標準搭載", tag:"keep" },
+          { t:"「作業机」とは何か／「親」とは誰か", tag:"keep" },
+          { t:"⚠️ 置くだけでは発火しない", tag:"warn" },
+          { t:"パターン①（本物）とパターン②（着せ替え）", tag:"keep",
+            note:"公開手順の多くは②。買う側は①だと思っている" },
+          { t:"3社それぞれの役割の作り方", tag:"keep",
+            note:"Claude=MD＋YAML／Codex=TOML／Antigravity=MD＋YAML" },
+          { t:"3社比較——業界標準であることの証明", tag:"keep" }
+        ]
+      },
+      {
+        id:"b2", title:"B2：【実演】20行のPythonで再現する",
+        sub:"商材の中身が何であるかの物証",
+        status:"done",
+        children:[
+          { t:"準備編（Antigravity IDE ／ 各社CLI ／ APIキー）", tag:"keep" },
+          { t:"プロンプト1つで環境が揃う", tag:"keep" },
+          { t:"コード解説：役割の正体は、ただの日本語の文章", tag:"keep" },
+          { t:"連携の正体は、文字列の連結（+ design）", tag:"keep" },
+          { t:"なぜ机が分かれるのか——APIはステートレス", tag:"keep" },
+          { t:"正直な補足：これは実用品ではない", tag:"keep" }
+        ]
+      },
+      {
+        id:"b3", title:"B3：無料で手に入るものの全体像",
+        sub:"判断材料をすべて開示する",
+        status:"done",
+        children:[
+          { t:"見分け方——5つのチェックポイント", tag:"keep" },
+          { t:"裏技：特定商取引法を1分で確認する", tag:"keep" },
+          { t:"正直に書きます：無料の日本語記事は充実している", tag:"keep" },
+          { t:"では、この記事の差別化はどこか（比較表）", tag:"keep" },
+          { t:"OSS上位互換の存在——Hermes・OpenClaw", tag:"keep" },
+          { t:"世界を3層に分けると構造が見える", tag:"keep" },
+          { t:"それでも有料に価値がある場合", tag:"keep" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "シリーズC：実装編（全4本）",
+    role: "「使い倒す → 限界を測る → その先」。最終回でシリーズ全体を締める",
+    items: [
+      {
+        id:"c1", title:"C1：標準機能を使い倒す——7つの指示手法",
+        sub:"違いは「いつ読み込まれるか」",
+        status:"done",
+        children:[
+          { t:"なぜ標準機能から始めるのか", tag:"keep" },
+          { t:"7つの全体像（常に／呼ばれたとき／読まれない／別の場所）", tag:"keep" },
+          { t:"Hooks——お願いではなく仕組みで強制する", tag:"keep" },
+          { t:"3つの問いで振り分ける判断フロー", tag:"keep" },
+          { t:"テーブルをB1と同じ形式に統一", tag:"fix" }
+        ]
+      },
+      {
+        id:"c2", title:"C2：記憶の設計——何を、どこに置くか",
+        sub:"3層の記憶を使い分ける",
+        status:"done",
+        children:[
+          { t:"記憶は3層（指示書／自動記憶／会話ログ）", tag:"keep" },
+          { t:"全ログは毎回読まれていない、という事実", tag:"keep" },
+          { t:"--resume と --continue の違い", tag:"keep" },
+          { t:"残すべきは判断・好み・失敗の3種類だけ", tag:"keep" },
+          { t:"量が増えたら目次方式へ", tag:"keep",
+            note:"⚠️ここもA3の階層的検索と同じ構造。相互リンクを張ると理解が繋がる" }
+        ]
+      },
+      {
+        id:"c3", title:"C3：限界を測る",
+        sub:"★実測が入る。他が持っていない一次情報",
+        status:"todo",
+        children:[
+          { t:"委譲が発火する条件を確かめる", tag:"new" },
+          { t:"並列できる作業／できない作業の見極め", tag:"new" },
+          { t:"コストの実測方法", tag:"new" },
+          { t:"⚠️ 役割ごとの独立記憶は、標準では作れない", tag:"warn" },
+          { t:"実測結果——実際に動かして分かったこと", tag:"new",
+            note:"★未着手。実機検証の結果を入れる" }
+        ]
+      },
+      {
+        id:"c4", title:"C4：その先——組み合わせるという発想",
+        sub:"シリーズ最終回。Obsidianの居場所も、ここで示す",
+        status:"todo",
+        children:[
+          { t:"標準機能で足りないのは2つだけ", tag:"keep",
+            note:"スキルの自己生成／役割ごとの独立記憶" },
+          { t:"Hermes——記憶とスキルが育つ", tag:"keep",
+            note:"⚠️記憶実装はSQLite＋全文検索。Vectorを使っていない＝索引方式と同じ判断" },
+          { t:"⚠️ サブエージェント同士は会話できない", tag:"warn" },
+          { t:"OpenClaw——協働が必要なら", tag:"keep" },
+          { t:"実務の答えは「並べて使う」", tag:"keep" },
+          { t:"⚠️ 3つのリスク（規約・インジェクション・暴走）", tag:"warn" },
+          { t:"段階的な進め方", tag:"keep" },
+          { t:"★最後に：Obsidianの本当の居場所", tag:"new",
+            note:"A1で予告した約束の回収。①既存データには不向き ②実行環境でもない ③ただし『これから書く・スマホで書く』なら無料の選択肢として成立。断定は避け限定的な推奨に" },
+          { t:"シリーズ全体のまとめ", tag:"keep" }
+        ]
+      }
+    ]
+  }
+];
+
+const TAGLABEL = { new:"新規", fix:"修正", keep:"流用", warn:"注意" };
+const openSet = new Set(["a2","a3"]);
+
+function renderChild(c){
+  const tag = c.tag ? `<span class="tag ${c.tag}">${TAGLABEL[c.tag]}</span>` : "";
+  const note = c.note ? `<div class="node-sub">${c.note}</div>` : "";
+  return `<div class="node-row">
+    <span class="caret leaf"></span>
+    <div class="node-title-wrap">
+      <span class="title-1">${tag}${c.t}</span>
+      ${note}
+    </div>
+  </div>`;
+}
+
+function renderItem(item){
+  const isOpen = openSet.has(item.id);
+  const st = item.status === "done"
+    ? `<span class="status done">✓ 完成</span>`
+    : `<span class="status todo">○ 未着手</span>`;
+  return `<div>
+    <div class="node-row root ${item.status === "done" ? "done" : ""}" data-toggle="${item.id}">
+      <span class="caret ${isOpen?"open":""}">▸</span>
+      <div class="node-title-wrap">
+        <div class="node-title-line">
+          <span class="title-root">${item.title}</span>
+          ${st}
+        </div>
+        <div class="node-sub">${item.sub}</div>
+      </div>
+    </div>
+    <div class="children ${isOpen?"open":""}">
+      ${item.children.map(renderChild).join("")}
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("tree").innerHTML = SERIES.map(s => `
+    <div class="series-head">
+      <div class="series-name">${s.name}</div>
+      <div class="series-role">${s.role}</div>
+    </div>
+    ${s.items.map(renderItem).join("")}
+  `).join("");
+
+  document.querySelectorAll("[data-toggle]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const id = el.getAttribute("data-toggle");
+      openSet.has(id) ? openSet.delete(id) : openSet.add(id);
+      render();
+    });
+  });
+}
+
+const ALL = SERIES.flatMap(s=>s.items.map(i=>i.id));
+document.getElementById("expandAll").addEventListener("click",()=>{
+  ALL.forEach(i=>openSet.add(i)); render();
+});
+document.getElementById("collapseAll").addEventListener("click",()=>{
+  openSet.clear(); render();
+});
+
+render();
+</script>
+</body>
+</html>

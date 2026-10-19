@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ゼロからわかるVector・Graph・GraphRAG</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff; }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>ゼロからわかるVector・Graph・GraphRAG</h1>
+
+<div class="tldr">
+<ul>
+<li>Vector：文章の意味を、地図上の座標に変換する技術</li>
+<li>Graph：点と線で、多段階のつながりを表す構造</li>
+<li>RAG：AIが答える前に、関連資料を検索してから答える仕組み</li>
+<li>GraphRAG：この3つをAIが自動で融合させ、人の手作業を不要にする</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">Vector——意味を座標に変換する</a></li>
+      <li><a href="#s2">Graph——点と線で関係をたどる</a></li>
+      <li><a href="#s3">RAG——答える前に調べる仕組み</a></li>
+      <li><a href="#s4">GraphRAG——AIが自動でつながりを作る</a></li>
+      <li><a href="#s5">どこにコストがかかるのか</a></li>
+      <li><a href="#s6">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回、Obsidianには「活かす層」がない、と書きました。書くための道具としては優秀でも、溜めた知識から新しい発見を生む仕組みは別に必要になる、という話です。</p>
+<p>今回は、その「活かす層」を作る技術を解説します。<strong>専門用語は一切前提にしません。</strong></p>
+<p>読み終える頃には、次回扱う「では個人はどこまでやるべきか」がそのまま理解できる状態になっています。</p>
+
+<h2 id="s1">Vector——意味を座標に変換する</h2>
+
+<p>文章を、地図の上の1点だと考えてください。</p>
+<p>「犬」という文章と「猫」という文章は、地図上でとても近い場所に置かれます。どちらも身近な動物の話だからです。一方「確定申告」という文章は、まったく離れた場所に置かれます。</p>
+<p><strong>Vector</strong>とは、この「地図上の座標」そのものです（専門用語では<strong>embedding</strong>とも呼ばれます）。</p>
+<p>文章をAIに読み込ませると、その意味に応じた座標（数字の並び）が出力されます。<strong>意味が近い文章ほど、座標同士の距離が近くなる。</strong> これがVectorの正体です。</p>
+
+<h3>キーワードが一致しなくても見つかる</h3>
+
+<p>この仕組みの価値は、ここにあります。</p>
+<p>「愛犬」と「ペットの世話」は、単語としては1文字も一致しません。それでも<strong>Vectorの世界では近い場所に座標を持ちます。</strong></p>
+<p>前回挙げた壁——<strong>「そのノートに何と書いたか覚えていないと、二度と出てこない」</strong>——は、これで越えられます。言葉を覚えていなくても、意味が近ければ見つかるからです。</p>
+
+<h2 id="s2">Graph——点と線で関係をたどる</h2>
+
+<p>友人関係を思い浮かべてください。</p>
+<p>あなたには友人がいて、その友人にはまた別の友人がいます。あなたから見ると、直接の友人は「1手先」、友人の友人は「2手先」です。</p>
+<p>この「人」を点（<strong>ノード</strong>）、「友人関係」を線（<strong>エッジ</strong>）として表したものが、<strong>Graph</strong>（グラフ構造）です。</p>
+<p>グラフの価値は、<strong>多段階のつながりを機械的にたどれる</strong>ことにあります。「Aさんから2手先にいる人は誰か」という問いに、線をたどるだけで答えが出ます。</p>
+<p>路線図で「新宿から乗り換え1回で行ける駅」を調べる感覚に近いものです。</p>
+
+<h2 id="s3">RAG——答える前に調べる仕組み</h2>
+
+<p>AI（<strong>大規模言語モデル</strong>。大量の文章を学習して自然な文章を生成できるAIのことです）には、知識の限界があります。学習した時点までの情報しか持っておらず、あなたの手元にある非公開の資料も知りません。</p>
+<p>この限界を補うのが<strong>RAG</strong>（検索拡張生成）です。仕組みはシンプルです。</p>
+<blockquote>
+<p><strong>AIが答えを作る前に、関連しそうな資料を検索し、その内容を読んでから回答を生成する</strong></p>
+</blockquote>
+<p>試験におけるカンニングペーパーのようなものです。ただし、正々堂々と参照が許されているカンニングペーパーです。</p>
+<p>RAGがあることで、AIは学習していない最新情報や、手元の資料に基づいて回答できるようになります。</p>
+
+<h2 id="s4">GraphRAG——AIが自動でつながりを作る</h2>
+
+<p>ここまでの3つを組み合わせたものが、<strong>GraphRAG</strong>です。Microsoft Researchが2024年に発表した手法で、現在では企業向けの主流の考え方になっています。</p>
+<p>核心はここです。</p>
+<blockquote>
+<p><strong>GraphRAGでは、つながりの構造そのものを、人間ではなくAIが自動で作ります。</strong></p>
+</blockquote>
+
+<p>処理の流れはこうなります。</p>
+
+<pre><code>大量の文章をAIに読ませる
+→ 「これは誰の話か」「何と何が関係しているか」を自動抽出
+→ 点と線として、つながりの地図を自動構築
+→ 質問が来たら、意味の近さとつながりの両方から関連情報を集める
+→ 集めた情報をもとに、AIが回答を生成する</code></pre>
+
+<h3>Obsidianとの決定的な違い</h3>
+
+<p>ここで、前回の話とつながります。</p>
+
+<table>
+<tr><th></th><th>Obsidianの[[リンク]]</th><th>GraphRAG</th></tr>
+<tr><td>誰が関係を判断するか</td><td>人間</td><td><strong>AI</strong></td></tr>
+<tr><td>作業</td><td>手作業で1件ずつ</td><td>自動</td></tr>
+<tr><td>見つかる関係</td><td>自分が知っている範囲</td><td><strong>気づいていなかった関係も</strong></td></tr>
+</table>
+
+<p>3年前に書いた文章と、先週書いた文章のつながり。<strong>あなたが気づいていなかったものも、機械的に発見してくれます。</strong></p>
+<p>前回、手動リンクには「自分がすでに重要だと思っているものにしかリンクを張れない」という限界があると書きました。<strong>GraphRAGは、この限界そのものを解消する設計になっています。</strong></p>
+
+<h2 id="s5">どこにコストがかかるのか</h2>
+
+<p>仕組みは理解できたと思います。もう1つだけ、次回のために知っておくと役立つことがあります。</p>
+<p><strong>この処理のうち、どこがAIの仕事で、どこが普通のプログラムの仕事なのか。</strong> ここを知ると、「なぜGraphRAGは高いのか」が一発でわかります。</p>
+
+<h3>Vector側の分担</h3>
+
+<pre><code>① 文章を分割する        → プログラム（機械的に切るだけ）
+② 意味の座標に変換する   → AIモデル
+③ 検索時に距離を計算する → プログラム（数値の計算）</code></pre>
+
+<p>意外に思われるかもしれませんが、<strong>②で単語ごとに重要度を判定しているわけではありません。</strong> 文章全体を一気に読んで、意味を圧縮した1つの座標を出しています。</p>
+<p>だから精度が高い代わりに、<strong>なぜその2つが近いと判断されたのかは直接には見えません。</strong></p>
+
+<h3>Graph側の分担</h3>
+
+<p>ここが本題です。</p>
+
+<pre><code>① 登場する人物・概念を抜き出す → AI
+② それらの関係を判定する       → AI
+③ 関係に名前をつける           → AI
+④ つながりの地図に書き込む     → プログラム</code></pre>
+
+<p><strong>関係を見つける工程が、丸ごとAIの仕事になっています。</strong> しかも文章のかたまりごとに、毎回AIを呼び出します。</p>
+
+<h3>全体をまとめると</h3>
+
+<table>
+<tr><th>工程</th><th>担当</th><th>コスト</th></tr>
+<tr><td>文章の分割</td><td>プログラム</td><td>ほぼゼロ</td></tr>
+<tr><td>意味の座標化</td><td>AIモデル</td><td>中</td></tr>
+<tr><td>人物・概念の抽出</td><td><strong>AI</strong></td><td><strong>高</strong></td></tr>
+<tr><td>関係の判定と命名</td><td><strong>AI</strong></td><td><strong>高</strong></td></tr>
+<tr><td>つながりの強さの計算</td><td>プログラム</td><td>低</td></tr>
+<tr><td>かたまりの検出</td><td>プログラム</td><td>低</td></tr>
+<tr><td>かたまりごとの要約</td><td><strong>AI</strong></td><td><strong>高</strong></td></tr>
+<tr><td>書き込み</td><td>プログラム</td><td>ほぼゼロ</td></tr>
+</table>
+
+<p><strong>AIが関わる工程だけが、費用の主犯</strong>だとわかります。</p>
+<p>そして重要なのは、<strong>この高コストな工程を「いつ実行するか」で総額が大きく変わる</strong>ということです。</p>
+<p>全部を事前に一括で処理するのか、必要になってから処理するのか。<strong>ここが次回の話の核心になります。</strong></p>
+
+<h2 id="s6">まとめ</h2>
+
+<ul>
+<li><strong>Vector</strong>は、文章の意味を座標として数値化したもの。キーワードを覚えていなくても探せる</li>
+<li><strong>Graph</strong>は、点と線で多段階のつながりを表す構造</li>
+<li><strong>RAG</strong>は、AIが答える前に関連資料を検索する仕組み</li>
+<li><strong>GraphRAG</strong>は、この3つをAIが自動で融合させる手法。手作業のリンク張りを根本から不要にする</li>
+<li>ただし<strong>AIが関わる工程は高コスト</strong>。「いつ実行するか」で総額が変わる</li>
+</ul>
+
+<p>ここまで読むと、「じゃあ全部導入したほうがいいのか」と思うかもしれません。</p>
+<p><strong>答えは「いいえ」です。</strong></p>
+<p>次回は、<strong>個人がどこまで使うべきか</strong>を扱います。結論を先に言うと、<strong>多くの人は、まだ何もしなくて大丈夫です。</strong> 蓄積量に応じた段階別の判断基準と、実際に動かせる実装用のプロンプトまで用意します 💡</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

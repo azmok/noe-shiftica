@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noe Shiftica vs フリーランス</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --noe: #7c6af7;
+    --teal: #4fd1c5;
+    --text: #e8e8f0;
+    --muted: #5a5a72;
+    --border: rgba(255,255,255,0.06);
+    --g-noe: #22c55e;
+    --r-noe: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', 'Noto Sans JP', sans-serif;
+    padding: 56px 24px 80px;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; }
+
+  .header { text-align: center; margin-bottom: 48px; }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--teal);
+    opacity: 0.8; margin-bottom: 16px;
+  }
+  .title {
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 700; line-height: 1.15;
+    letter-spacing: -0.5px; margin-bottom: 12px;
+  }
+  .title em {
+    font-style: normal;
+    background: linear-gradient(130deg, var(--noe), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle { font-size: 13px; color: var(--muted); }
+
+  /* LEGEND */
+  .legend-wrap {
+    display: flex; justify-content: center;
+    gap: 24px; margin-bottom: 44px;
+    flex-wrap: wrap; align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; }
+  .legend-bar { width: 28px; height: 7px; border-radius: 99px; }
+  .legend-sep { width: 1px; height: 16px; background: var(--border); }
+  .legend-color-label { font-size: 11px; font-weight: 500; }
+
+  /* NOTICE */
+  .notice {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid var(--teal);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 40px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .notice strong { color: var(--text); font-weight: 500; }
+
+  /* PRICE TABLE */
+  .price-table-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; margin-bottom: 48px;
+  }
+  .price-table-header {
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: grid; grid-template-columns: 1.6fr 1.1fr 1.1fr 1.1fr 1.1fr; gap: 8px;
+  }
+  .th { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .price-row {
+    padding: 16px 28px;
+    display: grid; grid-template-columns: 1.6fr 1.1fr 1.1fr 1.1fr 1.1fr; gap: 8px;
+    border-bottom: 1px solid var(--border); align-items: center;
+  }
+  .price-row:last-child { border-bottom: none; }
+  .row-type { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .type-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    padding: 2px 7px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .type-badge.static { background: rgba(79,209,197,0.1); color: var(--teal); border: 1px solid rgba(79,209,197,0.2); }
+  .type-badge.dynamic { background: rgba(124,106,247,0.1); color: var(--noe); border: 1px solid rgba(124,106,247,0.2); }
+  .noe-price { font-weight: 700; font-size: 15px; color: #fff; }
+  .noe-price sub { font-size: 60%; font-weight: 400; opacity: 0.7; }
+  .rival-price { font-size: 13px; color: rgba(255,255,255,0.4); }
+  .cell-sm { font-size: 12px; }
+  .cell-sm .main { font-weight: 500; }
+  .cell-sm .sub { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+  .cell-sm .green { color: var(--g-noe); }
+  .cell-sm .amber { color: #f59e0b; }
+
+  /* SAME badge */
+  .same-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; padding: 2px 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted); border: 1px solid var(--border);
+  }
+
+  /* SECTION */
+  .section-label { display: flex; align-items: center; gap: 12px; margin: 48px 0 20px; }
+  .section-label-text {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); white-space: nowrap;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* CHART */
+  .chart-block {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; margin-bottom: 48px;
+  }
+  .chart-block-header {
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .chart-block-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .chart-tag { font-family: 'DM Mono', monospace; font-size: 9px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .chart-tag.static { background: rgba(79,209,197,0.1); color: var(--teal); }
+  .chart-tag.dynamic { background: rgba(124,106,247,0.1); color: var(--noe); }
+
+  .chart-row {
+    padding: 18px 28px; border-bottom: 1px solid var(--border); transition: background 0.15s;
+  }
+  .chart-row:last-child { border-bottom: none; }
+  .chart-row:hover { background: rgba(255,255,255,0.012); }
+
+  .row-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .row-label { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 500; }
+  .row-icon {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;
+  }
+
+  .dir-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.5px; padding: 2px 8px; border-radius: 20px; white-space: nowrap; font-weight: 500;
+  }
+  .dir-badge.high { background: rgba(34,197,94,0.12); color: var(--g-noe); border: 1px solid rgba(34,197,94,0.2); }
+  .dir-badge.low { background: rgba(239,68,68,0.12); color: var(--r-noe); border: 1px solid rgba(239,68,68,0.2); }
+  .dir-badge.equal { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  .bar-group { display: flex; flex-direction: column; gap: 7px; }
+  .bar-line { display: grid; grid-template-columns: 90px 1fr 130px; align-items: center; gap: 10px; }
+  .bar-entity { font-size: 11px; font-weight: 500; text-align: right; white-space: nowrap; }
+  .bar-track { height: 7px; background: rgba(255,255,255,0.04); border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; }
+
+  .g-noe-fill { background: var(--g-noe); }
+  .g-rival-fill { background: var(--g-noe); opacity: 0.25; }
+  .r-noe-fill { background: var(--r-noe); }
+  .r-rival-fill { background: var(--r-noe); opacity: 0.25; }
+  .eq-noe-fill { background: #f59e0b; }
+  .eq-rival-fill { background: #f59e0b; opacity: 0.3; }
+
+  .bar-entity.gn { color: var(--g-noe); }
+  .bar-entity.gr { color: var(--g-noe); opacity: 0.5; }
+  .bar-entity.rn { color: var(--r-noe); }
+  .bar-entity.rr { color: var(--r-noe); opacity: 0.5; }
+  .bar-entity.eq { color: #f59e0b; }
+  .bar-entity.eqr { color: #f59e0b; opacity: 0.5; }
+
+  .bar-val { font-family: 'DM Mono', monospace; font-size: 11px; white-space: nowrap; }
+  .bar-val.nv { color: var(--text); }
+  .bar-val.rv { color: var(--muted); }
+
+  /* INSIGHTS */
+  .insights { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 32px; }
+  .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 18px; }
+  .insight-num {
+    font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 8px; letter-spacing: -1px;
+  }
+  .insight-num.purple {
+    background: linear-gradient(135deg, var(--noe), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .insight-num.amber { color: #f59e0b; }
+  .insight-label { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  .footer-note { text-align: center; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); opacity: 0.35; letter-spacing: 0.5px; }
+
+  @media (max-width: 640px) {
+    .price-table-header, .price-row { grid-template-columns: 1.4fr 1fr 1fr; padding: 14px 16px; }
+    .price-table-header .th:nth-child(4), .price-table-header .th:nth-child(5),
+    .price-row > *:nth-child(4), .price-row > *:nth-child(5) { display: none; }
+    .insights { grid-template-columns: 1fr 1fr; }
+    .bar-line { grid-template-columns: 60px 1fr 90px; }
+    .chart-row { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="eyebrow">Pricing & Efficiency · 2026</div>
+    <h1 class="title">Noe Shiftica vs<br><em>フリーランス（個人）</em></h1>
+    <p class="subtitle">静的サイト・動的CMS（WP系）の2パターン比較 ── ファクトベース</p>
+  </div>
+
+  <div class="legend-wrap">
+    <div class="legend-item"><div class="legend-bar" style="background:#22c55e;"></div>Noe Shiftica</div>
+    <div class="legend-item"><div class="legend-bar" style="background:#22c55e;opacity:0.3;"></div>フリーランス</div>
+    <div class="legend-sep"></div>
+    <span class="legend-color-label" style="color:#22c55e;">🟢 高いほど◎</span>
+    <span class="legend-color-label" style="color:#ef4444;">　🔴 低いほど◎</span>
+    <span class="legend-color-label" style="color:#f59e0b;">　🟡 拮抗</span>
+  </div>
+
+  <!-- NOTICE -->
+  <div class="notice">
+    ⚠️ <strong>フェアな比較について：</strong>フリーランスはスキルの個人差が大きいため、スコアは「一般的な水準」を想定しています。実力のあるフリーランスは一部の項目でNoe Shifticaを上回る可能性があります。
+  </div>
+
+  <!-- PRICE TABLE -->
+  <div class="price-table-wrap">
+    <div class="price-table-header">
+      <div class="th">種別</div>
+      <div class="th" style="color:#22c55e;opacity:0.9;">Noe 制作費</div>
+      <div class="th" style="color:rgba(255,255,255,0.3);">フリーランス</div>
+      <div class="th">月額ランニング</div>
+      <div class="th">標準納期</div>
+    </div>
+    <div class="price-row">
+      <div class="row-type"><span class="type-badge static">Static</span>静的サイト</div>
+      <div class="noe-price">15万<sub>〜</sub></div>
+      <div class="rival-price">5〜20万</div>
+      <div class="cell-sm">
+        <span class="main green">≒ ¥0</span>
+        <span class="sub">vs 5千〜2万/月</span>
+      </div>
+      <div class="cell-sm">
+        <span class="main amber">同等〜短縮可</span>
+        <span class="sub">vs 数日〜1ヶ月</span>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="row-type"><span class="type-badge dynamic">CMS</span>動的（WP系）</div>
+      <div class="noe-price">35万<sub>〜</sub></div>
+      <div class="rival-price">15〜80万</div>
+      <div class="cell-sm">
+        <span class="main green">≒ ¥0</span>
+        <span class="sub">vs 5千〜3万/月</span>
+      </div>
+      <div class="cell-sm">
+        <span class="main amber">同等〜短縮可</span>
+        <span class="sub">vs 1週〜2ヶ月</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATIC -->
+  <div class="section-label">
+    <span class="section-label-text">静的サイト 比較チャート</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-block-header">
+      <div class="chart-block-title"><span class="chart-tag static">Static</span>静的サイト（HTML/CSS中心）</div>
+    </div>
+
+    <!-- 制作コスト 🔴 フリーランス優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">💰</div>制作コスト</div><span class="dir-badge low">🔴 低いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity rn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill r-noe-fill" style="width:38%"></div></div><span class="bar-val nv">15万〜</span></div>
+        <div class="bar-line"><span class="bar-entity rr">フリーランス</span><div class="bar-track"><div class="bar-fill r-rival-fill" style="width:20%"></div></div><span class="bar-val rv">5〜20万</span></div>
+      </div>
+    </div>
+
+    <!-- 月額コスト 🔴 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🔄</div>月額コスト</div><span class="dir-badge low">🔴 低いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity rn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill r-noe-fill" style="width:2%"></div></div><span class="bar-val nv">≒ ¥0</span></div>
+        <div class="bar-line"><span class="bar-entity rr">フリーランス</span><div class="bar-track"><div class="bar-fill r-rival-fill" style="width:40%"></div></div><span class="bar-val rv">5千〜2万/月</span></div>
+      </div>
+    </div>
+
+    <!-- インフラコスト 🔴 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🌐</div>インフラコスト</div><span class="dir-badge low">🔴 低いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity rn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill r-noe-fill" style="width:2%"></div></div><span class="bar-val nv">≒ ¥0</span></div>
+        <div class="bar-line"><span class="bar-entity rr">フリーランス</span><div class="bar-track"><div class="bar-fill r-rival-fill" style="width:38%"></div></div><span class="bar-val rv">サーバー・ドメイン込み</span></div>
+      </div>
+    </div>
+
+    <!-- 納品期間 🔴 拮抗 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">📅</div>納品までの期間</div><span class="dir-badge equal">🟡 拮抗</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity eq">Noe Shiftica</span><div class="bar-track"><div class="bar-fill eq-noe-fill" style="width:28%"></div></div><span class="bar-val nv">短縮可</span></div>
+        <div class="bar-line"><span class="bar-entity eqr">フリーランス</span><div class="bar-track"><div class="bar-fill eq-rival-fill" style="width:35%"></div></div><span class="bar-val rv">数日〜1ヶ月</span></div>
+      </div>
+    </div>
+
+    <!-- 品質 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">✨</div>品質（デザイン・SEO・パフォーマンス）</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:83%"></div></div><span class="bar-val nv">モダン構成・均一品質</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:52%"></div></div><span class="bar-val rv">スキルにより大きく差あり</span></div>
+      </div>
+    </div>
+
+    <!-- バグ再発防止力 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🧠</div>バグ再発防止力</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:88%"></div></div><span class="bar-val nv">自動蓄積</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:38%"></div></div><span class="bar-val rv">個人管理・引き継ぎ困難</span></div>
+      </div>
+    </div>
+
+    <!-- セキュリティリスク 🔴 拮抗 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🛡️</div>バグ・セキュリティリスク</div><span class="dir-badge equal">🟡 拮抗</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity eq">Noe Shiftica</span><div class="bar-track"><div class="bar-fill eq-noe-fill" style="width:12%"></div></div><span class="bar-val nv">低い</span></div>
+        <div class="bar-line"><span class="bar-entity eqr">フリーランス</span><div class="bar-track"><div class="bar-fill eq-rival-fill" style="width:16%"></div></div><span class="bar-val rv">低い（同等〜やや高）</span></div>
+      </div>
+    </div>
+
+    <!-- 人的リソース効率 🟢 拮抗 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">👥</div>人的リソース効率</div><span class="dir-badge equal">🟡 拮抗</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity eq">Noe Shiftica</span><div class="bar-track"><div class="bar-fill eq-noe-fill" style="width:90%"></div></div><span class="bar-val nv">1人 ＋ AI</span></div>
+        <div class="bar-line"><span class="bar-entity eqr">フリーランス</span><div class="bar-track"><div class="bar-fill eq-rival-fill" style="width:85%"></div></div><span class="bar-val rv">1人</span></div>
+      </div>
+    </div>
+
+    <!-- アフターケア 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🤝</div>アフターケア・継続サポート</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:85%"></div></div><span class="bar-val nv">蓄積ベースで継続対応</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:35%"></div></div><span class="bar-val rv">連絡途絶リスクあり</span></div>
+      </div>
+    </div>
+
+    <!-- スタック柔軟性 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">⚡</div>スタック柔軟性・拡張性</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:85%"></div></div><span class="bar-val nv">モダン・拡張自由</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:55%"></div></div><span class="bar-val rv">スキルに依存</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CMS -->
+  <div class="section-label">
+    <span class="section-label-text">動的CMS（WP系）比較チャート</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-block-header">
+      <div class="chart-block-title"><span class="chart-tag dynamic">CMS</span>動的サイト（WordPress系 CMS）</div>
+    </div>
+
+    <!-- 制作コスト 🔴 拮抗〜FL優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">💰</div>制作コスト</div><span class="dir-badge equal">🟡 拮抗</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity eq">Noe Shiftica</span><div class="bar-track"><div class="bar-fill eq-noe-fill" style="width:35%"></div></div><span class="bar-val nv">35万〜</span></div>
+        <div class="bar-line"><span class="bar-entity eqr">フリーランス</span><div class="bar-track"><div class="bar-fill eq-rival-fill" style="width:28%"></div></div><span class="bar-val rv">15〜80万</span></div>
+      </div>
+    </div>
+
+    <!-- 月額コスト 🔴 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🔄</div>月額コスト</div><span class="dir-badge low">🔴 低いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity rn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill r-noe-fill" style="width:2%"></div></div><span class="bar-val nv">≒ ¥0</span></div>
+        <div class="bar-line"><span class="bar-entity rr">フリーランス</span><div class="bar-track"><div class="bar-fill r-rival-fill" style="width:45%"></div></div><span class="bar-val rv">5千〜3万/月</span></div>
+      </div>
+    </div>
+
+    <!-- インフラコスト 🔴 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🌐</div>インフラコスト</div><span class="dir-badge low">🔴 低いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity rn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill r-noe-fill" style="width:2%"></div></div><span class="bar-val nv">≒ ¥0</span></div>
+        <div class="bar-line"><span class="bar-entity rr">フリーランス</span><div class="bar-track"><div class="bar-fill r-rival-fill" style="width:42%"></div></div><span class="bar-val rv">サーバー＋保守費</span></div>
+      </div>
+    </div>
+
+    <!-- 納品期間 🔴 拮抗 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">📅</div>納品までの期間</div><span class="dir-badge equal">🟡 拮抗</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity eq">Noe Shiftica</span><div class="bar-track"><div class="bar-fill eq-noe-fill" style="width:30%"></div></div><span class="bar-val nv">短縮可</span></div>
+        <div class="bar-line"><span class="bar-entity eqr">フリーランス</span><div class="bar-track"><div class="bar-fill eq-rival-fill" style="width:40%"></div></div><span class="bar-val rv">1週〜2ヶ月</span></div>
+      </div>
+    </div>
+
+    <!-- 品質 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">✨</div>品質（デザイン・SEO・パフォーマンス）</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:88%"></div></div><span class="bar-val nv">最新スタック・均一品質</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:50%"></div></div><span class="bar-val rv">スキルにより大きく差あり</span></div>
+      </div>
+    </div>
+
+    <!-- バグ再発防止力 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🧠</div>バグ再発防止力</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:90%"></div></div><span class="bar-val nv">自動蓄積</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:35%"></div></div><span class="bar-val rv">個人管理・引き継ぎ困難</span></div>
+      </div>
+    </div>
+
+    <!-- セキュリティリスク 🔴 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🛡️</div>バグ・セキュリティリスク</div><span class="dir-badge low">🔴 低いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity rn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill r-noe-fill" style="width:20%"></div></div><span class="bar-val nv">低（最新スタック）</span></div>
+        <div class="bar-line"><span class="bar-entity rr">フリーランス</span><div class="bar-track"><div class="bar-fill r-rival-fill" style="width:58%"></div></div><span class="bar-val rv">WPプラグイン管理が属人的</span></div>
+      </div>
+    </div>
+
+    <!-- 人的リソース効率 🟢 拮抗 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">👥</div>人的リソース効率</div><span class="dir-badge equal">🟡 拮抗</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity eq">Noe Shiftica</span><div class="bar-track"><div class="bar-fill eq-noe-fill" style="width:92%"></div></div><span class="bar-val nv">1人 ＋ AI</span></div>
+        <div class="bar-line"><span class="bar-entity eqr">フリーランス</span><div class="bar-track"><div class="bar-fill eq-rival-fill" style="width:82%"></div></div><span class="bar-val rv">1人</span></div>
+      </div>
+    </div>
+
+    <!-- アフターケア 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">🤝</div>アフターケア・継続サポート</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:85%"></div></div><span class="bar-val nv">蓄積ベースで継続対応</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:32%"></div></div><span class="bar-val rv">連絡途絶リスクあり</span></div>
+      </div>
+    </div>
+
+    <!-- スタック柔軟性 🟢 Noe優位 -->
+    <div class="chart-row">
+      <div class="row-top"><div class="row-label"><div class="row-icon">⚡</div>スタック柔軟性・拡張性</div><span class="dir-badge high">🟢 高いほど◎</span></div>
+      <div class="bar-group">
+        <div class="bar-line"><span class="bar-entity gn">Noe Shiftica</span><div class="bar-track"><div class="bar-fill g-noe-fill" style="width:92%"></div></div><span class="bar-val nv">API直結・自由度高</span></div>
+        <div class="bar-line"><span class="bar-entity gr">フリーランス</span><div class="bar-track"><div class="bar-fill g-rival-fill" style="width:48%"></div></div><span class="bar-val rv">WPテーマ依存が多い</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insights">
+    <div class="insight-card">
+      <div class="insight-num amber">静的コスト</div>
+      <div class="insight-label">フリーランスが安い傾向<br>5〜20万 vs Noe 15万〜<br>ここは正直に拮抗〜FL優位</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num purple">品質・サポート</div>
+      <div class="insight-label">最新スタック・均一品質・<br>アフターケアはNoe優位<br>フリーランスはスキル次第</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num purple">¥0</div>
+      <div class="insight-label">月額ランニング（両パターン共通）<br>Firebase・Cloudflare・Neon構成<br>フリーランスはサーバー費が別途発生</div>
+    </div>
+  </div>
+
+  <p class="footer-note">DATA: LISKUL · ペライチ大学 · ferret One · Web制作の教科書 · 2026 ── Noe Shiftica価格はあずま確定値 · フリーランス相場はクラウドワークス調査ベース</p>
+
+</div>
+</body>
+</html>

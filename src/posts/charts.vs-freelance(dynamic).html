@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noe Shiftica vs フリーランス｜動的CMSサイト比較</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --surface: #111118;
+    --surface2: #1a1a28;
+    --noe: #7c6af7;
+    --teal: #4fd1c5;
+    --text: #e8e8f0;
+    --ink2: #b0b0c4;
+    --muted: #6b6b80;
+    --border: rgba(255,255,255,0.07);
+    --g: #22c55e;
+    --amber: #f59e0b;
+    --r: #ef4444;
+    /* cost colors */
+    --c-init: #7c6af7;
+    --c-run: #3b82f6;
+    --c-maint: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', 'Noto Sans JP', sans-serif;
+    padding: 56px 24px 80px;
+  }
+
+  .container { max-width: 920px; margin: 0 auto; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 56px; }
+  .eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--teal); opacity: 0.8; margin-bottom: 16px;
+  }
+  .title {
+    font-size: clamp(22px, 4vw, 38px); font-weight: 700;
+    line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 12px;
+  }
+  .title em {
+    font-style: normal;
+    background: linear-gradient(130deg, var(--noe), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle { font-size: 13px; color: var(--muted); }
+
+  /* LEGEND ROW */
+  .legend-wrap {
+    display: flex; justify-content: center;
+    gap: 20px; flex-wrap: wrap; margin-bottom: 48px;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .legend-sep { width: 1px; height: 16px; background: var(--border); }
+
+  /* SECTION DIVIDER */
+  .section-head {
+    display: flex; align-items: center; gap: 14px;
+    margin: 56px 0 24px;
+  }
+  .section-head-text {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* SCALE TABS */
+  .scale-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 28px;
+  }
+  .scale-tab {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 14px;
+    position: relative; overflow: hidden;
+  }
+  .scale-tab::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: linear-gradient(90deg, var(--noe), var(--teal));
+  }
+  .scale-tag {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--noe); margin-bottom: 6px;
+  }
+  .scale-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .scale-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* CHART BLOCK */
+  .chart-block {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; margin-bottom: 40px;
+  }
+  .chart-header {
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .chart-note { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); opacity: 0.6; }
+
+  /* COST LEGEND inside chart */
+  .cost-legend {
+    display: flex; gap: 16px; padding: 12px 24px;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .cost-legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--ink2);
+  }
+  .cost-legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  /* STACKED BARS */
+  .stacked-group { padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+
+  .stacked-row {
+    display: grid; grid-template-columns: 150px 1fr 80px;
+    align-items: center; gap: 12px;
+  }
+
+  .row-label { font-size: 12px; font-weight: 500; }
+  .row-label.noe-l { color: var(--noe); }
+  .row-label.fl-l { color: var(--ink2); opacity: 0.75; }
+  .row-label.fl-m { color: var(--ink2); opacity: 0.55; }
+
+  .stacked-bar {
+    height: 20px; background: rgba(255,255,255,0.04);
+    border-radius: 6px; overflow: hidden; display: flex;
+  }
+
+  .seg { height: 100%; }
+  .seg-init-noe { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+  .seg-init-fl { background: var(--c-init); opacity: 0.5; }
+  .seg-run { background: var(--c-run); opacity: 0.7; border-left: 1px solid rgba(0,0,0,0.15); }
+  .seg-maint { background: var(--c-maint); opacity: 0.65; border-left: 1px solid rgba(0,0,0,0.15); }
+
+  .row-val {
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    font-weight: 600; text-align: right; white-space: nowrap;
+  }
+  .row-val.noe-v { color: var(--teal); }
+  .row-val.fl-v { color: var(--ink2); }
+
+  .divider-row { height: 1px; background: var(--border); margin: 2px 0; }
+
+  /* SAVINGS BADGE */
+  .savings-box {
+    margin: 4px 24px 16px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .savings-label { font-size: 11px; color: var(--ink2); }
+  .savings-val { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; color: var(--g); }
+
+  /* DELIVERY CHART */
+  .delivery-group { padding: 16px 24px; display: flex; flex-direction: column; gap: 10px; }
+
+  .delivery-row {
+    display: grid; grid-template-columns: 150px 1fr 90px;
+    align-items: center; gap: 12px;
+  }
+
+  .del-bar-track { height: 16px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; }
+  .del-bar-fill { height: 100%; border-radius: 4px; }
+  .del-noe { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+  .del-fl { background: rgba(255,255,255,0.2); }
+
+  .del-val {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    text-align: right; white-space: nowrap;
+  }
+  .del-val.noe-dv { color: var(--teal); font-weight: 600; }
+  .del-val.fl-dv { color: var(--muted); }
+
+  /* SCALE DIVIDER inside chart */
+  .scale-divider {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px 4px;
+  }
+  .scale-divider-text {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap;
+  }
+  .scale-divider-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* INSIGHT CARDS */
+  .insights { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 32px; }
+  .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 16px; }
+  .insight-num {
+    font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 8px; letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--noe), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .insight-label { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  .footnote {
+    text-align: center; font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--muted); opacity: 0.35; letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 640px) {
+    .scale-tabs { grid-template-columns: 1fr; }
+    .stacked-row, .delivery-row { grid-template-columns: 110px 1fr 70px; }
+    .insights { grid-template-columns: 1fr 1fr; }
+    .chart-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="eyebrow">Cost & Delivery · Dynamic CMS · 2026</div>
+    <h1 class="title">Noe Shiftica vs <em>フリーランス</em><br>動的CMSサイト 3規模比較</h1>
+    <p class="subtitle">初期費用・3年ランニングコスト・納期を規模別にファクトベースで比較</p>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend-wrap">
+    <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,var(--noe),var(--teal));"></div>Noe Shiftica</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.3);"></div>フリーランス</div>
+    <div class="legend-sep"></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-init);"></div>初期費用</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-run);"></div>ランニングコスト</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-maint);opacity:0.7;"></div>保守費用</div>
+  </div>
+
+  <!-- SCALE OVERVIEW -->
+  <div class="scale-tabs">
+    <div class="scale-tab">
+      <div class="scale-tag">Small · 小規模</div>
+      <div class="scale-name">コーポレート基本</div>
+      <div class="scale-desc">1〜10ページ<br>会社概要・サービス・お問い合わせ</div>
+    </div>
+    <div class="scale-tab">
+      <div class="scale-tag">Medium · 中規模</div>
+      <div class="scale-name">集客・ブログ型</div>
+      <div class="scale-desc">10〜30ページ<br>実績・採用・ブログ機能あり</div>
+    </div>
+    <div class="scale-tab">
+      <div class="scale-tag">Large · 大規模</div>
+      <div class="scale-name">EC・高機能型</div>
+      <div class="scale-desc">30ページ〜<br>EC・会員・予約・複合機能</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       CHART 1: 3年トータルコスト
+  ════════════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-head-text">Chart 01 · 3年トータルコスト</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-header">
+      <span class="chart-title">初期費用 ＋ 3年ランニングコスト比較（保守なし／あり）</span>
+      <span class="chart-note">🔴 低いほど◎　最大値=FL大規模保守あり 約257万</span>
+    </div>
+
+    <div class="cost-legend">
+      <div class="cost-legend-item"><div class="cost-legend-dot" style="background:var(--c-init);"></div>🟣 初期費用</div>
+      <div class="cost-legend-item"><div class="cost-legend-dot" style="background:var(--c-run);"></div>🔵 ランニング（月1万×36ヶ月=36万）</div>
+      <div class="cost-legend-item"><div class="cost-legend-dot" style="background:var(--c-maint);opacity:0.7;"></div>🔴 保守費用（月2.5万×36ヶ月=90万）</div>
+    </div>
+
+    <div class="stacked-group">
+
+      <!-- ── 小規模 ── -->
+      <div class="scale-divider">
+        <span class="scale-divider-text">Small · 小規模（1〜10P）</span>
+        <div class="scale-divider-line"></div>
+      </div>
+
+      <!-- Noe 小 -->
+      <div class="stacked-row">
+        <span class="row-label noe-l">Noe Shiftica</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-noe" style="width:13.6%"></div>
+        </div>
+        <span class="row-val noe-v">35万円</span>
+      </div>
+
+      <!-- FL 小・保守なし: 15+36=51万 -->
+      <div class="stacked-row">
+        <span class="row-label fl-l">FL 小・保守なし</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-fl" style="width:5.8%"></div>
+          <div class="seg seg-run" style="width:14.0%"></div>
+        </div>
+        <span class="row-val fl-v">約51万円</span>
+      </div>
+
+      <!-- FL 小・保守あり: 15+36+90=141万 -->
+      <div class="stacked-row">
+        <span class="row-label fl-m">FL 小・保守あり</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-fl" style="width:5.8%"></div>
+          <div class="seg seg-run" style="width:14.0%"></div>
+          <div class="seg seg-maint" style="width:35.0%"></div>
+        </div>
+        <span class="row-val fl-v">約141万円</span>
+      </div>
+
+      <div class="divider-row"></div>
+
+      <!-- ── 中規模 ── -->
+      <div class="scale-divider">
+        <span class="scale-divider-text">Medium · 中規模（10〜30P）</span>
+        <div class="scale-divider-line"></div>
+      </div>
+
+      <!-- Noe 中 -->
+      <div class="stacked-row">
+        <span class="row-label noe-l">Noe Shiftica</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-noe" style="width:17.5%"></div>
+        </div>
+        <span class="row-val noe-v">45万円</span>
+      </div>
+
+      <!-- FL 中・保守なし: 50+36=86万 -->
+      <div class="stacked-row">
+        <span class="row-label fl-l">FL 中・保守なし</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-fl" style="width:19.5%"></div>
+          <div class="seg seg-run" style="width:14.0%"></div>
+        </div>
+        <span class="row-val fl-v">約86万円</span>
+      </div>
+
+      <!-- FL 中・保守あり: 50+36+90=176万 -->
+      <div class="stacked-row">
+        <span class="row-label fl-m">FL 中・保守あり</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-fl" style="width:19.5%"></div>
+          <div class="seg seg-run" style="width:14.0%"></div>
+          <div class="seg seg-maint" style="width:35.0%"></div>
+        </div>
+        <span class="row-val fl-v">約176万円</span>
+      </div>
+
+      <div class="divider-row"></div>
+
+      <!-- ── 大規模 ── -->
+      <div class="scale-divider">
+        <span class="scale-divider-text">Large · 大規模（30P〜 EC・高機能）</span>
+        <div class="scale-divider-line"></div>
+      </div>
+
+      <!-- Noe 大 -->
+      <div class="stacked-row">
+        <span class="row-label noe-l">Noe Shiftica</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-noe" style="width:21.4%"></div>
+        </div>
+        <span class="row-val noe-v">55万円</span>
+      </div>
+
+      <!-- FL 大・保守なし: 100+36=136万 -->
+      <div class="stacked-row">
+        <span class="row-label fl-l">FL 大・保守なし</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-fl" style="width:38.9%"></div>
+          <div class="seg seg-run" style="width:14.0%"></div>
+        </div>
+        <span class="row-val fl-v">約136万円</span>
+      </div>
+
+      <!-- FL 大・保守あり: 100+36+90=226万 -->
+      <div class="stacked-row">
+        <span class="row-label fl-m">FL 大・保守あり</span>
+        <div class="stacked-bar">
+          <div class="seg seg-init-fl" style="width:38.9%"></div>
+          <div class="seg seg-run" style="width:14.0%"></div>
+          <div class="seg seg-maint" style="width:35.0%"></div>
+        </div>
+        <span class="row-val fl-v">約226万円</span>
+      </div>
+
+    </div>
+
+    <!-- SAVINGS -->
+    <div class="savings-box">
+      <span class="savings-label">最大差額（FL大規模・保守あり 226万 vs Noe Shiftica 55万）</span>
+      <span class="savings-val">▲ 171万円の節約</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       CHART 2: 納期比較
+  ════════════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-head-text">Chart 02 · 納期比較</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-header">
+      <span class="chart-title">制作納期比較（要件定義〜公開まで）</span>
+      <span class="chart-note">🔴 低いほど◎　最大値=FL大規模 3ヶ月</span>
+    </div>
+
+    <div class="delivery-group">
+
+      <!-- 小規模 -->
+      <div class="scale-divider">
+        <span class="scale-divider-text">Small · 小規模</span>
+        <div class="scale-divider-line"></div>
+      </div>
+
+      <div class="delivery-row">
+        <span class="row-label noe-l">Noe Shiftica</span>
+        <div class="del-bar-track"><div class="del-bar-fill del-noe" style="width:15%"></div></div>
+        <span class="del-val noe-dv">14日</span>
+      </div>
+      <div class="delivery-row">
+        <span class="row-label fl-l">フリーランス</span>
+        <div class="del-bar-track"><div class="del-bar-fill del-fl" style="width:50%"></div></div>
+        <span class="del-val fl-dv">2〜4週間</span>
+      </div>
+
+      <div class="divider-row"></div>
+
+      <!-- 中規模 -->
+      <div class="scale-divider">
+        <span class="scale-divider-text">Medium · 中規模</span>
+        <div class="scale-divider-line"></div>
+      </div>
+
+      <div class="delivery-row">
+        <span class="row-label noe-l">Noe Shiftica</span>
+        <div class="del-bar-track"><div class="del-bar-fill del-noe" style="width:24%"></div></div>
+        <span class="del-val noe-dv">21日</span>
+      </div>
+      <div class="delivery-row">
+        <span class="row-label fl-l">フリーランス</span>
+        <div class="del-bar-track"><div class="del-bar-fill del-fl" style="width:67%"></div></div>
+        <span class="del-val fl-dv">1〜2ヶ月</span>
+      </div>
+
+      <div class="divider-row"></div>
+
+      <!-- 大規模 -->
+      <div class="scale-divider">
+        <span class="scale-divider-text">Large · 大規模</span>
+        <div class="scale-divider-line"></div>
+      </div>
+
+      <div class="delivery-row">
+        <span class="row-label noe-l">Noe Shiftica</span>
+        <div class="del-bar-track"><div class="del-bar-fill del-noe" style="width:33%"></div></div>
+        <span class="del-val noe-dv">1ヶ月</span>
+      </div>
+      <div class="delivery-row">
+        <span class="row-label fl-l">フリーランス</span>
+        <div class="del-bar-track"><div class="del-bar-fill del-fl" style="width:100%"></div></div>
+        <span class="del-val fl-dv">2〜3ヶ月</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insights">
+    <div class="insight-card">
+      <div class="insight-num">▲171万</div>
+      <div class="insight-label">最大コスト差<br>FL大規模・保守あり vs Noe Shiftica大規模<br>3年で171万円の差</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">1/3〜</div>
+      <div class="insight-label">納期の速さ<br>全規模でNoe Shifticaが<br>フリーランスの1/3〜1/2の期間</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">¥0</div>
+      <div class="insight-label">月額ランニング<br>Firebase・Cloudflare・Neon構成<br>3規模すべてで月額ほぼ0円</div>
+    </div>
+  </div>
+
+  <p class="footnote">
+    DATA: Web幹事 · ferret One · NT CREATION · Teraceの相談室 · Medicalgrits · クロスデザイナー · 2026<br>
+    フリーランス相場は中央値。ランニング：FL月1万円×36ヶ月。保守：FL月2.5万円×36ヶ月。Noe Shifticaは確定価格。
+  </p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>現在動いている2シリーズ — 全体マップ</title>
+<style>
+  :root{
+    --bg:#0d0e12; --panel:#14151a; --panel-elev:#1c1e26;
+    --fg:#e6e7ea; --fg-muted:#9aa0ac; --fg-faint:#6b7280;
+    --line:#2d2f38; --amber:#ffb347; --cyan:#5ec8d8;
+    --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic','Segoe UI',sans-serif;
+    padding:2rem 1rem 4rem; -webkit-text-size-adjust:100%;
+  }
+  .wrap{ max-width:44rem; margin:0 auto; }
+  .eyebrow{ text-align:center; font-size:0.72rem; font-weight:600;
+    letter-spacing:0.12em; color:var(--fg-faint); margin-bottom:0.4rem; }
+  h1{ text-align:center; font-size:1.5rem; font-weight:700; margin:0 0 0.5rem;
+    line-height:1.4; background:var(--grad);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent; }
+  .subtitle{ text-align:center; color:var(--fg-muted); font-size:0.85rem;
+    margin-bottom:1.8rem; line-height:1.6; }
+
+  .series-header{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:1rem; margin:2.4rem 0 0.8rem; padding-bottom:0.6rem;
+    border-bottom:1px solid var(--line);
+  }
+  .series-header:first-of-type{ margin-top:0; }
+  .series-name{ font-size:1.05rem; font-weight:700; color:#fff; }
+  .series-progress{ font-size:0.78rem; color:var(--fg-muted); white-space:nowrap; }
+  .series-desc{ font-size:0.82rem; color:var(--fg-muted); margin-bottom:1.1rem; line-height:1.7; }
+
+  .controls{ display:flex; justify-content:center; gap:0.6rem; margin:1.8rem 0; }
+  button.ctrl{ display:flex; align-items:center; gap:0.35rem; font-size:0.78rem;
+    font-family:inherit; border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--fg-muted); }
+  button.ctrl.primary{ background:var(--panel-elev); color:var(--fg); }
+  button.ctrl:hover{ opacity:0.85; }
+
+  .node-row{ display:flex; align-items:flex-start; gap:0.55rem; cursor:default;
+    padding:0.55rem 0.7rem; margin-bottom:0.4rem; border-radius:10px; }
+  .node-row.has-children{ cursor:pointer; }
+  .node-row.root{ padding:0.8rem 1rem; background:var(--panel-elev); border:1px solid var(--line); }
+  .caret{ margin-top:0.15rem; color:var(--fg-faint); flex-shrink:0; width:18px;
+    display:inline-flex; justify-content:center; transition:transform 0.15s ease;
+    font-size:0.8rem; user-select:none; }
+  .caret.leaf{ margin-top:0.65rem; width:5px; height:5px; border-radius:50%;
+    background:var(--fg-faint); }
+  .caret.open{ transform:rotate(90deg); }
+  .node-title-wrap{ flex:1; min-width:0; }
+  .node-title-line{ display:flex; flex-wrap:wrap; align-items:center; gap:0.6rem; }
+  .title-root{ font-size:1rem; font-weight:700; color:#fff; line-height:1.5; }
+  .title-1{ font-size:0.9rem; font-weight:600; color:var(--fg); line-height:1.5; }
+  .node-sub{ font-size:0.8rem; color:var(--fg-muted); margin-top:0.15rem; line-height:1.6; }
+
+  .badge{ display:inline-flex; align-items:center; gap:0.3rem; font-size:0.66rem;
+    font-weight:600; letter-spacing:0.04em; padding:0.18rem 0.5rem;
+    border-radius:999px; white-space:nowrap; }
+  .badge.done{ color:var(--bg); background:var(--grad); }
+  .badge.todo{ color:var(--fg-muted); border:1px solid var(--line); }
+
+  .children{ padding-left:1rem; border-left:1.5px solid var(--line);
+    overflow:hidden; max-height:0; transition:max-height 0.25s ease; }
+  .children.open{ max-height:4000px; }
+  .depth-0 > .children{ margin-left:1.5rem; }
+
+  .footnote{ text-align:center; color:var(--fg-faint); font-size:0.75rem;
+    margin-top:2.4rem; line-height:1.9; }
+  .note{
+    max-width:38rem; margin:0 auto 2rem; padding:0.9rem 1.1rem;
+    background:var(--panel-elev); border:1px solid var(--line);
+    border-radius:10px; font-size:0.8rem; color:var(--fg-muted); line-height:1.8;
+  }
+  .note b{ color:#fff; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">CURRENT STATE — 2 SERIES IN PROGRESS</div>
+    <h1>今、動いている2つのシリーズ</h1>
+    <p class="subtitle">「なぜ」を扱うシリーズと、「どう作るか」を扱うシリーズ</p>
+
+    <div class="note">
+      <b>この2本の関係</b><br>
+      シリーズAは「商材を見抜き、原理を理解する」ための<b>理論・解説編</b>。<br>
+      シリーズBは「実際にコードを書いて動かす」ための<b>実践・チュートリアル編</b>。<br>
+      Aを読んでから、Bで手を動かす、という順番を想定しています。
+    </div>
+
+    <div id="tree"></div>
+
+    <p class="footnote">
+      <span style="color:var(--amber)">■</span> 公開準備完了 ／
+      <span style="color:var(--fg-muted)">■</span> 執筆待ち
+    </p>
+  </div>
+
+<script>
+  const SERIES_A = {
+    name: "シリーズA：「AI社員」と第二の脳の正体",
+    desc: "商材の見抜き方 → データの資産化 → エージェントの仕組み。全6回。個人向けに統一済み",
+    done: 6, total: 6,
+    items: [
+      { id:"a1", title:"「AI社員」商材の見分け方", status:"done",
+        sub:"5つのチェックポイントと、世界の3層構造" },
+      { id:"a2", title:"Obsidianはなぜ「第二の脳」になれないのか", status:"done",
+        sub:"データ構造からの解剖。個人の蓄積量視点に修正済み" },
+      { id:"a3", title:"ゼロからわかるVector・Graph・GraphRAG", status:"done",
+        sub:"専門用語ゼロからの土台固め" },
+      { id:"a4", title:"個人のための2026年最適解", status:"done",
+        sub:"蓄積量で判断。SQLite中心の構成に修正済み" },
+      { id:"a5", title:"「Obsidian×AI社員」の主役は、Obsidianではない", status:"done",
+        sub:"作れるが、Obsidianは何もしていない。作業机の比喩で技術解説" },
+      { id:"a6", title:"個人が無料で「AI社員」を作る方法", status:"done",
+        sub:"Claude Codeの標準機能だけで実装。設定ファイル3枚＋黒板アーキテクチャ" }
+    ]
+  };
+
+  const SERIES_B = {
+    name: "シリーズB：初心者でも作れるAI社員の作り方",
+    desc: "Python × Antigravity で、実際にWebサイト制作チームを動かす。全4回。手を動かす実践編",
+    done: 1, total: 4,
+    items: [
+      { id:"b1", title:"フレームワークなしで、AI社員は作れる", status:"done",
+        sub:"環境構築（Antigravity/Claude Code/Codex/手動の4ルート）→ 2体（デザイナー・コーダー）が動くまで。目次トグル・見出し階層対応済み" },
+      { id:"b2", title:"5人チームに拡張する", status:"todo",
+        sub:"リサーチャー・検証役・統括を追加。モデル使い分け・並列化の見極め" },
+      { id:"b3", title:"素のPythonの限界——ツールを使わせる", status:"todo",
+        sub:"Web検索・ファイル書き込み・ブラウザ確認。フレームワーク導入の判断基準" },
+      { id:"b4", title:"フレームワークを導入する", status:"todo",
+        sub:"CrewAI導入・Antigravityのブラウザ検証・実際にできたサイトの検証結果" }
+    ]
+  };
+
+  function collectIds(series){ return series.items.map(i=>i.id); }
+  const ALL_IDS = [...collectIds(SERIES_A), ...collectIds(SERIES_B)];
+  const openSet = new Set(ALL_IDS.filter(id => id === "b1" || id.startsWith("a")));
+
+  function badgeHtml(status){
+    return status === "done"
+      ? `<span class="badge done">✓ 公開準備完了</span>`
+      : `<span class="badge todo">○ 執筆待ち</span>`;
+  }
+
+  function renderItem(item){
+    const isOpen = openSet.has(item.id);
+    return `
+      <div class="depth-0">
+        <div class="node-row root">
+          <span class="caret leaf"></span>
+          <div class="node-title-wrap">
+            <div class="node-title-line">
+              <span class="title-1">${item.title}</span>
+              ${badgeHtml(item.status)}
+            </div>
+            <div class="node-sub">${item.sub}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderSeries(series){
+    return `
+      <div class="series-header">
+        <span class="series-name">${series.name}</span>
+        <span class="series-progress">${series.done} / ${series.total} 完成</span>
+      </div>
+      <p class="series-desc">${series.desc}</p>
+      ${series.items.map(renderItem).join("")}
+    `;
+  }
+
+  function render(){
+    document.getElementById("tree").innerHTML =
+      renderSeries(SERIES_A) + renderSeries(SERIES_B);
+  }
+
+  render();
+</script>
+</body>
+</html>

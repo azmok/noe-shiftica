@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>【実演】20行のPythonで「AI社員」を再現する</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+
+  --bg: #14151a;
+  --bg-elev: #1c1e26;
+  --fg: #e6e7ea;
+  --fg-muted: #9aa0ac;
+  --fg-faint: #6b7280;
+  --line: #2d2f38;
+  --accent: #ff7a9c;
+
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def);
+  color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45;
+  background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{
+  margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff;
+}
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+h4{
+  margin:1.4rem auto 0.5rem; font-weight:600; font-size:0.96rem; color:var(--fg);
+}
+
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+
+.step{
+  display:inline-block; font-family:var(--font-mono), monospace;
+  font-size:0.72rem; font-weight:600; letter-spacing:0.06em;
+  padding:0.2em 0.6em; border-radius:999px;
+  background:var(--grad); color:#14151a; margin-bottom:0.5rem;
+}
+
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint);
+  transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{
+  display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0;
+}
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+.toc-sub{ margin:0.15rem 0 0.35rem; padding-left:1.1rem; list-style:none; }
+.toc-sub li{ margin:0.1em 0; padding-left:0; }
+.toc-sub li::before{ display:none; }
+.toc-sub a{
+  font-size:0.84rem; color:var(--fg-faint);
+  border-left:2px solid var(--line); padding-left:0.7rem;
+}
+.toc-sub a:hover{ border-left-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>【実演】20行のPythonで「AI社員」を再現する</h1>
+
+<div class="tldr">
+<ul>
+<li>プログラミングの知識は必要ありません。コードもAIが書きます</li>
+<li>あなたがやるのは、用意された文章を貼り付けることだけ</li>
+<li>できあがるものの中核は、たった20行ほど</li>
+<li>その20行を読むと、「AI社員」が何だったのかが分かります</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s0">今回やること</a></li>
+      <li><a href="#s1">先に、お金の話をします</a></li>
+      <li>
+        <a href="#s2">準備編</a>
+        <ul class="toc-sub">
+          <li><a href="#s2a">準備1：フォルダを作る</a></li>
+          <li><a href="#s2b">準備2：Antigravity IDEを入れる</a></li>
+          <li><a href="#s2c">準備3：ターミナルを開く</a></li>
+          <li><a href="#s2d">準備4：CLIを起動する</a></li>
+          <li><a href="#s2e">準備5：APIキーを取得する</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#s3">実装編（3ステップ）</a>
+        <ul class="toc-sub">
+          <li><a href="#s3a">ステップ1：作ってもらう</a></li>
+          <li><a href="#s3b">ステップ2：キーを設定する</a></li>
+          <li><a href="#s3c">ステップ3：動かしてもらう</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#s4">中身を読んでみる</a>
+        <ul class="toc-sub">
+          <li><a href="#s4a">役割の正体は、ただの文章</a></li>
+          <li><a href="#s4b">連携の正体は、文字列の連結</a></li>
+          <li><a href="#s4c">なぜ、これで役割分担が成立するのか</a></li>
+        </ul>
+      </li>
+      <li><a href="#s5">うまくいかないときは</a></li>
+      <li><a href="#s6">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>前回、「AI社員」の実体は標準機能の組み合わせだと書きました。</p>
+<p>今回は、それを<strong>実際に手を動かして確かめます。</strong> 読むだけでなく、自分の手元で動かせます。</p>
+<blockquote>
+<p><strong>プログラミングの知識は、まったく必要ありません。</strong><br>
+コードを書くのも、ファイルを作るのも、全部AIがやります。<br>
+あなたがやるのは、この記事にある文章を貼り付けることだけです。</p>
+</blockquote>
+<p>「そんなうまい話が」と思うかもしれませんが、2026年の今はこれが普通です。むしろ<strong>この事実こそが、高額な講座が不要である理由</strong>でもあります。</p>
+
+<h2 id="s0">今回やること</h2>
+
+<p>2人のAIが役割を分けて働く、最小のチームを作ります。</p>
+
+<pre><code>あなた「海の見えるカフェのページを作って」
+      ↓
+デザイナー役のAI ── どんなページにするか考える
+      ↓ 考えた内容を渡す
+コーダー役のAI  ── 実際のWebページを作る
+      ↓
+Webページが完成する</code></pre>
+
+<p>テーマを1つ伝えるだけで、勝手に構成が考えられ、勝手にページが出来上がります。<strong>準備も含めて30分ほど</strong>です。</p>
+<p>そして完成したあと、<strong>中身のコードを読みます。</strong> ここが今回の本題です。</p>
+
+<h2 id="s1">先に、お金の話をします</h2>
+
+<p>気持ちよく進めるために、費用の話を最初に済ませておきます。</p>
+<p>結論から言うと、<strong>月3,000円ほどのサブスクを1つ契約している状態</strong>が、いちばん快適です。</p>
+
+<table>
+<tr><th>会社</th><th>プラン</th><th>月額の目安</th></tr>
+<tr><td>Google</td><td>Google AI Pro</td><td>約3,000円</td></tr>
+<tr><td>Anthropic</td><td>Claude Pro</td><td>約3,000円</td></tr>
+<tr><td>OpenAI</td><td>ChatGPT Plus</td><td>約3,000円</td></tr>
+</table>
+
+<p><strong>どれか1つで大丈夫です。</strong> すでにChatGPTやClaudeを契約している方は、<strong>追加の費用はかかりません。</strong></p>
+<p>無料でも試せますが、使える回数がかなり限られています。途中で止まると、それだけで嫌になります。<strong>最初の一歩でつまずかないために、月3,000円は妥当な投資</strong>だと僕は考えています。</p>
+<p>そして、このシリーズで扱っている高額な講座は<strong>数十万円</strong>という価格帯でした。<strong>桁が2つ違います。</strong></p>
+<p>⚠️ 料金は変わりやすい分野です。上記は2026年8月時点の目安なので、契約前に各社の公式ページで確認してください。</p>
+
+<h2 id="s2">準備編</h2>
+
+<p>ここが少し長いですが、<strong>一度やれば次回からは不要</strong>です。</p>
+
+<h3 id="s2a"><span class="step">準備 1</span><br>フォルダを作る</h3>
+
+<p>デスクトップなど分かりやすい場所に、<strong>空のフォルダを1つ作ります。</strong> 名前は <code>ai-team</code> にしてください。右クリックから「新規フォルダ」を選ぶだけです。</p>
+<p>⚠️ <strong>なぜ先に作るのか</strong>：AIに「フォルダを作って」と頼むと、<strong>パソコンの個人フォルダ全体がAIから見える状態</strong>になることがあります。関係のないファイルまで読み込まれる原因になるので、先に作って範囲を区切っておきます。</p>
+
+<h3 id="s2b"><span class="step">準備 2</span><br>Antigravity IDEを入れる</h3>
+
+<p><strong>契約している会社に関係なく、全員がインストールします。</strong> 「IDE」は、ファイルの中身を見たり書き換えたりするための道具です。</p>
+<p><a href="https://antigravity.google/">antigravity.google</a> を開いてください。Windows・Mac・Linuxすべて対応、<strong>無料</strong>です。</p>
+<p>⚠️ <strong>注意</strong>：ダウンロードページには、似た名前のものが4つ並んでいます。</p>
+
+<table>
+<tr><th>名前</th><th>何のためのものか</th></tr>
+<tr><td><strong>Antigravity IDE</strong></td><td><strong>← 今回入れるのはこれです</strong></td></tr>
+<tr><td>Antigravity 2.0</td><td>複数の作業をまとめて管理するアプリ</td></tr>
+<tr><td>Antigravity CLI</td><td>Googleと契約している方が、後で追加します</td></tr>
+<tr><td>Antigravity SDK</td><td>開発者向けの部品</td></tr>
+</table>
+
+<p>インストールしたら起動して、メニューから<strong>「ファイル」→「フォルダを開く」</strong>で、準備1で作った <code>ai-team</code> を選んでください。</p>
+<p>📌 初回起動時にGoogleアカウントを求められることがありますが、<strong>無料のアカウントで大丈夫</strong>です。今回IDEは「ファイルを見る道具」としてだけ使います。</p>
+
+<h3 id="s2c"><span class="step">準備 3</span><br>ターミナルを開く</h3>
+
+<p>メニューから<strong>「ターミナル」→「新しいターミナル」</strong>を選んでください。画面の下に新しい欄が開きます。</p>
+<p>怖がる必要はありません。<strong>打つコマンドは全部この記事に書いてあります。</strong> コピーして貼るだけです。</p>
+<p>💡 キーボードなら <code>Ctrl</code> + <code>@</code> でも開けます。</p>
+
+<h3 id="s2d"><span class="step">準備 4</span><br>CLIを起動する</h3>
+
+<p><strong>契約している会社によって分かれます。</strong> 自分の契約に合うところだけ読んでください。</p>
+
+<h4>▸ Googleと契約している方</h4>
+<p><a href="https://antigravity.google/docs/cli/getting-started">公式ページ</a>の手順でAntigravity CLIをインストールします。Windowsの場合はこれです。</p>
+<pre><code>curl -fsSL https://antigravity.google/cli/install.cmd -o install.cmd && install.cmd && del install.cmd</code></pre>
+<p>インストール後、<strong>ターミナルを閉じて開き直してから</strong>、次を実行します。</p>
+<pre><code>agy</code></pre>
+
+<h4>▸ Anthropic（Claude）と契約している方</h4>
+<pre><code>brew install --cask claude-code</code></pre>
+<p>Windowsの方は<a href="https://code.claude.com/docs/en/installation">公式手順</a>をご覧ください。インストール後、次を実行します。</p>
+<pre><code>claude</code></pre>
+
+<h4>▸ OpenAI（ChatGPT）と契約している方</h4>
+<pre><code># Mac / Linux
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+# Windows（PowerShell）
+powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"</code></pre>
+<p>インストール後、次を実行します。</p>
+<pre><code>codex</code></pre>
+<p>起動したら「Sign in with ChatGPT」を選び、契約中のアカウントでログインしてください。</p>
+
+<p>どのCLIでも、<strong>起動に成功すると文章を入力できる状態</strong>になります。</p>
+
+<h3 id="s2e"><span class="step">準備 5</span><br>APIキーを取得する</h3>
+
+<p>最後に「APIキー」を取ります。<strong>作ったプログラムがAIを呼び出すための鍵</strong>です。</p>
+<p>ここは混乱しやすいので、はっきり分けておきます。</p>
+
+<pre><code>CLI（agy / claude / codex）
+  → AIがあなたの代わりにファイルを作る
+  → 契約しているサブスクで動く
+
+APIキー
+  → 出来上がったプログラムがAIを呼ぶ
+  → サブスクとは別の仕組み。別途取得が必要</code></pre>
+
+<p>💡 <strong>なぜ別なのか</strong>：サブスク用のログインは、CLI自身が使うための認証です。各社とも、この認証を自作プログラムから流用することを規約で禁止しています。専用の鍵を別途取得してください。</p>
+<p>使う予定の会社のものを、<strong>1つだけ</strong>取得します。</p>
+
+<pre><code>▸ Google
+  https://aistudio.google.com/apikey
+  →「APIキーを作成」（AIza... で始まる文字列）
+
+▸ Anthropic
+  https://console.anthropic.com/settings/keys
+  →「Create Key」（sk-ant-... で始まる文字列）
+
+▸ OpenAI
+  https://platform.openai.com/api-keys
+  →「Create new secret key」（sk-... で始まる文字列）</code></pre>
+
+<p>💰 今回作るものは、1回動かしてもごくわずかな金額です。正確な単価は各社の公式ページで確認してください。</p>
+
+<h2 id="s3">実装編（3ステップ）</h2>
+
+<h3 id="s3a"><span class="step">STEP 1</span><br>作ってもらう</h3>
+
+<p>起動したCLIに、次の文章を<strong>そのまま貼り付けてください。</strong> どの会社のCLIでも同じです。</p>
+
+<pre><code>Pythonで「役割を持つAIエージェント」の最小構成を作ってください。
+私はプログラミング初心者なので、必要なものはすべて自動で用意してください。
+今開いているこのフォルダを、作業フォルダとして使います。
+
+## 対応してほしい会社（3社すべて）
+Google（Gemini）、Anthropic（Claude）、OpenAI（ChatGPT）の3社に
+対応させてください。
+
+【手順の前提】
+まず .env ファイルを作ります。この時点では、APIキーはまだ
+1つも設定されていません。3社分の行をすべてコメントアウトした
+状態で用意してください。
+私があとで、自分が使う会社の行だけコメントを外して、
+実際のキーを貼り付けます。
+
+そのうえでプログラム側は、実行された時に .env を読み込み、
+「コメントが外されている行はどれか」を見て、
+その会社のAPIを使う、という作りにしてください。
+
+## 使用するモデルについて（重要）
+- モデル名は、あなたの記憶だけで決めないでください
+- 検索ツールを実際に使って、次の3社それぞれの公式ドキュメントを調べ、
+  現時点で提供されている「標準的な」最新モデル名を確認してください
+  - Google: ai.google.dev
+  - Anthropic: docs.claude.com
+  - OpenAI: platform.openai.com/docs/models
+- 確認した3社分のモデル名を、コード内に辞書として持たせてください
+- 確認せずに記憶だけで書くと、提供終了したモデルを指定してしまい、
+  実行時にエラーになることがあります
+
+## 環境
+- パッケージ管理には uv を使う（未インストールなら導入から行う）
+- 必要なパッケージは3社分すべて
+  （google-genai、anthropic、openai、python-dotenv）
+
+## 作ってほしいファイル
+
+### .env
+次の内容で作成してください。キーはまだ入れず、3行すべてを
+コメントアウトした状態にしてください。
+
+  # 使う会社の行だけ、先頭の # を外してキーを貼ってください
+
+  # GEMINI_API_KEY=ここにキーを貼ってください
+  # ANTHROPIC_API_KEY=ここにキーを貼ってください
+  # OPENAI_API_KEY=ここにキーを貼ってください
+
+### .gitignore
+.env と output/ と .venv/ を除外する
+
+### agents.py
+- 実行時に .env を読み込む
+- 3つのキーのうち、コメントが外されて有効になっているのは
+  どれかを判定し、対応する会社のクライアントを用意する
+- どれも有効でない場合は、分かりやすい日本語のエラーを出す
+- agent(role, task, model=None) という関数を1つ定義する
+  - model 未指定なら、確認済みの最新モデル名を使う
+  - 3社のAPIの違いは、この関数の中で吸収する
+- 戻り値は、会社によらず常にテキストのみ
+
+### roles.py
+DESIGNER と CODER という2つの文字列を定義する
+- DESIGNER: UIデザイナー。渡されたテーマから、1枚のWebページの
+  構成・配色・フォント・各セクションの文言を決める。
+  仕様だけを日本語で書き、コードは書かない
+- CODER: フロントエンドエンジニア。渡された仕様を、
+  外部ファイルに依存しない1枚のHTMLとして実装する。
+  レスポンシブ対応。出力はHTMLコードのみ
+
+### main.py
+- THEME という変数にテーマを書く
+  （初期値は「海の見える個人経営のカフェ。落ち着いた大人向けの雰囲気」）
+- デザイナーを呼んで仕様を作り、output/design.md に保存
+- その仕様をコーダーに渡してHTMLを作り、output/index.html に保存
+- AIの返答からコードフェンスを取り除く処理を入れる
+- 各工程の進行状況を日本語で分かりやすく表示する
+- 使用している会社名とモデル名も表示する
+- すべて完了したら、標準ライブラリの webbrowser を使って
+  output/index.html を自動でブラウザで開く
+
+### README.md
+セットアップ手順と実行方法。3社の確認済みモデル名と、
+その確認に使った情報源も書いておいてください
+
+## 最後に
+- 作ったファイルの一覧と役割を日本語で説明してください
+- 確認した3社のモデル名と、情報源を教えてください
+- 私が次に何をすればいいかも教えてください</code></pre>
+
+<p>貼り付けたら、あとは待つだけです。<strong>3社分のモデル名を調べるところまで、全部やってくれます。</strong></p>
+
+<h3 id="s3b"><span class="step">STEP 2</span><br>キーを設定する</h3>
+
+<p><strong>ここだけが、あなたの手作業です。</strong></p>
+<p>画面左のファイル一覧から <code>.env</code> を開いてください。</p>
+
+<pre><code># 使う会社の行だけ、先頭の # を外してキーを貼ってください
+
+# GEMINI_API_KEY=ここにキーを貼ってください
+# ANTHROPIC_API_KEY=ここにキーを貼ってください
+# OPENAI_API_KEY=ここにキーを貼ってください</code></pre>
+
+<p>やることは<strong>2つだけ</strong>です。</p>
+<ol>
+<li>自分が使う会社の行だけ、先頭の <code>#</code> と空白を消す</li>
+<li>「ここにキーを貼ってください」を、実際の鍵に置き換える</li>
+</ol>
+
+<p>Googleを使う場合の完成形です。</p>
+
+<pre><code># 使う会社の行だけ、先頭の # を外してキーを貼ってください
+
+GEMINI_API_KEY=AIzaSy...（あなたの鍵）
+# ANTHROPIC_API_KEY=ここにキーを貼ってください
+# OPENAI_API_KEY=ここにキーを貼ってください</code></pre>
+
+<p><strong>使わない2行は、そのまま <code>#</code> を付けたままで大丈夫です。</strong> <code>#</code> で始まる行はメモ書き扱いになり、プログラムから無視されます。</p>
+<p>⚠️ <code>.env</code> の中身は誰にも見せないでください。鍵が漏れると、他人にあなたの分の料金を使われます。</p>
+
+<h3 id="s3c"><span class="step">STEP 3</span><br>動かしてもらう</h3>
+
+<p>CLIの入力欄に戻って、こう伝えてください。</p>
+
+<pre><code>.env にAPIキーを設定しました。実行してください。</code></pre>
+
+<p><strong>これだけです。</strong> コマンドを自分で打つ必要もありません。</p>
+
+<pre><code>使用中のAPI: Google（Gemini）
+デザイナーが仕様を作成中...
+コーダーが実装中...
+完了: output/index.html
+ブラウザで開きます...</code></pre>
+
+<p>最後に、<strong>できあがったページが自動的にブラウザで開きます。</strong></p>
+<p>テーマを変えたければ、こう頼めます。</p>
+<pre><code>main.py のテーマを「隠れ家風の古書店」に変えて、もう一度実行してください。</code></pre>
+
+<h2 id="s4">中身を読んでみる</h2>
+
+<p><strong>ここからが本題です。</strong> 何かを書く必要はありません。読むだけです。</p>
+<p>できあがったファイルを見ると、「AI社員」と呼ばれているものの正体がはっきりします。</p>
+
+<h3 id="s4a">役割の正体は、ただの文章</h3>
+
+<p><code>roles.py</code> を開いてみてください。</p>
+
+<pre><code>DESIGNER = """あなたはUIデザイナーです。
+渡されたテーマから、1枚のWebページの仕様を決めてください。
+
+- ページ全体の構成（どのセクションを、どの順番で置くか）
+- 配色（背景・文字・アクセントの3色を、カラーコードで指定）
+- 各セクションに入れる文言の内容
+
+コードは書かないでください。仕様だけを日本語で書いてください。"""
+
+
+CODER = """あなたはフロントエンドエンジニアです。
+渡された仕様を、1枚のHTMLファイルとして実装してください。
+
+- スマホでも崩れないようにする
+- 仕様にないものは追加しない
+- 出力はHTMLコードのみ。説明文は不要"""</code></pre>
+
+<p><strong>見てのとおり、ただの日本語の文章です。</strong> プログラムらしいものは何もありません。</p>
+<p>つまり——<strong>「AI社員を作る」とは、こういう文章を書くことでした。</strong></p>
+<p>ここを書き換えれば、そのまま別の社員になります。「あなたは経理担当です」と書けば経理係に、「あなたは校正者です」と書けば校正係に。<strong>特別な技術は要りません。</strong></p>
+
+<p>💡 <strong>うまく書くコツ</strong>が3つあります。</p>
+<ol>
+<li><strong>やってほしくないことを書く</strong>——「コードは書かない」のような線引きが、暴走を防ぎます</li>
+<li><strong>出し方を指定する</strong>——「日本語で」「HTMLだけ」と書かないと、余計な前置きが混ざります</li>
+<li><strong>具体的に書く</strong>——「配色」より「3色をカラーコードで」のほうが精度が上がります</li>
+</ol>
+
+<h3 id="s4b">連携の正体は、文字列の連結</h3>
+
+<p>次に <code>main.py</code> の、いちばん大事な2行を見てください。</p>
+
+<pre><code>design = agent(DESIGNER, "このテーマで仕様を作って")
+result = agent(CODER,    "この仕様を実装して" + design)</code></pre>
+
+<p>2行目に注目してください。<code>+ design</code> という部分があります。</p>
+<p><strong>デザイナーの出力を、そのままコーダーへの指示文にくっつけているだけです。</strong></p>
+<p>これが「連携」の正体です。特別な仕組みは、どこにもありません。</p>
+
+<h3 id="s4c">なぜ、これで役割分担が成立するのか</h3>
+
+<p>ここが最も面白いところです。</p>
+<p>前回、役割分担の本体は<strong>「作業する机を分けること」</strong>だと書きました。では、このコードのどこで机を分けているのでしょうか。</p>
+<p>答えは、<strong>分ける処理を書いていない</strong>、です。</p>
+<p>AIを呼び出す仕組みは、<strong>前回のやり取りを覚えていません。</strong> 呼び出すたびに、そのとき渡された内容だけを見て応答します。</p>
+<p>つまり<strong>呼び出すたびに、机が自動的にまっさらな状態から始まります。</strong></p>
+<p>デザイナーが迷った過程も、書きかけて消した案も、コーダーの机には乗りません。届くのは完成した仕様だけです。</p>
+<blockquote>
+<p><strong>特別な仕組みが分けているのではなく、最初から分かれている。</strong></p>
+</blockquote>
+<p>裏を返すと、大事な注意点があります。<strong>必要な情報は、毎回きちんと渡さないといけません。</strong> 「さっきの仕様で」は通じません。</p>
+<p>だから <code>+ design</code> という一手間が必要になる。<strong>この一手間こそが、机が分かれていることの証拠</strong>でもあります。</p>
+
+<h2 id="s5">うまくいかないときは</h2>
+
+<p>基本的には、<strong>エラーの文章をそのままAIに貼って「直してください」と伝えれば解決します。</strong></p>
+<p>💡 1つだけコツがあります。AIは<strong>モデル名のような「よく変わる情報」を、古い記憶のまま答える</strong>ことがあります。直してもらったのに同じ種類のエラーが出る場合は、<strong>「検索して確認してから直して」と付け加えてください。</strong></p>
+
+<table>
+<tr><th>症状</th><th>どうするか</th></tr>
+<tr><td>CLIのコマンドが見つからない</td><td>ターミナルを閉じて開き直してください</td></tr>
+<tr><td>「APIキーが見つかりません」</td><td><code>.env</code> の <code>#</code> が外れているか確認を</td></tr>
+<tr><td>「モデルが見つかりません」</td><td>「公式サイトを検索して、現在使えるモデル名を確認してから直して」と伝える</td></tr>
+<tr><td>「上限に達しました」</td><td>1分ほど待ってから、もう一度実行を</td></tr>
+<tr><td>ページに変な記号が出る</td><td>「HTMLに余計な記号が混ざっています」と伝える</td></tr>
+</table>
+
+<p>💡 <strong>遠慮なくAIに聞いてください。</strong> 「この行は何をしているの？」という質問にも答えてくれます。</p>
+
+<h2 id="s6">まとめ</h2>
+
+<ul>
+<li>プログラミングの知識がなくても、AIチームは作れる</li>
+<li>あなたがやったのは、<strong>文章を貼るのと、<code>#</code> を外して鍵を貼ること</strong>だけ</li>
+<li>「役割」の正体は、<strong>ただの日本語の文章</strong></li>
+<li>「連携」の正体は、<strong>前の出力を次の指示文にくっつけるだけ</strong></li>
+<li>役割分担が成立するのは、<strong>呼び出すたびに机がまっさらになる</strong>から</li>
+</ul>
+
+<p>つまり——<strong>「AI社員」とは、指示する文章を切り替えているだけのものでした。</strong></p>
+
+<p>ここで、正直に補足しておきます。<strong>今回作ったものは、実用品ではありません。</strong> 記憶も持たないし、繰り返しても賢くなりません。</p>
+<p>ただ、それでいいんです。今回の目的は<strong>「中身が何であるかを自分の目で確かめること」</strong>だったからです。</p>
+<p>そのうえで、次の疑問が残ります。</p>
+<blockquote>
+<p><strong>では、まともなものを作るには何が必要で、それはいくらかかるのか。</strong></p>
+</blockquote>
+<p>次回はそこを扱います。<strong>無料で手に入るものの全体像</strong>——標準機能、無料の解説記事、そして無料のOSS。<strong>どこまでがお金を払わずに手に入るのかを、隠さず並べます</strong> ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  var toggle = document.getElementById('tocToggle');
+  toggle.addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

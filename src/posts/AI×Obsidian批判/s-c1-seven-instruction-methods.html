@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>標準機能を使い倒す——7つの指示手法</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.8rem;
+  line-height:1.45; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.32rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.06rem; color:#fff; }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+table{ border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:0.86em; }
+th, td{ border:1px solid var(--line); padding:0.55rem 0.7rem; text-align:left; vertical-align:top; }
+th{ background:var(--bg-elev); color:#fff; font-weight:600; }
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+</style>
+</head>
+<body>
+
+<h1>標準機能を使い倒す——7つの指示手法</h1>
+
+<div class="tldr">
+<ul>
+<li>AIへの指示手法は7つある。多くの人は2つしか使っていません</li>
+<li>違いは機能ではなく、<strong>「いつ読み込まれるか」</strong>です</li>
+<li>常に読まれるものに詰め込むと、精度が落ちます</li>
+<li>使い分けを覚えるだけで、外部ツールなしで到達できる範囲が広がります</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">なぜ標準機能から始めるのか</a></li>
+      <li><a href="#s2">7つの手法——全体像</a></li>
+      <li><a href="#s3">① 常に読まれるもの</a></li>
+      <li><a href="#s4">② 呼ばれたときだけ読まれるもの</a></li>
+      <li><a href="#s5">③ 読まれないところで動くもの</a></li>
+      <li><a href="#s6">④ 別の場所で動くもの</a></li>
+      <li><a href="#s7">使い分けの判断基準</a></li>
+      <li><a href="#s8">まとめ</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>ここからは、実際に作る側に回ります。</p>
+<p>前のシリーズで、「AI社員」の実体は標準機能の組み合わせだと確かめました。<strong>では、その標準機能をどこまで使い倒せるのか。</strong></p>
+<p>結論から言うと、多くの人が使っているのは<strong>7つあるうちの2つだけ</strong>です。残りの5つを知るだけで、外部ツールを入れずに到達できる範囲がかなり変わります。</p>
+
+<h2 id="s1">なぜ標準機能から始めるのか</h2>
+
+<p>いきなり便利なフレームワークを入れるほうが早い、と思うかもしれません。</p>
+<p>ただ、その順番だと<strong>何が起きているか分からないまま動かすことになります。</strong> そして問題が起きたとき、自分のせいなのか道具のせいなのか、切り分けられません。</p>
+<blockquote>
+<p><strong>先に手で触るから、抽象化の下が読める。</strong></p>
+</blockquote>
+<p>それに——標準機能を知らないまま外部ツールを入れると、<strong>すでに持っているものを二重に買うことになります。</strong> 実際、前のシリーズで見たとおり、記憶の仕組みはもう標準で入っています。</p>
+<p>だから順番はこうです。<strong>使い倒す → 限界を測る → 足りなければ次へ。</strong></p>
+
+<h2 id="s2">7つの手法——全体像</h2>
+
+<p>まず一覧です。<strong>注目してほしいのは「いつ読み込まれるか」の列</strong>です。</p>
+
+<table>
+<tr><th>手法</th><th>いつ読み込まれるか</th><th>主な用途</th></tr>
+<tr><td>指示書ファイル</td><td>開始時から最後まで</td><td>常に守ってほしい方針</td></tr>
+<tr><td>Skills</td><td>呼ばれたときだけ</td><td>特定の作業手順</td></tr>
+<tr><td>スラッシュコマンド</td><td>呼び出したとき</td><td>定型作業の短縮</td></tr>
+<tr><td>サブエージェント</td><td>委譲時。要約だけ返す</td><td>役割分担</td></tr>
+<tr><td>Hooks</td><td><strong>読み込まれない</strong></td><td>絶対に飛ばせない処理</td></tr>
+<tr><td>自動記憶</td><td>毎回、自動で</td><td>過去の作業の記憶</td></tr>
+<tr><td>記憶の恒久化</td><td>実行したとき</td><td>繰り返しをルール化</td></tr>
+</table>
+
+<p>この違いが、なぜ重要なのか。</p>
+<p><strong>AIには「一度に見渡せる情報の量」に限りがあります。</strong> そして情報が増えるほど、真ん中に埋もれたものを見落としやすくなります。</p>
+<p>つまり——<strong>常に読まれるものに全部詰め込むと、かえって精度が落ちます。</strong></p>
+<p>逆に、必要なときだけ読み込む場所に置いておけば、<strong>普段は軽いまま保てます。</strong> これが7つを使い分ける理由です。</p>
+
+<p>📌 名前は会社によって違いますが、<strong>この構造自体は3社共通</strong>です。指示書ファイルは <code>CLAUDE.md</code> / <code>AGENTS.md</code> / <code>GEMINI.md</code> のように呼び名が変わるだけです。</p>
+
+<h2 id="s3">① 常に読まれるもの</h2>
+
+<h3>指示書ファイル</h3>
+
+<p>プロジェクトのフォルダに置くテキストファイルです。<strong>開始時に読み込まれ、最後まで残ります。</strong></p>
+
+<pre><code># このプロジェクトについて
+
+- 日本語で回答すること
+- コードを変更したら、必ず動作確認まで行う
+- 実装は必ず coder サブエージェントに委譲すること</code></pre>
+
+<p>ここに書くべきなのは、<strong>「常に守ってほしいこと」だけ</strong>です。</p>
+<p>⚠️ よくある失敗が、<strong>ここに全部詰め込むこと</strong>です。業務マニュアル、過去の経緯、細かい手順——全部書きたくなりますが、<strong>常駐する情報が増えるほどAIの注意が散ります。</strong></p>
+<p>💡 目安として、<strong>「毎回必ず必要か？」と自問してください。</strong> 「特定の作業のときだけ必要」なら、次に説明するSkillsに置くべきです。</p>
+
+<h2 id="s4">② 呼ばれたときだけ読まれるもの</h2>
+
+<h3>Skills（スキル）</h3>
+
+<p><strong>特定の作業手順を、独立したファイルにまとめておく仕組み</strong>です。</p>
+<p>重要なのは、<strong>普段は読み込まれないこと</strong>です。目次だけが常駐していて、必要になった瞬間に本体が読まれます。</p>
+
+<pre><code>普段     ：「請求書作成」という項目名だけ知っている
+        ↓
+その作業が必要になった
+        ↓
+初めて   ：手順の本文が読み込まれる</code></pre>
+
+<p>だから<strong>手順が何十ページあっても、普段の動作は軽いまま</strong>です。</p>
+<p>業務マニュアルのような「長いけど、たまにしか使わないもの」は、ここに置くのが正解です。</p>
+
+<h3>スラッシュコマンド</h3>
+
+<p>よく使う指示に、短い呼び名をつけておく機能です。</p>
+
+<pre><code>/review   → 「変更点を確認して、問題があれば指摘して」
+/report   → 「今日の作業内容を日報形式でまとめて」</code></pre>
+
+<p>毎回同じ文章を打つ手間が消えます。<strong>地味ですが、使用頻度が高いものほど効きます。</strong></p>
+
+<h2 id="s5">③ 読まれないところで動くもの</h2>
+
+<h3>Hooks（フック）</h3>
+
+<p>ここが、多くの人が知らない機能です。</p>
+<p><strong>Hooksは、AIの判断を経由せずに、決まったタイミングで確実に実行される処理</strong>です。</p>
+
+<pre><code>指示書に書いた場合：
+  「保存前に必ずテストを実行してください」
+  → AIが「今回は不要かな」と判断してしまう可能性がある
+
+Hooksに書いた場合：
+  ファイル保存 → 自動でテスト実行
+  → AIの判断を挟まない。100%実行される</code></pre>
+
+<p><strong>この違いは決定的です。</strong></p>
+<p>「絶対に飛ばしてはいけない処理」は、指示書ではなくHooksに置いてください。<strong>お願いするのではなく、仕組みで強制する</strong>という発想です。</p>
+<p>💡 用途の例：保存前の自動整形、コミット前のテスト実行、機密情報が含まれていないかの確認。</p>
+
+<h2 id="s6">④ 別の場所で動くもの</h2>
+
+<h3>サブエージェント</h3>
+
+<p>前のシリーズでも扱いましたが、改めて整理します。</p>
+<p>役割ごとに<code>.md</code>ファイルを用意しておくと、<strong>その役割専用の作業スペースが立ち上がります。</strong></p>
+<p>決定的な性質は、<strong>親には要約だけが返ること</strong>です。</p>
+
+<pre><code>コーダー役が試行錯誤して1000行書いた
+        ↓
+親に届くのは「実装完了。3ファイル変更」だけ
+        ↓
+親の作業スペースは汚れない</code></pre>
+
+<p>⚠️ <strong>ただし、ファイルを置くだけでは発動しません。</strong></p>
+<p>指示書に「実装は必ず◯◯に委譲すること」と明記しないと、AIは自分でやってしまいます。<strong>「わざわざ人を呼ぶより自分でやったほうが早い」と判断するからです。</strong></p>
+<p>💡 <strong>確認方法</strong>：画面に「委譲中」を示す表示が出ていれば、実際に分担が起きています。出ないまま会話が続いている場合は、1つの場所で全部やっている状態です。</p>
+
+<h3>自動記憶と、その恒久化</h3>
+
+<p>残る2つは記憶に関するものです。</p>
+<p><strong>自動記憶</strong>は、何も設定しなくても裏で動きます。セッションを閉じても、次に開いたときに前回の内容を覚えています。</p>
+<p><strong>記憶の恒久化</strong>は、それを一歩進めた機能です。実行すると、AIが過去の記憶を見直して<strong>繰り返し現れるパターンを見つけて提案してきます。</strong></p>
+
+<blockquote>
+<p>「同じ指摘を3回受けています。これは恒久的なルールにすべきでは？」</p>
+</blockquote>
+
+<p>承認すれば、指示書ファイルに書き込まれます。<strong>以降ずっと守られる</strong>ようになります。</p>
+<p>📌 記憶まわりは奥が深いので、<strong>次回まるごと1本使って扱います。</strong> 3層に分かれていること、全ログが毎回読まれるわけではないこと、どこに何を置くべきか——実務で効くのはこの部分です。</p>
+
+<h2 id="s7">使い分けの判断基準</h2>
+
+<p>7つを覚えるより、<strong>3つの問いで振り分ける</strong>ほうが実用的です。</p>
+
+<pre><code>Q1. 毎回必要か？
+    YES → 指示書ファイル
+    NO  → Q2へ
+
+Q2. 絶対に飛ばしてはいけないか？
+    YES → Hooks（仕組みで強制する）
+    NO  → Q3へ
+
+Q3. 長い手順か？
+    YES → Skills（必要なときだけ読ませる）
+    NO  → スラッシュコマンド（呼び名をつける）</code></pre>
+
+<p>そして<strong>「作業スペースを分けたいか」がYESなら、サブエージェント</strong>を追加する。</p>
+<p>この振り分けができるようになると、<strong>「指示書が長くなりすぎて、AIが指示を守らなくなる」という典型的な失敗を避けられます。</strong></p>
+
+<h3>実際にありがちな配置ミス</h3>
+
+<table>
+<tr><th>やりがちな配置</th><th>正しい配置</th></tr>
+<tr><td>業務マニュアルを指示書に全部書く</td><td>Skillsに切り出す</td></tr>
+<tr><td>「テストを忘れずに」と指示書に書く</td><td>Hooksで自動実行する</td></tr>
+<tr><td>毎回同じ長文を打ち込む</td><td>スラッシュコマンドにする</td></tr>
+<tr><td>役割ファイルを置いて満足する</td><td>委譲を指示書に明記する</td></tr>
+</table>
+
+<p><strong>どれも「機能を知らない」のではなく「置き場所を間違えている」だけ</strong>です。</p>
+
+<h2 id="s8">まとめ</h2>
+
+<ul>
+<li>指示手法は7つある。多くの人は<strong>2つしか使っていない</strong></li>
+<li>違いは機能ではなく<strong>「いつ読み込まれるか」</strong></li>
+<li>常駐する場所に詰め込むと、<strong>かえって精度が落ちる</strong></li>
+<li>絶対に飛ばせない処理は、<strong>お願いではなく仕組みで強制する</strong></li>
+<li>役割ファイルは、<strong>置くだけでは発動しない</strong></li>
+<li>3つの問いで振り分ければ、置き場所は自然に決まる</li>
+</ul>
+
+<p>ここまでが、指示の全体像です。</p>
+<p>次回は、<strong>記憶</strong>に絞って扱います。</p>
+<p>「使うほど賢くなる」と言われる部分の実体は何なのか。<strong>過去のやり取りは毎回読み込まれているのか。</strong> セッションを閉じたら何が消えて、何が残るのか。</p>
+<p>ここを正確に理解すると、<strong>知識を資産として積み上げる設計</strong>ができるようになります ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

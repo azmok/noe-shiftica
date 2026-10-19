@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI進化タイムライン — Infographic v3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg: #08080e;
+  --surface: #0e0e18;
+  --border: #181828;
+  --text: #dddde8;
+  --text-dim: #6a6a82;
+  --c-arch: #55efc4;
+  --c-llm: #a29bfe;
+  --c-image: #00cec9;
+  --c-video後、ローカルでpupetterでこのコードの高解像度のスクショとりたいから、使い方も教えて。: #fd79a8;
+  --c-event: #ffeaa7;
+  --c-discourse: #fab1a0;
+  --c-tp: #39ff14;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  overflow: auto;
+  cursor: grab;
+  user-select: none;
+}
+body.grabbing { cursor: grabbing; }
+
+/* ── Top Bar (fixed) ── */
+.top-bar {
+  position: fixed; left: 0; top: 0; z-index: 500;
+  width: 100%;
+  background: rgba(8,8,14,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s;
+}
+.top-bar.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.header {
+  padding: 16px 32px 8px;
+}
+.header h1 {
+  font-size: 1.4rem; font-weight: 900;
+  background: linear-gradient(90deg, var(--c-arch), var(--c-llm), var(--c-image), var(--c-video), var(--c-event), var(--c-discourse));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header p { color: var(--text-dim); font-size: 0.7rem; margin-top: 3px; }
+
+#scrollHint.hidden{
+  display: none;
+}
+
+.legend-bar {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  padding: 6px 32px 12px;
+}
+.legend-chip { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--text-dim); }
+.legend-chip .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+/* ── Toggle hint (mobile) ── */
+.toggle-hint {
+  position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+  z-index: 510;
+  font-size: 0.55rem; color: var(--text-dim);
+  background: rgba(14,14,24,0.9);
+  padding: 4px 12px; border-radius: 12px;
+  border: 1px solid var(--border);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s;
+}
+.toggle-hint.visible { opacity: 1; }
+
+/* ── Canvas spacer for fixed header ── */
+.canvas-spacer { height: 110px; }
+@media (max-width: 768px) {
+  .header { padding: 12px 16px 6px; }
+  .header h1 { font-size: 1.1rem; }
+  .legend-bar { padding: 4px 16px 10px; gap: 10px; }
+  .canvas-spacer { height: 100px; }
+}
+
+.canvas { position: relative; transform-origin: 0 0; transition: transform 0.15s ease-out; }
+
+.year-col { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--border); }
+.year-col-label {
+  position: sticky; top: 0; z-index: 100; background: var(--bg);
+  font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 600;
+  color: #2a2a44; padding: 10px 14px; border-bottom: 1px solid var(--border);
+}
+
+.lanes { position: relative; padding-top: 52px; }
+.lane { position: relative; border-bottom: 1px solid var(--border); }
+.lane-label-wrap {
+  position: sticky; left: 0; z-index: 80;
+  display: flex; align-items: flex-start;
+  padding: 12px 0 12px 20px; width: 120px; height: 100%;
+  background: var(--bg); border-right: 3px solid;
+}
+.lane-label-text {
+  writing-mode: vertical-rl; text-orientation: mixed;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+}
+
+.flow-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+
+/* ── Turning Point lines ── */
+.tp-line {
+  position: absolute; top: 0; z-index: 15;
+  border-left: 2px dashed var(--c-tp);
+  opacity: 0.7;
+}
+.tp-label {
+  position: absolute; z-index: 16;
+  writing-mode: vertical-rl; text-orientation: mixed;
+  font-size: 0.6rem; font-weight: 900;
+  color: var(--c-tp);
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 8px var(--c-tp), 0 0 20px rgba(57,255,20,0.3);
+  padding: 8px 4px;
+}
+
+/* ── Cards ── */
+.card { position: absolute; z-index: 20; width: 140px; }
+.card.highlight { z-index: 25; }
+.card.highlight .card-title {
+  text-shadow: 0 0 6px var(--glow), 0 0 14px var(--glow);
+}
+.card.highlight .card-dot {
+  width: 14px; height: 14px;
+  box-shadow: 0 0 8px var(--glow), 0 0 20px var(--glow);
+}
+.card-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  margin-bottom: 3px; position: relative;
+  box-shadow: 0 0 6px var(--glow);
+}
+.card-date { font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: var(--text-dim); margin-bottom: 1px; }
+.card-title { font-size: 0.58rem; font-weight: 700; line-height: 1.35; margin-bottom: 2px; }
+.card-body { font-size: 0.48rem; color: var(--text-dim); line-height: 1.45; }
+.card-tag {
+  display: inline-block; font-size: 1rem; padding: 1px 5px;
+  border-radius: 6px; margin-top: 3px; font-weight: 600;
+}
+
+/* ── Big Evolution badge ── */
+.evo-badge {
+  display: inline-block;
+  font-size: 0.42rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-top: 2px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #ff6b6b, #feca57);
+  color: #000;
+  letter-spacing: 0.05em;
+  animation: evoPulse 2s ease-in-out infinite;
+}
+@keyframes evoPulse {
+  0%,100% { opacity: 0.85; }
+  50% { opacity: 1; box-shadow: 0 0 6px rgba(255,107,107,0.5); }
+}
+
+.scroll-hint {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 300;
+  color: var(--text-dim); font-size: 0.65rem;
+  background: rgba(14,14,24,0.92); padding: 5px 14px; border-radius: 16px;
+  border: 1px solid var(--border); animation: pulse 2s ease-in-out infinite;
+  pointer-events: none; transition: opacity 0.6s;
+}
+@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+/* ── Zoom Controls ── */
+.zoom-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  user-select: none;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s;
+}
+.zoom-controls.hidden {
+  transform: translateX(80px);
+  opacity: 0;
+  pointer-events: none;
+}
+.zoom-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(14,14,24,0.92);
+  backdrop-filter: blur(12px);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.zoom-btn:hover {
+  background: rgba(30,30,50,0.95);
+  border-color: var(--c-llm);
+  box-shadow: 0 0 12px rgba(162,155,254,0.25);
+}
+.zoom-btn:active {
+  transform: scale(0.92);
+}
+.zoom-btn.reset {
+  font-size: 0.55rem;
+  letter-spacing: 0.02em;
+}
+.zoom-level {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  padding: 2px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar" id="topBar">
+  <div class="header">
+    <h1>AI 進化タイムライン 2017 → 2026</h1>
+    <p>横スクロールで辿る — LLM・画像生成・動画生成AIの進化、アーキテクチャ、世間の言説とイベント ｜ 🟢 = ターニングポイント ｜ Ctrl+ホイール or ピンチでズーム</p>
+  </div>
+  <div class="legend-bar">
+    <div class="legend-chip"><div class="dot" style="background:var(--c-arch)"></div>アーキテクチャ</div>
+    <div class="legend-chip"><div class="dot" style="background:var(--c-llm)"></div>LLM</div>
+    <div class="legend-chip"><div class="dot" style="background:var(--c-image)"></div>画像生成AI</div>
+    <div class="legend-chip"><div class="dot" style="background:var(--c-video)"></div>動画生成AI</div>
+    <div class="legend-chip"><div class="dot" style="background:var(--c-event)"></div>社会的イベント</div>
+    <div class="legend-chip"><div class="dot" style="background:var(--c-discourse)"></div>世間の言説</div>
+    <div class="legend-chip"><div class="dot" style="background:var(--c-tp);box-shadow:0 0 6px var(--c-tp)"></div>ターニングポイント</div>
+  </div>
+</div>
+<div class="toggle-hint" id="toggleHint">タップでUI表示/非表示</div>
+
+<div class="canvas-spacer"></div>
+
+<div class="canvas" id="canvas">
+  <svg class="flow-svg" id="flowSvg"></svg>
+  <div class="lanes" id="lanes"></div>
+</div>
+<div class="scroll-hint" id="scrollHint">← 横スクロール / ドラッグ / Ctrl+ホイールでズーム →</div>
+
+<!-- Zoom Controls -->
+<div class="zoom-controls">
+  <button class="zoom-btn" id="zoomIn" title="ズームイン">+</button>
+  <div class="zoom-level" id="zoomLevel">100%</div>
+  <button class="zoom-btn" id="zoomOut" title="ズームアウト">−</button>
+  <button class="zoom-btn reset" id="zoomReset" title="リセット">RST</button>
+</div>
+
+<script>
+  const CATS = [
+  { id:'arch',      label:'アーキテクチャ',  color:'#55efc4' },
+  { id:'llm',       label:'LLM',              color:'#a29bfe' },
+  { id:'image',     label:'画像生成AI',       color:'#00cec9' },
+  { id:'video',     label:'動画生成AI',       color:'#fd79a8' },
+  { id:'event',     label:'社会的イベント',   color:'#ffeaa7' },
+  { id:'discourse', label:'世間の言説',       color:'#fab1a0' },
+];
+
+const TPS = [
+  { y:2017, m:6,  label:'Transformer誕生' },
+  { y:2022, m:8,  label:'画像生成AIの民主化' },
+  { y:2022, m:11, label:'ChatGPT — 対話AIの爆発' },
+  { y:2024, m:9,  label:'推論モデルの登場' },
+  { y:2025, m:11, label:'Gemini 3 / GPT-5.2 時代' },
+  { y:2026, m:2,  label:'3.1 Pro / Claude 4.6 / GPT-5.4 — 大進化' },
+];
+
+const DATA = [
+  { y:2017,m:6,  cat:'arch',     tag:'Transformer',         title:'「Attention Is All You Need」',            body:'GoogleがTransformerを発表。Self-Attentionで系列全体を並列処理。全AI基盤技術。' },
+  { y:2017,m:6,  cat:'discourse', tag:'世間の認知',          title:'世間の反応：ほぼゼロ',                     body:'革命性は一般に認知されず、NLP研究者内の話題にとどまった。' },
+  { y:2018,m:6,  cat:'llm',      tag:'GPT-1',               title:'GPT-1（OpenAI）',                          body:'Transformerデコーダで事前学習→ファインチューニング。1.17億パラメータ。' },
+  { y:2018,m:10, cat:'llm',      tag:'BERT',                 title:'BERT（Google）',                            body:'双方向エンコーダ。マスク言語モデルで文脈理解が飛躍。' },
+  { y:2019,m:2,  cat:'llm',      tag:'GPT-2',               title:'GPT-2（OpenAI）',                          body:'15億パラメータ。「危険すぎて公開できない」と限定公開。' },
+  { y:2019,m:2,  cat:'discourse', tag:'AI危険論',            title:'「危険すぎて公開不可」報道',                body:'フェイクニュース懸念が主流メディアで初報道。' },
+  { y:2020,m:6,  cat:'llm',      tag:'GPT-3',               title:'GPT-3（OpenAI）',                          body:'1750億パラメータ。Few-shot学習を実証。API提供で非開発者もAI生成に触れる時代へ。' },
+  { y:2020,m:6,  cat:'arch',     tag:'Scaling Laws',         title:'スケーリング則の定量化',                    body:'モデル規模・データ量・計算量と性能の関係を定量化。開発戦略を根本的に変えた。' },
+  { y:2020,m:8,  cat:'discourse', tag:'ハルシネーション',    title:'ハルシネーション問題の認知',                body:'GPT-3が自信満々に嘘をつく問題が広く認知。' },
+  { y:2021,m:1,  cat:'image',    tag:'DALL·E',               title:'DALL·E 発表',                              body:'GPT-3アーキテクチャを画像生成に応用。CLIPも同時発表。' },
+  { y:2021,m:3,  cat:'discourse', tag:'確率的オウム',        title:'「確率的オウム」論文（Bender & Gebru）',    body:'「LLMは訓練データのパターンを確率的に再現しているだけ」。「次の単語を予測しているだけ」言説の学術的起点。' },
+  { y:2021,m:5,  cat:'llm',      tag:'LaMDA',                title:'Google LaMDA',                             body:'対話特化LLM。後のBard/Geminiの前身。' },
+  { y:2021,m:12, cat:'arch',     tag:'Latent Diffusion',     title:'Latent Diffusion Model',                   body:'拡散モデルを潜在空間で動作。SD基盤技術。' },
+  { y:2022,m:1,  cat:'arch',     tag:'RLHF',                 title:'InstructGPT / RLHF',                       body:'人間フィードバックからの強化学習。ChatGPT直接的前身。' },
+  { y:2022,m:4,  cat:'image',    tag:'DALL·E 2',             title:'DALL·E 2',                                 body:'高品質テキスト→画像。Outpainting。招待制。' },
+  { y:2022,m:7,  cat:'image',    tag:'Midjourney',           title:'Midjourney β',                             body:'Discordで誰でも使える画像生成AI。一般ユーザー初の大量接触。' },
+  { y:2022,m:7,  cat:'discourse',tag:'アーティストvs AI',    title:'「廃業です」の悲鳴',                       body:'プロイラストレーターのツイートが大バズ。' },
+  { y:2022,m:8,  cat:'image',    tag:'Stable Diffusion',     title:'Stable Diffusion',                         body:'OSSでローカル動作。カスタムモデル・LoRA・ControlNet急成長。' },
+  { y:2022,m:8,  cat:'event',    tag:'AI vs アート',          title:'AIアート、美術品評会1位',                  body:'MJ作品がコロラド州美術品評会1位。世界的論争。' },
+  { y:2022,m:10, cat:'discourse',tag:'著作権問題',           title:'NovelAI学習データ炎上',                    body:'Danbooru学習発覚→炎上→モデルリーク。著作権問題表面化。' },
+  { y:2022,m:11, cat:'llm',      tag:'ChatGPT',              title:'ChatGPT リリース',                         body:'GPT-3.5対話AI。5日で100万ユーザー。人類史上最速普及。' },
+  { y:2022,m:12, cat:'discourse',tag:'ChatGPTバブル',        title:'「何でもできるAI」過信',                   body:'万能AI報道過熱。教育機関が禁止令。' },
+  { y:2023,m:2,  cat:'event',    tag:'Bard失態',             title:'Bard デモで株価急落',                      body:'事実誤認でAlphabet株約1,000億ドル下落。' },
+  { y:2023,m:3,  cat:'llm',      tag:'GPT-4',                title:'GPT-4',                                    body:'マルチモーダル対応。推論力大幅向上。MS「AGIの火花」論文。' },
+  { y:2023,m:3,  cat:'event',    tag:'Bar Exam合格',         title:'GPT-4、米国司法試験合格',                  body:'MBE 7科目中5科目で人間超え。法曹界に衝撃。' },
+  { y:2023,m:3,  cat:'event',    tag:'開発停止要請',         title:'「AI開発を6ヶ月止めろ」',                  body:'Musk, Wozniakら公開書簡。' },
+  { y:2023,m:3,  cat:'image',    tag:'Midjourney V5',        title:'Midjourney V5',                            body:'フォトリアル大幅進化。「実写と区別不可能」。' },
+  { y:2023,m:3,  cat:'discourse',tag:'Word of the Year',     title:'「確率的オウム」がAI年間語',               body:'米国方言学会選定。「次の単語予測だけ」が一般浸透。' },
+  { y:2023,m:4,  cat:'discourse',tag:'理解vs暗記',           title:'Hinton「理解なくして予測なし」',            body:'60 Minutesで反論。Benderは「パターンマッチ」堅持。' },
+  { y:2023,m:5,  cat:'event',    tag:'Hinton退社',           title:'Hinton退社 → AI脅威論',                   body:'「AIのゴッドファーザー」がAI安全性懸念を公言。' },
+  { y:2023,m:6,  cat:'event',    tag:'日本司法試験',         title:'GPT-4ベースAI、司法試験合格水準',          body:'リーガルスケープが会社法7割超正答。' },
+  { y:2023,m:7,  cat:'llm',      tag:'LLaMA 2',              title:'LLaMA 2 OSS公開',                          body:'高性能LLMのOSS化加速。' },
+  { y:2023,m:7,  cat:'llm',      tag:'Claude 2',             title:'Claude 2（Anthropic）',                    body:'Constitutional AI。安全性重視。' },
+  { y:2023,m:9,  cat:'image',    tag:'DALL·E 3',             title:'DALL·E 3',                                 body:'ChatGPT統合。対話しながら画像生成。' },
+  { y:2023,m:12, cat:'llm',      tag:'Gemini',               title:'Google Gemini',                            body:'マルチモーダルネイティブ。Ultra/Pro/Nano展開。' },
+  { y:2024,m:2,  cat:'video',    tag:'Sora',                 title:'Sora プレビュー',                          body:'テキスト→最大60秒高品質動画。Diffusion Transformer。一般未公開。' },
+  { y:2024,m:2,  cat:'discourse',tag:'映像危機論',           title:'「ハリウッド壊滅」',                       body:'Soraデモで映像自動化への恐怖噴出。' },
+  { y:2024,m:3,  cat:'llm',      tag:'Claude 3',             title:'Claude 3 Opus',                            body:'GPT-4超えベンチマーク多数。3モデル展開。' },
+  { y:2024,m:5,  cat:'llm',      tag:'GPT-4o',               title:'GPT-4o',                                   body:'テキスト・音声・画像ネイティブ統合。' },
+  { y:2024,m:6,  cat:'video',    tag:'Gen-3/Kling',          title:'Gen-3 Alpha / Kling',                      body:'Sora不在のまま動画AI市場が急進化。' },
+  { y:2024,m:7,  cat:'arch',     tag:'MoE',                  title:'Mixture of Experts 主流化',                 body:'入力に応じ一部エキスパートだけ活性化。' },
+  { y:2024,m:9,  cat:'llm',      tag:'o1',                   title:'OpenAI o1（推論モデル）',                   body:'「考えてから答える」推論特化。数学五輪予選83%。' },
+  { y:2024,m:9,  cat:'discourse',tag:'パラダイム転換',       title:'「予測だけではない」論争転換',              body:'o1で「確率的オウム」批判に実証的反論。' },
+  { y:2024,m:10, cat:'video',    tag:'Veo 2',                title:'Google Veo 2',                             body:'エンタープライズ動画生成。API提供。' },
+  { y:2024,m:12, cat:'video',    tag:'Sora公開',             title:'Sora 一般公開',                            body:'10ヶ月遅れ公開。「期待ほどではない」評も。' },
+  { y:2024,m:12, cat:'llm',      tag:'o3',                   title:'o3 プレビュー',                            body:'ARC-AGI 87.5%。AGI接近を示唆。' },
+  { y:2025,m:1,  cat:'llm',      tag:'DeepSeek-R1',          title:'DeepSeek-R1「ショック」',                  body:'中国発671B推論モデル。o1同等でOSS・低コスト。NVIDIA株急落。' },
+  { y:2025,m:1,  cat:'discourse',tag:'AI地政学',             title:'「中国がAIで追いつく」',                   body:'米国AI巨額投資モデルへの疑問噴出。' },
+  { y:2025,m:2,  cat:'event',    tag:'東大共通テスト',       title:'o1、東大共通テスト9割超',                  body:'LifePrompt実験で91.3%。1次選抜突破。' },
+  { y:2025,m:3,  cat:'event',    tag:'東大理三合格',         title:'AI、東大理三合格水準（2025）',             body:'o1 & DeepSeek R1が理三合格最低点超え。河合塾採点。' },
+  { y:2025,m:5,  cat:'event',    tag:'司法試験満点',         title:'AI、司法試験短答式ほぼ満点',               body:'リーガルスケープAI 160/175点。' },
+  { y:2025,m:6,  cat:'llm',      tag:'Claude 4',             title:'Claude 4',                                 body:'推論・コーディング大幅向上。Claude Code CLIでエージェント開発本格化。' },
+  { y:2025,m:6,  cat:'llm',      tag:'Gemini 2.5 Pro',       title:'Gemini 2.5 Pro GA',                        body:'安定版リリース。ベンチマーク上位。Flash-Liteも同時発表。' },
+  { y:2025,m:8,  cat:'llm',      tag:'GPT-5',                title:'GPT-5',                                    body:'高速/推論モデル自動選択ルーター搭載。全ユーザーのデフォルトに。' },
+  { y:2025,m:9,  cat:'video',    tag:'Sora 2',               title:'Sora 2',                                   body:'物理シミュレーション大幅向上。SNS的アプリ。著作権議論。' },
+  { y:2025,m:9,  cat:'arch',     tag:'DiT',                  title:'Diffusion Transformer標準化',               body:'U-Net→DiT移行。Transformerベース拡散が標準に。' },
+  { y:2025,m:11, cat:'llm',      tag:'Gemini 3 Pro',         title:'Gemini 3 Pro', evo:true,                   body:'Gemini 2.5から大幅進化。推論・マルチモーダル・エージェント能力が飛躍。Deep Thinkモードも。GPT-5.2リリースを促した。' },
+  { y:2025,m:12, cat:'llm',      tag:'GPT-5.2',              title:'GPT-5.2（OpenAI）', evo:true,              body:'Gemini 3対抗で急遽リリース。推論性能大幅向上。' },
+  { y:2025,m:12, cat:'llm',      tag:'Gemini 3 Flash',       title:'Gemini 3 Flash',                           body:'2.5 Flash後継。高速推論モデル。' },
+  { y:2025,m:12, cat:'image',    tag:'Midjourney V7',        title:'Midjourney V7',                            body:'細部描写・速度大幅向上。動画・3D拡張も開発中。' },
+  { y:2025,m:12, cat:'discourse',tag:'世界モデル論',         title:'「道具か知性か」論争深化',                 body:'「確率的オウム」→「世界モデルを持つのか？」へ。' },
+  { y:2026,m:1,  cat:'llm',      tag:'Claude Opus 4.6', evo:true, title:'Claude Opus 4.6（Anthropic）',        body:'最先端マルチモーダル推論。メモリ・ブラウジングエージェント・デスクトップ自動化を統合。あずま評価：「かなりの進化」。' },
+  { y:2026,m:2,  cat:'llm',      tag:'Gemini 3.1 Pro', evo:true,  title:'Gemini 3.1 Pro（Google）',            body:'ARC-AGI-2で77.1%（3 Proの31.1%から倍増以上）。GPQA Diamond 94.3%。SWE-Bench 80.6%。ベンチマークリーダー。あずま評価：「かなりの進化」。' },
+  { y:2026,m:2,  cat:'llm',      tag:'GPT-5.3 Codex',         title:'GPT-5.3 Codex（OpenAI）',                 body:'Codex+GPT-5統合。コード生成から汎用コーディングエージェントへ。25%高速化。' },
+  { y:2026,m:3,  cat:'llm',      tag:'GPT-5.4', evo:true,     title:'GPT-5.4（OpenAI）',                       body:'現時点の最新フラッグシップ。推論・コーディング・エージェント統合。ネイティブPC操作。BigLaw Bench 91%。Cursor/Harvey高評価。' },
+  { y:2026,m:3,  cat:'event',    tag:'東大2026',               title:'最新AI、東大理三9割に迫る（東進調査）',   body:'2026年東大二次試験で最新AIが理三合格レベルを突破、9割に迫るスコア。文系数学は全3種が満点。「図形・史料」に課題残る。' },
+  { y:2026,m:3,  cat:'llm',      tag:'Gemini 3.1 Flash Lite', title:'Gemini 3.1 Flash Lite',                   body:'3.1世代の高速・低コストモデル。開発者向け。' },
+  { y:2026,m:4,  cat:'discourse',tag:'エージェント時代',     title:'エージェントAI時代の到来',                 body:'Codex Agent・Deep Research・Claude Code等でAIが自律タスク実行。「AIディレクション」時代へ。' },
+];
+
+// ── Layout ──
+const LABEL_W = 130, YEAR_W = 400, CARD_W = 140, CARD_H_EST = 140, LANE_PAD = 18;
+const START_YEAR = 2017, END_YEAR = 2026;
+const TOTAL_W = LABEL_W + (END_YEAR - START_YEAR + 1) * YEAR_W + 100;
+const TOP_PAD = 52;
+
+const laneCounts = {};
+CATS.forEach(c => { laneCounts[c.id] = {}; });
+DATA.forEach(d => {
+  const bucket = d.y + '-' + (d.m <= 4 ? 'a' : d.m <= 8 ? 'b' : 'c');
+  laneCounts[d.cat][bucket] = (laneCounts[d.cat][bucket] || 0) + 1;
+});
+function maxStack(catId) {
+  const counts = Object.values(laneCounts[catId]);
+  return counts.length ? Math.max(...counts) : 1;
+}
+
+const laneHeights = {}, laneYStarts = {};
+let cumulY = TOP_PAD;
+CATS.forEach(cat => {
+  const stacks = maxStack(cat.id);
+  const h = Math.max(stacks * (CARD_H_EST + 8) + LANE_PAD * 2, 180);
+  laneHeights[cat.id] = h;
+  laneYStarts[cat.id] = cumulY;
+  cumulY += h;
+});
+const TOTAL_H = cumulY + 40;
+
+const canvas = document.getElementById('canvas');
+const lanesEl = document.getElementById('lanes');
+const flowSvg = document.getElementById('flowSvg');
+
+canvas.style.width = TOTAL_W + 'px';
+canvas.style.height = TOTAL_H + 'px';
+flowSvg.setAttribute('width', TOTAL_W);
+flowSvg.setAttribute('height', TOTAL_H);
+
+// Year columns
+for (let yr = START_YEAR; yr <= END_YEAR; yr++) {
+  const x = LABEL_W + (yr - START_YEAR) * YEAR_W;
+  const col = document.createElement('div');
+  col.className = 'year-col';
+  col.style.left = x + 'px';
+  col.innerHTML = `<div class="year-col-label">${yr}</div>`;
+  canvas.appendChild(col);
+}
+
+// Lanes
+CATS.forEach(cat => {
+  const lane = document.createElement('div');
+  lane.className = 'lane';
+  lane.style.height = laneHeights[cat.id] + 'px';
+  lane.style.position = 'relative';
+  lane.style.background = `linear-gradient(90deg, ${cat.color}06, transparent 30%)`;
+  const labelWrap = document.createElement('div');
+  labelWrap.className = 'lane-label-wrap';
+  labelWrap.style.borderRightColor = cat.color;
+  labelWrap.style.float = 'left';
+  const labelText = document.createElement('div');
+  labelText.className = 'lane-label-text';
+  labelText.style.color = cat.color;
+  labelText.textContent = cat.label;
+  labelWrap.appendChild(labelText);
+  lane.appendChild(labelWrap);
+  lanesEl.appendChild(lane);
+});
+
+function getX(y, m) { return LABEL_W + (y - START_YEAR + (m - 1) / 12) * YEAR_W; }
+
+// ── Turning point lines ──
+TPS.forEach(tp => {
+  const x = getX(tp.y, tp.m);
+  const line = document.createElement('div');
+  line.className = 'tp-line';
+  line.style.left = x + 'px';
+  line.style.height = TOTAL_H + 'px';
+  canvas.appendChild(line);
+
+  const label = document.createElement('div');
+  label.className = 'tp-label';
+  label.style.left = (x + 6) + 'px';
+  label.style.top = (TOP_PAD + 10) + 'px';
+  label.textContent = tp.label;
+  canvas.appendChild(label);
+});
+
+// ── Place cards ──
+const placed = {};
+CATS.forEach(c => { placed[c.id] = []; });
+
+DATA.forEach(item => {
+  const cat = CATS.find(c => c.id === item.cat);
+  const x = getX(item.y, item.m);
+  const laneTop = laneYStarts[item.cat];
+
+  let slotY = laneTop + LANE_PAD;
+  for (const p of placed[item.cat]) {
+    if (Math.abs(p.x - x) < CARD_W + 10) slotY = Math.max(slotY, p.bottom + 6);
+  }
+
+  const card = document.createElement('div');
+  card.className = 'card' + (item.evo ? ' highlight' : '');
+  card.style.left = x + 'px';
+  card.style.top = slotY + 'px';
+  card.style.width = CARD_W + 'px';
+  card.style.setProperty('--glow', cat.color);
+
+  let evoBadge = item.evo ? '<span class="evo-badge">🔥 大進化</span>' : '';
+
+  card.innerHTML = `
+    <div class="card-dot" style="background:${cat.color}"></div>
+    <div class="card-date">${item.y}.${String(item.m).padStart(2,'0')}</div>
+    <div class="card-title" style="color:${cat.color}">${item.title}</div>
+    <div class="card-body">${item.body}</div>
+    <span class="card-tag" style="background:${cat.color}18;color:${cat.color}">${item.tag}</span>
+    ${evoBadge}
+  `;
+  canvas.appendChild(card);
+
+  const estH = 35 + item.title.length * 0.9 + item.body.length * 0.55 + 25;
+  placed[item.cat].push({ x, top: slotY, bottom: slotY + Math.max(estH, 90) });
+});
+
+// ── Flow lines ──
+const svgNS = 'http://www.w3.org/2000/svg';
+CATS.forEach(cat => {
+  const items = DATA.filter(d => d.cat === cat.id).sort((a,b) => (a.y*12+a.m) - (b.y*12+b.m));
+  if (items.length < 2) return;
+  const midY = laneYStarts[cat.id] + laneHeights[cat.id] / 2;
+  for (let i = 0; i < items.length - 1; i++) {
+    const x1 = getX(items[i].y, items[i].m), x2 = getX(items[i+1].y, items[i+1].m);
+    const cx1 = x1 + (x2-x1)*0.4, cx2 = x1 + (x2-x1)*0.6;
+    const bH = 4;
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', `M${x1},${midY-bH} C${cx1},${midY-bH} ${cx2},${midY-bH} ${x2},${midY-bH} L${x2},${midY+bH} C${cx2},${midY+bH} ${cx1},${midY+bH} ${x1},${midY+bH} Z`);
+    path.setAttribute('fill', cat.color);
+    path.setAttribute('opacity', '0.07');
+    flowSvg.appendChild(path);
+    const line = document.createElementNS(svgNS, 'path');
+    line.setAttribute('d', `M${x1},${midY} C${cx1},${midY} ${cx2},${midY} ${x2},${midY}`);
+    line.setAttribute('stroke', cat.color);
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('fill', 'none');
+    line.setAttribute('opacity', '0.15');
+    flowSvg.appendChild(line);
+  }
+});
+
+// ══════════════════════════════════════
+// ── ZOOM SYSTEM ──
+// ══════════════════════════════════════
+const ZOOM_MIN = 0.3;
+const ZOOM_MAX = 3.0;
+const ZOOM_STEP = 0.05;
+const zoomIn = document.getElementById('zoomIn');
+const zoomOut = document.getElementById('zoomOut');
+let currentZoom = 0.5;
+
+const zoomLevelEl = document.getElementById('zoomLevel');
+
+function applyZoom(newZoom, centerX, centerY) {
+  const oldZoom = currentZoom;
+  currentZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newZoom));
+
+  canvas.style.transform = `scale(${currentZoom})`;
+  zoomLevelEl.textContent = Math.round(currentZoom * 100) + '%';
+
+  if (centerX !== undefined && centerY !== undefined) {
+    const ratio = currentZoom / oldZoom;
+    const newScrollX = (window.scrollX + centerX) * ratio - centerX;
+    const newScrollY = (window.scrollY + centerY) * ratio - centerY;
+    window.scrollTo(newScrollX, newScrollY);
+  }
+}
+
+function init_apply_zoom(){
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  applyZoom(currentZoom, cx, cy);
+}
+init_apply_zoom();
+
+zoomIn.addEventListener('click', () => {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  applyZoom(currentZoom + ZOOM_STEP, cx, cy);
+});
+
+zoomOut.addEventListener('click', () => {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  applyZoom(currentZoom - ZOOM_STEP, cx, cy);
+});
+
+document.getElementById('zoomReset').addEventListener('click', () => {
+  applyZoom(1.0, window.innerWidth / 2, window.innerHeight / 2);
+});
+
+document.querySelectorAll('.zoom-btn').forEach(btn => {
+  btn.addEventListener('touchend', (e) => {}, { passive: false });
+});
+
+window.addEventListener('wheel', (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    const delta = -e.deltaY * 0.002;
+    applyZoom(currentZoom + delta, e.clientX, e.clientY);
+  }
+}, { passive: false });
+
+let lastPinchDist = 0;
+let pinchCenterX = 0;
+let pinchCenterY = 0;
+
+function getPinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.hypot(dx, dy);
+}
+
+window.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    lastPinchDist = getPinchDist(e.touches);
+    pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+  }
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    const dist = getPinchDist(e.touches);
+    const scale = dist / lastPinchDist;
+    pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    applyZoom(currentZoom * scale, pinchCenterX, pinchCenterY);
+    lastPinchDist = dist;
+  }
+}, { passive: false });
+
+window.addEventListener('keydown', (e) => {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
+    applyZoom(currentZoom + ZOOM_STEP, cx, cy);
+  } else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+    applyZoom(currentZoom - ZOOM_STEP, cx, cy);
+  } else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+    applyZoom(1.0, cx, cy);
+  }
+});
+
+// ══════════════════════════════════════
+// ── DRAG SCROLL SYSTEM (FIXED) ──
+// ══════════════════════════════════════
+let drag = false, sx, sy, sl, st;
+let moved = false; // Flag to track actual movement
+
+document.addEventListener('mousedown', e => {
+  if (e.target.closest('a') || e.target.closest('.zoom-controls')) return;
+  drag = true;
+  moved = false;
+  // Use clientX/Y to avoid relative coordinate drift during scroll
+  sx = e.clientX; 
+  sy = e.clientY;
+  sl = window.scrollX;
+  st = window.scrollY;
+  document.body.classList.add('grabbing');
+});
+
+document.addEventListener('mousemove', e => {
+  if (!drag) return;
+  const dx = e.clientX - sx;
+  const dy = e.clientY - sy;
+
+  // Set moved flag if distance exceeds threshold
+  if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+    moved = true;
+  }
+
+  window.scrollTo(sl - dx, st - dy);
+  e.preventDefault();
+});
+
+document.addEventListener('mouseup', () => {
+  drag = false;
+  document.body.classList.remove('grabbing');
+});
+
+// ══════════════════════════════════════
+// ── MOBILE & DESKTOP UI TOGGLE ──
+// ══════════════════════════════════════
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+const topBar = document.getElementById('topBar');
+const zoomControls = document.querySelector('.zoom-controls');
+const toggleHint = document.getElementById('toggleHint');
+const scrollHint = document.getElementById('scrollHint');
+let uiVisible = true;
+let hinted = true;
+let toggleTimeout = null;
+let isDragging = false;
+let touchStartX = 0;
+let touchStartY = 0;
+
+if (isTouchDevice) {
+  toggleHint.classList.add('visible');
+  setTimeout(() => toggleHint.classList.remove('visible'), 3000);
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isDragging = false;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1) {
+      const dx = Math.abs(e.touches[0].clientX - touchStartX);
+      const dy = Math.abs(e.touches[0].clientY - touchStartY);
+      if (dx > 10 || dy > 10) isDragging = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    if (isDragging) return;
+    if (e.target.closest('.zoom-controls') || e.target.closest('.top-bar')) return;
+    if (e.changedTouches.length !== 1) return;
+
+    uiVisible = !uiVisible;
+    topBar.classList.toggle('hidden', !uiVisible);
+    zoomControls.classList.toggle('hidden', !uiVisible);
+    scrollHint.classList.toggle('hidden', !uiVisible);
+
+    toggleHint.textContent = uiVisible ? 'UI 表示' : 'UI 非表示（タップで戻す）';
+    toggleHint.classList.add('visible');
+    clearTimeout(toggleTimeout);
+    toggleTimeout = setTimeout(() => toggleHint.classList.remove('visible'), 1500);
+  }, { passive: true });
+} else {
+  // Desktop toggle logic
+  document.querySelector('#canvas').addEventListener('click', (e) => {
+      // If we just finished dragging, don't toggle UI
+      if (moved) return;
+      
+      uiVisible = !uiVisible;
+      hinted = !hinted;
+      topBar.classList.toggle('hidden', !uiVisible);
+      zoomControls.classList.toggle('hidden', !uiVisible);
+      if(scrollHint) scrollHint.classList.toggle('hidden', !hinted);
+  });
+}
+
+window.addEventListener('scroll', () => {
+    if (hinted && window.scrollX > 50) {
+        hinted = false;
+        if(scrollHint) scrollHint.style.opacity = '0';
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3年間トータルコスト試算 ── 保守あり vs なし</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0f;
+  --surface: #161619;
+  --surface2: #1e1e23;
+  --border: #2a2a30;
+  --text: #e8e8ec;
+  --text2: #9898a4;
+  --green: #22c55e;
+  --green-dim: #166534;
+  --red: #ef4444;
+  --red-dim: #7f1d1d;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --noe: #8b5cf6;
+  --noe-dim: rgba(139,92,246,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  padding: 40px 20px 80px;
+}
+.container { max-width: 1240px; margin: 0 auto; }
+h1 {
+  font-size: 26px; font-weight: 800; margin-bottom: 4px;
+  background: linear-gradient(135deg, #fff, #a0a0b0);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.subtitle { font-size: 12px; color: var(--text2); font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
+.note-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 18px; font-size: 12px; color: var(--text2); margin-bottom: 36px; line-height: 1.8;
+}
+.note-box strong { color: var(--text); }
+
+.section-title {
+  font-size: 17px; font-weight: 800; margin: 40px 0 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 4px; color: #fff; }
+.tag-static { background: var(--blue); }
+.tag-dynamic { background: #a855f7; }
+
+.section-desc { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
+
+.table-wrap {
+  overflow-x: auto; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--surface); margin-bottom: 32px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 820px; }
+thead th {
+  background: var(--surface2); padding: 11px 12px; text-align: center;
+  font-weight: 600; font-size: 11px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+thead th:first-child { text-align: left; min-width: 130px; }
+thead th.h-no { color: var(--green); }
+thead th.h-yes { color: var(--red); }
+thead th.h-diff { color: var(--amber); }
+
+tbody td {
+  padding: 9px 12px; border-bottom: 1px solid var(--border);
+  text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+}
+tbody td:first-child {
+  text-align: left; font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 600; font-size: 13px; background: var(--surface2);
+}
+tbody tr:last-child td { border-bottom: none; }
+
+.sub { display: block; font-size: 10px; color: var(--text2); font-weight: 300; font-family: 'Noto Sans JP', sans-serif; }
+.val-g { color: var(--green); }
+.val-r { color: var(--red); }
+.val-a { color: var(--amber); }
+.val-n { color: var(--noe); font-weight: 700; }
+
+.noe-row td { background: var(--noe-dim) !important; border-bottom-color: rgba(139,92,246,0.2); }
+.noe-row td:first-child { background: rgba(139,92,246,0.18) !important; color: var(--noe); }
+
+.impossible {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; color: var(--red); font-weight: 600;
+  background: var(--red-dim); padding: 2px 6px; border-radius: 3px;
+}
+
+.summary-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px; margin-top: 28px;
+}
+.sum-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px;
+}
+.sum-card .sc-num { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700; margin-bottom: 3px; }
+.sum-card .sc-label { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+.footnote {
+  font-size: 11px; color: var(--text2); margin-top: 36px;
+  padding-top: 16px; border-top: 1px solid var(--border); line-height: 1.8;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>3年間トータルコスト試算</h1>
+<p class="subtitle">保守あり vs 保守なし ── 依頼先規模 × サイト種別</p>
+
+<div class="note-box">
+  <strong>計算式：</strong> 制作費 ＋（月額保守費 × 36ヶ月）= 3年総額<br>
+  <strong>保守なし：</strong> 制作費のみ。ただし大手は保守セット必須（実質選択不可）のケースが多い。<br>
+  <strong>保守あり：</strong> 各社の保守費相場（最低/平均/最高）を36ヶ月分加算。<br>
+  <strong>Noe Shiftica：</strong> 静的は保守プランなし（都度改修¥6,000〜）。動的は任意で月¥6,000〜。
+</div>
+
+<!-- ========== 静的サイト ========== -->
+<div class="section-title"><span class="tag tag-static">STATIC</span>静的サイト（HTML/CSS）</div>
+<p class="section-desc">コーポレート・名刺代わり（5〜15ページ）想定</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="h-no" colspan="3">保守なし（制作費のみ）</th>
+    <th class="h-yes" colspan="3">保守あり（制作費＋保守36ヶ月）</th>
+    <th class="h-diff">保守による<br>上乗せ額（平均）</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="h-no">最低</th><th class="h-no">平均</th><th class="h-no">最高</th>
+    <th class="h-yes">最低</th><th class="h-yes">平均</th><th class="h-yes">最高</th>
+    <th class="h-diff"></th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス<span class="sub">個人・副業</span></td>
+    <td class="val-g">¥5万</td><td>¥15万</td><td>¥30万</td>
+    <td>¥5万</td><td>¥22万</td><td>¥48万</td>
+    <td class="val-a">+¥7万<span class="sub">¥2,000×36</span></td>
+  </tr>
+  <tr>
+    <td>小規模制作会社<span class="sub">3〜10人</span></td>
+    <td>¥15万</td><td>¥40万</td><td>¥80万</td>
+    <td>¥26万</td><td>¥58万</td><td>¥116万</td>
+    <td class="val-a">+¥18万<span class="sub">¥5,000×36</span></td>
+  </tr>
+  <tr>
+    <td>中規模制作会社<span class="sub">10〜50人</span></td>
+    <td>¥30万</td><td>¥100万</td><td>¥200万</td>
+    <td>¥48万</td><td>¥136万</td><td>¥272万</td>
+    <td class="val-a">+¥36万<span class="sub">¥10,000×36</span></td>
+  </tr>
+  <tr>
+    <td>大手制作会社<span class="sub">50人以上</span></td>
+    <td colspan="3" style="text-align:center"><span class="impossible">実質選択不可（90〜100%セット）</span></td>
+    <td>¥116万</td><td>¥270万</td><td class="val-r">¥480万</td>
+    <td class="val-a">+¥90万<span class="sub">¥25,000×36</span></td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica<span class="sub">AI×1人</span></td>
+    <td class="val-n" colspan="3">一律 ¥15万<span class="sub">保守プランなし</span></td>
+    <td class="val-n" colspan="3">¥15万 + 都度改修¥6,000〜/回<span class="sub">年2回改修 → 3年で¥18.6万 ／ 月1回 → ¥36.6万</span></td>
+    <td class="val-n">+¥0〜22万<span class="sub">使った分だけ</span></td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ========== 動的サイト ========== -->
+<div class="section-title"><span class="tag tag-dynamic">DYNAMIC</span>動的サイト（CMS）</div>
+<p class="section-desc">WordPress / PayloadCMS等。ブログ・ニュース更新機能つき。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th class="h-no" colspan="3">保守なし（制作費のみ）</th>
+    <th class="h-yes" colspan="3">保守あり（制作費＋保守36ヶ月）</th>
+    <th class="h-diff">保守による<br>上乗せ額（平均）</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="h-no">最低</th><th class="h-no">平均</th><th class="h-no">最高</th>
+    <th class="h-yes">最低</th><th class="h-yes">平均</th><th class="h-yes">最高</th>
+    <th class="h-diff"></th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス<span class="sub">個人・副業</span></td>
+    <td class="val-g">¥15万</td><td>¥30万</td><td>¥50万</td>
+    <td>¥26万</td><td>¥48万</td><td>¥86万</td>
+    <td class="val-a">+¥18万<span class="sub">¥5,000×36</span></td>
+  </tr>
+  <tr>
+    <td>小規模制作会社<span class="sub">3〜10人</span></td>
+    <td>¥50万</td><td>¥100万</td><td>¥200万</td>
+    <td>¥68万</td><td>¥140万</td><td>¥272万</td>
+    <td class="val-a">+¥40万<span class="sub">¥11,000×36</span></td>
+  </tr>
+  <tr>
+    <td>中規模制作会社<span class="sub">10〜50人</span></td>
+    <td>¥100万</td><td>¥200万</td><td>¥400万</td>
+    <td>¥136万</td><td>¥290万</td><td class="val-r">¥580万</td>
+    <td class="val-a">+¥90万<span class="sub">¥25,000×36</span></td>
+  </tr>
+  <tr>
+    <td>大手制作会社<span class="sub">50人以上</span></td>
+    <td colspan="3" style="text-align:center"><span class="impossible">実質選択不可（95〜100%セット）</span></td>
+    <td>¥308万</td><td class="val-r">¥680万</td><td class="val-r">¥1,360万</td>
+    <td class="val-r">+¥180万<span class="sub">¥50,000×36</span></td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica<span class="sub">AI×1人</span></td>
+    <td class="val-n">¥35万</td><td class="val-n">¥35万</td><td class="val-n">¥40万+<span class="sub">プレミアム応相談</span></td>
+    <td class="val-n">¥57万<span class="sub">¥35万+¥6,000×36</span></td>
+    <td class="val-n">¥57万</td>
+    <td class="val-n">¥62万<span class="sub">¥40万+¥6,000×36</span></td>
+    <td class="val-n">+¥22万<span class="sub">¥6,000×36（任意）</span></td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- ========== SUMMARY ========== -->
+<div class="section-title">差額サマリー ── 全依頼先比較</div>
+<p class="section-desc">保守費が3年間で実際にいくら上乗せされるか。静的/動的それぞれのファクト。</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+  <tr>
+    <th>依頼先</th>
+    <th>3年間の<br>保守費（静的）</th>
+    <th>3年間の<br>保守費（動的）</th>
+    <th>保守なし<br>選択可否（静的）</th>
+    <th>保守なし<br>選択可否（動的）</th>
+    <th>動的サイト<br>3年総額（平均）</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>フリーランス<span class="sub">個人・副業</span></td>
+    <td class="val-g">+¥7万<span class="sub">¥2,000×36</span></td>
+    <td>+¥18万<span class="sub">¥5,000×36</span></td>
+    <td class="val-g">選択可（70〜80%）</td>
+    <td class="val-a">選択可（50〜60%）</td>
+    <td>¥48万</td>
+  </tr>
+  <tr>
+    <td>小規模制作会社<span class="sub">3〜10人</span></td>
+    <td class="val-a">+¥18万<span class="sub">¥5,000×36</span></td>
+    <td class="val-a">+¥40万<span class="sub">¥11,000×36</span></td>
+    <td class="val-a">交渉次第（30〜50%）</td>
+    <td class="val-r">強く推奨（15〜30%）</td>
+    <td>¥140万</td>
+  </tr>
+  <tr>
+    <td>中規模制作会社<span class="sub">10〜50人</span></td>
+    <td class="val-a">+¥36万<span class="sub">¥10,000×36</span></td>
+    <td class="val-r">+¥90万<span class="sub">¥25,000×36</span></td>
+    <td class="val-r">困難（15〜30%）</td>
+    <td class="val-r">ほぼ不可（5〜15%）</td>
+    <td class="val-r">¥290万</td>
+  </tr>
+  <tr>
+    <td>大手制作会社<span class="sub">50人以上</span></td>
+    <td class="val-r">+¥90万<span class="sub">¥25,000×36</span></td>
+    <td class="val-r">+¥180万<span class="sub">¥50,000×36</span></td>
+    <td class="val-r">実質不可（0〜10%）</td>
+    <td><span class="impossible">実質不可（0〜5%）</span></td>
+    <td class="val-r">¥680万</td>
+  </tr>
+  <tr class="noe-row">
+    <td>Noe Shiftica<span class="sub">AI×1人</span></td>
+    <td class="val-n">¥0<span class="sub">都度改修¥6,000〜/回</span></td>
+    <td class="val-n">+¥22万<span class="sub">¥6,000×36（任意）</span></td>
+    <td class="val-n">保守プラン自体なし</td>
+    <td class="val-n">完全任意</td>
+    <td class="val-n">¥35〜57万</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<p class="section-desc" style="margin-top:28px;">動的サイト 3年総額の依頼先間比較（保守あり・平均値ベース）</p>
+
+<div class="summary-grid">
+  <div class="sum-card">
+    <div class="sc-num" style="color:var(--green)">¥48万</div>
+    <div class="sc-label"><strong>フリーランス</strong><br>制作¥30万 + 保守¥18万<br>保守なしなら¥30万</div>
+  </div>
+  <div class="sum-card">
+    <div class="sc-num" style="color:var(--amber)">¥140万</div>
+    <div class="sc-label"><strong>小規模制作会社</strong><br>制作¥100万 + 保守¥40万<br>保守なしなら¥100万（交渉次第）</div>
+  </div>
+  <div class="sum-card">
+    <div class="sc-num" style="color:var(--red)">¥290万</div>
+    <div class="sc-label"><strong>中規模制作会社</strong><br>制作¥200万 + 保守¥90万<br>保守なしはほぼ不可</div>
+  </div>
+  <div class="sum-card">
+    <div class="sc-num" style="color:var(--red)">¥680万</div>
+    <div class="sc-label"><strong>大手制作会社</strong><br>制作¥500万 + 保守¥180万<br>保守なしは実質不可</div>
+  </div>
+  <div class="sum-card">
+    <div class="sc-num" style="color:var(--noe)">¥35〜57万</div>
+    <div class="sc-label"><strong>Noe Shiftica</strong><br>制作¥35万 + 保守¥0〜22万<br>保守は完全任意</div>
+  </div>
+</div>
+
+<div class="footnote">
+  ※ 各社の制作費・保守費は Web幹事・PRONIアイミツ・NT CREATION等の2025〜2026年相場データから算出。<br>
+  ※ Noe Shiftica の価格はあずま確定値。静的一律¥15万、動的¥35万〜、プレミアム¥40万〜応相談。<br>
+  ※ 大手の「保守なし」は契約上は可能な場合もあるが、実質的にセット販売が業界慣行（90〜100%）。
+</div>
+
+</div>
+</body>
+</html>

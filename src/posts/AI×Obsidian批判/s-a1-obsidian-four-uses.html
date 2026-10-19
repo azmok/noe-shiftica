@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Obsidianとは何か——4つの用途と照合してみた</title>
+<style>
+:root{
+  --font-nSansJp: "Noto Sans JP";
+  --font-mono: "Roboto Mono";
+  --font-def: normal normal 300 1rem/1.75 var(--font-nSansJp), sans-serif;
+  --bg: #14151a; --bg-elev: #1c1e26;
+  --fg: #e6e7ea; --fg-muted: #9aa0ac; --fg-faint: #6b7280;
+  --line: #2d2f38; --accent: #ff7a9c;
+  --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior: smooth; }
+[id]{ scroll-margin-top: 1.4rem; }
+body{
+  -webkit-text-size-adjust:100%;
+  width:100%; max-width:38rem; margin:3rem auto; padding:0 1.1rem;
+  font: var(--font-def); color: var(--fg); background: var(--bg);
+  word-break: break-word; overflow-wrap: anywhere;
+}
+a{ text-decoration:none; color:var(--accent); opacity:0.85; }
+a:hover{ opacity:1; }
+p{ margin-top:0.75em; }
+p:first-child{ margin-top:0; }
+strong, b{ color:#fff; font-weight:500; }
+h1{
+  text-align:center; margin:0.4em auto 0.9em; font-weight:700; font-size:1.72rem;
+  line-height:1.5; background: var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+h2{
+  margin:2.4rem auto 1rem; font-weight:700; font-size:1.3rem; color:#fff;
+  border-top:1px solid var(--line); padding-top:1.6rem; line-height:1.5;
+}
+h2:first-of-type{ border-top:none; padding-top:0; }
+h3{ margin:1.9rem auto 0.7rem; font-weight:600; font-size:1.05rem; color:#fff; line-height:1.6; }
+h3::before{ content:"› "; color:var(--fg-faint); font-weight:400; }
+h4{ margin:1.5rem auto 0.5rem; font-weight:600; font-size:0.97rem; color:var(--fg); }
+ul, ol{ margin:0.7em auto; }
+ul{ list-style:none; }
+ul > li{ position:relative; padding-left:1.1em; }
+ul > li::before{
+  content:""; position:absolute; left:0; top:0.72em;
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+}
+li{ text-align:left; margin:0.4em 0; }
+ol{ list-style:decimal; padding-left:1.4em; }
+ol > li{ padding-left:0; }
+ol > li::before{ display:none; }
+code{
+  font-family: var(--font-mono), monospace; font-size:0.85em;
+  background: var(--bg-elev); color:#ffb3c6;
+  padding:0.12em 0.4em; border-radius:4px; border:1px solid var(--line);
+}
+pre{
+  background: var(--bg-elev); border:1px solid var(--line); border-radius:8px;
+  padding:1rem; margin:1rem 0; overflow-x:auto;
+}
+pre code{ background:none; border:none; padding:0; color:var(--fg); font-size:0.8em; line-height:1.7; }
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+table{
+  border-collapse:collapse;
+  width: 100%;
+  min-width: 30rem;
+  margin: 0;
+  font-size:0.82em;
+}
+th, td{
+  border:1px solid var(--line);
+  padding:0.6rem 0.8rem;
+  text-align:center;
+  vertical-align:middle;
+}
+th{
+  background:var(--bg-elev);
+  color:#fff;
+  font-weight:600;
+  text-align:center;
+  white-space: nowrap;
+}
+td.verb-cell {
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  background: var(--bg-elev);
+}
+td.judge-cell { font-weight: 700; white-space: nowrap; }
+td.left { text-align: left; }
+tr.highlight td { background: rgba(255, 122, 156, 0.12); color: #fff; }
+tr.highlight td.verb-cell { background: rgba(255, 122, 156, 0.2); color: #fff; }
+tr.highlight td:first-child { border-left: 3px solid var(--accent); }
+
+blockquote{
+  margin:1.2rem 0; padding:0.7rem 1rem;
+  border-left:3px solid var(--accent); background:var(--bg-elev);
+  border-radius:0 6px 6px 0; color:var(--fg-muted);
+}
+blockquote p{ margin-top:0; }
+hr{ border:none; margin:2.6rem 0; height:1px; background:var(--line); }
+.tldr{
+  position:relative; margin:1.6rem 0; padding:1.1rem 1.2rem 0.9rem;
+  background: var(--bg-elev); border:1px solid transparent; border-radius:10px;
+  background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box, var(--grad) border-box;
+}
+.tldr::before{
+  content:"TL;DR"; display:inline-block; margin-bottom:0.5rem;
+  font-family: var(--font-mono), monospace; font-size:0.75rem; font-weight:600;
+  letter-spacing:0.08em; padding:0.15em 0.6em; border-radius:999px;
+  background: var(--grad); color:#14151a;
+}
+.tldr ul{ margin:0; }
+.tldr li{ font-size:0.92em; }
+.toc{
+  margin:1.8rem 0 2rem; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.toc-title{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.85rem 1.1rem; font-size:0.82rem; font-weight:600;
+  letter-spacing:0.06em; color:var(--fg-muted); cursor:pointer; user-select:none;
+}
+.toc-title::before{
+  content:"▸"; font-size:0.75em; color:var(--fg-faint); transition:transform 0.2s ease;
+}
+.toc.is-open .toc-title::before{ transform:rotate(90deg); }
+.toc-title:hover{ color:#fff; }
+.toc-body{ display:none; padding:0 1.1rem 1.1rem; }
+.toc.is-open .toc-body{ display:block; }
+.toc-list{ margin:0; padding:0; list-style:none; }
+.toc-list > li{ padding-left:0; margin:0.3em 0; }
+.toc-list > li::before{ display:none; }
+.toc-list a{ display:block; font-size:0.92rem; color:var(--fg-muted); padding:0.2rem 0; }
+.toc-list a:hover{ color:var(--accent); opacity:1; }
+.toc-sub{ margin:0.15rem 0 0.35rem; padding-left:1.1rem; list-style:none; }
+.toc-sub li{ margin:0.1em 0; padding-left:0; }
+.toc-sub li::before{ display:none; }
+.toc-sub a{
+  font-size:0.84rem; color:var(--fg-faint);
+  border-left:2px solid var(--line); padding-left:0.7rem;
+}
+.toc-sub a:hover{ border-left-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>Obsidianとは何か<br>——4つの用途と照合してみた</h1>
+
+<div class="tldr">
+<ul>
+<li>Obsidianの機能は、実は4つしかありません</li>
+<li>データ活用の用途は、4つの動詞に整理できます</li>
+<li>1つずつ照合すると、応えられるのは<strong>1.5個だけ</strong>でした</li>
+<li>専門知識ゼロ、Obsidian未経験でも読めるように書いています</li>
+</ul>
+</div>
+
+<div class="toc is-open" id="toc">
+  <div class="toc-title" id="tocToggle">目次</div>
+  <div class="toc-body">
+    <ul class="toc-list">
+      <li><a href="#s1">第1部：Obsidianとは何か</a></li>
+      <li><a href="#s2">[[リンク]]とは、結局何なのか</a></li>
+      <li><a href="#s3">第2部：4つの用途と照合する</a></li>
+      <li>
+        <a href="#s4">照合してみる</a>
+        <ul class="toc-sub">
+          <li><a href="#s4a">①【取り出す】△</a></li>
+          <li><a href="#s4b">②【束ねる】×</a></li>
+          <li><a href="#s4c">③【見つける】×</a></li>
+          <li><a href="#s4d">④【作る】○</a></li>
+        </ul>
+      </li>
+      <li><a href="#s5">【本題】既存文書の資産化に向かない理由</a></li>
+      <li><a href="#s6">結論：書く道具と、活かす道具は別レイヤー</a></li>
+    </ul>
+  </div>
+</div>
+
+<p>SNSでこういう投稿を見かけました。</p>
+
+<blockquote>
+<p><strong>Obsidian × AI で、既存の知識を資産化する</strong></p>
+</blockquote>
+
+<p>会社に溜まった資料、過去に書いた文章、調べてまとめたメモ——そういったものをObsidianに集めて、AIと組み合わせて活用しよう、という趣旨です。</p>
+<p>気になったので、実際に使ってみました。正直な第一印象はこうでした。</p>
+<p><strong>「書く体験はすごくいい。でも、これが第二の脳？」</strong></p>
+<p>ただ、感覚だけでは議論になりません。そこで、こういう手順で検証することにしました。</p>
+
+<pre><code>① Obsidianが何であるかを、正確に定義する
+        ↓
+② データ活用の用途を、整理する
+        ↓
+③ 1つずつ照合して、応えられるかを判定する</code></pre>
+
+<p><strong>好き嫌いではなく、機能と用途の突き合わせで判断します。</strong></p>
+
+<h2 id="s1">第1部：Obsidianとは何か</h2>
+
+<p>使ったことのない方のために、ここから説明します。</p>
+<p>Obsidianは<strong>メモアプリの一種</strong>です。そして、その特徴は<strong>4つだけ</strong>です。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>No.</th>
+  <th>特徴</th>
+  <th>内容</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td class="verb-cell">.md特化</td>
+  <td class="left">メモが1件1ファイルとして手元に保存される</td>
+</tr>
+<tr class="highlight">
+  <td>2</td>
+  <td class="verb-cell">[[記事名]]</td>
+  <td class="left"><strong>メモ同士のつながりを、手で登録できる</strong></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td class="verb-cell">#タグ</td>
+  <td class="left">メモに分類のラベルを、手で付けられる</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td class="verb-cell">グラフビュー</td>
+  <td class="left">登録したつながりを、点と線の図で表示できる</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td class="verb-cell">プラグイン</td>
+  <td class="left">機能を追加できる（AI関連を含む）</td>
+</tr>
+</table>
+</div>
+
+<p><strong>この5つが、Obsidianの本体です。</strong> それ以上でも以下でもありません。</p>
+<p>💡 そして<strong>2と3は、実は同じもの</strong>です。この点は次の章で説明します。</p>
+
+<h3>①「.md特化」とは</h3>
+
+<p>多くのメモサービスは、書いた内容が運営会社のサーバーに保存されます。Obsidianは違います。</p>
+<p><strong>1件のメモが、1つのファイルとしてあなたのパソコンに保存されます。</strong> Wordの文書がフォルダに並んでいるのと同じイメージです。</p>
+<p><strong>Markdown</strong>（マークダウン）というのは、記号で書式を表す書き方のことです。</p>
+
+<pre><code># これは見出し
+
+- これは箇条書き
+
+**これは太字**</code></pre>
+
+<p>ボタンで装飾するのではなく、記号を打つだけ。<strong>だから中身はただの文字データで、メモ帳でも開けます。</strong></p>
+<p>💡 <strong>これはObsidianの正当な長所です。</strong> サービスが終了しても、ファイルは手元に残ります。</p>
+
+<h3>② ③ ④ つながりの登録と、その可視化</h3>
+
+<p>ここが目玉機能であり、「第二の脳」と呼ばれる理由です。次の章で詳しく見ます。</p>
+
+<h3>⑤ プラグイン</h3>
+
+<p>後から機能を追加できる仕組みです。AI関連のものもあります。</p>
+<p>⚠️ <strong>ただし1つ注意があります。</strong> プラグインで追加した機能は、<strong>Obsidianの本体機能とは別に動きます。</strong> この点が後半で効いてくるので、覚えておいてください。</p>
+
+<h2 id="s2">[[リンク]]とは、結局何なのか</h2>
+
+<h3>まず、実際に書くとどうなるか</h3>
+
+<p>メモを書いているとき、他のメモを参照したくなったとします。そのときは、こう書きます。</p>
+
+<pre><code>今日は開発環境について調べた。
+詳しくは [[Docker入門]] を見ること。</code></pre>
+
+<p><strong>角カッコを2つ重ねて、中にメモの名前を書く。</strong> それだけです。</p>
+<p>するとその部分がクリックできるようになり、押すと「Docker入門」というメモに飛べます。<strong>Wikipediaの記事内のリンクと同じ感覚</strong>です。</p>
+<p>そして<strong>グラフビュー</strong>を開くと、メモを点、リンクを線として、全体が1枚の図で表示されます。<strong>頭の中の連想が、そのまま図になったように見えます。</strong></p>
+<p>実際、初めて見たときはかなり感動します。</p>
+
+<h3>では、そこで作られたものは何か</h3>
+
+<p>ここからが本題です。</p>
+<p><code>[[Docker入門]]</code> と書いたとき、実際に作られた情報は<strong>たった1つ</strong>です。</p>
+
+<blockquote>
+<p><strong>「このメモと、Docker入門というメモは、関係がある」</strong></p>
+</blockquote>
+
+<p>それだけです。<strong>関係の内容でも、意味でもありません。</strong> 「AとBはつながっている」という、それだけの記録です。</p>
+<p>メモが100件あって、リンクを300本張ったとします。すると<strong>あなたは300件の「つながりの記録」を、手作業で1件ずつ作った</strong>ことになります。</p>
+
+<h3>データベースの言葉で言うと</h3>
+
+<p>この「つながりだけを記録した一覧」には、正式な呼び名があります。<strong>交差テーブル</strong>といいます。</p>
+<p>クラスの名簿でたとえます。</p>
+
+<pre><code>【名簿】
+  1番 田中さん
+  2番 佐藤さん
+  3番 鈴木さん
+
+【友達の組み合わせ表】  ← これが交差テーブル
+  1番 と 2番 は友達
+  1番 と 3番 は友達</code></pre>
+
+<p><strong>名簿とは別に、「誰と誰が友達か」だけを記録した表を作る。</strong> これが交差テーブルです。</p>
+<p>Obsidianでは、<strong>メモ1件が名簿の行、<code>[[リンク]]</code>が組み合わせ表の行</strong>にあたります。</p>
+
+<h3>そして、これは本来</h3>
+
+<p><strong>データベースの世界では、この組み合わせ表は自動で作られるのが普通です。</strong> 人間が1件ずつ手で書くものではありません。</p>
+<p>つまりObsidianの<code>[[リンク]]</code>は——</p>
+
+<blockquote>
+<p><strong>本来なら自動で作られるはずの「つながりの記録」を、人間が手作業で入力している</strong></p>
+</blockquote>
+
+<p>ということになります。<strong>これが、Obsidianの中核機能の正体です。</strong></p>
+<h3>タグも、実は同じものです</h3>
+
+<p>Obsidianには「タグ」という機能もあります。<code>#料理</code> のように書いて、メモを分類する機能です。</p>
+<p>リンクとは別の機能に見えます。<strong>ですが、記録されている情報の形はまったく同じです。</strong></p>
+
+<pre><code>リンク：このメモ ──> あのメモ
+タグ　：このメモ ──> 「料理」という分類
+
+どちらも
+「AとBはつながっている」という1件の記録</code></pre>
+
+<p><strong>つながる相手が、メモなのか分類名なのかが違うだけ</strong>です。</p>
+<p>別機能に見えるのは、<strong>「ファイル」という単位に引っ張られているから</strong>にすぎません。データとしては、どちらも同じ交差テーブルの行です。</p>
+<p>💡 <strong>つまりObsidianの中核機能は、実質1つです。</strong> 「つながりを、人間が手で登録する」——リンクもタグも、その別の顔でしかありません。</p>
+
+<h2 id="s3">第2部：4つの用途と照合する</h2>
+
+<p>ここからが検証です。</p>
+<p>「既存のデータを資産化する」と言ったとき、<strong>実際にやりたいことは何でしょうか。</strong></p>
+<p>整理すると、<strong>4つの動詞</strong>に分かれます。</p>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>動詞</th>
+  <th>やりたいこと</th>
+  <th>具体例</th>
+  <th>必要な技術</th>
+</tr>
+<tr>
+  <td class="verb-cell">取り出す</td>
+  <td class="left">必要な情報を引く</td>
+  <td class="left">「あの件、どうなってたっけ」</td>
+  <td class="left">索引／キーワード検索／意味検索</td>
+</tr>
+<tr>
+  <td class="verb-cell">束ねる</td>
+  <td class="left">全体を要約・集計する</td>
+  <td class="left">「7月は技術記事が多かった」</td>
+  <td class="left">要約生成／クラスタリング</td>
+</tr>
+<tr class="highlight">
+  <td class="verb-cell">見つける</td>
+  <td class="left"><strong>気づいていない関係を発見する</strong></td>
+  <td class="left"><strong>「体調が悪い日は記事が短い」</strong></td>
+  <td class="left"><strong>Graph</strong>／GraphRAG</td>
+</tr>
+<tr>
+  <td class="verb-cell">作る</td>
+  <td class="left">材料にして新しく生み出す</td>
+  <td class="left">下書き、壁打ち、戦略の検討</td>
+  <td class="left">上3つの成果＋AIの生成</td>
+</tr>
+</table>
+</div>
+
+<p>💡 <strong>3つ目に注目してください。</strong> 「第二の脳」という言葉が本来指しているのは、まさにこれです。</p>
+<p>自分では気づいていなかった関係を、<strong>システムのほうから提示してくれる。</strong> だからこそ「第二の」脳と呼ぶ価値があります。</p>
+
+<h3>「束ねる」と「見つける」の境目</h3>
+
+<p>この2つは混同されやすいので、はっきりさせておきます。</p>
+<p><strong>判断基準は1つだけです。</strong></p>
+
+<blockquote>
+<p><strong>答えの形が、あらかじめ予測できるか。</strong></p>
+</blockquote>
+
+<pre><code>「今月書いた記事を、月別に集計して」
+  → 集計結果が返ってくると、最初から分かっている
+  → 束ねる
+
+「この3年分のメモから、気づいていない傾向はある？」
+  → 何が出てくるか、事前には分からない
+  → 見つける</code></pre>
+
+<p><strong>どちらも「分析」と呼ばれますが、中身は別物です。</strong> 前者は数えるだけ。後者は、あなたの想定の外にあるものを引き当てる作業です。</p>
+<p>⚠️ この記事で問題にするのは、<strong>後者のほう</strong>です。</p>
+<p>それでは、1つずつ照合していきます。</p>
+
+<h2 id="s4">照合してみる</h2>
+
+<h3 id="s4a">照合①【取り出す】——△</h3>
+
+<p>先に公平に書いておくと、<strong>Obsidianの検索はかなり優秀です。</strong></p>
+<p>正規表現が使えて、条件を組み合わせられて、ファイル名・フォルダ・タグ・行・見出し単位でも絞り込めます。<strong>メモアプリの検索としては、最高クラスと言っていい水準</strong>です。</p>
+<p>ただし、<strong>やっていることは「文字の一致」です。</strong></p>
+<p>どれだけ条件を細かく指定できても、<strong>入力した文字と一致する文字を探しているだけ</strong>で、意味は見ていません。</p>
+<p>だから、こういう条件がつきます。</p>
+
+<blockquote>
+<p><strong>「そのメモに何と書いたか」を覚えていること。</strong></p>
+</blockquote>
+
+<p>3年前に書いたメモを、あなたはどんな言葉で書いたでしょうか。「愛犬の世話」か、「ペットのケア」か。<strong>覚えていなければ、そのメモは存在しないのと同じです。</strong></p>
+<p>そして<strong>量が増えるほど、この「覚えていない領域」が増えていきます。</strong></p>
+<p><strong>判定：△</strong>——<strong>実装は優秀。ただし機構が「文字の一致」なので、記憶に依存する。</strong></p>
+
+<h3 id="s4b">照合②【束ねる】——×</h3>
+
+<p>「この3年分のメモから、自分の関心がどう変化したかをまとめて」</p>
+<p><strong>Obsidianには、この機能がありません。</strong></p>
+<p>できるのは検索と表示までで、<strong>複数のメモを横断して要約したり、傾向を出したりする仕組みは持っていません。</strong></p>
+<p>「プラグインを入れれば」と思われるかもしれません。ですが、それは<strong>Obsidianの機能ではなく、追加したプラグインの機能</strong>です。</p>
+<p><strong>判定：×</strong>——本体機能としては存在しない。</p>
+
+<h3 id="s4c">照合③【見つける】——×</h3>
+
+<p><strong>ここが最も重要な照合です。</strong></p>
+<p>グラフビューを見ると、点と線がつながっていて、いかにも「発見」が起きそうに見えます。</p>
+<p>ですが、思い出してください。<strong>その線は、あなたが手で張ったものです。</strong></p>
+
+<pre><code>グラフビューに表示されるもの
+  = あなたが「関係がある」と判断して登録したもの
+  = あなたがすでに知っている関係</code></pre>
+
+<p><strong>知らなかった関係は、1本も表示されません。</strong> 登録していないのですから、当然です。</p>
+
+<h4>そして、人は「知っているもの」しか登録できない</h4>
+
+<p>ここに、もう1段深い問題があります。</p>
+<p>人間の脳には<strong>「注意のフィルター」</strong>があります。<strong>今の自分が重要だと感じているものだけを意識に上げる</strong>仕組みです。興味のないものは、目の前にあっても気づけません。</p>
+<p>つまり——<strong>あなたがリンクを張れるのは、すでに重要だと思っている範囲の中だけ</strong>です。</p>
+<p>3年分のリンクは、<strong>3年分の思い込みの記録</strong>でもあります。当時つながりに気づかなかった2つのメモは、今も切り離されたまま。そして<strong>気づいていないのだから、探すこともできません。</strong></p>
+
+<blockquote>
+<p>第一の脳がすでに信じていることしか映せないものは、第二の脳ではありません。<br>
+<strong>ただの鏡です。</strong></p>
+</blockquote>
+
+<h4>実例：最も成功している実践者は、手で張っていない</h4>
+
+<p>この判定を、実例で裏付けます。</p>
+<p>AI研究者のAndrej Karpathy氏が、2026年に自身の知識ベースの設計を公開しました。<strong>約100記事・40万語</strong>の規模です。</p>
+<p>構成は3つのフォルダだけ。<strong>資料を放り込むと、AIがそれを読んで整理し、ページ同士のリンクも自動で張ります。</strong></p>
+<p>そして彼は、その結果をObsidianで見ています。<strong>ただし——</strong></p>
+
+<blockquote>
+<p><strong>リンクを張っているのは人間ではなく、AIです。</strong><br>
+Karpathy氏自身も、<strong>Obsidianは推奨だが必須ではない</strong>としています。</p>
+</blockquote>
+
+<p>💡 <strong>つまり「見つける」を成立させているのは、Obsidianの外側にある仕組み</strong>です。Obsidianは、AIが張った線を眺めるための窓として使われているだけです。</p>
+<p><strong>判定：×</strong>——手で張ったものしか出てこない。それは「すでに知っていること」でしかない。</p>
+
+<h3 id="s4d">照合④【作る】——○</h3>
+
+<p>最後は、素直に評価できる項目です。</p>
+<p>下書きを書く、考えを整理する、AIに読ませる材料を置いておく。<strong>この用途では、Obsidianは優秀です。</strong></p>
+<p>理由は3つあります。</p>
+
+<ol>
+<li><strong>書き心地</strong>——書きながら見た目が確認でき、スマホでも打ちやすい。地味ですが、自作すると最も骨が折れる部分です</li>
+<li><strong>他のツールと組み合わせやすい</strong>——中身はただのフォルダとファイルなので、他のアプリやAIツールがそのまま扱えます</li>
+<li><strong>同期の安定性</strong>——パソコンとスマホで内容を揃える仕組みが堅実で、バッテリーにも優しい</li>
+</ol>
+
+<p><strong>判定：○</strong>——書く道具、置く道具としては優秀。</p>
+
+<p>📌 <strong>ただし、この記事の論点はここではありません。</strong></p>
+<p>今回検証しているのは<strong>「すでにある文書を活かせるか」</strong>です。これから新しく書く場合の話は、別の議論になります。</p>
+<p><strong>Obsidianが本当に力を発揮する使い方については、このシリーズの最終回で改めて扱います。</strong> 結論だけ先に言うと、<strong>明確に適した場面が1つあります。</strong></p>
+
+<h3>照合結果</h3>
+
+<div class="table-wrapper">
+<table>
+<tr>
+  <th>動詞</th>
+  <th>判定</th>
+  <th>理由</th>
+</tr>
+<tr>
+  <td class="verb-cell">取り出す</td>
+  <td class="judge-cell" style="color:var(--amber)">△</td>
+  <td class="left">キーワードのみ。記憶に依存する</td>
+</tr>
+<tr>
+  <td class="verb-cell">束ねる</td>
+  <td class="judge-cell" style="color:var(--fg-faint)">×</td>
+  <td class="left">本体機能として存在しない</td>
+</tr>
+<tr class="highlight">
+  <td class="verb-cell">見つける</td>
+  <td class="judge-cell" style="color:var(--accent)">×</td>
+  <td class="left"><strong>手で張ったものしか出てこない</strong></td>
+</tr>
+<tr>
+  <td class="verb-cell">作る</td>
+  <td class="judge-cell" style="color:#7ddba0">○</td>
+  <td class="left">書く道具としては優秀</td>
+</tr>
+</table>
+</div>
+
+<p><strong>4つのうち、応えられるのは1.5個。</strong> そして<strong>「第二の脳」の核心である【見つける】が×</strong>です。</p>
+
+<h2 id="s5">【本題】既存文書の資産化に向かない理由</h2>
+
+<p>ここまでは、Obsidianを一般的に評価しました。</p>
+<p>ここからは、冒頭のSNSの主張に絞ります。<strong>すでにある文書</strong>をObsidianに入れて活用する場合です。</p>
+<p><strong>結論から言うと、これは最悪の選択肢です。</strong></p>
+<p>そして理由は、リンクでも検索でもありません。<strong>もっと手前にあります。</strong></p>
+
+<h3>いちばん根本的な問題——そもそも入り口ですらない</h3>
+
+<p>ここが見落とされがちな点です。</p>
+<p><strong>既存のデータは、そのままではObsidianに入りません。</strong></p>
+<p>会社の資料を思い浮かべてください。PDF、Word、Excel、PowerPoint、メール、社内Wikiのページ。<strong>そのどれも、Markdownファイルではありません。</strong></p>
+<p>つまり、活用する前に<strong>変換の工程</strong>が必要になります。</p>
+
+<pre><code>既存データ（PDF・Word・Excel・メール）
+        ↓
+  ここで何が必要か
+        ↓
+① 中身のテキストを取り出す
+② 表や見出しの構造を保ったまま整形する
+③ 意味の切れ目で適切に分割する
+④ 「いつ・誰が・何の書類か」の情報を付ける
+        ↓
+   ようやく扱える形になる</code></pre>
+
+<p><strong>この工程は、実務で「前処理」と呼ばれる領域です。</strong> そして専門のツールが数多く存在します。</p>
+<p>実際、AI活用の失敗の多くは、<strong>モデルの性能ではなくこの前処理と分割に原因がある</strong>とされています。ある解説では、こう言い切られていました。</p>
+
+<blockquote>
+<p><strong>取り込みと分割を間違えると、賢いプロンプトや大きなモデルでは完全には補えない</strong></p>
+</blockquote>
+
+<h4>そして、Obsidianはこの工程を担いません</h4>
+
+<p>Obsidianは<strong>Markdownファイルを表示・編集するアプリ</strong>です。</p>
+<p><strong>PDFをMarkdownに変換する機能も、表の構造を保つ機能も、意味の切れ目で分割する機能も、標準では持っていません。</strong></p>
+
+<pre><code>PDF / Word / Excel
+    ↓ ← Obsidianは、ここを一切やらない
+.mdファイル
+    ↓
+Obsidianで開ける</code></pre>
+
+<p>ここに、決定的な問いが立ちます。</p>
+
+<blockquote>
+<p><strong>変換が終わった時点で、もうObsidianである必要があるでしょうか。</strong></p>
+</blockquote>
+
+<p>整った<code>.md</code>ファイルが手元にあるなら、<strong>それを検索用のデータベースに入れるほうが素直です。</strong></p>
+<p>💡 <strong>これが「ただのメモアプリだから」の正確な中身です。</strong> メモアプリは、書いたものを扱う道具であって、<strong>外から持ち込んだものを整える道具ではありません。</strong></p>
+
+<h3>そして、無理に入れた後も出番がない</h3>
+
+<p>仮に変換を済ませて、Obsidianに入れたとします。<strong>それでも、次の3つが起きます。</strong></p>
+
+<h4>① リンクが1本も存在しない</h4>
+
+<p>既存の文書には、<code>[[リンク]]</code>が<strong>1本も張られていません。</strong> Obsidian用に書かれたものではないので、当然です。</p>
+<p><strong>Obsidianの中核機能が、初日からゼロの状態です。</strong></p>
+<p>手で張ろうにも、3000件を全部読んで関係を見つける作業になります。現実的でないのは、説明するまでもないと思います。</p>
+<p>⚠️ しかも、<strong>手で張る意味そのものが消えています。</strong> 「自分で考えて書くと記憶に残る」という効果は、<strong>考えながら書いているときにしか働きません。</strong> 既存文書を機械的に紐づける作業には、思考の工程がありません。</p>
+<p><strong>作業の負担だけが残り、得られるはずだった効果はゼロです。</strong></p>
+
+<h4>② 覚えていない文書は、探せない</h4>
+
+<p>照合①で書いたとおり、Obsidianの検索は優秀ですが<strong>「何と書いてあるか知っている」ことが前提</strong>でした。</p>
+<p>既存文書は、<strong>自分で書いたものですらない</strong>場合があります。会社の資料、何年も前の議事録。<strong>そこに何と書いてあるかを、あなたは知りません。</strong></p>
+<p>新しく書き溜める場合は「数年後に困る」問題ですが、<strong>既存文書では初日から起きます。</strong></p>
+
+<h4>③ AI検索を足しても、Obsidianの外側で動く</h4>
+
+<p>「意味で検索できるプラグインを入れればいい」と考える方もいると思います。実際、そういうものは存在します。</p>
+<p><strong>ですが、その仕組みを調べると驚くことが分かります。</strong></p>
+<p>それらは文書を読み込んで、<strong>別の場所に専用の索引を作ります。</strong> そして——</p>
+
+<blockquote>
+<p><strong>元のファイルには、一切書き込みません。</strong><br>
+<code>[[リンク]]</code>にも、グラフビューにも、その結果は反映されません。</p>
+</blockquote>
+
+<p>第1部で「プラグインは本体機能とは別に動く」と書いたのは、このことです。</p>
+
+<pre><code>Obsidian本体（リンク・グラフ）
+  → 使われていない
+
+AIの検索機能
+  → Obsidianの外側で、独自に動いている
+
+Obsidianの役割
+  → ファイルを置いておく場所。それだけ</code></pre>
+
+<h3>まとめると</h3>
+
+<blockquote>
+<p><strong>整える前も、整えた後も、Obsidianの出番がない。</strong></p>
+</blockquote>
+
+<p>前半では変換を担わず、後半では機能が使われない。<strong>だから「最悪の選択肢」と書きました。</strong></p>
+<p>⚠️ 補足として、もう1つ挙げておきます。<strong><code>[[...]]</code>というリンクの書き方は、Obsidian独自のものです。</strong> GitHubなど他の場所では、リンクとして認識されません。</p>
+<p>「ただのMarkdownだからどこでも読める」が売りのはずが、<strong>中核機能を使った瞬間に、その売りが弱まる</strong>——という構造にもなっています。</p>
+
+<h2 id="s6">結論：書く道具と、活かす道具は別レイヤー</h2>
+
+<p>検証をまとめます。</p>
+<p>Obsidianは<strong>優れたメモアプリ</strong>です。照合④のとおり、書く道具としては今でも合理的な選択肢です。</p>
+<p>ただし、<strong>4つの用途のうち応えられるのは1.5個</strong>。そして<strong>「第二の脳」の核心である【見つける】は、構造的に不可能</strong>でした。</p>
+
+<pre><code>【書く層】     Obsidian などのメモアプリ
+               → 摩擦なく書ける。ここは強い
+
+【活かす層】   意味で探す仕組み
+               ＋ 関係を自動で見つける仕組み
+               → ここは別の技術が必要</code></pre>
+
+<p><strong>この2つは競合していません。層が違うだけです。</strong></p>
+<p>Karpathy氏の事例が、まさにそれを示していました。<strong>活かす層をAIが担当し、Obsidianは見るための窓として使う。</strong> だから機能しているわけです。</p>
+<p>だから、正しい問いはこうなります。</p>
+
+<blockquote>
+<p>❌ 「Obsidianを使うべきか」<br>
+⭕ <strong>「自分がやりたいのは、4つの動詞のどれか」</strong></p>
+</blockquote>
+
+<p><strong>そして、すでにある文書を活かしたいなら——Obsidianは選択肢に入りません。</strong></p>
+<p>入り口でも出口でもないからです。整える工程は担わず、整え終わった後も出番がない。<strong>これが今回の結論です。</strong></p>
+<p>📌 <strong>ただし、これはObsidianが悪いという話ではありません。</strong> そもそもそういう用途の道具ではない、というだけです。<strong>本当に適している場面については、シリーズの最終回で扱います。</strong></p>
+<p>次回は、その「活かす層」の技術を専門知識ゼロから解説します。<strong>4つの動詞に、それぞれどの技術が対応するのか。</strong></p>
+<p>意味で探す仕組み、関係を自動でたどる仕組み、そしてその2つをAIが融合させる手法。<strong>とくに「意味で探せるようになれば【見つける】も解決するのか」——この問いには、はっきりした答えがあります。</strong></p>
+<p>名前は難しそうですが、中身はとてもシンプルです ჱ̒⸝⸝•̀֊•́⸝⸝)</p>
+
+<hr>
+<h2>関連記事</h2>
+<p><!-- TODO: noe-shiftica.com/blog の関連記事リンクをここに追記 --></p>
+
+<script>
+  var toc = document.getElementById('toc');
+  document.getElementById('tocToggle').addEventListener('click', function () {
+    toc.classList.toggle('is-open');
+  });
+</script>
+</body>
+</html>

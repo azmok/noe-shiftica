@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>全3シリーズ構成 — Plot Map v3</title>
+<style>
+  :root{
+    --bg:#0d0e12; --panel:#14151a; --panel-elev:#1c1e26;
+    --fg:#e6e7ea; --fg-muted:#9aa0ac; --fg-faint:#6b7280;
+    --line:#2d2f38; --amber:#ffb347; --cyan:#5ec8d8; --pink:#ff5f9e;
+    --grad: linear-gradient(100deg, #ff5f9e 0%, #ff7a59 55%, #ffb347 100%);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic','Segoe UI',sans-serif;
+    padding:2rem 1rem 4rem; -webkit-text-size-adjust:100%;
+  }
+  .wrap{ max-width:46rem; margin:0 auto; }
+  .eyebrow{ text-align:center; font-size:0.72rem; font-weight:600;
+    letter-spacing:0.12em; color:var(--fg-faint); margin-bottom:0.4rem; }
+  h1{ text-align:center; font-size:1.5rem; font-weight:700; margin:0 0 0.5rem;
+    line-height:1.4; background:var(--grad);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent; }
+  .subtitle{ text-align:center; color:var(--fg-muted); font-size:0.85rem;
+    margin-bottom:1.6rem; line-height:1.7; }
+
+  .note{
+    max-width:38rem; margin:0 auto 2rem; padding:1rem 1.2rem;
+    background:var(--panel-elev); border:1px solid var(--line);
+    border-radius:10px; font-size:0.8rem; color:var(--fg-muted); line-height:1.85;
+  }
+  .note b{ color:#fff; font-weight:600; }
+  .note .hl{ color:var(--amber); font-weight:600; }
+
+  .controls{ display:flex; justify-content:center; gap:0.6rem; margin-bottom:1.8rem; }
+  button.ctrl{ display:flex; align-items:center; gap:0.35rem; font-size:0.78rem;
+    font-family:inherit; border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--fg-muted); }
+  button.ctrl.primary{ background:var(--panel-elev); color:var(--fg); }
+  button.ctrl:hover{ opacity:0.85; }
+
+  .series-head{
+    margin:2.4rem 0 0.5rem; padding-bottom:0.6rem;
+    border-bottom:1px solid var(--line);
+  }
+  .series-head:first-of-type{ margin-top:0; }
+  .series-name{ font-size:1.08rem; font-weight:700; color:#fff; }
+  .series-role{ font-size:0.8rem; color:var(--fg-muted); margin-top:0.3rem; line-height:1.7; }
+
+  .node-row{ display:flex; align-items:flex-start; gap:0.55rem;
+    padding:0.55rem 0.7rem; margin-bottom:0.35rem; border-radius:10px; }
+  .node-row.has-children{ cursor:pointer; }
+  .node-row.root{ padding:0.8rem 1rem; background:var(--panel-elev);
+    border:1px solid var(--line); }
+  .caret{ margin-top:0.15rem; color:var(--fg-faint); flex-shrink:0; width:18px;
+    display:inline-flex; justify-content:center; transition:transform 0.15s ease;
+    font-size:0.8rem; user-select:none; }
+  .caret.leaf{ margin-top:0.62rem; width:5px; height:5px; border-radius:50%;
+    background:var(--fg-faint); }
+  .caret.open{ transform:rotate(90deg); }
+  .node-title-wrap{ flex:1; min-width:0; }
+  .title-root{ font-size:1rem; font-weight:700; color:#fff; line-height:1.5; }
+  .title-1{ font-size:0.88rem; font-weight:400; color:var(--fg); line-height:1.6; }
+  .node-sub{ font-size:0.78rem; color:var(--fg-muted); margin-top:0.2rem; line-height:1.7; }
+
+  .children{ padding-left:1rem; border-left:1.5px solid var(--line);
+    overflow:hidden; max-height:0; transition:max-height 0.25s ease;
+    margin-left:1.5rem; }
+  .children.open{ max-height:6000px; }
+
+  .tag{ display:inline-block; font-size:0.65rem; font-weight:600;
+    padding:0.1rem 0.42rem; border-radius:4px; margin-right:0.45rem;
+    vertical-align:0.08em; white-space:nowrap; }
+  .tag.new{ color:var(--pink); border:1px solid rgba(255,95,158,0.45); }
+  .tag.fix{ color:var(--amber); border:1px solid rgba(255,179,71,0.45); }
+  .tag.keep{ color:var(--fg-faint); border:1px solid var(--line); }
+  .tag.warn{ color:var(--cyan); border:1px solid rgba(94,200,216,0.45); }
+
+  .origin{ font-size:0.72rem; color:var(--fg-faint); margin-top:0.15rem; }
+
+  .footnote{ text-align:center; color:var(--fg-faint); font-size:0.75rem;
+    margin-top:2.4rem; line-height:2; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PLOT MAP v3 — FINAL STRUCTURE</div>
+    <h1>全3シリーズ構成</h1>
+    <p class="subtitle">データ資産化編 ／ 情報商材批判編 ／ 実装編</p>
+
+    <div class="note">
+      <b>v2からの変更点</b><br>
+      ① <span class="hl">2テーマが混在していた旧シリーズAを分割。</span>
+      Obsidian批判を商材批判の根拠にできなくなったため、接着剤が外れた<br>
+      ② <span class="hl">Obsidian評価を「批判」から「用途の切り分け」へ転換。</span>
+      まっとうな技術者もObsidian×Claude Codeを実践しているため<br>
+      ③ <span class="hl">実装編を「Claude Codeを使い倒す→限界を測る→その先」の弧に再設計。</span>
+      自作の役割分担から始めるのをやめた<br>
+      ④ <span class="hl">Auto Memory の発見により、Hermesの優位が2つに絞られた</span>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl primary" id="expandAll">▾ すべて展開</button>
+      <button class="ctrl" id="collapseAll">▸ すべて閉じる</button>
+    </div>
+
+    <div id="tree"></div>
+
+    <p class="footnote">
+      タイトルをタップすると開閉します<br>
+      <span style="color:var(--pink)">■</span> 新規執筆 ／
+      <span style="color:var(--amber)">■</span> 要修正 ／
+      <span style="color:var(--fg-faint)">■</span> ほぼ流用 ／
+      <span style="color:var(--cyan)">■</span> リスク注記
+    </p>
+  </div>
+
+<script>
+const SERIES = [
+  {
+    name: "シリーズA：データ資産化編（全3本）",
+    role: "商材批判から切り離した純粋な技術解説。「書く道具」と「溜めたものを活かす道具」は別レイヤーである、という一点に絞る",
+    items: [
+      {
+        id:"a1", title:"A1：Obsidianは「第二の脳」になれるか",
+        sub:"データ構造からの検証",
+        children:[
+          { t:"導入：実際に使ってみて感じた違和感", tag:"keep" },
+          { t:"[[リンク]]の正体——交差テーブルへの手動入力", tag:"keep" },
+          { t:"手動リンクの認知科学的検証（生成効果・注意のフィルター）", tag:"keep" },
+          { t:"「テキストだから永続する」神話の検証（SQLite・議会図書館）", tag:"keep" },
+          { t:"公平な検証——Obsidianのベストユースケース", tag:"keep" },
+          { t:"Karpathy氏のLLM Wiki——個人規模ならこれで十分", tag:"new",
+            note:"約100記事・40万語では「凝った検索は不要だった」という報告。Obsidianを可視化に使用" },
+          { t:"数年書き溜めたとき、何が起きるか（4つの壁）", tag:"keep" },
+          { t:"結論：書く道具と、活かす道具は別レイヤー", tag:"fix",
+            note:"「Obsidianは劣化RDB」の断定は残しつつ、商材批判への接続を切る" }
+        ]
+      },
+      {
+        id:"a2", title:"A2：ゼロからわかるVector・Graph・GraphRAG",
+        sub:"専門用語ゼロからの土台固め",
+        children:[
+          { t:"Vector——意味を座標に変換する", tag:"keep" },
+          { t:"Graph——点と線で多段階の関係をたどる", tag:"keep" },
+          { t:"RAG——答える前に調べる仕組み", tag:"keep" },
+          { t:"GraphRAG——AIが自動でグラフを構築する", tag:"keep" },
+          { t:"コスト構造——AIとプログラムの分担表", tag:"keep" }
+        ]
+      },
+      {
+        id:"a3", title:"A3：個人のための2026年最適解",
+        sub:"蓄積量で、やるべきことは変わる",
+        children:[
+          { t:"判断基準は蓄積量だけ（3段階）", tag:"keep" },
+          { t:"Lost in the Middle——収まることと読まれることは別問題", tag:"keep" },
+          { t:"SQLite + sqlite-vec で完結する", tag:"keep" },
+          { t:"純正GraphRAGは個人には過剰（コストの実数字）", tag:"keep" },
+          { t:"実装の落とし穴3つ", tag:"keep" },
+          { t:"実装プロンプト（個人スケール版）", tag:"keep" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "シリーズB：情報商材批判編（全3本）",
+    role: "今回の新事実を全投入して、反論不可能にする。Obsidian批判に依存しない構成へ",
+    items: [
+      {
+        id:"b1", title:"B1：「AI社員」の正体——それ、全部標準機能です",
+        sub:"CLI標準機能との照合",
+        children:[
+          { t:"導入：SNSで見かける「AI社員」という言葉", tag:"keep" },
+          { t:"実体＝CLAUDE.md ＋ .claude/agents/ の .mdファイル", tag:"keep" },
+          { t:"Anthropicが公開している7つの指示手法", tag:"new",
+            note:"CLAUDE.md／Skills／Hooks／サブエージェント／Auto Memory／remember／スラッシュコマンド" },
+          { t:"商材が触れているのは、そのうち2つだけ", tag:"new" },
+          { t:"Auto Memory——自動で記憶する仕組みが既に標準搭載", tag:"new",
+            note:"手動のCLAUDE.mdとは別に、Claudeが自分で書く記憶。2026年2月頃から段階展開" },
+          { t:"100万トークンの文脈保持も標準装備", tag:"new" },
+          { t:"サブエージェントは本物か——机は本当に分かれる", tag:"new",
+            note:"要約だけを親に返す＝役割の着せ替えではない" },
+          { t:"⚠️ ただし委譲指示がないと発火しない", tag:"warn",
+            note:"ファイルを置くだけでは机が分かれない。多くの解説記事がここに触れていない" }
+        ]
+      },
+      {
+        id:"b2", title:"B2：【実演】20行のPythonで「AI社員」を再現する",
+        sub:"商材の中身が何であるかの物証",
+        children:[
+          { t:"準備（Antigravity IDE ／ 各社CLI ／ APIキー）", tag:"keep",
+            note:"現行の実装編Part1をここへ移設・凝縮" },
+          { t:"プロンプト1つで環境が揃う", tag:"keep" },
+          { t:"実行してみる——2人チームが動く", tag:"keep" },
+          { t:"コード解説：役割の正体は、ただの日本語の文章", tag:"keep" },
+          { t:"なぜ机が分かれるのか——APIはステートレス", tag:"keep" },
+          { t:"結論：これが数十万円の中身だった", tag:"fix",
+            note:"チュートリアルではなく「証拠」としての位置づけに変更" }
+        ]
+      },
+      {
+        id:"b3", title:"B3：無料で手に入るものの全体像",
+        sub:"判断材料をすべて開示する",
+        children:[
+          { t:"見分け方——5つのチェックポイント", tag:"keep" },
+          { t:"裏技：特定商取引法を1分で確認する", tag:"keep" },
+          { t:"無料の日本語記事が、すでに大量にある", tag:"new",
+            note:"企業ブログ・YouTube・実践チェックリスト付き。内容も正確。ここを正直に書く" },
+          { t:"では、この記事の差別化はどこか", tag:"new",
+            note:"7つの指示手法・OSS上位互換・実測値。他が触れていない領域を明示" },
+          { t:"OSS上位互換の存在——Hermes・OpenClaw", tag:"new",
+            note:"どちらも無料。日本語解説記事も複数ある。にもかかわらず商材に言及がない" },
+          { t:"世界を3層に分けると構造が見える", tag:"keep" },
+          { t:"結論：有料である必然性が、どこにもない", tag:"fix" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "シリーズC：実装編（全4本）",
+    role: "「使い倒す → 限界を測る → その先」の弧。前回の失敗（いきなり自作の役割分担から始めた）を逆順にする",
+    items: [
+      {
+        id:"c1", title:"C1：Claude Codeを使い倒す——7つの指示手法",
+        sub:"まず標準機能の全体像を押さえる",
+        children:[
+          { t:"なぜ標準機能から始めるのか", tag:"new",
+            note:"先に手で触るから、抽象化の下が読める。前シリーズで機能した論法を踏襲" },
+          { t:"CLAUDE.md——開始時に読まれ、最後まで残る", tag:"new" },
+          { t:"Skills——呼ばれたときだけ読み込まれる", tag:"new" },
+          { t:"Hooks——コンテキストの外で確実に実行される", tag:"new" },
+          { t:"サブエージェント——要約だけを返す", tag:"new" },
+          { t:"Auto Memory——Claudeが自分で書く記憶", tag:"new" },
+          { t:"/remember——繰り返しを恒久ルールに昇格させる", tag:"new" },
+          { t:"読み込まれ方の違いが、設計を決める", tag:"new" }
+        ]
+      },
+      {
+        id:"c2", title:"C2：記憶の設計——何をどこに置くか",
+        sub:"3層の記憶を使い分ける",
+        children:[
+          { t:"3層の記憶（CLAUDE.md ／ Auto Memory ／ セッションログ）", tag:"new" },
+          { t:"全ログは自動で読まれない、という事実", tag:"new",
+            note:"「毎回膨大なログを参照する」という誤解を解く" },
+          { t:"--resume と --continue の違い", tag:"new",
+            note:"完全な会話履歴が戻る。ツール呼び出しと結果まで" },
+          { t:"⚠️ ディレクトリごとに保存される落とし穴", tag:"warn" },
+          { t:"手動（自分で書く）と自動（Claudeが書く）の使い分け", tag:"new" },
+          { t:"docs/ による知識の資産化——何を残し、何を残さないか", tag:"new",
+            note:"判断・好み・失敗の3種類だけ。作業の過程は残さない" }
+        ]
+      },
+      {
+        id:"c3", title:"C3：限界を測る——どこまで標準機能で足りるか",
+        sub:"実測してから、次に進む",
+        children:[
+          { t:"委譲が発火する条件を確かめる", tag:"new" },
+          { t:"並列できる作業／できない作業の見極め", tag:"new" },
+          { t:"コストの実測方法", tag:"new" },
+          { t:"⚠️ 役割ごとの独立記憶は、標準では作れない", tag:"warn",
+            note:"ここが最大の限界。プロジェクト単位の記憶しか持てない" },
+          { t:"実測結果——実際に動かして分かったこと", tag:"new",
+            note:"★あずま自身の一次情報。他の記事が絶対に持っていない部分" }
+        ]
+      },
+      {
+        id:"c4", title:"C4：その先——組み合わせるという発想",
+        sub:"1つ選ぶのではなく、並列配置する",
+        children:[
+          { t:"Hermesに残る2つの優位", tag:"new",
+            note:"スキルの自己生成／プロファイル単位の独立記憶。それ以外はClaude Codeが追いついた" },
+          { t:"⚠️ Hermesのサブエージェントは互いに会話できない", tag:"warn",
+            note:"「1人の運用者と、その場限りの外注先」と評される構造" },
+          { t:"OpenClaw——エージェント協働が必要ならこちら", tag:"new",
+            note:"永続的なエージェントチーム。状態を保持して会話できる" },
+          { t:"実際の構成は階層ではなく並列配置＋相互運用", tag:"new",
+            note:"ノートPCにClaude Code／VPSにHermes／別VPSにOpenClaw" },
+          { t:"⚠️ 規約リスク——サブスクのOAuth流用", tag:"warn",
+            note:"各社が禁止。ブロック事例あり。APIキーで動かすこと" },
+          { t:"⚠️ セキュリティ——プロンプトインジェクションとCVE", tag:"warn" },
+          { t:"段階的な進め方（STEP1〜6）", tag:"new" }
+        ]
+      }
+    ]
+  }
+];
+
+const TAGLABEL = { new:"新規", fix:"修正", keep:"流用", warn:"注意" };
+const openSet = new Set(["b1","c4"]);
+
+function renderChild(c){
+  const tag = c.tag ? `<span class="tag ${c.tag}">${TAGLABEL[c.tag]}</span>` : "";
+  const note = c.note ? `<div class="node-sub">${c.note}</div>` : "";
+  return `<div class="node-row">
+    <span class="caret leaf"></span>
+    <div class="node-title-wrap">
+      <span class="title-1">${tag}${c.t}</span>
+      ${note}
+    </div>
+  </div>`;
+}
+
+function renderItem(item){
+  const isOpen = openSet.has(item.id);
+  return `<div>
+    <div class="node-row root has-children" data-toggle="${item.id}">
+      <span class="caret ${isOpen?"open":""}">▸</span>
+      <div class="node-title-wrap">
+        <span class="title-root">${item.title}</span>
+        <div class="node-sub">${item.sub}</div>
+      </div>
+    </div>
+    <div class="children ${isOpen?"open":""}">
+      ${item.children.map(renderChild).join("")}
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("tree").innerHTML = SERIES.map(s => `
+    <div class="series-head">
+      <div class="series-name">${s.name}</div>
+      <div class="series-role">${s.role}</div>
+    </div>
+    ${s.items.map(renderItem).join("")}
+  `).join("");
+
+  document.querySelectorAll("[data-toggle]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const id = el.getAttribute("data-toggle");
+      openSet.has(id) ? openSet.delete(id) : openSet.add(id);
+      render();
+    });
+  });
+}
+
+const ALL = SERIES.flatMap(s=>s.items.map(i=>i.id));
+document.getElementById("expandAll").addEventListener("click",()=>{
+  ALL.forEach(i=>openSet.add(i)); render();
+});
+document.getElementById("collapseAll").addEventListener("click",()=>{
+  openSet.clear(); render();
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フリーランスとNoe Shiftica、どちらを選ぶべきか？ | Noe Shiftica Blog</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+--bg: #09090f;
+--surface: #111118;
+--surface2: #1a1a28;
+--ink: #e8e8f0;
+--ink2: #b0b0c4;
+--muted: #6b6b80;
+--border: rgba(255,255,255,0.08);
+--noe: #7c6af7;
+--teal: #4fd1c5;
+--g: #22c55e;
+--amber: #f59e0b;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(--bg);
+color: var(--ink);
+font-family: ‘DM Sans’, ‘Noto Sans JP’, sans-serif;
+font-size: 16px;
+line-height: 1.85;
+}
+
+/* HERO */
+.hero {
+background: #0d0d18;
+border-bottom: 1px solid var(--border);
+padding: 80px 24px 72px;
+position: relative;
+overflow: hidden;
+}
+.hero::before {
+content: ‘’;
+position: absolute;
+top: -100px; right: -100px;
+width: 480px; height: 480px;
+background: radial-gradient(circle, rgba(124,106,247,0.15) 0%, transparent 65%);
+pointer-events: none;
+}
+.hero-inner { max-width: 720px; margin: 0 auto; position: relative; }
+.hero-series {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+color: rgba(255,255,255,0.35);
+margin-bottom: 20px;
+display: flex; align-items: center; gap: 10px;
+}
+.hero-series::before {
+content: ‘’; display: inline-block;
+width: 24px; height: 1px; background: var(--noe);
+}
+.hero-tag {
+display: inline-flex; align-items: center; gap: 6px;
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+letter-spacing: 1px; text-transform: uppercase;
+color: var(--noe);
+background: rgba(124,106,247,0.12);
+border: 1px solid rgba(124,106,247,0.3);
+padding: 4px 12px; border-radius: 4px; margin-bottom: 24px;
+}
+.hero h1 {
+font-family: ‘Shippori Mincho’, serif;
+font-size: clamp(24px, 4vw, 40px);
+font-weight: 600; line-height: 1.35;
+color: #fff; margin-bottom: 20px;
+}
+.hero h1 em {
+font-style: normal;
+background: linear-gradient(130deg, #7c6af7, #4fd1c5);
+-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+background-clip: text;
+}
+.hero-lead { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.8; max-width: 560px; margin-bottom: 32px; }
+.hero-meta {
+display: flex; align-items: center; gap: 16px;
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+color: rgba(255,255,255,0.25); letter-spacing: 1px;
+}
+
+/* ARTICLE */
+.article { max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; }
+
+/* TOC */
+.toc {
+background: var(--surface);
+border: 1px solid var(--border);
+border-left: 3px solid var(--noe);
+border-radius: 12px; padding: 24px 28px; margin-bottom: 56px;
+}
+.toc-title {
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+letter-spacing: 2px; text-transform: uppercase;
+color: var(--muted); margin-bottom: 14px;
+}
+.toc ol { list-style: none; counter-reset: toc; }
+.toc li {
+counter-increment: toc;
+display: flex; align-items: baseline; gap: 10px;
+font-size: 13px; color: var(--ink2);
+padding: 5px 0; border-bottom: 1px dashed var(--border);
+}
+.toc li:last-child { border-bottom: none; }
+.toc li::before {
+content: counter(toc, decimal-leading-zero);
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+color: var(--noe); min-width: 22px;
+}
+.toc a { color: var(--ink2); text-decoration: none; }
+.toc a:hover { color: var(--noe); }
+
+/* SECTION */
+.section { margin-bottom: 64px; }
+.section-eyebrow {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 3px; text-transform: uppercase;
+color: var(--noe); opacity: 0.8; margin-bottom: 10px;
+}
+h2 {
+font-family: ‘Shippori Mincho’, serif;
+font-size: clamp(19px, 3vw, 25px); font-weight: 600;
+line-height: 1.4; color: var(--ink);
+margin-bottom: 20px; padding-bottom: 14px;
+border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 28px 0 10px; }
+p { color: var(--ink2); margin-bottom: 16px; }
+strong { color: var(--ink); font-weight: 600; }
+
+/* CALLOUT */
+.callout {
+border-radius: 12px; padding: 18px 22px;
+margin: 24px 0; font-size: 14px; line-height: 1.75;
+}
+.callout.info {
+background: rgba(124,106,247,0.1);
+border: 1px solid rgba(124,106,247,0.25);
+border-left: 3px solid var(--noe); color: var(--ink2);
+}
+.callout.warn {
+background: rgba(245,158,11,0.1);
+border: 1px solid rgba(245,158,11,0.25);
+border-left: 3px solid var(--amber); color: var(--ink2);
+}
+.callout.good {
+background: rgba(34,197,94,0.1);
+border: 1px solid rgba(34,197,94,0.25);
+border-left: 3px solid var(--g); color: var(--ink2);
+}
+.callout-label {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 2px; text-transform: uppercase;
+margin-bottom: 8px; font-weight: 500;
+}
+.callout.info .callout-label { color: var(--noe); }
+.callout.warn .callout-label { color: var(--amber); }
+.callout.good .callout-label { color: var(--g); }
+
+/* ── COST SECTION ── */
+.cost-block {
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: 20px; overflow: hidden; margin: 32px 0;
+}
+.cost-block-header {
+background: var(--surface2);
+border-bottom: 1px solid var(--border);
+padding: 16px 24px;
+display: flex; align-items: center; justify-content: space-between;
+}
+.cost-block-title {
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+.cost-block-note { font-size: 11px; color: var(--muted); opacity: 0.6; }
+
+/* INITIAL COST BARS */
+.init-cost-group { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.init-row { display: grid; grid-template-columns: 130px 1fr 80px; align-items: center; gap: 12px; }
+.init-label { font-size: 12px; font-weight: 500; }
+.init-label.noe-l { color: var(--noe); }
+.init-label.fl-l { color: var(--ink2); opacity: 0.7; }
+.bar-track { height: 8px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 99px; }
+.noe-bar { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+.fl-bar { background: rgba(255,255,255,0.2); }
+.init-val {
+font-family: ‘DM Mono’, monospace; font-size: 11px;
+color: var(--ink); text-align: right; white-space: nowrap;
+}
+
+.divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* 3-YEAR CHART */
+.year3-grid { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+.year3-group { }
+.year3-group-title {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 2px; text-transform: uppercase;
+color: var(--muted); margin-bottom: 10px;
+padding-bottom: 6px; border-bottom: 1px dashed var(--border);
+}
+
+.year3-row {
+display: grid; grid-template-columns: 160px 1fr 80px;
+align-items: center; gap: 12px; margin-bottom: 8px;
+}
+.year3-row:last-child { margin-bottom: 0; }
+
+.year3-label { font-size: 12px; }
+.year3-label.noe-l { color: var(--noe); font-weight: 600; }
+.year3-label.fl-maint { color: var(--ink2); opacity: 0.55; }
+.year3-label.fl-no { color: var(--ink2); opacity: 0.75; }
+
+.year3-val {
+font-family: ‘DM Mono’, monospace; font-size: 12px;
+text-align: right; white-space: nowrap;
+}
+.year3-val.noe-v { color: var(--teal); font-weight: 700; }
+.year3-val.fl-v { color: var(--ink2); }
+
+/* NOE bar stays short and green */
+.noe-bar3 { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+/* FL no-maint */
+.fl-no-bar { background: rgba(255,255,255,0.18); }
+/* FL with-maint */
+.fl-maint-bar { background: rgba(239,68,68,0.45); }
+
+/* SAVINGS BADGE */
+.savings-row {
+background: rgba(34,197,94,0.08);
+border: 1px solid rgba(34,197,94,0.2);
+border-radius: 10px; padding: 14px 18px;
+display: flex; align-items: center; justify-content: space-between;
+margin: 16px 24px;
+flex-wrap: wrap; gap: 8px;
+}
+.savings-label { font-size: 12px; color: var(--ink2); }
+.savings-val {
+font-family: ‘DM Mono’, monospace; font-size: 13px;
+font-weight: 700; color: var(--g);
+}
+
+/* STRENGTH CARDS */
+.strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0; }
+.strength-card {
+background: var(--surface); border: 1px solid var(--border);
+border-radius: 14px; padding: 20px 18px;
+position: relative; overflow: hidden;
+}
+.strength-card::before {
+content: ‘’; position: absolute; top: 0; left: 0; right: 0;
+height: 2px; background: linear-gradient(90deg, var(--noe), var(--teal));
+}
+.strength-icon { font-size: 22px; margin-bottom: 10px; }
+.strength-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.strength-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* PRICING BOX */
+.pricing-box {
+background: var(--surface2); border: 1px solid var(--border);
+border-radius: 16px; padding: 28px 24px; margin: 28px 0;
+}
+.pricing-box-title {
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+letter-spacing: 2px; text-transform: uppercase;
+color: var(--muted); margin-bottom: 20px;
+}
+.pricing-row {
+display: flex; justify-content: space-between; align-items: baseline;
+padding: 11px 0; border-bottom: 1px solid var(--border);
+}
+.pricing-row:last-child { border-bottom: none; }
+.pricing-item { font-size: 13px; color: var(--ink2); }
+.pricing-val { font-family: ‘DM Mono’, monospace; font-size: 14px; font-weight: 500; color: var(--ink); }
+.pricing-val.free { color: var(--teal); }
+.pricing-val.paid { color: var(--amber); }
+
+/* MINI BARS in article */
+.chart-embed {
+background: #0d0d18; border: 1px solid var(--border);
+border-radius: 16px; padding: 24px; margin: 28px 0;
+}
+.chart-embed-label {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 2px; text-transform: uppercase;
+color: rgba(255,255,255,0.3); margin-bottom: 18px;
+}
+.mini-bar-group { display: flex; flex-direction: column; gap: 14px; }
+.mini-bar-item { }
+.mini-bar-header {
+display: flex; justify-content: space-between;
+align-items: center; margin-bottom: 7px;
+}
+.mini-bar-label { font-size: 12px; color: rgba(255,255,255,0.65); }
+.mini-bar-result {
+font-family: ‘DM Mono’, monospace; font-size: 10px;
+padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+}
+.mini-bar-result.noe-win { background: rgba(124,106,247,0.15); color: var(--noe); }
+.mini-bar-result.fl-win { background: rgba(255,255,255,0.06); color: var(--muted); }
+.mini-bar-result.tie { background: rgba(245,158,11,0.12); color: var(--amber); }
+
+.mini-lines { display: flex; flex-direction: column; gap: 4px; }
+.mini-line { display: grid; grid-template-columns: 80px 1fr 100px; align-items: center; gap: 8px; }
+.mini-ent { font-family: ‘DM Mono’, monospace; font-size: 10px; text-align: right; white-space: nowrap; }
+.mini-ent.noe-e { color: var(--noe); }
+.mini-ent.fl-e { color: rgba(255,255,255,0.3); }
+.mini-track-s { height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; }
+.mini-fill-s { height: 100%; border-radius: 99px; }
+.nf { background: linear-gradient(90deg, var(--noe), var(--teal)); }
+.gf { background: var(--g); opacity: 0.25; }
+.rf { background: #ef4444; }
+.rf2 { background: #ef4444; opacity: 0.28; }
+.af { background: var(--amber); opacity: 0.6; }
+.af2 { background: var(--amber); opacity: 0.28; }
+.mini-val { font-family: ‘DM Mono’, monospace; font-size: 10px; white-space: nowrap; color: var(--ink2); }
+.mini-val.bright { color: var(--ink); }
+
+/* VERDICT */
+.verdict {
+background: var(--surface2); border: 1px solid var(--border);
+border-radius: 20px; padding: 36px 32px; margin: 40px 0;
+}
+.verdict-label {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 3px; text-transform: uppercase;
+color: var(--noe); margin-bottom: 14px;
+}
+.verdict h3 {
+font-family: ‘Shippori Mincho’, serif;
+font-size: clamp(17px, 2.5vw, 22px); font-weight: 600;
+color: var(--ink); margin: 0 0 14px; line-height: 1.4;
+}
+.verdict p { color: var(--ink2); font-size: 14px; line-height: 1.8; margin-bottom: 12px; }
+.verdict-choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.choose-box { border-radius: 12px; padding: 18px 16px; }
+.choose-box.noe { background: rgba(124,106,247,0.1); border: 1px solid rgba(124,106,247,0.25); }
+.choose-box.fl { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+.choose-title {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;
+}
+.choose-box.noe .choose-title { color: var(--noe); }
+.choose-box.fl .choose-title { color: var(--muted); }
+.choose-list { list-style: none; }
+.choose-list li {
+font-size: 12px; color: var(--ink2);
+padding: 4px 0; display: flex; align-items: flex-start;
+gap: 8px; line-height: 1.5;
+}
+.choose-list li::before { content: ‘—’; color: var(--muted); flex-shrink: 0; }
+.choose-box.noe .choose-list li::before { content: ‘✓’; color: var(--noe); }
+
+/* CTA */
+.cta { text-align: center; padding: 48px 24px; border-top: 1px solid var(--border); margin-top: 64px; }
+.cta-label {
+font-family: ‘DM Mono’, monospace; font-size: 9px;
+letter-spacing: 3px; text-transform: uppercase;
+color: var(--muted); margin-bottom: 12px;
+}
+.cta h3 {
+font-family: ‘Shippori Mincho’, serif; font-size: 22px;
+font-weight: 600; color: var(--ink); margin-bottom: 12px; margin-top: 0;
+}
+.cta p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+.cta-btn {
+display: inline-block; background: var(--noe); color: #fff;
+font-size: 13px; font-weight: 600; padding: 14px 32px;
+border-radius: 8px; text-decoration: none; letter-spacing: 0.3px;
+transition: opacity 0.2s;
+}
+.cta-btn:hover { opacity: 0.82; }
+
+.footnote {
+text-align: center; font-family: ‘DM Mono’, monospace;
+font-size: 9px; color: var(--muted); opacity: 0.4;
+letter-spacing: 0.5px; margin-top: 48px;
+padding-top: 24px; border-top: 1px solid var(--border);
+}
+
+@media (max-width: 600px) {
+.strength-grid, .verdict-choose { grid-template-columns: 1fr; }
+.init-row, .year3-row { grid-template-columns: 110px 1fr 70px; }
+.mini-line { grid-template-columns: 60px 1fr 80px; }
+.pricing-box { padding: 20px 16px; }
+.verdict { padding: 24px 18px; }
+}
+.references {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.references-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.references-list {
+  list-style: none;
+  counter-reset: ref;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.references-list li {
+  counter-increment: ref;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.references-list li::before {
+  content: '[' counter(ref) ']';
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--noe);
+  opacity: 0.7;
+  flex-shrink: 0;
+  min-width: 28px;
+}
+
+.references-list a {
+  color: var(--ink2);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255,255,255,0.15);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.references-list a:hover {
+  color: var(--noe);
+  border-bottom-color: var(--noe);
+}
+
+</style>
+
+</head>
+<body>
+
+<!-- HERO -->
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-series">Web制作会社選びシリーズ · vol.02</div>
+    <div class="hero-tag">📊 データで比較</div>
+    <h1>フリーランスと<em>Noe Shiftica</em>、<br>どちらを選ぶべきか？</h1>
+    <p class="hero-lead">「フリーランスの方が安い」は本当か。初期費用・3年トータルコスト・品質・アフターケアまで、ファクトベースで正直に比較します。</p>
+    <div class="hero-meta">
+      <span>2026.03</span><span>·</span>
+      <span>Noe Shiftica</span><span>·</span>
+      <span>約10分で読めます</span>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE -->
+
+<div class="article">
+
+  <!-- TOC -->
+
+  <div class="toc">
+    <div class="toc-title">目次</div>
+    <ol>
+      <li><a href="#intro">そもそも何が違うのか</a></li>
+      <li><a href="#init">初期費用だけで比べると</a></li>
+      <li><a href="#total">3年トータルコストで逆転する</a></li>
+      <li><a href="#data">9項目のデータ比較</a></li>
+      <li><a href="#tech">他のフリーランスにない技術構成</a></li>
+      <li><a href="#hearing">ヒアリングと制作プロセス</a></li>
+      <li><a href="#support">修正対応・アフターケア</a></li>
+      <li><a href="#verdict">結局どちらを選ぶべきか</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+
+  <div class="section" id="intro">
+    <div class="section-eyebrow">01 · はじめに</div>
+    <h2>そもそも何が違うのか</h2>
+    <p>「フリーランスに頼めば安くできる」。この認識は、初期費用だけを見れば正しいことがあります。しかし、Webサイトは公開後も維持費・修正費・保守費がかかり続けます。</p>
+    <p>この記事では初期費用と3年間のランニングコストを合算した<strong>トータルコスト</strong>で比較します。さらに品質・アフターケア・技術力まで含めて、フラットに整理します。</p>
+    <div class="callout info">
+      <div class="callout-label">この記事について</div>
+      フリーランスを否定する内容ではありません。スキルの高いフリーランスは実力者揃いです。ここでは「一般的なフリーランス」との比較をファクトベースで整理します。
+    </div>
+  </div>
+
+  <!-- 02 初期費用 -->
+
+  <div class="section" id="init">
+    <div class="section-eyebrow">02 · 初期費用</div>
+    <h2>初期費用だけで比べると</h2>
+    <p>まず初期制作費用の比較です。フリーランスは5〜20万円が一般的な相場で、Noe Shifticaの静的サイト15万円と近い価格帯です。</p>
+
+
+<div class="cost-block">
+  <div class="cost-block-header">
+    <span class="cost-block-title">初期制作費用 比較（静的サイト）</span>
+    <span class="cost-block-note">🔴 低いほど◎</span>
+  </div>
+  <div class="init-cost-group">
+    <div class="init-row">
+      <span class="init-label noe-l">Noe Shiftica</span>
+      <div class="bar-track"><div class="bar-fill noe-bar" style="width:75%"></div></div>
+      <span class="init-val">15万円〜</span>
+    </div>
+    <div class="divider"></div>
+    <div class="init-row">
+      <span class="init-label fl-l">フリーランス 5万</span>
+      <div class="bar-track"><div class="bar-fill fl-bar" style="width:25%"></div></div>
+      <span class="init-val">5万円</span>
+    </div>
+    <div class="init-row">
+      <span class="init-label fl-l">フリーランス 10万</span>
+      <div class="bar-track"><div class="bar-fill fl-bar" style="width:50%"></div></div>
+      <span class="init-val">10万円</span>
+    </div>
+    <div class="init-row">
+      <span class="init-label fl-l">フリーランス 15万</span>
+      <div class="bar-track"><div class="bar-fill fl-bar" style="width:75%"></div></div>
+      <span class="init-val">15万円</span>
+    </div>
+  </div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-label">正直に言うと</div>
+  初期費用だけを見れば、フリーランスの5〜10万円はNoe Shifticaより安いです。しかしこれは「制作費用だけ」の話。公開後のコストを加えると、話は変わります。
+</div>
+
+
+  </div>
+
+  <!-- 03 3年トータル -->
+
+  <div class="section" id="total">
+    <div class="section-eyebrow">03 · トータルコスト</div>
+    <h2>3年トータルコストで逆転する</h2>
+    <p>フリーランスに依頼した場合、<strong>保守なし</strong>でもサーバー・ドメイン代として月平均7,500円、<strong>保守あり</strong>では月平均2万円が追加でかかります。Noe Shifticaは月額ランニングコストがほぼゼロです。</p>
+
+
+<div class="cost-block">
+  <div class="cost-block-header">
+    <span class="cost-block-title">3年トータルコスト比較（初期費用 + ランニング36ヶ月）</span>
+    <span class="cost-block-note">🔴 低いほど◎</span>
+  </div>
+
+  <div class="year3-grid">
+
+    <!-- NOE -->
+    <div class="year3-group">
+      <div class="year3-group-title">Noe Shiftica</div>
+      <div class="year3-row">
+        <span class="year3-label noe-l">Noe Shiftica</span>
+        <div class="bar-track"><div class="bar-fill noe-bar3" style="width:17%"></div></div>
+        <span class="year3-val noe-v">15万円</span>
+      </div>
+    </div>
+
+    <!-- FL 5万 -->
+    <div class="year3-group">
+      <div class="year3-group-title">フリーランス 初期5万円</div>
+      <div class="year3-row">
+        <span class="year3-label fl-no">保守なし</span>
+        <div class="bar-track"><div class="bar-fill fl-no-bar" style="width:37%"></div></div>
+        <span class="year3-val fl-v">約32万円</span>
+      </div>
+      <div class="year3-row">
+        <span class="year3-label fl-maint">保守あり</span>
+        <div class="bar-track"><div class="bar-fill fl-maint-bar" style="width:88%"></div></div>
+        <span class="year3-val fl-v">約77万円</span>
+      </div>
+    </div>
+
+    <!-- FL 10万 -->
+    <div class="year3-group">
+      <div class="year3-group-title">フリーランス 初期10万円</div>
+      <div class="year3-row">
+        <span class="year3-label fl-no">保守なし</span>
+        <div class="bar-track"><div class="bar-fill fl-no-bar" style="width:42%"></div></div>
+        <span class="year3-val fl-v">約37万円</span>
+      </div>
+      <div class="year3-row">
+        <span class="year3-label fl-maint">保守あり</span>
+        <div class="bar-track"><div class="bar-fill fl-maint-bar" style="width:94%"></div></div>
+        <span class="year3-val fl-v">約82万円</span>
+      </div>
+    </div>
+
+    <!-- FL 15万 -->
+    <div class="year3-group">
+      <div class="year3-group-title">フリーランス 初期15万円</div>
+      <div class="year3-row">
+        <span class="year3-label fl-no">保守なし</span>
+        <div class="bar-track"><div class="bar-fill fl-no-bar" style="width:48%"></div></div>
+        <span class="year3-val fl-v">約42万円</span>
+      </div>
+      <div class="year3-row">
+        <span class="year3-label fl-maint">保守あり</span>
+        <div class="bar-track"><div class="bar-fill fl-maint-bar" style="width:100%"></div></div>
+        <span class="year3-val fl-v">約87万円</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="savings-row">
+    <span class="savings-label">最大差額（FL 15万・保守あり vs Noe Shiftica）</span>
+    <span class="savings-val">▲ 72万円の節約</span>
+  </div>
+</div>
+
+<div class="callout good">
+  <div class="callout-label">計算の前提</div>
+  フリーランス保守なし：月平均7,500円（サーバー・ドメイン・SSL）<br>
+  フリーランス保守あり：月平均2万円（上記 + フリーランスへの保守委託）<br>
+  Noe Shiftica：Firebase・Cloudflare・Neon構成により月額ほぼ0円
+</div>
+
+<p>初期費用でNoe Shifticaより安く見えたとしても、<strong>保守ありで3年運用すると最大5.8倍のコスト差</strong>が生まれます。Webサイトを長く・しっかり使うなら、トータルで考えることが重要です。</p>
+
+
+  </div>
+
+  <!-- 04 9項目比較 -->
+
+  <div class="section" id="data">
+    <div class="section-eyebrow">04 · データ比較</div>
+    <h2>9項目のデータ比較</h2>
+    <p>コスト以外の9項目も正直に比較します。🟡はフリーランスと拮抗している項目です。</p>
+
+
+<div class="chart-embed">
+  <div class="chart-embed-label">Noe Shiftica vs フリーランス · 9項目比較</div>
+  <div class="mini-bar-group">
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🔴 制作コスト（低いほど◎）</span>
+        <span class="mini-bar-result tie">🟡 拮抗〜FL優位</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s af" style="width:75%"></div></div>
+          <span class="mini-val bright">15万〜</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s af2" style="width:35%"></div></div>
+          <span class="mini-val">5〜20万</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🔴 月額・インフラコスト（低いほど◎）</span>
+        <span class="mini-bar-result noe-win">Noe 圧勝</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s rf" style="width:2%"></div></div>
+          <span class="mini-val bright">≒ ¥0</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s rf2" style="width:48%"></div></div>
+          <span class="mini-val">5千〜2万/月</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🔴 納品までの期間（低いほど◎）</span>
+        <span class="mini-bar-result tie">🟡 拮抗</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s af" style="width:30%"></div></div>
+          <span class="mini-val bright">短縮可</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s af2" style="width:38%"></div></div>
+          <span class="mini-val">数日〜1ヶ月</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🟢 品質（デザイン・SEO・パフォーマンス）</span>
+        <span class="mini-bar-result noe-win">Noe 優位</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s nf" style="width:83%"></div></div>
+          <span class="mini-val bright">均一・高品質</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s gf" style="width:52%"></div></div>
+          <span class="mini-val">スキル次第</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🟢 バグ再発防止力</span>
+        <span class="mini-bar-result noe-win">Noe 優位</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s nf" style="width:88%"></div></div>
+          <span class="mini-val bright">AI自動蓄積</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s gf" style="width:38%"></div></div>
+          <span class="mini-val">個人管理・引き継ぎ困難</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🔴 バグ・セキュリティリスク（低いほど◎）</span>
+        <span class="mini-bar-result tie">🟡 拮抗</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s rf" style="width:12%"></div></div>
+          <span class="mini-val bright">低い</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s rf2" style="width:18%"></div></div>
+          <span class="mini-val">低い〜やや高</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🟢 アフターケア・継続サポート</span>
+        <span class="mini-bar-result noe-win">Noe 優位</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s nf" style="width:85%"></div></div>
+          <span class="mini-val bright">蓄積ベースで継続対応</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s gf" style="width:33%"></div></div>
+          <span class="mini-val">連絡途絶リスクあり</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🟢 人的リソース効率</span>
+        <span class="mini-bar-result tie">🟡 拮抗</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s nf" style="width:90%"></div></div>
+          <span class="mini-val bright">1人 ＋ AI</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s gf" style="width:82%"></div></div>
+          <span class="mini-val">1人</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-bar-item">
+      <div class="mini-bar-header">
+        <span class="mini-bar-label">🟢 スタック柔軟性・拡張性</span>
+        <span class="mini-bar-result noe-win">Noe 優位</span>
+      </div>
+      <div class="mini-lines">
+        <div class="mini-line">
+          <span class="mini-ent noe-e">Noe</span>
+          <div class="mini-track-s"><div class="mini-fill-s nf" style="width:88%"></div></div>
+          <span class="mini-val bright">モダン・拡張自由</span>
+        </div>
+        <div class="mini-line">
+          <span class="mini-ent fl-e">フリーランス</span>
+          <div class="mini-track-s"><div class="mini-fill-s gf" style="width:50%"></div></div>
+          <span class="mini-val">スキルに依存</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  </div>
+
+  <!-- 05 技術 -->
+
+  <div class="section" id="tech">
+    <div class="section-eyebrow">05 · 技術構成</div>
+    <h2>他のフリーランスにない技術構成</h2>
+    <p>Noe Shifticaが使用するのはNext.js・PayloadCMS・Neon・Firebaseという<strong>2026年現在の最新スタック</strong>です。多くのフリーランスが依然WordPressベースで制作している中、これは明確な差別化です。</p>
+
+
+<div class="strength-grid">
+  <div class="strength-card">
+    <div class="strength-icon">⚡</div>
+    <div class="strength-title">圧倒的な表示速度</div>
+    <div class="strength-desc">Next.js SSG/ISR + Cloudflare CDNにより、Core Web VitalsスコアでWPベースのサイトを大幅に上回ります。</div>
+  </div>
+  <div class="strength-card">
+    <div class="strength-icon">🔍</div>
+    <div class="strength-title">SEOに特化した設計</div>
+    <div class="strength-desc">プラグイン不要。メタデータ・構造化データ・OGPを設計段階から組み込むため、SEO対応が後付けになりません。</div>
+  </div>
+  <div class="strength-card">
+    <div class="strength-icon">🛡️</div>
+    <div class="strength-title">プラグイン脆弱性ゼロ</div>
+    <div class="strength-desc">WPのプラグイン管理が不要なため、セキュリティリスクの大半を構造的に排除できます。</div>
+  </div>
+  <div class="strength-card">
+    <div class="strength-icon">🧠</div>
+    <div class="strength-title">AIによるバグ記録・再発防止</div>
+    <div class="strength-desc">発生したバグはすべてAIが記録・蓄積。同じトラブルは2度と繰り返しません。</div>
+  </div>
+</div>
+
+
+  </div>
+
+  <!-- 06 ヒアリング -->
+
+  <div class="section" id="hearing">
+    <div class="section-eyebrow">06 · ヒアリング</div>
+    <h2>ヒアリングと制作プロセス</h2>
+    <p>多くのフリーランスは「要件を聞いて作る」フローです。Noe Shifticaでは<strong>制作と並行してクライアントとの対話を続ける</strong>プロセスを採用しています。</p>
+    <p>ターゲット・競合・ブランドの方向性・更新頻度・将来の拡張計画——これらを初回だけでなく、制作の各フェーズで確認しながら進めます。「完成してみたらイメージと違った」というよくあるトラブルを構造的に防ぎます。</p>
+    <div class="callout good">
+      <div class="callout-label">ヒアリングで確認すること</div>
+      サイトの目的・ターゲット層 / 競合サイトの参考例 / ブランドカラー・トーン / 公開後の更新頻度 / 将来的な機能追加の予定 / SEOで狙うキーワード など
+    </div>
+  </div>
+
+  <!-- 07 サポート -->
+
+  <div class="section" id="support">
+    <div class="section-eyebrow">07 · アフターケア</div>
+    <h2>修正対応・アフターケア</h2>
+    <p>フリーランスへの依頼で最も多いトラブルのひとつが<strong>公開後の連絡途絶</strong>です。個人である以上、転職・多忙といった理由で対応が途切れるリスクは構造的に存在します。</p>
+
+
+<div class="pricing-box">
+  <div class="pricing-box-title">Noe Shiftica · 修正・サポート料金</div>
+  <div class="pricing-row">
+    <span class="pricing-item">公開後の修正（1〜2回目）</span>
+    <span class="pricing-val free">無料</span>
+  </div>
+  <div class="pricing-row">
+    <span class="pricing-item">公開後の修正（3回目以降）</span>
+    <span class="pricing-val paid">1回 ¥6,000</span>
+  </div>
+  <div class="pricing-row">
+    <span class="pricing-item">既知バグの再発対応</span>
+    <span class="pricing-val free">無料</span>
+  </div>
+  <div class="pricing-row">
+    <span class="pricing-item">月額ランニングコスト</span>
+    <span class="pricing-val free">≒ ¥0</span>
+  </div>
+</div>
+
+<p>また発生したバグはすべてAIが記録・蓄積されるため、<strong>同じトラブルは2度と繰り返しません</strong>。</p>
+
+
+  </div>
+
+  <!-- 08 VERDICT -->
+
+  <div class="section" id="verdict">
+    <div class="section-eyebrow">08 · 結論</div>
+    <h2>結局どちらを選ぶべきか</h2>
+    <p>正直に言います。すべての案件でNoe Shifticaが最適とは言いません。予算が極めて限られていて、シンプルなサイト1枚だけあればいいケースなら、フリーランスが合う場合もあります。</p>
+    <p>ただし<strong>長く使うサイト・集客に使うサイト・将来拡張する予定のあるサイト</strong>であれば、トータルコストと品質・安心感でNoe Shifticaが上回ります。</p>
+
+
+<div class="verdict">
+  <div class="verdict-label">判断基準まとめ</div>
+  <h3>どちらを選ぶかは「何を重視するか」で決まる</h3>
+  <p>初期費用の安さだけを見るならフリーランスに優位性があります。ただしトータルコスト・品質の均一性・アフターケアの安心感を総合すると、Noe Shifticaは長期的に合理的な選択です。</p>
+  <div class="verdict-choose">
+    <div class="choose-box noe">
+      <div class="choose-title">Noe Shifticaが向いている</div>
+      <ul class="choose-list">
+				<li>質の高いオリジナルのWebサイトを作りたい</li>
+				<li>トータルコストで賢く投資したい</li>
+        <li>最新技術でSEO・速度を本気で重視したい</li>
+				<li>長期的に使うサイトを作りたい</li>
+        <li>公開後のサポートの安心感が欲しい</li>
+      </ul>
+    </div>
+    <div class="choose-box fl">
+      <div class="choose-title">フリーランスが向いている</div>
+      <ul class="choose-list">
+        <li>初期費用をとにかく抑えたい</li>
+        <li>シンプルな1枚サイトで十分</li>
+        <li>信頼できる知人のエンジニアがいる</li>
+        <li>短期間だけ使えればいい</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  
+
+  
+  <div class="references">
+  <div class="references-title">参考文献</div>
+  <ol class="references-list">
+    <li>Web幹事「<a href="https://web-kanji.com/posts/homepage-market-price" target="_blank" rel="noopener">ホームページ制作の料金相場【2026年最新版】</a>」</li>
+    <li>あきばれホームページ「<a href="https://www.akibare-hp.jp/base/costavg/" target="_blank" rel="noopener">ホームページ作成費用の相場と失敗しない選び方【2026年最新版】</a>」</li>
+    <li>ペライチ大学「<a href="https://peraichi.com/univ/freelance-marketprice" target="_blank" rel="noopener">ホームページ制作をフリーランスに依頼する費用と相場【2025年版】</a>」</li>
+    <li>LISKUL「<a href="https://liskul.com/home-page-market-price-26706" target="_blank" rel="noopener">ホームページ制作の相場と損しない３つのポイント</a>」</li>
+    <li>ferret One「<a href="https://ferret-one.com/blog/home-page-cost" target="_blank" rel="noopener">ホームページ作成費用の相場は？依頼先別・規模別</a>」</li>
+    <li>Web制作の教科書「<a href="https://csplan.jp/media/homepage-freelance/" target="_blank" rel="noopener">ホームページ制作をフリーランス（個人）に依頼するときの費用を解説</a>」</li>
+    <li>NT CREATION「<a href="https://ntcreation-web.com/column/2355/" target="_blank" rel="noopener">WordPressホームページ制作の費用相場【2026年版】</a>」</li>
+    <li>DigitalCube LabWorks「<a href="https://labworks.digitalcube.jp/column/wp-maintenance-cost/" target="_blank" rel="noopener">WordPress保守の費用相場</a>」</li>
+    <li>クラウドワークス調査（2025年9月）フリーランスのホームページ制作案件相場</li>
+  </ol>
+</div>
+
+</div>
+</body>
+</html>
