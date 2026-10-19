@@ -1,18 +1,20 @@
 import React from "react"
 import { Post } from "@/payload-types"
-import { RichText, JSXConvertersFunction, HeadingJSXConverter } from "@payloadcms/richtext-lexical/react"
+import { RichText, JSXConvertersFunction } from "@payloadcms/richtext-lexical/react"
 import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { withOriginalImageLink } from "@/plugins/originalImageLink/converter"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
-import { ArticleCustomAssets } from "./ArticleCustomAssets"
-import { ArticleToc, tocEntries } from "./ArticleToc"
-import { ArticleTocSidebar } from "./ArticleTocSidebar"
-import { HeadingAnchorBehavior } from "./HeadingAnchorBehavior"
-import { TwitterEmbedLoader } from "./TwitterEmbedLoader"
-import { extractHeadings } from "@/lib/articleHeadings"
+import { ArticleCustomAssets } from "@/plugins/customAssets/ArticleCustomAssets"
+import { ArticleToc, tocEntries } from "@/plugins/articleToc/ArticleToc"
+import { ArticleTocSidebar } from "@/plugins/articleToc/ArticleTocSidebar"
+import { HeadingAnchorBehavior } from "@/plugins/articleToc/HeadingAnchorBehavior"
+import { headingWithAnchor } from "@/plugins/articleToc/headingConverter"
+import { extractHeadings } from "@/plugins/articleToc/headings"
+import { TwitterEmbedLoader } from "@/plugins/twitterEmbed/TwitterEmbedLoader"
+import { hasTwitterEmbed } from "@/plugins/twitterEmbed/hasTwitterEmbed"
 import { toInternalHref } from "@/lib/articleLinks"
 import styles from './PostArticle.module.css'
 import Prism from "prismjs"
@@ -109,31 +111,6 @@ const extractSvgDefs = (content: unknown): string[] => {
     }
     walk((content as any)?.root)
     return defs
-}
-
-// True when a raw-HTML block holds an X (Twitter) embed, so widgets.js is only
-// loaded on articles that actually need it.
-type EmbedScanNode = {
-    type?: string
-    fields?: { blockType?: string; renderAsHtml?: boolean; code?: unknown }
-    children?: EmbedScanNode[]
-}
-
-const hasTwitterEmbed = (content: unknown): boolean => {
-    const walk = (node: EmbedScanNode | undefined): boolean => {
-        if (!node) return false
-        if (
-            node.type === 'block' &&
-            node.fields?.blockType === 'code-block' &&
-            node.fields?.renderAsHtml &&
-            typeof node.fields.code === 'string' &&
-            /class=["'][^"']*\btwitter-tweet\b/.test(node.fields.code)
-        ) {
-            return true
-        }
-        return Array.isArray(node.children) && node.children.some(walk)
-    }
-    return walk((content as { root?: EmbedScanNode } | null)?.root)
 }
 
 // Payload renders body links as plain <a>, so links to other articles reloaded the whole
@@ -260,33 +237,11 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     },
 })
 
-const LinkIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-    </svg>
-)
-
-// The body renders twice (mobile + desktop). Only the first tree carries a real
-// `id`, so fragment IDs stay unique; HeadingAnchorBehavior scrolls to whichever
-// copy is visible via data-heading-id.
-const withHeadingAnchors = (idByNode: WeakMap<object, string>, withIds: boolean): JSXConvertersFunction => (args) => {
-    const heading: NonNullable<typeof HeadingJSXConverter.heading> = ({ node, nodesToJSX }) => {
-        const Tag = node.tag
-        const children = nodesToJSX({ nodes: node.children })
-        const id = idByNode.get(node)
-        if (!id) return <Tag>{children}</Tag>
-        return (
-            <Tag id={withIds ? id : undefined} data-heading-id={id} className={styles.anchoredHeading}>
-                {children}
-                <a href={`#${id}`} className={styles.headingLink} aria-label="この見出しへのリンク">
-                    <LinkIcon />
-                </a>
-            </Tag>
-        )
-    }
-    return { ...customConverters(args), heading }
-}
+// Article body converters plus heading anchors (articleToc plugin).
+const withHeadingAnchors = (idByNode: WeakMap<object, string>, withIds: boolean): JSXConvertersFunction => (args) => ({
+    ...customConverters(args),
+    heading: headingWithAnchor(idByNode, withIds),
+})
 
 export const PostArticle: React.FC<{
     post: Post

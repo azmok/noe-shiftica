@@ -323,6 +323,10 @@ export interface Post {
     | null;
   htmlEmbed?: (number | null) | HtmlFile;
   /**
+   * 記事公開時にHero Imageから自動生成されます。
+   */
+  ogImage?: string | null;
+  /**
    * この記事のレンダリング結果全体に適用されるCSS。記事ルートの範囲だけに自動スコープされ、他の記事やサイト共通UIには漏れません。
    */
   customCss?: string | null;
@@ -330,10 +334,6 @@ export interface Post {
    * この記事のページに読み込まれるJS。記事内だけに存在するクラス名/IDを対象にしてください。
    */
   customJs?: string | null;
-  /**
-   * 記事公開時にHero Imageから自動生成されます。
-   */
-  ogImage?: string | null;
   /**
    * 過去に使用されていたスラッグの履歴です（自動記録）。
    */
@@ -427,6 +427,14 @@ export interface TechPost {
    * 記事公開時にHero Imageから自動生成されます。
    */
   ogImage?: string | null;
+  /**
+   * この記事のレンダリング結果全体に適用されるCSS。記事ルートの範囲だけに自動スコープされ、他の記事やサイト共通UIには漏れません。
+   */
+  customCss?: string | null;
+  /**
+   * この記事のページに読み込まれるJS。記事内だけに存在するクラス名/IDを対象にしてください。
+   */
+  customJs?: string | null;
   /**
    * 過去に使用されていたスラッグの履歴です（自動記録）。
    */
@@ -924,9 +932,9 @@ export interface PostsSelect<T extends boolean = true> {
   heroImage?: T;
   customMetaData?: T;
   htmlEmbed?: T;
+  ogImage?: T;
   customCss?: T;
   customJs?: T;
-  ogImage?: T;
   slugHistory?:
     | T
     | {
@@ -954,6 +962,8 @@ export interface TechPostsSelect<T extends boolean = true> {
   customMetaData?: T;
   htmlEmbed?: T;
   ogImage?: T;
+  customCss?: T;
+  customJs?: T;
   slugHistory?:
     | T
     | {

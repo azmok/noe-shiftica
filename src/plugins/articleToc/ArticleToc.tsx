@@ -1,5 +1,5 @@
 import React from "react"
-import type { ArticleHeading } from "@/lib/articleHeadings"
+import type { ArticleHeading } from "./headings"
 
 const MIN_ENTRIES = 2
 

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import type { ArticleHeading } from "@/lib/articleHeadings"
+import type { ArticleHeading } from "./headings"
 
 // A heading counts as "being read" once its top passes this line (px from the viewport top).
 const ACTIVE_LINE = 120
