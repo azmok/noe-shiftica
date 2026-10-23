@@ -347,6 +347,12 @@ export const ApiEndpointGuide: React.FC = () => {
                     </td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>heroImage</td>
+                    <td style={{ padding: '6px 8px' }}>string | number</td>
+                    <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>
+                    <td style={{ padding: '6px 8px' }}>Hero 画像。<code>images</code> で送ったファイル名、既存 Media のファイル名、または Media ID。本文に無い画像でもよい</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>categories</td>
                     <td style={{ padding: '6px 8px' }}>array</td>
                     <td style={{ padding: '6px 8px', opacity: 0.6 }}>任意</td>

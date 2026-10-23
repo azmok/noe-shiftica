@@ -11,7 +11,9 @@
  *
  * 下書き作成（同じ slug があれば下書きとして上書き更新）:
  *   node scripts/publish-article.mjs draft <article.md> \
- *     [--collection tech-posts] [--images <dir>] [--categories "22,ナレッジ"] [--tags "a,b"] [--dry-run]
+ *     [--collection tech-posts] [--images <dir>] [--categories "22,ナレッジ"] [--tags "a,b"]
+ *     [--hero <画像ファイル | media ID>] [--dry-run]
+ *   --hero: Hero 画像。ファイル名は記事フォルダ（--images）からの相対で、本文に無い画像でもよい
  *
  * 公開（最新の下書きをそのまま公開）:
  *   node scripts/publish-article.mjs publish <slug> [--collection tech-posts]
@@ -82,6 +84,20 @@ async function draft(mdPath, opts) {
     return { filename: path.basename(src), data: fs.readFileSync(file).toString('base64') }
   })
 
+  // --hero はファイル名か media ID。ファイルなら（本文で参照済みでなければ）images に足して送る
+  let heroImage
+  if (opts.hero) {
+    if (/^\d+$/.test(opts.hero)) heroImage = Number(opts.hero)
+    else {
+      const file = path.join(dir, opts.hero)
+      if (!fs.existsSync(file)) throw new Error(`Hero 画像が見つかりません: ${file}`)
+      heroImage = path.basename(opts.hero)
+      if (!images.some((i) => i.filename === heroImage)) {
+        images.push({ filename: heroImage, data: fs.readFileSync(file).toString('base64') })
+      }
+    }
+  }
+
   const body = {
     collection: opts.collection,
     markdown,
@@ -89,6 +105,7 @@ async function draft(mdPath, opts) {
     status: 'draft',
     ...(opts.categories ? { categories: list(opts.categories) } : {}),
     ...(opts.tags ? { tags: list(opts.tags) } : {}),
+    ...(heroImage !== undefined ? { heroImage } : {}),
   }
 
   if (opts.dryRun) {
@@ -100,6 +117,7 @@ async function draft(mdPath, opts) {
           images: images.map((i) => `${i.filename} (${Math.round((i.data.length * 3) / 4 / 1024)} KB)`),
           categories: body.categories,
           tags: body.tags,
+          heroImage: body.heroImage,
         },
         null,
         2,
@@ -110,6 +128,7 @@ async function draft(mdPath, opts) {
 
   const res = await send(body)
   console.log(`${res.operation === 'create' ? '下書きを作成' : '下書きを更新'}しました: ${res.slug}`)
+  if (res.heroImageId !== undefined) console.log(`  Hero 画像: media #${res.heroImageId}`)
   console.log(`  管理画面: ${BASE}${res.adminUrl}`)
   console.log(`  公開URL（公開後）: ${BASE}${res.url}`)
 }
