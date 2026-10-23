@@ -3,7 +3,7 @@
 AI（外部AI連携の API キー）から記事を投稿・公開・削除するための API と、その呼び出しログをまとめたプラグイン。
 
 ## 登録するもの
-- **`POST /api/ai/posts`**（`endpoints/posts.ts`）: 記事フォルダの `.md` と画像（base64）から記事を作成・更新する。`{ slug, collection, status: "published" }` だけ送ると最新の下書きをそのまま公開する。
+- **`POST /api/ai/posts`**（`endpoints/posts.ts`）: 記事フォルダの `.md` と画像（base64）から記事を作成・更新する。`{ slug, collection, status: "published" }` だけ送ると最新の下書きをそのまま公開する。`heroImage`（ファイル名 or media ID）で Hero 画像も設定できる（posts / tech-posts 共通）。
 - **`DELETE /api/ai/posts?id=` / `?slug=`**: 記事を削除する。
 - **`api-logs` コレクション**（`collection.ts`）: 上記の呼び出し結果を記録する。一覧の上部に API ガイド（`components/ApiEndpointGuide.tsx`）を出す。
 

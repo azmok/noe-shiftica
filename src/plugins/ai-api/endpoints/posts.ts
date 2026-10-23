@@ -21,6 +21,8 @@ import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } f
  *   - images              [{ filename, data(base64), alt? }]。本文の `![alt](./filename)` を
  *                         media にアップロードして画像ブロックとして埋め込む。同名の media が
  *                         既にあれば再利用するので、更新時に送り直しても重複しない
+ *   - heroImage           Hero 画像。`images` で送ったファイル名、既存 media の
+ *                         ファイル名、または media ID。本文に無い画像でもよい
  *   - categories          [ID or カテゴリ名, ...]（旧 `category` 単数も可）
  *   - 本文のリンクはすべて「新しいタブで開く」（target="_blank"）で保存する
  *   - status              "draft"（既定）/ "published"
@@ -197,6 +199,27 @@ async function resolveImages(
   return { mediaIds }
 }
 
+/**
+ * Hero 画像の指定（media ID、またはファイル名）を media ID にする。ファイル名は本文の画像と同じ
+ * 規則で、送られた `images` のアップロード／同名 media の再利用を行う
+ */
+async function resolveHeroImage(
+  payload: Payload,
+  user: TypedUser,
+  input: unknown,
+  inputs: ImageInput[],
+  alt: string,
+): Promise<{ id: number | string } | { error: string; status: number }> {
+  if (typeof input === 'number' || (typeof input === 'string' && /^\d+$/.test(input.trim()))) {
+    return { id: Number(input) }
+  }
+  if (typeof input !== 'string' || !input.trim()) {
+    return { error: '"heroImage" must be a media ID or an image filename', status: 400 }
+  }
+  const result = await resolveImages(payload, user, [{ src: input.trim(), alt }], inputs)
+  return 'error' in result ? result : { id: result.mediaIds[0] }
+}
+
 /** カテゴリ指定（ID または名前）を ID の配列にする。見つからない名前はエラー */
 async function resolveCategories(
   payload: Payload,
@@ -367,6 +390,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
     category,
     categories,
     tags,
+    heroImage,
     customCss,
     customJs,
   } = body
@@ -402,6 +426,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
     hasMarkdown: Boolean(markdown),
     markdownLength: markdown?.length ?? 0,
     images: images.map((img) => (typeof img?.filename === 'string' ? img.filename : '?')),
+    ...(heroImage !== undefined ? { heroImage } : {}),
   })
 
   // 2. Validate input
@@ -490,6 +515,26 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
       return Response.json({ error: imageResult.error }, { status: imageResult.status })
     }
 
+    // 6b. Hero image (posts and tech-posts both have it via the shared blog fields)
+    let heroImageId: number | string | undefined
+    if (heroImage !== undefined && heroImage !== null && heroImage !== '') {
+      const heroResult = await resolveHeroImage(payload, user, heroImage, images, title)
+      if ('error' in heroResult) {
+        await recordApiLog(payload, user, {
+          action: 'post',
+          status: 'error',
+          responseStatus: heroResult.status,
+          postTitle: title,
+          postSlug: slug,
+          clientIp,
+          requestSummary: summary,
+          errorMessage: heroResult.error,
+        })
+        return Response.json({ error: heroResult.error }, { status: heroResult.status })
+      }
+      heroImageId = heroResult.id
+    }
+
     // 7. Parse Markdown into Lexical AST and embed the uploaded images
     // Payload のルートエンドポイントは管理画面と同じ lexical を使うので、変換を直接呼べる
     // （旧 Next.js ルートでは lexical が二重に読み込まれ、Lexical error #290 で落ちていた）
@@ -535,6 +580,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
       ...(finalDescription ? { description: finalDescription } : {}),
       ...(categoryIds.length ? { categories: categoryIds } : {}),
       ...(customMetaData ? { customMetaData } : {}),
+      ...(heroImageId !== undefined ? { heroImage: heroImageId } : {}),
       ...(customCss ? { customCss } : {}),
       ...(customJs ? { customJs } : {}),
     }
@@ -582,6 +628,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
         url: publicUrl,
         adminUrl: `/admin/collections/${targetCollection}/${docId}`,
         mediaIds: imageResult.mediaIds,
+        ...(heroImageId !== undefined ? { heroImageId } : {}),
       },
       { status: operation === 'create' ? 201 : 200 },
     )

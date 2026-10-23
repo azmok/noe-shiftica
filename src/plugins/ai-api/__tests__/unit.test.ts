@@ -316,6 +316,58 @@ describe('POST /api/ai/posts — article folder flow', () => {
   })
 })
 
+describe('POST /api/ai/posts — hero image', () => {
+  const blogPerms: Perms = { ...fullPerms, posts: { read: true, create: true, update: true, publish: true } }
+  const createdBlogPost = () => mockPayload.create.mock.calls.find(([a]) => a.collection === 'posts')?.[0]
+  const plain = '---\ntitle: "T"\nslug: "t"\n---\n\n本文'
+
+  beforeEach(() => {
+    mockPayload.auth.mockResolvedValue({ user: apiClient(blogPerms) })
+  })
+
+  it('uploads a hero image sent in "images" even when the body does not reference it', async () => {
+    const res = await post({
+      collection: 'posts',
+      markdown: plain,
+      images: [{ filename: 'hero.png', data: tinyPng }],
+      heroImage: 'hero.png',
+    })
+    expect(res.status).toBe(201)
+    expect((await res.json()).heroImageId).toBe(101)
+    const mediaCreate = mockPayload.create.mock.calls.find(([a]) => a.collection === 'media')![0]
+    expect(mediaCreate).toMatchObject({ data: { alt: 'T' }, file: { name: 'hero.png' }, overrideAccess: false })
+    expect(createdBlogPost()!.data.heroImage).toBe(101)
+  })
+
+  it('reuses an existing media by filename and accepts a media ID', async () => {
+    await post({ collection: 'posts', markdown: plain, heroImage: '02_existing.png' })
+    expect(createdBlogPost()!.data.heroImage).toBe(202)
+    expect(mockPayload.create.mock.calls.filter(([a]) => a.collection === 'media')).toHaveLength(0)
+
+    vi.clearAllMocks()
+    mockPayload.auth.mockResolvedValue({ user: apiClient(blogPerms) })
+    await post({ collection: 'posts', markdown: plain, heroImage: '303' })
+    expect(createdBlogPost()!.data.heroImage).toBe(303)
+  })
+
+  it('leaves heroImage untouched when it is not sent', async () => {
+    await post({ collection: 'posts', markdown: plain })
+    expect(createdBlogPost()!.data).not.toHaveProperty('heroImage')
+  })
+
+  it('rejects a hero filename that was not sent and does not exist', async () => {
+    const res = await post({ collection: 'posts', markdown: plain, heroImage: 'missing.png' })
+    expect(res.status).toBe(400)
+    expect(lastLog()).toMatchObject({ status: 'error' })
+  })
+
+  it('sets the hero image on tech-posts as well', async () => {
+    const res = await post({ collection: 'tech-posts', markdown: plain, heroImage: 303 })
+    expect(res.status).toBe(201)
+    expect(createdPost()!.data.heroImage).toBe(303)
+  })
+})
+
 describe('POST /api/ai/posts — publish an existing draft', () => {
   const draft = { id: 55, title: '記事タイトル', slug: 'the-article', content: { root: {} }, _status: 'draft' }
 
