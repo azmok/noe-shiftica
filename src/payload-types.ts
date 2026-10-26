@@ -335,6 +335,10 @@ export interface Post {
    */
   customJs?: string | null;
   /**
+   * 記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
+   */
+  revisedAt?: string | null;
+  /**
    * 過去に使用されていたスラッグの履歴です（自動記録）。
    */
   slugHistory?:
@@ -435,6 +439,10 @@ export interface TechPost {
    * この記事のページに読み込まれるJS。記事内だけに存在するクラス名/IDを対象にしてください。
    */
   customJs?: string | null;
+  /**
+   * 記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
+   */
+  revisedAt?: string | null;
   /**
    * 過去に使用されていたスラッグの履歴です（自動記録）。
    */
@@ -935,6 +943,7 @@ export interface PostsSelect<T extends boolean = true> {
   ogImage?: T;
   customCss?: T;
   customJs?: T;
+  revisedAt?: T;
   slugHistory?:
     | T
     | {
@@ -964,6 +973,7 @@ export interface TechPostsSelect<T extends boolean = true> {
   ogImage?: T;
   customCss?: T;
   customJs?: T;
+  revisedAt?: T;
   slugHistory?:
     | T
     | {
