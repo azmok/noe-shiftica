@@ -18,6 +18,7 @@
     "db:create-migration": "payload migrate:create",
     "db:migrate": "payload migrate",
     "db:migrate:status": "payload migrate:status",
+    "db:migrate:https": "tsx scripts/migrate-over-https.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.config.integration.ts",
