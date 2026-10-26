@@ -3,8 +3,7 @@
 import React, { useRef, useState, useCallback } from 'react'
 import { useForm, useDocumentInfo } from '@payloadcms/ui'
 import { DRAFT_SAVE_EVENT } from '../shared/draftStorage'
-
-const KNOWN_FIELDS = ['title', 'slug', 'publishedAt', 'content', 'description']
+import { extractCustomMetaData, revisedAtFromFrontmatter } from './frontmatter'
 
 export const MarkdownImporterUI: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -87,12 +86,8 @@ export const MarkdownImporterUI: React.FC = () => {
 
             await new Promise(resolve => setTimeout(resolve, 150))
 
-            const customMetaData: Record<string, any> = {}
-            Object.keys(frontmatter).forEach((key) => {
-                if (!KNOWN_FIELDS.includes(key) && key !== 'date') {
-                    customMetaData[key] = frontmatter[key]
-                }
-            })
+            const customMetaData = extractCustomMetaData(frontmatter)
+            const revisedAt = revisedAtFromFrontmatter(frontmatter)
 
             if (dispatchFields) {
                 dispatchFields({ type: 'UPDATE', path: 'title', value: frontmatter.title || '' })
@@ -115,6 +110,10 @@ export const MarkdownImporterUI: React.FC = () => {
                 }
 
                 dispatchFields({ type: 'UPDATE', path: 'customMetaData', value: customMetaData })
+
+                if (revisedAt !== undefined) {
+                    dispatchFields({ type: 'UPDATE', path: 'revisedAt', value: revisedAt })
+                }
 
                 if (lexical) {
                     dispatchFields({ type: 'UPDATE', path: 'content', value: lexical, initialValue: lexical })

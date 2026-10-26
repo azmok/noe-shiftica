@@ -9,6 +9,7 @@ A professional-grade plugin for Noe Shiftica that enables seamless Markdown file
 - **🌐 Smart Translation**: Detects Japanese/CJK titles and automatically translates them to English slugs using Google Translate API (via `translateToSlug` utility).
 - **📝 Lexical Conversion**: Transforms Markdown body into Payload's native Lexical (JSON) format, preserving structure and formatting.
 - **🏷️ Custom Metadata**: Collects non-standard frontmatter keys into a `customMetaData` field for flexibility.
+- **🗓️ Revised date**: `updated:` goes to `revisedAt` (revisedDate plugin). The key list is shared with `/api/ai/posts` via `frontmatter.ts`, so both entry points map frontmatter the same way.
 - **🛡️ Validation Helper**: Includes a `beforeValidate` hook to ensure posts with only HTML embeds (and no text content) can still be published by injecting a placeholder.
 
 ## How it Works

@@ -14,6 +14,7 @@ interface BlogPostingPost {
   slug?: string | null
   publishedAt?: string | null
   updatedAt?: string | null
+  revisedAt?: string | null
   ogImage?: string | null
   coverImage?: unknown
   heroImage?: unknown
@@ -56,7 +57,7 @@ export function BlogPostingJsonLd({ post, basePath }: BlogPostingJsonLdProps) {
     'headline': post.title ?? '',
     ...(image ? { image } : {}),
     ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
-    ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
+    ...(post.revisedAt || post.updatedAt ? { dateModified: post.revisedAt || post.updatedAt } : {}),
     'author': {
       '@type': 'Person',
       'name': AUTHOR_NAME,

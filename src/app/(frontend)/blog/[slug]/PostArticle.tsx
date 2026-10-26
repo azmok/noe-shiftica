@@ -8,6 +8,7 @@ import { withOriginalImageLink } from "@/plugins/originalImageLink/converter"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
 import { ArticleCustomAssets } from "@/plugins/customAssets/ArticleCustomAssets"
+import { displayedUpdate } from "@/plugins/revisedDate"
 import { ArticleToc, tocEntries } from "@/plugins/articleToc/ArticleToc"
 import { ArticleTocSidebar } from "@/plugins/articleToc/ArticleTocSidebar"
 import { HeadingAnchorBehavior } from "@/plugins/articleToc/HeadingAnchorBehavior"
@@ -41,6 +42,15 @@ const fmtDateTimeJst = (value: string): string =>
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        timeZone: 'Asia/Tokyo',
+    })
+
+// Date-only variant for the editor-set 更新日 (revisedAt), e.g. "2026年10月26日".
+const fmtDateJst = (value: string): string =>
+    new Date(value).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
         timeZone: 'Asia/Tokyo',
     })
 
@@ -256,6 +266,7 @@ export const PostArticle: React.FC<{
         calculateReadingTime(post.content) + calculateReadingTime(htmlBodyHtml) ||
         1
     const scopeId = `article-${post.id}`
+    const lastUpdate = displayedUpdate(post)
     const svgDefs = extractSvgDefs(post.content)
     const { headings, idByNode } = extractHeadings(post.content)
     const toc = tocEntries(headings)
@@ -495,9 +506,9 @@ export const PostArticle: React.FC<{
                                                         )}
                                                     </div>
                                                 )}
-                                                {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() && (
+                                                {lastUpdate && (
                                                     <span className="text-white/50 text-[12px] font-normal">
-                                                        最終更新: {fmtDateTimeJst(post.updatedAt)}
+                                                        最終更新: {lastUpdate.dateOnly ? fmtDateJst(lastUpdate.value) : fmtDateTimeJst(lastUpdate.value)}
                                                     </span>
                                                 )}
                                             </div>

@@ -2,6 +2,7 @@ import type { Payload, PayloadHandler, PayloadRequest, TypedUser } from 'payload
 import matter from 'gray-matter'
 import { translateToSlug } from '../../../lib/translateToSlug'
 import { parseMarkdownToLexical } from '../../markdownImport'
+import { extractCustomMetaData, mergeCustomMetaData, revisedAtFromFrontmatter } from '../../markdownImport/frontmatter'
 import { type Operation, canAccess, isActiveUser, isApiClient } from '../../api-clients/permissions'
 import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '../markdown'
 
@@ -18,6 +19,9 @@ import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } f
  *   - markdown            記事フォルダの .md そのまま。冒頭の <link>/<h1>・HTML コメント・
  *                         X の widgets.js <script> は自動で除去する
  *   - title / slug / description   省略時は markdown の frontmatter から補う
+ *   - frontmatter の updated       記事の「更新日」（revisedAt）に入る
+ *   - frontmatter のその他のキー   customMetaData（og_title / seo_title など）にマージする。
+ *                                  書いていないキーは残り、`キー: null` で削除できる
  *   - images              [{ filename, data(base64), alt? }]。本文の `![alt](./filename)` を
  *                         media にアップロードして画像ブロックとして埋め込む。同名の media が
  *                         既にあれば再利用するので、更新時に送り直しても重複しない
@@ -567,10 +571,20 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
     }
     const categoryIds = categoryResult.ids
 
-    // Tags live in customMetaData.tags (TagsField). Keep any other existing metadata.
-    const customMetaData = Array.isArray(tags)
-      ? { ...(existingDoc?.customMetaData ?? {}), tags }
-      : undefined
+    // Same rule as the admin Markdown import: every frontmatter key without its own field
+    // (og_title, seo_title, ...) goes to customMetaData. Merged onto the existing metadata so
+    // keys the .md doesn't mention survive; `key: null` removes one. Tags live in
+    // customMetaData.tags (TagsField) and the explicit `tags` body field wins.
+    const metaFromFrontmatter = extractCustomMetaData(frontmatterData)
+    const customMetaData =
+      Object.keys(metaFromFrontmatter).length || Array.isArray(tags)
+        ? mergeCustomMetaData(existingDoc?.customMetaData, {
+            ...metaFromFrontmatter,
+            ...(Array.isArray(tags) ? { tags } : {}),
+          })
+        : undefined
+    // frontmatter `updated:` → revisedAt (revisedDate plugin). Absent = leave as is.
+    const revisedAt = revisedAtFromFrontmatter(frontmatterData)
 
     const postData: any = {
       title,
@@ -580,6 +594,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
       ...(finalDescription ? { description: finalDescription } : {}),
       ...(categoryIds.length ? { categories: categoryIds } : {}),
       ...(customMetaData ? { customMetaData } : {}),
+      ...(revisedAt !== undefined ? { revisedAt } : {}),
       ...(heroImageId !== undefined ? { heroImage: heroImageId } : {}),
       ...(customCss ? { customCss } : {}),
       ...(customJs ? { customJs } : {}),
