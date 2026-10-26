@@ -10,7 +10,7 @@ export default defineConfig({
       // Shared unit tests (lib, api routes)
       'tests/unit/**/*.test.ts',
       // Plugin-specific unit tests (mock-based, no live APIs)
-      'src/plugins/**/__tests__/unit.test.ts',
+      'src/plugins/**/__tests__/*.test.ts',
     ],
     exclude: [
       // Live API tests are excluded from the default run

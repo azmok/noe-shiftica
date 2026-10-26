@@ -16,11 +16,18 @@
 ## Standing instructions (Azuma)
 - バックグラウンドコマンド（App Hosting のロールアウト、長時間ビルド等）の**出力ファイルは確認しなくてよい**。完了通知 / exit code 0 だけで十分とみなす。
 - 修正したら**毎回 `git add` まで**を作業の区切りとする（ステージングまで実行する）。
-- **`git commit` と `git push` は、Azuma が明示的に指示するまで絶対に実行しない。** 「完了した」「検証OK」等は実行の許可を意味しない。
 - デプロイ後の本番反映確認・ロールアウトの追跡は待たなくてよい（Azuma が確認する）。
 - **機能はプラグイン単位で作る**（詳細は `AGENTS.md` の Standing instructions）:
   1. 既存プラグイン（`src/plugins/*`）の守備範囲に入る変更は、そのプラグインを変更・追加する。
   2. どの既存プラグインにも属さない変更は、新規プラグインとして `src/plugins/<name>/` に作る。
+
+## クラウド環境での DB マイグレーション
+Claude Code のクラウド環境は外向き通信が HTTPS（443）だけなので、Postgres の通常接続（5432）を使う
+`pnpm db:migrate` は動かない。代わりに Neon の HTTPS ドライバで流す `pnpm db:migrate:https` を使う
+（`scripts/migrate-over-https.ts`。結果は `payload migrate` と同じで、`payload_migrations` にも記録する）。
+- 先に `pnpm db:migrate:https --dry-run` で流す SQL を確認してから実行する。`--status` で適用状況だけ見られる。
+- 対応するのは `db.execute(sql\`...\`)` だけのマイグレーション（結果を読む / payload・req を使うものはエラーで止まる）。
+- **列を追加するマイグレーションは、コードをマージ（本番ロールアウト）する前に流す**。逆順だと記事取得がエラーになる。
 
 ## ⚠️ ファイルエンコーディング（編集後に必ず検証）
 Windows 環境＋複数エージェントで作業するため、ソースに **NUL バイト混入 / UTF-16 保存**の
