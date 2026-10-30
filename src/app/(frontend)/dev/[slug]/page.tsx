@@ -8,6 +8,7 @@ import { notFound, redirect } from "next/navigation";
 import { PostArticle } from "../../blog/[slug]/PostArticle";
 import { BlogPostingJsonLd } from "../../components/BlogPostingJsonLd";
 import { findAdjacentPosts, findPublishedPost } from "@/lib/postQueries";
+import { resolveCanonical } from "@/lib/canonical";
 import { Metadata } from "next";
 
 // CDN TTL. revalidatePath() refreshes the ISR cache but does NOT purge the App Hosting
@@ -59,14 +60,9 @@ export async function generateMetadata({
         const title = cmd.seo_title || cmd.title || post.title;
         const description = cmd.seo_description || cmd.description || "";
 
-        // Self-referencing canonical, defaulting to this post's own URL. A custom
-        // override from customMetaData.canonical wins (absolute URL or path kept
-        // as-is; a bare slug is resolved under /dev). Without this, the page
-        // inherits the root layout's `canonical: "/"`.
-        const customCanonical = typeof cmd.canonical === 'string' ? cmd.canonical.trim() : '';
-        const canonical = customCanonical
-            ? (/^https?:\/\//.test(customCanonical) || customCanonical.startsWith('/') ? customCanonical : `/dev/${customCanonical}`)
-            : `/dev/${post.slug}`;
+        // Self-referencing canonical (see resolveCanonical). Without this, the
+        // page inherits the root layout's `canonical: "/"`.
+        const canonical = resolveCanonical(cmd.canonical, `/dev/${post.slug}`);
 
         const cmdOgImage = cmd.og_image && (cmd.og_image.startsWith('http://') || cmd.og_image.startsWith('https://')) ? cmd.og_image : null;
         const ogImage = cmdOgImage || post.ogImage || (post.coverImage && typeof post.coverImage === 'object' ? (post.coverImage as any).url : '');
@@ -80,6 +76,7 @@ export async function generateMetadata({
             openGraph: {
                 title: cmd.og_title || title,
                 description: cmd.og_description || description,
+                url: `/dev/${post.slug}`,
                 type: 'article',
                 publishedTime: post.publishedAt || undefined,
                 ...(ogImage ? { images: [{ url: ogImage }] } : {}),
