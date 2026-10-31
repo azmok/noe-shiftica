@@ -79,6 +79,7 @@ export interface Config {
     changelog: Changelog;
     passkeys: Passkey;
     'html-files': HtmlFile;
+    videos: Video;
     'hosted-pages': HostedPage;
     'api-logs': ApiLog;
     'api-clients': ApiClient;
@@ -98,6 +99,7 @@ export interface Config {
     changelog: ChangelogSelect<false> | ChangelogSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     'html-files': HtmlFilesSelect<false> | HtmlFilesSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
     'hosted-pages': HostedPagesSelect<false> | HostedPagesSelect<true>;
     'api-logs': ApiLogsSelect<false> | ApiLogsSelect<true>;
     'api-clients': ApiClientsSelect<false> | ApiClientsSelect<true>;
@@ -554,6 +556,28 @@ export interface Passkey {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * 空なら、ファイル名が入ります
+   */
+  alt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
  * CSS/JS を含む HTML をアップロード、または直接編集して /p/<slug> で公開します。
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -746,6 +770,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'html-files';
         value: number | HtmlFile;
+      } | null)
+    | ({
+        relationTo: 'videos';
+        value: number | Video;
       } | null)
     | ({
         relationTo: 'hosted-pages';
@@ -1049,6 +1077,24 @@ export interface HtmlFilesSelect<T extends boolean = true> {
   alt?: T;
   bodyHtml?: T;
   embedCss?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  alt?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
