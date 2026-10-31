@@ -1,0 +1,11 @@
+.figure {
+  margin: 2rem 0;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+  background: #000;
+}

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { withOriginalImageLink } from "@/plugins/originalImageLink/converter"
+import { withVideoEmbed } from "@/plugins/videoEmbed/converter"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
 import { ArticleCustomAssets } from "@/plugins/customAssets/ArticleCustomAssets"
@@ -137,7 +138,8 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     link: (args) => asSiteLink(typeof defaultConverters.link === 'function' ? defaultConverters.link(args) : null),
     autolink: (args) => asSiteLink(typeof defaultConverters.autolink === 'function' ? defaultConverters.autolink(args) : null),
     // Body images open their original (full-size) file in a new tab
-    upload: withOriginalImageLink(defaultConverters.upload),
+    // Videos play inline; images open their original in a new tab
+    upload: withVideoEmbed(withOriginalImageLink(defaultConverters.upload)),
     // Re-apply inline text styling (color / font-size / gradient) that the
     // default text converter drops. We let the default converter handle the
     // format flags (bold/italic/…), then wrap its output in a styled <span>.
