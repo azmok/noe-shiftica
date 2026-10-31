@@ -10,6 +10,7 @@ import * as migration_20260616_214317_add_hosted_pages_collection from './202606
 import * as migration_20261004_082418_add_api_clients from './20261004_082418_add_api_clients';
 import * as migration_20261019_103452_add_tech_posts_custom_assets from './20261019_103452_add_tech_posts_custom_assets';
 import * as migration_20261026_080000_add_revised_at from './20261026_080000_add_revised_at';
+import * as migration_20261031_120000_add_videos_collection from './20261031_120000_add_videos_collection';
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261026_080000_add_revised_at.up,
     down: migration_20261026_080000_add_revised_at.down,
     name: '20261026_080000_add_revised_at'
+  },
+  {
+    up: migration_20261031_120000_add_videos_collection.up,
+    down: migration_20261031_120000_add_videos_collection.down,
+    name: '20261031_120000_add_videos_collection'
   },
 ];

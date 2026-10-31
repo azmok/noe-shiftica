@@ -33,6 +33,7 @@ import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { htmlHostingPlugin } from './plugins/html-hosting'
 import { apiClientsPlugin } from './plugins/api-clients'
 import { aiApiPlugin } from './plugins/ai-api'
+import { videoUploadPlugin } from './plugins/videoUpload'
 import { aiContentOptimizerPlugin } from './plugins/aiContentOptimizer'
 import { autosavePlugin } from './plugins/autosave'
 import { slugTrackerPlugin } from './plugins/slugTracker'
@@ -173,6 +174,8 @@ const configPromise = buildConfig({
     }),
     panelResizerPlugin(),
     htmlFileManagerPlugin(),
+    // 動画専用コレクション + ブラウザ → GCS の直接アップロード（画像の media は従来どおりサーバー経由）
+    videoUploadPlugin(),
     htmlHostingPlugin(),
     // AI 記事 API（/api/ai/posts）と api-logs。api-logs も下の権限ラップに含めるため apiClientsPlugin() より前に置く
     aiApiPlugin(),
