@@ -11,12 +11,14 @@
  *
  * 下書き作成（同じ slug があれば下書きとして上書き更新）:
  *   node scripts/publish-article.mjs draft <article.md> \
- *     [--collection tech-posts] [--images <dir>] [--categories "22,ナレッジ"] [--tags "a,b"]
+ *     [--collection posts|tech-posts] [--images <dir>] [--categories "22,ナレッジ"] [--tags "a,b"]
  *     [--hero <画像ファイル | media ID>] [--dry-run]
  *   --hero: Hero 画像。ファイル名は記事フォルダ（--images）からの相対で、本文に無い画像でもよい
  *
  * 公開（最新の下書きをそのまま公開）:
- *   node scripts/publish-article.mjs publish <slug> [--collection tech-posts]
+ *   node scripts/publish-article.mjs publish <slug> [--collection posts|tech-posts]
+ *
+ * --collection: posts（Blog、既定）/ tech-posts（Dev Journal）。サーバー側の既定と揃えている
  */
 
 import fs from 'node:fs'
@@ -26,7 +28,7 @@ const BASE = (process.env.NOE_PAYLOAD_URL || 'https://noe-shiftica.com').replace
 
 function parseArgs(argv) {
   const [command, target, ...rest] = argv
-  const opts = { collection: 'tech-posts', dryRun: false }
+  const opts = { collection: 'posts', dryRun: false }
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i]
     if (a === '--dry-run') opts.dryRun = true
