@@ -337,7 +337,7 @@ export interface Post {
    */
   customJs?: string | null;
   /**
-   * 記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
+   * 記事の内容を更新した日。記事ページ冒頭の「Updated」に表示されます（空なら、公開日と別の日に保存されたときだけ自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
    */
   revisedAt?: string | null;
   /**
@@ -442,7 +442,7 @@ export interface TechPost {
    */
   customJs?: string | null;
   /**
-   * 記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
+   * 記事の内容を更新した日。記事ページ冒頭の「Updated」に表示されます（空なら、公開日と別の日に保存されたときだけ自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
    */
   revisedAt?: string | null;
   /**
