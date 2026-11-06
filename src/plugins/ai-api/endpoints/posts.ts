@@ -131,12 +131,38 @@ function forbidden(operation: Operation, collection: string) {
 
 const baseName = (p: string) => p.split('/').pop() ?? p
 
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+type MediaDoc = { id: number | string; filename?: string | null; filesize?: number | null }
+
+/**
+ * `name` と、Payload が名前の重複回避で付けた `stem-1.ext` / `stem-2.ext` … の media を探す。
+ * 完全一致を先頭に並べて返す。
+ */
+async function findSameNameMedia(payload: Payload, name: string): Promise<MediaDoc[]> {
+  const dot = name.lastIndexOf('.')
+  const stem = dot > 0 ? name.slice(0, dot) : name
+  const ext = dot > 0 ? name.slice(dot) : ''
+  const suffixed = new RegExp(`^${escapeRegExp(stem)}-\\d+${escapeRegExp(ext)}$`)
+  const found = await payload.find({
+    collection: 'media',
+    where: { or: [{ filename: { equals: name } }, { filename: { like: `${stem}-` } }] },
+    limit: 100,
+    depth: 0,
+  })
+  const docs = (found.docs as MediaDoc[]).filter(
+    (d) => d.filename === name || (typeof d.filename === 'string' && suffixed.test(d.filename)),
+  )
+  return [...docs.filter((d) => d.filename === name), ...docs.filter((d) => d.filename !== name)]
+}
+
 /**
  * 本文で参照している画像を media の ID に解決する。
- * 同名ファイルが media にあり、送られたデータとサイズが同じ（またはデータが送られていない）なら
- * 再利用する。別記事の同名・別画像を取り違えないよう、サイズが違えば新規にアップロードする
- * （Payload が名前の重複を -1 などで回避する）。アップロードは呼び出し元として実行するので、
- * Media の「作成」権限が必要。
+ * 同名ファイル（Payload が付けた `-1` などの連番違いを含む）が media にあり、送られたデータと
+ * サイズが同じなら再利用する。データが送られていなければ完全一致の同名 media を使う。
+ * 別記事の同名・別画像を取り違えないよう、サイズが一致しなければ新規にアップロードする
+ * （Payload が名前の重複を -1 などで回避する。連番違いも探すので、再送で重複が増えない）。
+ * アップロードは呼び出し元として実行するので、Media の「作成」権限が必要。
  */
 async function resolveImages(
   payload: Payload,
@@ -169,15 +195,12 @@ async function resolveImages(
   for (const ref of refs) {
     const name = baseName(ref.src)
     // Internal lookup by filename so re-sending the same article does not duplicate media.
-    const existing = await payload.find({
-      collection: 'media',
-      where: { filename: { equals: name } },
-      limit: 1,
-      depth: 0,
-    })
+    const candidates = await findSameNameMedia(payload, name)
     const file = provided.get(name)
-    const found = existing.docs[0] as { id: number | string; filesize?: number | null } | undefined
-    if (found && (!file || found.filesize === file.buffer.length)) {
+    const found = file
+      ? candidates.find((d) => d.filesize === file.buffer.length)
+      : candidates.find((d) => d.filename === name)
+    if (found) {
       mediaIds.push(found.id)
       continue
     }

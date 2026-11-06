@@ -100,16 +100,27 @@ const post = async (body: unknown) =>
 
 let existingPosts: Record<string, unknown>[] = []
 let existingSize = 1234
+let extraMedia: { id: number; filename: string; filesize: number }[] = []
+
+type FilenameCond = { filename: { equals?: string; like?: string } }
 
 beforeEach(() => {
   vi.clearAllMocks()
   parseMarkdownToLexical.mockImplementation(convertStub)
   existingPosts = []
   existingSize = 1234
+  extraMedia = []
   mockPayload.auth.mockResolvedValue({ user: apiClient(fullPerms) })
   mockPayload.find.mockImplementation(async ({ collection, where }) => {
     if (collection === 'media') {
-      return { docs: where.filename.equals === '02_existing.png' ? [{ id: 202, filesize: existingSize }] : [] }
+      const library = [{ id: 202, filename: '02_existing.png', filesize: existingSize }, ...extraMedia]
+      const conds: FilenameCond[] = where.or ?? [where]
+      const docs = library.filter((d) =>
+        conds.some(({ filename: f }) =>
+          f.equals !== undefined ? d.filename === f.equals : d.filename.includes(f.like ?? '\0'),
+        ),
+      )
+      return { docs }
     }
     if (collection === 'categories') {
       return { docs: where.name.equals === 'ナレッジ' ? [{ id: 100 }] : [] }
@@ -257,6 +268,25 @@ describe('POST /api/ai/posts — article folder flow', () => {
     })
     expect((await res.json()).mediaIds).toEqual([101, 101])
     expect(mockPayload.create.mock.calls.filter(([a]) => a.collection === 'media')).toHaveLength(2)
+  })
+
+  it('reuses the renamed copy (name-1.png) on re-send instead of uploading it again', async () => {
+    const mine = Buffer.from('my-article-image')
+    // 別記事の 02_existing.png（別画像）があったため、前回の送信で 02_existing-1.png として保存された
+    extraMedia = [
+      { id: 303, filename: '02_existing-1.png', filesize: mine.length },
+      { id: 404, filename: '02_existing-copy.png', filesize: mine.length },
+    ]
+    const res = await post({
+      collection: 'tech-posts',
+      markdown,
+      images: [
+        { filename: '01_new.png', data: tinyPng },
+        { filename: '02_existing.png', data: mine.toString('base64') },
+      ],
+    })
+    expect((await res.json()).mediaIds).toEqual([101, 303])
+    expect(mockPayload.create.mock.calls.filter(([a]) => a.collection === 'media')).toHaveLength(1)
   })
 
   it('saves every link to open in a new tab', async () => {
