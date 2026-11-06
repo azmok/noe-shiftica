@@ -21,7 +21,7 @@ export const revisedDateFields: Field[] = [
     label: '更新日',
     admin: {
       position: 'sidebar',
-      description: '記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。',
+      description: '記事の内容を更新した日。記事ページ冒頭の「Updated」に表示されます（空なら、公開日と別の日に保存されたときだけ自動の更新日時）。Markdown の frontmatter `updated:` から入ります。',
       date: {
         pickerAppearance: 'dayOnly',
         displayFormat: 'yyyy/MM/dd',
@@ -41,9 +41,14 @@ export const revisedDatePlugin =
     ),
   })
 
+/** JST の暦日（YYYY-MM-DD） */
+const jstDay = (value: string) =>
+  new Date(value).toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' })
+
 /**
- * 記事ページに出す「最終更新」。revisedAt があればそれ（日付のみ）、なければ
- * updatedAt（日時）を、公開日より後のときだけ返す。
+ * 記事ページの冒頭に出す更新日（Updated）。revisedAt があればそれ（日付のみ）を必ず返す。
+ * なければ updatedAt（日時）を、公開日より後の「別の日（JST）」のときだけ返す。
+ * 公開当日の保存（下書き → 公開の直後の保存やタグ修正など）では出さない。
  */
 export function displayedUpdate(post: {
   revisedAt?: string | null
@@ -51,7 +56,12 @@ export function displayedUpdate(post: {
   publishedAt?: string | null
 }): { value: string; dateOnly: boolean } | null {
   if (post.revisedAt) return { value: post.revisedAt, dateOnly: true }
-  if (post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime()) {
+  if (
+    post.updatedAt &&
+    post.publishedAt &&
+    new Date(post.updatedAt).getTime() > new Date(post.publishedAt).getTime() &&
+    jstDay(post.updatedAt) !== jstDay(post.publishedAt)
+  ) {
     return { value: post.updatedAt, dateOnly: false }
   }
   return null

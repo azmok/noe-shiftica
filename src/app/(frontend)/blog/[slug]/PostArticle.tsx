@@ -56,6 +56,14 @@ const fmtDateJst = (value: string): string =>
     })
 
 // Compact variant for the mobile meta row, e.g. "2026.06.19 14:30".
+const fmtDateJstCompact = (value: string): string =>
+    new Date(value).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'Asia/Tokyo',
+    })
+
 const fmtDateTimeJstCompact = (value: string): string =>
     new Date(value)
         .toLocaleString('ja-JP', {
@@ -341,6 +349,15 @@ export const PostArticle: React.FC<{
                             <span className="text-white/80">{post.publishedAt ? fmtDateTimeJstCompact(post.publishedAt) : ''}</span>
                         </div>
 
+                        {lastUpdate && (
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-(--color-neu-primary)">Updated</span>
+                                <span className="text-white/80">
+                                    {lastUpdate.dateOnly ? fmtDateJstCompact(lastUpdate.value) : fmtDateTimeJstCompact(lastUpdate.value)}
+                                </span>
+                            </div>
+                        )}
+
                         {readingTime > 0 && (
                             <div className="flex items-center gap-1.5">
                                 <span className="text-(--color-neu-primary)">読了目安</span>
@@ -496,6 +513,7 @@ export const PostArticle: React.FC<{
                                                 {post.publishedAt && (
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
+                                                            <span className="text-(--color-neu-primary) text-[12px] font-bold uppercase tracking-[0.05em]">Published</span>
                                                             {fmtDateTimeJst(post.publishedAt)}
                                                         </span>
                                                         {readingTime > 0 && (
@@ -509,8 +527,9 @@ export const PostArticle: React.FC<{
                                                     </div>
                                                 )}
                                                 {lastUpdate && (
-                                                    <span className="text-white/50 text-[12px] font-normal">
-                                                        最終更新: {lastUpdate.dateOnly ? fmtDateJst(lastUpdate.value) : fmtDateTimeJst(lastUpdate.value)}
+                                                    <span className="text-white/70 text-[14px] font-normal flex items-center gap-1.5">
+                                                        <span className="text-(--color-neu-primary) text-[12px] font-bold uppercase tracking-[0.05em]">Updated</span>
+                                                        {lastUpdate.dateOnly ? fmtDateJst(lastUpdate.value) : fmtDateTimeJst(lastUpdate.value)}
                                                     </span>
                                                 )}
                                             </div>

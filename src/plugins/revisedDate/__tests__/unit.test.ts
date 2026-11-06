@@ -42,6 +42,13 @@ describe('displayedUpdate', () => {
 
   it('shows nothing when there is no later update', () => {
     expect(displayedUpdate({ updatedAt: publishedAt, publishedAt })).toBeNull()
+    // 公開と同じ JST の日の保存（下書き → 公開の直後など）は出さない
+    expect(displayedUpdate({ updatedAt: '2026-03-10T14:59:00.000Z', publishedAt })).toBeNull()
+    // JST で日付が変われば出す（2026-03-11 00:00 JST）
+    expect(displayedUpdate({ updatedAt: '2026-03-10T15:00:00.000Z', publishedAt })).toEqual({
+      value: '2026-03-10T15:00:00.000Z',
+      dateOnly: false,
+    })
     expect(displayedUpdate({})).toBeNull()
   })
 })

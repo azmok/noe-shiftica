@@ -13,7 +13,7 @@
   - `updated: null` で空に戻す。キーを書かなければ今の値のまま
 
 ## 表示
-`displayedUpdate(post)` を記事ページ（`PostArticle.tsx` の「最終更新」）で使う。`revisedAt` があればそれを日付だけで表示し、空なら従来どおり `updatedAt`（公開日より後のときだけ）を日時で表示する。構造化データ（`BlogPostingJsonLd`）の `dateModified` も `revisedAt` を優先する。
+`displayedUpdate(post)` を記事ページ（`PostArticle.tsx`）冒頭の「Updated」（「Published」の隣。/blog・/dev 共通、モバイル・デスクトップ両方）で使う。`revisedAt` があればそれを日付だけで表示し、空なら `updatedAt` を日時で表示する。ただし `updatedAt` は公開日と別の日（JST）のときだけ（公開当日の保存やタグ修正では出さない）。構造化データ（`BlogPostingJsonLd`）の `dateModified` も `revisedAt` を優先する。
 
 ## DB
 列は `src/migrations/20261026_080000_add_revised_at.ts` で追加する。**このプラグインを本番に出す前に、本番 DB でマイグレーションを流すこと**（`pnpm db:migrate`）。
