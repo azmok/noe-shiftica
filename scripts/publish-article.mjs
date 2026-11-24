@@ -12,8 +12,11 @@
  * 下書き作成（同じ slug があれば下書きとして上書き更新）:
  *   node scripts/publish-article.mjs draft <article.md> \
  *     [--collection tech-posts] [--images <dir>] [--categories "22,ナレッジ"] [--tags "a,b"]
- *     [--hero <画像ファイル | media ID>] [--dry-run]
+ *     [--hero <画像ファイル | media ID>] [--render markdown] [--status draft|published] [--dry-run]
  *   --hero: Hero 画像。ファイル名は記事フォルダ（--images）からの相対で、本文に無い画像でもよい
+ *   --render markdown: 本文を Lexical ではなく Markdown 原文のまま表示するモードで送る
+ *     （ai-box の中の画像や <img src="./…"> もアップロードする。noe-posts の記事はこれを使う）
+ *   --status published: 下書きを経由せず、この本文のまま公開する（既定は draft）
  *
  * 公開（最新の下書きをそのまま公開）:
  *   node scripts/publish-article.mjs publish <slug> [--collection tech-posts]
@@ -62,6 +65,33 @@ export function referencedImages(markdown) {
   return [...new Set(files)]
 }
 
+/** 本文中の相対パス画像すべて（--render markdown 用。サーバー側 referencedMarkdownImages と同じ規則） */
+export function referencedImagesAll(markdown) {
+  const files = new Set()
+  let inFence = false
+  const add = (raw) => {
+    if (/^(?:[a-z][a-z0-9+.-]*:|\/|#|data:)/i.test(raw)) return
+    if (/(^|\/)_assets\//.test(raw)) return
+    let src = raw
+    try {
+      src = decodeURI(raw)
+    } catch {
+      // keep as written
+    }
+    if (/\.(png|jpe?g|gif|webp)$/i.test(src)) files.add(src.replace(/^\.\//, ''))
+  }
+  for (const line of markdown.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence
+      continue
+    }
+    if (inFence) continue
+    for (const m of line.matchAll(/!\[[^\]]*\]\(\s*([^)\s]+)[^)]*\)/g)) add(m[1])
+    for (const m of line.matchAll(/<img\b[^>]*?\bsrc=["']([^"']+)["']/gi)) add(m[1])
+  }
+  return [...files]
+}
+
 async function send(body) {
   const key = process.env.NOE_PAYLOAD_API_KEY
   if (!key) throw new Error('NOE_PAYLOAD_API_KEY が設定されていません。')
@@ -78,7 +108,8 @@ async function send(body) {
 async function draft(mdPath, opts) {
   const markdown = fs.readFileSync(mdPath, 'utf8')
   const dir = opts.images || path.dirname(mdPath)
-  const images = referencedImages(markdown).map((src) => {
+  const refs = opts.render === 'markdown' ? referencedImagesAll(markdown) : referencedImages(markdown)
+  const images = refs.map((src) => {
     const file = path.join(dir, src)
     if (!fs.existsSync(file)) throw new Error(`画像が見つかりません: ${file}`)
     return { filename: path.basename(src), data: fs.readFileSync(file).toString('base64') }
@@ -102,7 +133,8 @@ async function draft(mdPath, opts) {
     collection: opts.collection,
     markdown,
     images,
-    status: 'draft',
+    status: opts.status === 'published' ? 'published' : 'draft',
+    ...(opts.render ? { renderMode: opts.render } : {}),
     ...(opts.categories ? { categories: list(opts.categories) } : {}),
     ...(opts.tags ? { tags: list(opts.tags) } : {}),
     ...(heroImage !== undefined ? { heroImage } : {}),
@@ -114,6 +146,8 @@ async function draft(mdPath, opts) {
         {
           endpoint: `${BASE}/api/ai/posts`,
           collection: body.collection,
+          status: body.status,
+          renderMode: body.renderMode,
           images: images.map((i) => `${i.filename} (${Math.round((i.data.length * 3) / 4 / 1024)} KB)`),
           categories: body.categories,
           tags: body.tags,
@@ -127,7 +161,8 @@ async function draft(mdPath, opts) {
   }
 
   const res = await send(body)
-  console.log(`${res.operation === 'create' ? '下書きを作成' : '下書きを更新'}しました: ${res.slug}`)
+  const published = body.status === 'published'
+  console.log(`${published ? '公開' : res.operation === 'create' ? '下書きを作成' : '下書きを更新'}しました: ${res.slug}`)
   if (res.heroImageId !== undefined) console.log(`  Hero 画像: media #${res.heroImageId}`)
   console.log(`  管理画面: ${BASE}${res.adminUrl}`)
   console.log(`  公開URL（公開後）: ${BASE}${res.url}`)
