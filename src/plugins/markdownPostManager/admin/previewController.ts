@@ -21,7 +21,7 @@ export const FALLBACK_PREVIEW = `<!doctype html><html lang="ja"><head><meta char
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/md-assets/md/article.scoped.css">
 <style>html,body{margin:0;background:#121212;color:#e5e5e5;font-family:system-ui,-apple-system,"Hiragino Sans",sans-serif}
-#article-page{max-width:820px;margin:0 auto;padding:32px 20px 40vh}.noe-preview-note{font-size:12px;color:#9aa0ac;margin-bottom:16px}</style>
+#article-page{max-width:820px;margin:0 auto;padding:32px 20px 40vh;line-height:1.8}#article-page img{max-width:100%;height:auto}#article-page a{color:#ccdd00}.noe-preview-note{font-size:12px;color:#9aa0ac;margin-bottom:16px}</style>
 </head><body><main id="article-page"><p class="noe-preview-note">簡易プレビュー（保存すると、本物の記事ページの見た目で確認できます）</p>
 <div class="md-render" data-md-root></div></main></body></html>`
 
