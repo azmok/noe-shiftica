@@ -630,3 +630,26 @@ describe('POST /api/ai/posts — renderMode', () => {
     expect((await res.json()).error).toContain('01_in_box.png')
   })
 })
+
+describe('POST /api/ai/posts — SVG images', () => {
+  const svg = (body: string) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg">${body}</svg>`).toString('base64')
+  const md = '---\ntitle: "T"\nslug: "t"\n---\n\n![図](./01_fig.svg)\n'
+
+  it('accepts a plain SVG figure and uploads it as image/svg+xml', async () => {
+    const res = await post({ collection: 'tech-posts', markdown: md, images: [{ filename: '01_fig.svg', data: svg('<rect width="1" height="1"/>') }] })
+    expect(res.status).toBe(201)
+    const media = mockPayload.create.mock.calls.find(([a]) => a.collection === 'media')?.[0]
+    expect(media.file.mimetype).toBe('image/svg+xml')
+  })
+
+  it.each([
+    ['<script>alert(1)</script>'],
+    ['<rect onload="x()"/>'],
+    ['<foreignObject><div/></foreignObject>'],
+    ['<a href="javascript:alert(1)">x</a>'],
+  ])('rejects an SVG with unsafe content: %s', async (body) => {
+    const res = await post({ collection: 'tech-posts', markdown: md, images: [{ filename: '01_fig.svg', data: svg(body) }] })
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toContain('unsafe')
+  })
+})

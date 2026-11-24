@@ -176,11 +176,12 @@ describe('referencedMarkdownImages', () => {
       '<img class="icons" src="../../_assets/icons/c.svg">',
       '![u](https://e.com/u.png)',
       '![svg](./d.svg)',
+      '![gif](./e.gif)',
       '```',
       '![z](./zz.png)',
       '```',
     ].join('\n')
-    expect(referencedMarkdownImages(md)).toEqual(['01.png', '02 x.jpg', '03.webp'])
+    expect(referencedMarkdownImages(md)).toEqual(['01.png', '02 x.jpg', '03.webp', 'd.svg', 'e.gif'])
   })
 })
 
