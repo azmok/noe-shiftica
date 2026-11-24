@@ -8,6 +8,7 @@ import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } f
 import { prepareMarkdownSource, referencedMarkdownImages } from '../../markdownPostManager/prepare'
 import { RENDER_MODES } from '../../markdownPostManager'
 import { checkGitOverwrite, markdownRevision } from '../../markdownPostManager/revision'
+import { MARKDOWN_CONTENT_PROVIDED } from '../../markdownPostManager/contentSync'
 
 /**
  * AI 用の記事 API（Payload のルートエンドポイント。URL は /api/ai/posts）。
@@ -729,12 +730,14 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
             data: postData,
             user,
             overrideAccess: false,
+            context: { [MARKDOWN_CONTENT_PROVIDED]: true },
           })
         : await payload.create({
             collection: targetCollection,
             data: postData,
             user,
             overrideAccess: false,
+            context: { [MARKDOWN_CONTENT_PROVIDED]: true },
           })
 
     const docId = String(savedDoc.id)

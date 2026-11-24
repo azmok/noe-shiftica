@@ -20,6 +20,22 @@ export interface RenderedMarkdown {
 
 const md = new MarkdownIt({ html: true, linkify: true, typographer: false })
 
+// 管理画面のプレビュー用：リストの中の段落（tight list で <p> が出ない）にも印を付けられるよう、
+// 隠し段落を <span class="noe-tight" data-src> で包む。env.sourceMap が無ければ今まで通り何も出さない
+const renderHiddenParagraph =
+  (open: boolean) =>
+  (tokens: any[], idx: number, options: any, env: any, self: any): string => {
+    const t = tokens[idx]
+    if (t.hidden) {
+      if (!env?.sourceMap) return ''
+      if (open) return t.attrGet('data-src') ? `<span class="noe-tight" data-src="${t.attrGet('data-src')}">` : ''
+      return t.meta?.span ? '</span>' : ''
+    }
+    return self.renderToken(tokens, idx, options)
+  }
+md.renderer.rules.paragraph_open = renderHiddenParagraph(true)
+md.renderer.rules.paragraph_close = renderHiddenParagraph(false)
+
 /** 共通アセットのパス（`../../_assets/…`）を、サイトの /md-assets/ に書き換える */
 const ASSET_PATH_RE = /^(?:\.{1,2}\/)+_assets\/(.*)$/
 
@@ -74,6 +90,34 @@ export interface RenderOptions {
    * `data-heading-id` は常に付く（HeadingAnchorBehavior / ArticleTocSidebar が見る）。
    */
   ids?: boolean
+  /**
+   * 管理画面のプレビュー用。段落・見出しに `data-src="開始行:終了行"`（markdownSource の行番号、0 始まり）、
+   * 表のセルに `data-row` / `data-col` を付ける。スクロールの連動と、クリックしてその場で書き換える機能が使う。
+   * サイトの表示では付けない（既定 false）。
+   */
+  sourceMap?: boolean
+}
+
+function addSourceMap(tokens: any[]): void {
+  const openHidden: number[] = []
+  let row = -1
+  let col = 0
+  for (const t of tokens) {
+    if ((t.type === 'paragraph_open' || t.type === 'heading_open') && t.map) t.attrSet('data-src', `${t.map[0]}:${t.map[1]}`)
+    if (t.type === 'paragraph_open' && t.hidden) openHidden.push(t.level)
+    if (t.type === 'paragraph_close' && t.hidden && openHidden.length && openHidden[openHidden.length - 1] === t.level) {
+      openHidden.pop()
+      t.meta = { ...(t.meta ?? {}), span: true }
+    }
+    if (t.type === 'tr_open' && t.map) {
+      row = t.map[0]
+      col = 0
+    }
+    if ((t.type === 'th_open' || t.type === 'td_open') && row >= 0) {
+      t.attrSet('data-row', String(row))
+      t.attrSet('data-col', String(col++))
+    }
+  }
 }
 
 export function renderMarkdownArticle(
@@ -81,10 +125,11 @@ export function renderMarkdownArticle(
   media: MarkdownMedia = {},
   options: RenderOptions = {},
 ): RenderedMarkdown {
-  const env: { headings: ArticleHeading[] } = { headings: [] }
+  const env: { headings: ArticleHeading[]; sourceMap?: boolean } = { headings: [], sourceMap: options.sourceMap }
   const used = new Set<string>()
 
   const tokens = md.parse(source ?? '', env)
+  if (options.sourceMap) addSourceMap(tokens)
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i]
     if (t.type !== 'heading_open') continue

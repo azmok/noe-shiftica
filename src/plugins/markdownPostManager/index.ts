@@ -1,5 +1,6 @@
 import type { Field, Plugin } from 'payload'
 import { markdownRevision } from './revision'
+import { syncContentFromMarkdown } from './contentSync'
 
 /**
  * markdownPostManager — Markdown 記事を DB で持ち、そのまま表示するプラグイン
@@ -47,9 +48,12 @@ export const markdownPostFields: Field[] = [
     type: 'textarea',
     label: 'Markdown 原文',
     admin: {
-      readOnly: true,
       condition: isMarkdown,
-      description: 'noe-posts から送られた原文（前処理済み）。ここでは編集せず、noe-posts 側で直して再送してください。',
+      description:
+        '本文の Markdown。公開後はここ（DB）が正本です。プレビューの段落・見出し・表のセルをクリックしても直せます。保存すると検索・読了時間用の本文（Lexical）も作り直します。',
+      components: {
+        Field: '@/plugins/markdownPostManager/admin/MarkdownEditorField#MarkdownEditorField',
+      },
     },
   },
   {
@@ -95,7 +99,14 @@ export const markdownPostManager =
     ...config,
     collections: (config.collections ?? []).map((collection) =>
       options.collections.includes(collection.slug)
-        ? { ...collection, fields: [...collection.fields, ...markdownPostFields] }
+        ? {
+            ...collection,
+            fields: [...collection.fields, ...markdownPostFields],
+            hooks: {
+              ...collection.hooks,
+              beforeChange: [...(collection.hooks?.beforeChange ?? []), syncContentFromMarkdown],
+            },
+          }
         : collection,
     ),
   })

@@ -41,3 +41,11 @@ noe-posts の `.md` を、ローカルプレビュー（Textastic など）と�
 - `/api/ai/posts` は、公開済みの記事に Markdown が送られてきたとき `checkGitOverwrite()` で判定する。受け入れるのは、同じ内容の再送か、frontmatter の `baseRevision` が DB の今の版と一致するときだけ。それ以外は 409（`code: "db-is-newer"`）。
 - 公開前の記事（下書き）は、今までどおり Git 側が上書きする。
 - 詳しくは `docs/markdown-post-manager-and-style-editor.md` §2.4。
+
+## 管理画面の Markdown エディタ（`admin/`、フェーズ2）
+`markdownSource` の欄を差し替える（`admin/MarkdownEditorField.tsx`）。
+- 左に Markdown、右にプレビュー。「MD / 並べて / プレビュー」の切り替えと全画面。スクロールは原文の行番号で連動し、表示を切り替えても同じ場所を開く。
+- プレビューは本物の下書きプレビューページ（`/dev|blog/<slug>/preview`）を iframe で開き、本文（`[data-md-root]`）だけを入力中の Markdown で差し替える（`admin/previewController.ts`。React 非依存）。未保存などでページが無いときは、上書き CSS だけの簡易表示。
+- プレビューの段落・見出し・表のセルをクリックすると、その場で書き換えられる（Enter で確定 / Shift+Enter で改行 / Esc で取り消し、太字・斜体・コード・リンク）。書き戻しは `admin/blockEdit.ts`（noe-posts の Netlify エディタと同じ規則）。行番号は `renderMarkdownArticle(..., { sourceMap: true })` が付ける `data-src` / `data-row` / `data-col`。
+- 「画像を追加」で Media にアップロードし、`markdownMedia` に登録して本文に `![](./ファイル名)` を入れる。本文が使っているのに `markdownMedia` に無い画像は、欄の下に警告を出す。
+- 保存すると `contentSync.ts` の beforeChange フックが `content`（Lexical。検索・読了時間・OG 用）を作り直す。`/api/ai/posts` は自分で作るので `req.context.markdownContentProvided` で飛ばす。
