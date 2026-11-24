@@ -134,7 +134,7 @@
 }
 @media (max-width: 768px) {
   /* モバイルでは段落の行間（1.5）がセルの中の文字にも効く */
-  :where(.md-render, html > body) table th, table td { line-height: 1.5; }
+  :where(.md-render, html > body) table th, :where(.md-render, html > body) table td { line-height: 1.5; }
 }
 
 
@@ -166,9 +166,9 @@
   right: 0;
   height: 46px;
   background:
-    :where(.md-render, html > body) radial-gradient(circle at 26px 50%, rgba(255, 95, 86, 0.8) 5.5px, transparent 6px),
-    :where(.md-render, html > body) radial-gradient(circle at 46px 50%, rgba(255, 189, 46, 0.8) 5.5px, transparent 6px),
-    :where(.md-render, html > body) radial-gradient(circle at 66px 50%, rgba(39, 201, 63, 0.8) 5.5px, transparent 6px),
+    radial-gradient(circle at 26px 50%, rgba(255, 95, 86, 0.8) 5.5px, transparent 6px),
+    radial-gradient(circle at 46px 50%, rgba(255, 189, 46, 0.8) 5.5px, transparent 6px),
+    radial-gradient(circle at 66px 50%, rgba(39, 201, 63, 0.8) 5.5px, transparent 6px),
     #090b0e;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -875,3 +875,5 @@ a,
 /* ===================================================================
    4. GUI エディタで追加した上書き
    =================================================================== */
+/* @gui-begin（GUI エディタが管理する区画。保存のたびに書き直される。手で書いてもよい） */
+/* @gui-end */
