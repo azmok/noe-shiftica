@@ -67,6 +67,12 @@ describe('renderMarkdownArticle', () => {
     expect(html).toContain('&lt;img src=&quot;./x.png&quot;&gt;')
   })
 
+  it('leaves other attributes such as data-src alone', () => {
+    const { html } = renderMarkdownArticle('<img data-src="./x.png" src="./x.png">', { 'x.png': { url: 'https://cdn/x.png' } })
+    expect(html).toContain('data-src="./x.png"')
+    expect(html).toContain(' src="https://cdn/x.png"')
+  })
+
   it('does not rewrite link hrefs to media', () => {
     expect(rewriteUrl('./x.png', 'href', { 'x.png': { url: 'https://cdn/x.png' } })).toBe('./x.png')
   })
