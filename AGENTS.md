@@ -19,8 +19,7 @@ re-read the relevant Signs (`query.py --type sign`) + the original instruction
 before retrying (the original instruction + Signs win over your latest failure log).
 
 ## Standing instructions (Azuma) — apply to EVERY agent
-- Make the change and run `git add`; treat staging as the work boundary.
-- **NEVER run `git commit` or `git push` until Azuma explicitly says so.** "Done" / "verified" is NOT permission.
+- Make the change, then `git add` → `git commit` → `git push` at the agent's own discretion (approved by Azuma on 2026-11-24). Push to the working branch only. Protected-file edits, running migrations for real, and publishing to production still need Azuma's prior approval.
 - No need to wait on or report background rollouts / long prod builds (Azuma checks those); tsc/unit verification is enough to report done.
 - Packages: JS = pnpm (+ fnm) only / Python = uv only. NEVER use pip or npm.
 - After editing source, verify it is clean UTF-8 with no NUL bytes (see Sign "Source files must stay clean UTF-8" in `memory/signs.md`).
