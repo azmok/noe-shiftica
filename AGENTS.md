@@ -19,7 +19,8 @@ re-read the relevant Signs (`query.py --type sign`) + the original instruction
 before retrying (the original instruction + Signs win over your latest failure log).
 
 ## Standing instructions (Azuma) — apply to EVERY agent
-- Make the change, then `git add` → `git commit` → `git push` at the agent's own discretion (approved by Azuma on 2026-11-24). Push to the working branch only. Protected-file edits, running migrations for real, and publishing to production still need Azuma's prior approval.
+- Make the change, then `git add` → `git commit` → `git push` at the agent's own discretion (approved by Azuma on 2026-11-24). Push to the working branch only.
+- Opening pull requests and merging them into main is also at the agent's own discretion (approved by Azuma on 2026-11-25), including the md-assets sync PRs opened by noe-posts' Action. Make sure tsc / unit tests pass before merging. Exception: a change that needs a column-adding/altering migration is merged only after that migration has been run for real (dry-run → Azuma's approval → run). Protected-file edits, running migrations for real, and destructive DB operations still need Azuma's prior approval.
 - No need to wait on or report background rollouts / long prod builds (Azuma checks those); tsc/unit verification is enough to report done.
 - Packages: JS = pnpm (+ fnm) only / Python = uv only. NEVER use pip or npm.
 - After editing source, verify it is clean UTF-8 with no NUL bytes (see Sign "Source files must stay clean UTF-8" in `memory/signs.md`).
