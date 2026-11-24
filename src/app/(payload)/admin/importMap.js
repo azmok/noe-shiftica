@@ -46,10 +46,13 @@ import { MobileFullscreenEditor as MobileFullscreenEditor_94986dd0765443c6a44756
 import { HostingUrlField as HostingUrlField_4a2099868d4869c9b5da93d211c320a6 } from '@/plugins/html-hosting/components/HostingUrlField'
 import { HostingEditor as HostingEditor_15976d9876b7ed1dab5acb3473d683df } from '@/plugins/html-hosting/components/HostingEditor'
 import { ApiEndpointGuide as ApiEndpointGuide_125f1c5d5dc04998c19f20c7335a6325 } from '@/plugins/ai-api/components/ApiEndpointGuide'
+import { TokenField as TokenField_471d4e9d7b8fc5678129ceb32bae45bd } from '@/plugins/markdownPostManager/manager/TokenField'
 import { PasskeyLoginButton as PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5 } from '@/components/admin/PasskeyLoginButton'
+import { NavLink as NavLink_d83026ee864eb0ea147e17bd51c1c061 } from '@/plugins/markdownPostManager/manager/NavLink'
 import { ImageCompressionProvider as ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc } from '@/components/admin/ImageCompressionProvider'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { PanelResizerProvider as PanelResizerProvider_e663389a985a61c76b0f3ac628630696 } from '@/plugins/panelResizer/Provider'
+import { ManagerView as ManagerView_e2a4c7cca7b8987041ac0c16ff4f2c89 } from '@/plugins/markdownPostManager/manager/ManagerView'
 import { PreviewView as PreviewView_f2bb3e5404c34e473bc1ff306c08df18 } from '@/plugins/html-file-manager/views/PreviewView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -102,10 +105,13 @@ export const importMap = {
   "@/plugins/html-hosting/components/HostingUrlField#HostingUrlField": HostingUrlField_4a2099868d4869c9b5da93d211c320a6,
   "@/plugins/html-hosting/components/HostingEditor#HostingEditor": HostingEditor_15976d9876b7ed1dab5acb3473d683df,
   "@/plugins/ai-api/components/ApiEndpointGuide#ApiEndpointGuide": ApiEndpointGuide_125f1c5d5dc04998c19f20c7335a6325,
+  "@/plugins/markdownPostManager/manager/TokenField#TokenField": TokenField_471d4e9d7b8fc5678129ceb32bae45bd,
   "@/components/admin/PasskeyLoginButton#PasskeyLoginButton": PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5,
+  "@/plugins/markdownPostManager/manager/NavLink#NavLink": NavLink_d83026ee864eb0ea147e17bd51c1c061,
   "@/components/admin/ImageCompressionProvider#ImageCompressionProvider": ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@/plugins/panelResizer/Provider#PanelResizerProvider": PanelResizerProvider_e663389a985a61c76b0f3ac628630696,
+  "@/plugins/markdownPostManager/manager/ManagerView#ManagerView": ManagerView_e2a4c7cca7b8987041ac0c16ff4f2c89,
   "@/plugins/html-file-manager/views/PreviewView#PreviewView": PreviewView_f2bb3e5404c34e473bc1ff306c08df18,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

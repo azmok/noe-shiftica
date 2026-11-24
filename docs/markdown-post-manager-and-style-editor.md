@@ -98,6 +98,19 @@ markdownPostManager({
   3. コミットする
 - 鍵はサーバーの環境変数だけに置く。ブラウザには出さない。
 
+### 2.7 管理画面のタブ「Markdown Post Manager」（Netlify エディタの引っ越し・2026-11-25 追加）
+
+公開**前**の記事（GitHub の非公開リポジトリにある .md）を編集する場所。公開**後**の記事は §2.3 の編集欄で直す。
+
+- `/admin/markdown-post-manager`（`manager/ManagerView.tsx`）が、静的アプリ `public/mpm-app/`（もとは noe-posts の `_tools/`）を iframe で開く。記事一覧のドロワー・本番そっくりのプレビュー・クリック編集・MD 表示・保存の結果（理由つき）はそのまま使える。
+- 見た目の調整（スタイルモード）は出さない。§3 の styleEditor で行う。
+- 設定は global `markdown-post-manager-settings`：リポジトリの URL（`https://github.com/<owner>/<repo>.git`）と GitHub の鍵。
+  - 鍵は PAYLOAD_SECRET から作った鍵で AES-256-GCM 暗号化して保存する。API やブラウザには返さない（`tokenEncrypted` は read: false。入力欄の `token` は virtual）。
+- GitHub への通信は `/api/mpm/github?path=…`（`manager/endpoints.ts`）を使う。
+  - 管理画面にログインした人の Cookie で呼び、鍵はサーバーが付ける。
+  - 中継するのは設定したリポジトリ（`/repos/<owner>/<repo>…`）だけ。
+- Netlify（noe-post-viewer）は止める。noe-posts の `_tools/` は手元（Pythonista）用に残す。
+
 ## 3. styleEditor
 
 ### 3.1 何をするか
@@ -136,7 +149,7 @@ markdownPostManager({
 
 ## 5. フェーズ
 
-進み具合（2026-11-25）：フェーズ1 完了（#29）／フェーズ2 完了（管理画面の MD エディタ＋プレビュー＋クリック編集。Q1 の答え「クリック編集も入れる」を反映）。
+進み具合（2026-11-25）：フェーズ1 完了（#29）／フェーズ2 完了（管理画面の MD エディタ＋プレビュー＋クリック編集。Q1 の答え「クリック編集も入れる」を反映）／§2.7 管理画面のタブ（Netlify エディタの引っ越し）実装済み。
 
 | # | 内容 | DB の変更 | noe-posts の変更 |
 |---|---|---|---|
