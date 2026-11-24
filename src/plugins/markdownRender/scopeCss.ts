@@ -1,7 +1,7 @@
 /**
- * 共通 CSS（ini.md.css）を、記事本文のコンテナだけに閉じ込める。
+ * 記事の CSS（article.css）を、記事本文のコンテナだけに閉じ込める。
  *
- * ini.md.css は単体の HTML ページ用なので `html` / `body` / `:root` / `*` / `h1` などの
+ * article.css は手元プレビュー（単体の HTML ページ）でも使うので `html` / `body` / `:root` / `*` / `h1` などの
  * グローバルなセレクタを含む。そのまま読み込むとサイトのヘッダーやフッターまで変わる。
  * そこで全体を `@scope (.md-render) { ... }` で包む。@scope の中では次の2点が問題になる:
  *
@@ -11,7 +11,7 @@
  *     → md-ui.js がコンテナにも状態クラスを付けるので、`:scope.js-motion .reveal` に書き換える
  *
  * @keyframes / @font-face などはスコープできない（グローバル）ので、@scope の外に出す。
- * パーサーは「コメント・文字列・波括弧」だけを追う軽量版（ini.md.css の範囲を対象にしている）。
+ * パーサーは「コメント・文字列・波括弧」だけを追う軽量版（article.css の範囲を対象にしている）。
  */
 
 export const MD_ROOT_CLASS = 'md-render'
@@ -156,7 +156,7 @@ function scopeRules(css: string, hoisted: string[]): string {
   return out
 }
 
-/** ini.md.css 全体を `.md-render` のスコープに閉じ込めた CSS にする */
+/** article.css 全体を `.md-render` のスコープに閉じ込めた CSS にする */
 export function scopeMarkdownCss(css: string, rootClass: string = MD_ROOT_CLASS): string {
   const hoisted: string[] = []
   const scoped = scopeRules(stripComments(css), hoisted)

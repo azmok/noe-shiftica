@@ -25,7 +25,7 @@
 - 記事の正本は非公開リポジトリ `azmok/noe-posts`（`dev/<slug>/<slug>.md` → tech-posts、`blog/<slug>/<slug>.md` → posts）。
   iPad の Textastic + Working Copy で書き、作業ブランチへの push で下書き送信、main へのマージで `status: published` の記事を公開（noe-posts の Actions）。
 - noe-posts の記事は `renderMode: 'markdown'` で保存され、表示は `src/plugins/markdownRender/`（markdown-it）。既存記事は `'lexical'` のまま変わらない。
-- 共通 CSS / JS / アイコンの正本は `public/md-assets/`（noe-posts の `_assets/` はその写し）。`ini.md.css` を変えたら `pnpm md-assets:build` で `ini.md.scoped.css` も更新してコミットする。
+- 記事の見た目は `article.css`（サイトの記事デザイン＋部品）1枚で、手元プレビューと本番が同じファイルを使う。**正本は noe-posts の `_assets/`**（CSS / JS / アイコン）。noe-posts の main で `_assets/` が変わると、Action が noe-shiftica の `public/md-assets/` を更新するプルリクエストを出す（`article.scoped.css` も再生成済み）。
 - 下書きプレビュー（`/dev|blog/<slug>/preview`）は管理画面ログイン必須（`src/plugins/draftPreviewGuard/`）。
 - 設計書：`docs/markdown-render-mode.md`
 
