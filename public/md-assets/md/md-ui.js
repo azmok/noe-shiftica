@@ -17,13 +17,16 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  var root;
-  var mount;   // 進捗バー・上へ戻るボタンの置き場所（サイトに埋め込まれた時は本文コンテナの中）
+  var boxSeq = 0;   // 複数の本文コンテナがあっても id が重ならないよう、全体で数える
+
+  // 本文コンテナ1つ分の初期化。サイトでは本文がモバイル用・デスクトップ用の2つ描画されるので、
+  // [data-md-root] ごとに1回ずつ呼ぶ（片方は CSS で非表示）
+  function createUi(root) {
+  var mount = root.hasAttribute('data-md-root') ? root : document.body;   // 進捗バー・上へ戻るボタンの置き場所
 
   /* ---------- 1. AI別ボックスの折りたたみ ---------- */
   // 初期状態：Claude のボックスは開く／ChatGPT・Gemini は閉じる
   // 個別に変えたい時は <div class="ai-box ..." data-open="true|false">
-  var boxSeq = 0;
   function setupAiBoxes() {
     root.querySelectorAll('.ai-box').forEach(function (box) {
       var title = box.querySelector('.ai-box__title');
@@ -245,19 +248,22 @@
     mount.appendChild(toTop);
   }
 
+  setupAiBoxes();
+  setupCopy();
+  setupMarkers();
+  setupDepth();
+  setupToTop();
+  setupProgress();
+  setupReveal();
+  document.documentElement.classList.add('md-ready');
+  root.classList.add('md-ready');
+  }
+
   function init() {
     // サイトに埋め込まれた時は [data-md-root] が本文コンテナ。無ければ（ローカルプレビュー）従来どおり探す
-    root = document.querySelector('[data-md-root]') || document.querySelector('article') || document.querySelector('main') || document.body;
-    mount = root.hasAttribute('data-md-root') ? root : document.body;
-    setupAiBoxes();
-    setupCopy();
-    setupMarkers();
-    setupDepth();
-    setupToTop();
-    setupProgress();
-    setupReveal();
-    document.documentElement.classList.add('md-ready');
-    root.classList.add('md-ready');
+    var embedded = document.querySelectorAll('[data-md-root]');
+    if (embedded.length) Array.prototype.forEach.call(embedded, createUi);
+    else createUi(document.querySelector('article') || document.querySelector('main') || document.body);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

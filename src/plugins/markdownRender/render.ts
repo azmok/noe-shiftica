@@ -66,7 +66,20 @@ function textOfInline(children: Array<{ type: string; content: string }> | null)
     .join('')
 }
 
-export function renderMarkdownArticle(source: string, media: MarkdownMedia = {}): RenderedMarkdown {
+export interface RenderOptions {
+  /**
+   * 見出しに実際の `id` を付けるか。本文はモバイル用とデスクトップ用の2回描画されるので、
+   * 片方だけ true にして fragment の id を一意に保つ（articleToc の headingWithAnchor と同じ方針）。
+   * `data-heading-id` は常に付く（HeadingAnchorBehavior / ArticleTocSidebar が見る）。
+   */
+  ids?: boolean
+}
+
+export function renderMarkdownArticle(
+  source: string,
+  media: MarkdownMedia = {},
+  options: RenderOptions = {},
+): RenderedMarkdown {
   const env: { headings: ArticleHeading[] } = { headings: [] }
   const used = new Set<string>()
 
@@ -81,7 +94,8 @@ export function renderMarkdownArticle(source: string, media: MarkdownMedia = {})
     let id = base
     for (let n = 2; used.has(id); n++) id = `${base}-${n}`
     used.add(id)
-    t.attrSet('id', id)
+    if (options.ids !== false) t.attrSet('id', id)
+    t.attrSet('data-heading-id', id)
     env.headings.push({ id, text, level: Number(t.tag.slice(1)) })
   }
 

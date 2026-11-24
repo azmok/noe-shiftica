@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { LivePreview } from "../../../blog/[slug]/LivePreview";
 import { unstable_noStore as noStore } from "next/cache";
 import Script from "next/script";
+import { requirePreviewUser } from "@/plugins/draftPreviewGuard";
 
 // Draft preview route: never index. It renders unpublished content and must not
 // appear in search results or compete with the published article's canonical.
@@ -21,6 +22,9 @@ export default async function DevPostPreviewPage({
 
     const { slug } = await params;
     const payload = await getPayload({ config: configPromise });
+
+    // 下書きは管理画面にログインしている人だけ（未ログインは /admin/login へ）
+    await requirePreviewUser(payload, `/dev/${slug}/preview`);
 
     const posts = await payload.find({
         collection: "tech-posts",

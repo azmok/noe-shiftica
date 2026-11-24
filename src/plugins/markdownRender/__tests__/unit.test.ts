@@ -79,8 +79,14 @@ describe('renderMarkdownArticle', () => {
       ['詳細', 3, '詳細'],
       ['問題の原因-2', 2, '問題の原因'],
     ])
-    expect(html).toContain('<h2 id="問題の原因">')
-    expect(html).toContain('<h2 id="問題の原因-2">')
+    expect(html).toContain('<h2 id="問題の原因" data-heading-id="問題の原因">')
+    expect(html).toContain('<h2 id="問題の原因-2" data-heading-id="問題の原因-2">')
+  })
+
+  it('ids: false keeps data-heading-id but drops id (second copy of the body)', () => {
+    const { html } = renderMarkdownArticle('## 見出し\n', {}, { ids: false })
+    expect(html).toContain('<h2 data-heading-id="見出し">')
+    expect(html).not.toContain(' id=')
   })
 })
 

@@ -562,3 +562,71 @@ describe('openLinksInNewTab', () => {
   })
 })
 
+
+describe('POST /api/ai/posts — renderMode', () => {
+  const mdBody = [
+    '---',
+    'title: "T"',
+    'slug: "t"',
+    'status: draft',
+    '---',
+    '',
+    '<link rel="stylesheet" href="../../_assets/md/ini.md.css" />',
+    '<div class="ai-box">',
+    '',
+    '![in box](./01_in_box.png)',
+    '',
+    '</div>',
+    '',
+    '<img src="./02_existing.png" alt="">',
+  ].join('\n')
+
+  beforeEach(() => {
+    mockPayload.find.mockImplementation(async ({ collection, where }) => {
+      if (collection === 'media' && where?.id) {
+        return { docs: where.id.in.map((id: number) => ({ id, url: `https://cdn.test/${id}.png` })) }
+      }
+      if (collection === 'media') {
+        return { docs: where.filename.equals === '02_existing.png' ? [{ id: 202, filesize: existingSize }] : [] }
+      }
+      return { docs: existingPosts }
+    })
+  })
+
+  it('stores the preprocessed source and an image map (images found inside HTML / boxes too)', async () => {
+    const res = await post({
+      collection: 'tech-posts',
+      markdown: mdBody,
+      renderMode: 'markdown',
+      images: [{ filename: '01_in_box.png', data: tinyPng }],
+    })
+    expect(res.status).toBe(201)
+    const data = createdPost().data
+    expect(data.renderMode).toBe('markdown')
+    expect(data.markdownSource).not.toContain('ini.md.css')
+    expect(data.markdownSource).not.toContain('status: draft')
+    expect(data.markdownSource).toContain('<div class="ai-box">')
+    expect(Object.keys(data.markdownMedia).sort()).toEqual(['01_in_box.png', '02_existing.png'])
+    expect(data.markdownMedia['01_in_box.png'].url).toMatch(/^https:\/\/cdn\.test\//)
+    // the Lexical content is still generated as before
+    expect(data.content).toBeTruthy()
+  })
+
+  it('does not add markdown fields by default', async () => {
+    await post({ collection: 'tech-posts', markdown: '---\ntitle: "T"\nslug: "t"\n---\n\n本文' })
+    const data = createdPost().data
+    expect(data).not.toHaveProperty('renderMode')
+    expect(data).not.toHaveProperty('markdownSource')
+  })
+
+  it('rejects an unknown renderMode', async () => {
+    const res = await post({ collection: 'tech-posts', markdown: 'x', renderMode: 'html' })
+    expect(res.status).toBe(400)
+  })
+
+  it('tells which image is missing when it was not sent', async () => {
+    const res = await post({ collection: 'tech-posts', markdown: mdBody, renderMode: 'markdown', images: [] })
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toContain('01_in_box.png')
+  })
+})

@@ -38,7 +38,7 @@
       '</div>' +
       '<p class="term-pop__body"></p>' +
       '<span class="term-pop__arrow" aria-hidden="true"></span>';
-    (mount || document.body).appendChild(pop);
+    document.body.appendChild(pop);
     titleEl = pop.querySelector('.term-pop__title');
     bodyEl = pop.querySelector('.term-pop__body');
     arrowEl = pop.querySelector('.term-pop__arrow');
@@ -49,6 +49,11 @@
   function open(term, byKeyboard) {
     if (current && current !== term) close(false);
     current = term;
+    // 本文コンテナ（[data-md-root]）の中にいる用語なら、ポップアップもその中に置く（CSS の閉じ込めが効く）。
+    // 本文は2つ描画され片方は非表示なので、押された用語のコンテナへ毎回移す
+    mount = term.closest ? term.closest('[data-md-root]') : null;
+    var host = mount || document.body;
+    if (pop.parentNode !== host) host.appendChild(pop);
     titleEl.textContent = term.getAttribute('data-term') || term.textContent.trim();
     bodyEl.textContent = term.getAttribute('data-note') || '';
     term.setAttribute('aria-expanded', 'true');
@@ -119,7 +124,6 @@
   function init() {
     var terms = document.querySelectorAll('.term[data-note]');
     if (!terms.length) return;
-    mount = document.querySelector('[data-md-root]');
     build();
     terms.forEach(function (t) {
       t.setAttribute('aria-expanded', 'false');
