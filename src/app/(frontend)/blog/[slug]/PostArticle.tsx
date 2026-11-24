@@ -287,10 +287,14 @@ export const PostArticle: React.FC<{
     const desktopConverters = withHeadingAnchors(idByNode, false)
 
     return (
-        <main className="grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
+        <main id="article-page" className="article-page grow w-full md:max-w-7xl mx-auto md:px-4 sm:px-6 lg:px-8 pt-0 md:pt-24 pb-20 md:pb-32 relative z-10">
             {svgDefs.map((html, i) => (
                 <div key={i} dangerouslySetInnerHTML={{ __html: html }} />
             ))}
+            {/* 記事ページの上書き CSS（正本：noe-posts/_assets/md/article.css）。全セレクタに #article-page が付いているので、
+                サイトの CSS より強く、ナビとフッターには効かない。markdownRender プラグインの README 参照 */}
+            {/* eslint-disable-next-line @next/next/no-css-tags -- 記事ページだけで読む上書き CSS。React 19 の precedence で head に集約される */}
+            <link rel="stylesheet" href="/md-assets/md/article.scoped.css" precedence="article-overrides" />
             <ArticleCustomAssets scopeId={scopeId} css={(post as any).customCss} js={(post as any).customJs} />
             <HeadingAnchorBehavior scopeId={scopeId} />
             {hasTwitterEmbed(post.content) && <TwitterEmbedLoader />}
@@ -304,9 +308,9 @@ export const PostArticle: React.FC<{
             <div id={scopeId} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
 
                 {/* Mobile Article View */}
-                <article className="selection:bg-(--color-neu-primary)/30 md:hidden flex flex-col pt-0">
+                <article className="article-mobile selection:bg-(--color-neu-primary)/30 md:hidden flex flex-col pt-0">
                     {/* Immersive Hero */}
-                    <div className="relative w-full aspect-video rounded-b-[40px] overflow-hidden shadow-2xl bg-black/40">
+                    <div data-slot="hero" className="article-hero relative w-full aspect-video rounded-b-[40px] overflow-hidden shadow-2xl bg-black/40">
                         {(() => {
                             try {
                                 const img = (post.heroImage || post.coverImage);
@@ -338,7 +342,7 @@ export const PostArticle: React.FC<{
                         </div>
 
                         <div className="absolute bottom-[1rem] left-6 right-6 z-20">
-                            <h1 className="text-3xl font-sans text-white leading-none drop-shadow-[1px_1px_1px_rgba(0,0,0,1)]">
+                            <h1 data-slot="title" className="article-title text-3xl font-sans text-white leading-none drop-shadow-[1px_1px_1px_rgba(0,0,0,1)]">
                                 {post.title}
                             </h1>
 
@@ -346,7 +350,7 @@ export const PostArticle: React.FC<{
                     </div>
 
                     {/* Mobile meta data */}
-                    <div className="px-6 pt-6 -mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <div data-slot="meta" className="article-meta px-6 pt-6 -mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                         <div className="flex items-center gap-1.5">
                             <span className="text-(--color-neu-primary)">Published</span>
                             <span className="text-white/80">{post.publishedAt ? fmtDateTimeJstCompact(post.publishedAt) : ''}</span>
@@ -367,19 +371,19 @@ export const PostArticle: React.FC<{
                     {/* Mobile Article Content */}
                     <div className="px-6 py-10 space-y-10">
                         {/* Key Points / Intro Card */}
-                        <div className="p-6 rounded-(--mobile-radius) bg-white/5 border border-white/10">
+                        <div className="article-insights p-6 rounded-(--mobile-radius) bg-white/5 border border-white/10">
                             <h2 className="text-sm font-bold text-(--color-neu-primary) uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-(--color-neu-primary) animate-pulse" />
                                 Key Insights
                             </h2>
-                            <p className="text-sm text-slate-300 leading-relaxed italic">
+                            <p data-slot="description" className="text-sm text-slate-300 leading-relaxed italic">
                                 {post.description || "この記事の主要なポイントをまとめました。詳細については以下の本文をご覧ください。"}
                             </p>
                         </div>
 
-                        <ArticleToc entries={toc} />
+                        <div className="article-toc" data-slot="toc"><ArticleToc entries={toc} /></div>
 
-                        <div className={mdMode ? 'native-link-cursor' : `prose prose-sm prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
+                        <div data-slot="body" className={`article-body prose prose-sm prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                             {(() => {
                                 if (mdMobile) return <MarkdownBody html={mdMobile.html} />;
@@ -411,7 +415,7 @@ export const PostArticle: React.FC<{
                             const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
                             if (tags.length === 0) return null;
                             return (
-                                <div className="flex flex-wrap gap-2 pt-8 border-t border-white/10">
+                                <div className="article-tags flex flex-wrap gap-2 pt-8 border-t border-white/10">
                                     {tags.map((tag, index) => (
                                         <span key={index} className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400">
                                             #{tag}
@@ -422,7 +426,7 @@ export const PostArticle: React.FC<{
                         })()}
 
                         {/* Mobile Navigation Cards */}
-                        <div className="space-y-4 pt-4">
+                        <div className="article-nav space-y-4 pt-4">
                             <h4 className="text-xs font-bold text-(--mobile-text-muted) uppercase tracking-widest text-center mb-6">Continue Reading</h4>
                             {nextPost && (
                                 <Link href={`${basePath}/${nextPost.slug}`} className="block">
@@ -445,7 +449,7 @@ export const PostArticle: React.FC<{
                 </article>
 
                 {/* Desktop Article Column */}
-                <article className="selection:bg-(--color-neu-primary)/30 hidden md:flex lg:col-span-12 xl:col-span-12 flex-col gap-12 mt-8">
+                <article className="article-desktop selection:bg-(--color-neu-primary)/30 hidden md:flex lg:col-span-12 xl:col-span-12 flex-col gap-12 mt-8">
                     <div className="relative w-full">
                         {/* Vertical Breadcrumbs */}
                         <div className="absolute -left-16 top-10 origin-top-left rotate-90 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest pointer-events-none whitespace-nowrap">
@@ -458,10 +462,10 @@ export const PostArticle: React.FC<{
 
                         {/* Main Card */}
                         {/* overflow-clip (not hidden) keeps the rounded clipping without breaking the sticky TOC */}
-                        <div className="bg-white/5 border border-white/10 overflow-clip rounded-[2.5rem] shadow-2xl">
+                        <div className="article-card bg-white/5 border border-white/10 overflow-clip rounded-[2.5rem] shadow-2xl">
                             <div className="flex flex-col">
                                 {/* Hero Image Section with Title Overlay */}
-                                <div className="w-full aspect-video relative group overflow-hidden bg-black/20 border-b border-white/5">
+                                <div data-slot="hero" className="article-hero w-full aspect-video relative group overflow-hidden bg-black/20 border-b border-white/5">
                                     {(() => {
                                         try {
                                             const img = (post.heroImage || post.coverImage);
@@ -491,14 +495,14 @@ export const PostArticle: React.FC<{
 
                                     {/* Title Overlay: White text + White glow shadow */}
                                     <div className="absolute inset-x-12 bottom-12 lg:inset-x-20 lg:bottom-20 z-20">
-                                        <h1 className="text-white text-4xl lg:text-5xl xl:text-7xl font-sans font-bold leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
+                                        <h1 data-slot="title" className="article-title text-white text-4xl lg:text-5xl xl:text-7xl font-sans font-bold leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
                                             {post.title}
                                         </h1>
                                     </div>
                                 </div>
 
                                 {/* Metadata Section (Below Hero) */}
-                                <div className="p-8 lg:px-20 lg:py-10 border-b border-white/5 bg-white/5">
+                                <div data-slot="meta" className="article-meta p-8 lg:px-20 lg:py-10 border-b border-white/5 bg-white/5">
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center gap-4">
                                             <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-(--color-neu-primary) bg-(--color-neu-primary)/5 px-3 py-1 rounded-sm">
@@ -532,10 +536,10 @@ export const PostArticle: React.FC<{
 
                                 <div className="xl:flex xl:justify-center xl:gap-8 xl:px-8">
                                 <div className="max-w-[872px] mx-auto xl:mx-0 w-full min-w-0 px-6 lg:px-12 py-16 lg:py-12 lg:pb-24 text-white">
-                                    <div className="mb-12">
+                                    <div className="article-toc mb-12" data-slot="toc">
                                         <ArticleToc entries={toc} />
                                     </div>
-                                    <div className={mdMode ? 'native-link-cursor' : `prose prose-lg prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
+                                    <div data-slot="body" className={`article-body prose prose-lg prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                                         {(() => {
                                             if (mdDesktop) return <MarkdownBody html={mdDesktop.html} />;
@@ -566,7 +570,7 @@ export const PostArticle: React.FC<{
                                         const tags = Array.isArray(cmd.tags) ? cmd.tags : [];
                                         if (tags.length === 0) return null;
                                         return (
-                                            <div className="flex flex-wrap gap-3 mt-16 pt-10 border-t border-white/10">
+                                            <div className="article-tags flex flex-wrap gap-3 mt-16 pt-10 border-t border-white/10">
                                                 {tags.map((tag, index) => (
                                                     <Link
                                                         key={index}
@@ -581,7 +585,7 @@ export const PostArticle: React.FC<{
                                     })()}
                                 </div>
                                 {toc.length > 0 && (
-                                    <aside className="hidden xl:block w-60 shrink-0 py-12">
+                                    <aside className="article-toc-sidebar hidden xl:block w-60 shrink-0 py-12">
                                         <ArticleTocSidebar entries={toc} scopeId={scopeId} />
                                     </aside>
                                 )}
@@ -591,7 +595,7 @@ export const PostArticle: React.FC<{
                     </div>
 
                     {/* Navigation */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                    <div className="article-nav grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
                         {prevPost ? (
                             <Link href={`${basePath}/${prevPost.slug}`} className="bg-white/5 border border-white/10 p-8 rounded-2xl group flex flex-col items-start transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-1">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-(--color-neu-primary) transition-colors flex items-center gap-1">

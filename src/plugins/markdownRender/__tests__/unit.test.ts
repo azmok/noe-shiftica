@@ -91,50 +91,47 @@ describe('renderMarkdownArticle', () => {
 })
 
 describe('scopeMarkdownCss', () => {
-  it('maps html / body / :root to :scope', () => {
-    expect(scopeSelector('html')).toBe(':scope')
-    expect(scopeSelector('body')).toBe(':scope')
-    expect(scopeSelector(':root')).toBe(':scope')
-    expect(scopeSelector('body.dark')).toBe(':scope.dark')
-    expect(scopeSelector('h1')).toBe('h1')
-    expect(scopeSelector('.bodyish')).toBe('.bodyish')
+  it('prefixes every selector with #article-page; html / body / :root become #article-page itself', () => {
+    expect(scopeSelector('html')).toBe('#article-page')
+    expect(scopeSelector('body')).toBe('#article-page')
+    expect(scopeSelector(':root')).toBe('#article-page')
+    expect(scopeSelector('body.dark')).toBe('#article-page.dark')
+    expect(scopeSelector('h1')).toBe('#article-page h1')
+    expect(scopeSelector('.article-body h2')).toBe('#article-page .article-body h2')
+    expect(scopeSelector('.bodyish')).toBe('#article-page .bodyish')
+    expect(scopeSelector('::selection')).toBe('#article-page ::selection')
   })
 
-  it('maps html state classes to the container', () => {
-    expect(scopeSelector('.js-motion .reveal')).toBe(':scope.js-motion .reveal')
-    expect(scopeSelector('.md-ready h1.text-gradient')).toBe(':scope.md-ready h1.text-gradient')
-    expect(scopeSelector('.js-motionx')).toBe('.js-motionx')
+  it('markdown-only adapters stay limited to the markdown body', () => {
+    expect(scopeSelector(':where(.md-render, html > body) table td')).toBe('#article-page :where(.md-render, html > body) table td')
   })
 
-  it('wraps in @scope, scopes selector lists and nested @media, hoists @keyframes', () => {
+  it('scopes selector lists and nested @media, and hoists @keyframes / @import', () => {
     const out = scopeMarkdownCss(`
       /* c { x } */
+      @import url("x.css");
       @keyframes k { from { opacity: 0 } to { opacity: 1 } }
       html, button, a:not(.x, .y) { touch-action: manipulation; }
       @media (max-width: 640px) { body { padding: 0 } th, td { min-width: 1em } }
     `)
-    expect(out.indexOf('@keyframes k')).toBeLessThan(out.indexOf('@scope (.md-render)'))
-    expect(out).toContain(':scope, button, a:not(.x, .y){')
-    expect(out).toMatch(/@media \(max-width: 640px\)\{\s*:scope\{ padding: 0 \}/)
-    expect(out).toContain('th, td{')
+    expect(out.indexOf('@import url("x.css");')).toBe(0)
+    expect(out).toMatch(/^@keyframes k\{ from \{ opacity: 0 \} to \{ opacity: 1 \} \}$/m)
+    expect(out).toContain('#article-page, #article-page button, #article-page a:not(.x, .y){')
+    expect(out).toMatch(/@media \(max-width: 640px\)\{\s*#article-page\{ padding: 0 \}/)
+    expect(out).toContain('#article-page th, #article-page td{')
     expect(out).not.toContain('c { x }')
-    // keyframes are not inside the @scope block
-    expect(out.slice(out.indexOf('@scope'))).not.toContain('@keyframes')
   })
 
-  it('braces stay balanced for the real article.css', () => {
+  it('every rule in the real article.css is scoped (nothing can reach the nav or footer)', () => {
     const css = fs.readFileSync(path.resolve(process.cwd(), 'public/md-assets/md/article.css'), 'utf8')
     const out = scopeMarkdownCss(css)
-    const count = (c: string) => out.split(c).length - 1
-    expect(count('{')).toBe(count('}'))
-    // no selector may start with html / body (they would match the whole site page)
-    expect(out).not.toMatch(/(^|,)\s*(html|body)\b/m)
-  })
-
-  it('local-preview-only rules can never match inside the site container', () => {
-    expect(scopeSelector('html > body')).toBe(':scope > body')
-    expect(scopeSelector('html:not(.md-render)')).toBe(':scope:not(.md-render)')
-    expect(scopeSelector(':where(html > body) *')).toBe(':where(html > body) *')
+    expect(out.split('{').length).toBe(out.split('}').length)
+    // collect top-level and @media-nested selector lists and check each selector starts with the root
+    const selectors = [...out.matchAll(/(?:^|\})\s*([^{}@][^{}]*)\{/g)].map((m) => m[1].trim()).filter((sel) => sel && !sel.startsWith('@') && !/^(from|to|\d+%)/.test(sel))
+    expect(selectors.length).toBeGreaterThan(50)
+    for (const list of selectors) {
+      for (const sel of list.split(/,(?![^(]*\))/)) expect(sel.trim().startsWith('#article-page')).toBe(true)
+    }
   })
 
   it('the committed article.scoped.css is up to date (run `pnpm md-assets:build`)', () => {

@@ -1,26 +1,25 @@
 /**
- * 記事の CSS（article.css）を、記事本文のコンテナだけに閉じ込める。
+ * 記事ページの上書き CSS（article.css）を、記事ページ（`#article-page`）の中だけに効かせる。
  *
- * article.css は手元プレビュー（単体の HTML ページ）でも使うので `html` / `body` / `:root` / `*` / `h1` などの
- * グローバルなセレクタを含む。そのまま読み込むとサイトのヘッダーやフッターまで変わる。
- * そこで全体を `@scope (.md-render) { ... }` で包む。@scope の中では次の2点が問題になる:
+ * 全セレクタの頭に `#article-page` を付ける。ID が付くので、サイトの CSS（Tailwind・prose・
+ * PostArticle.module.css）より必ず強くなり、上書きが確実に効く。ナビとフッターは
+ * `#article-page` の外にあるので影響しない。
  *
- *  1. `html` / `body` / `:root` は、スコープの「祖先」なので何にもマッチしない
- *     → `:scope`（= コンテナ自身）に書き換える
- *  2. `.js-motion .reveal` のような「html に付く状態クラス」も祖先扱いでマッチしない
- *     → md-ui.js がコンテナにも状態クラスを付けるので、`:scope.js-motion .reveal` に書き換える
+ *   - `html` / `body` / `:root` で始まるセレクタは `#article-page` 自身に置き換える
+ *     （`:root { --x }` の変数は記事ページの中だけで使える）
+ *   - `@media` / `@supports` などの中も同じように変換する
+ *   - `@keyframes` / `@font-face` / `@import` などはセレクタを持たないので、そのまま先頭に出す
  *
- * @keyframes / @font-face などはスコープできない（グローバル）ので、@scope の外に出す。
  * パーサーは「コメント・文字列・波括弧」だけを追う軽量版（article.css の範囲を対象にしている）。
+ * noe-posts の Pythonista プレビュー（_tools/scope-css.js）も同じ規則で変換している。
  */
+
+export const ARTICLE_ROOT = '#article-page'
 
 export const MD_ROOT_CLASS = 'md-render'
 
-/** html に付く状態クラス（md-ui.js が html とコンテナの両方に付ける） */
-const STATE_CLASSES = ['js-motion', 'md-ready']
-
-/** @scope の外に出す（グローバルな）at-rule */
-const HOISTED_AT_RULES = ['keyframes', '-webkit-keyframes', 'font-face', 'property', 'counter-style']
+/** セレクタを持たない（そのまま先頭に出す）at-rule */
+const HOISTED_AT_RULES = ['keyframes', '-webkit-keyframes', 'font-face', 'property', 'counter-style', 'import', 'charset']
 
 /** 中にルールを持つ at-rule（中身のセレクタを書き換える） */
 const NESTED_AT_RULES = ['media', 'supports', 'layer', 'container']
@@ -101,22 +100,16 @@ function splitSelectors(list: string): string[] {
   return out
 }
 
-const stateRe = new RegExp(`^\\.(${STATE_CLASSES.join('|')})(?![\\w-])`)
-
-/** セレクタ1つ分（先頭の html / body / :root と、状態クラスだけ書き換える） */
-export function scopeSelector(selector: string): string {
+/** セレクタ1つ分に `root` を付ける（html / body / :root は root 自身に置き換える） */
+export function scopeSelector(selector: string, root: string = ARTICLE_ROOT): string {
   const trimmed = selector.trim()
   if (!trimmed) return trimmed
-  // html / body / :root（後ろに .class や [attr] や :pseudo が続いてもよい）
-  const root = trimmed.match(/^(html|body|:root)(?![\w-])/i)
-  if (root) return ':scope' + trimmed.slice(root[0].length)
-  // 先頭が状態クラス（`.js-motion .reveal` → `:scope.js-motion .reveal`）
-  const state = trimmed.match(stateRe)
-  if (state) return ':scope' + trimmed
-  return trimmed
+  const top = trimmed.match(/^(html|body|:root)(?![\w-])/i)
+  if (top) return root + trimmed.slice(top[0].length)
+  return `${root} ${trimmed}`
 }
 
-function scopeRules(css: string, hoisted: string[]): string {
+function scopeRules(css: string, hoisted: string[], root: string): string {
   let out = ''
   let i = 0
   while (i < css.length) {
@@ -133,8 +126,8 @@ function scopeRules(css: string, hoisted: string[]): string {
     const prelude = css.slice(i, j).trim()
 
     if (css[j] === ';' || j >= css.length) {
-      // `@import` などの文。スコープの外では意味が変わるので、そのまま残す
-      if (prelude) out += prelude + ';\n'
+      // `@import` などの文は先頭に出す
+      if (prelude) hoisted.push(prelude + ';')
       i = j + 1
       continue
     }
@@ -145,10 +138,10 @@ function scopeRules(css: string, hoisted: string[]): string {
     if (prelude.startsWith('@')) {
       const name = prelude.slice(1).split(/[\s({]/)[0].toLowerCase()
       if (HOISTED_AT_RULES.includes(name)) hoisted.push(`${prelude}{${inner}}`)
-      else if (NESTED_AT_RULES.includes(name)) out += `${prelude}{\n${scopeRules(inner, hoisted)}}\n`
+      else if (NESTED_AT_RULES.includes(name)) out += `${prelude}{\n${scopeRules(inner, hoisted, root)}}\n`
       else out += `${prelude}{${inner}}\n`
     } else {
-      const selectors = splitSelectors(prelude).map(scopeSelector).join(', ')
+      const selectors = splitSelectors(prelude).map((sel) => scopeSelector(sel, root)).join(', ')
       out += `${selectors}{${inner}}\n`
     }
     i = blockEnd
@@ -156,9 +149,9 @@ function scopeRules(css: string, hoisted: string[]): string {
   return out
 }
 
-/** article.css 全体を `.md-render` のスコープに閉じ込めた CSS にする */
-export function scopeMarkdownCss(css: string, rootClass: string = MD_ROOT_CLASS): string {
+/** article.css 全体を、記事ページ（`#article-page`）の中だけに効く CSS にする */
+export function scopeMarkdownCss(css: string, root: string = ARTICLE_ROOT): string {
   const hoisted: string[] = []
-  const scoped = scopeRules(stripComments(css), hoisted)
-  return `${hoisted.join('\n')}${hoisted.length ? '\n' : ''}@scope (.${rootClass}) {\n${scoped}}\n`
+  const scoped = scopeRules(stripComments(css), hoisted, root)
+  return `${hoisted.join('\n')}${hoisted.length ? '\n' : ''}${scoped}`
 }
