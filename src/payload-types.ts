@@ -337,6 +337,30 @@ export interface Post {
    */
   customJs?: string | null;
   /**
+   * 'markdown' のとき、本文は下の markdownSource をそのまま表示します（Lexical は検索・読了時間用）。通常は 'lexical'。
+   */
+  renderMode?: string | null;
+  /**
+   * noe-posts から送られた原文（前処理済み）。ここでは編集せず、noe-posts 側で直して再送してください。
+   */
+  markdownSource?: string | null;
+  /**
+   * ファイル名 → { id, url }。本文の ./xxx.png をこの URL に書き換えます。
+   */
+  markdownMedia?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Markdown 原文から自動で計算する印。Git から上書きするとき、DB の方が新しくないかの確認に使います。
+   */
+  markdownRevision?: string | null;
+  /**
    * 記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
    */
   revisedAt?: string | null;
@@ -441,6 +465,30 @@ export interface TechPost {
    * この記事のページに読み込まれるJS。記事内だけに存在するクラス名/IDを対象にしてください。
    */
   customJs?: string | null;
+  /**
+   * 'markdown' のとき、本文は下の markdownSource をそのまま表示します（Lexical は検索・読了時間用）。通常は 'lexical'。
+   */
+  renderMode?: string | null;
+  /**
+   * noe-posts から送られた原文（前処理済み）。ここでは編集せず、noe-posts 側で直して再送してください。
+   */
+  markdownSource?: string | null;
+  /**
+   * ファイル名 → { id, url }。本文の ./xxx.png をこの URL に書き換えます。
+   */
+  markdownMedia?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Markdown 原文から自動で計算する印。Git から上書きするとき、DB の方が新しくないかの確認に使います。
+   */
+  markdownRevision?: string | null;
   /**
    * 記事の内容を更新した日。記事ページの「最終更新」に表示されます（空なら自動の更新日時）。Markdown の frontmatter `updated:` から入ります。
    */
@@ -971,6 +1019,10 @@ export interface PostsSelect<T extends boolean = true> {
   ogImage?: T;
   customCss?: T;
   customJs?: T;
+  renderMode?: T;
+  markdownSource?: T;
+  markdownMedia?: T;
+  markdownRevision?: T;
   revisedAt?: T;
   slugHistory?:
     | T
@@ -1001,6 +1053,10 @@ export interface TechPostsSelect<T extends boolean = true> {
   ogImage?: T;
   customCss?: T;
   customJs?: T;
+  renderMode?: T;
+  markdownSource?: T;
+  markdownMedia?: T;
+  markdownRevision?: T;
   revisedAt?: T;
   slugHistory?:
     | T

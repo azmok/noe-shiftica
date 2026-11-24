@@ -19,7 +19,7 @@
     "db:migrate": "payload migrate",
     "db:migrate:status": "payload migrate:status",
     "db:migrate:https": "tsx scripts/migrate-over-https.ts",
-    "md-assets:build": "tsx src/plugins/markdownRender/build-md-assets.ts",
+    "md-assets:build": "tsx src/plugins/markdownPostManager/build-md-assets.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.config.integration.ts",
