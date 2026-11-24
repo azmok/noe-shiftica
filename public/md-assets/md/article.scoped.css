@@ -1,6 +1,6 @@
 @scope (.md-render) {
 :scope:not(.md-render){
-  background: #050505;
+  background: #121212;      
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
@@ -10,7 +10,7 @@
   margin: 0 auto;
   max-width: 872px;
   padding: 3rem 3rem 6rem;
-  background: #050505;
+  background: #121212;
 }
 @media (max-width: 1023.98px){
 :scope > body{ padding: 2.5rem 1.5rem 5rem; }
@@ -47,7 +47,7 @@
 
   
   --font-sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", Meiryo, "Yu Gothic", "YuGothic", sans-serif;
-  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "Roboto Mono", monospace;   
 
   
   --bg: #050505;
@@ -410,22 +410,6 @@ ol > li{
 ul > li{
   padding-inline-start: 0.375em;
 }
-:scope > ul > li p{
-  margin-top: 0.75em;
-  margin-bottom: 0.75em;
-}
-:scope > ul > li > p:first-child{
-  margin-top: 1.25em;
-}
-:scope > ul > li > p:last-child{
-  margin-bottom: 1.25em;
-}
-:scope > ol > li > p:first-child{
-  margin-top: 1.25em;
-}
-:scope > ol > li > p:last-child{
-  margin-bottom: 1.25em;
-}
 ul ul, ul ol, ol ul, ol ol{
   margin-top: 0.75em;
   margin-bottom: 0.75em;
@@ -450,33 +434,15 @@ h3 + *{
 h4 + *{
   margin-top: 0;
 }
-thead th:first-child{
-  padding-inline-start: 0;
-}
-thead th:last-child{
-  padding-inline-end: 0;
-}
 tbody td, tfoot td{
   padding-top: 0.5714286em;
   padding-inline-end: 0.5714286em;
   padding-bottom: 0.5714286em;
   padding-inline-start: 0.5714286em;
 }
-tbody td:first-child, tfoot td:first-child{
-  padding-inline-start: 0;
-}
-tbody td:last-child, tfoot td:last-child{
-  padding-inline-end: 0;
-}
 figure{
   margin-top: 2em;
   margin-bottom: 2em;
-}
-:scope > :first-child{
-  margin-top: 0;
-}
-:scope > :last-child{
-  margin-bottom: 0;
 }
 :scope{
   --tw-prose-body: var(--tw-prose-invert-body);
@@ -666,23 +632,11 @@ thead th{
     padding-bottom: 0.6666667em;
     padding-inline-start: 1em;
   }
-thead th:first-child{
-    padding-inline-start: 0;
-  }
-thead th:last-child{
-    padding-inline-end: 0;
-  }
 tbody td, tfoot td{
     padding-top: 0.6666667em;
     padding-inline-end: 1em;
     padding-bottom: 0.6666667em;
     padding-inline-start: 1em;
-  }
-tbody td:first-child, tfoot td:first-child{
-    padding-inline-start: 0;
-  }
-tbody td:last-child, tfoot td:last-child{
-    padding-inline-end: 0;
   }
 figure{
     margin-top: 1.7142857em;
@@ -867,23 +821,11 @@ thead th{
     padding-bottom: 0.75em;
     padding-inline-start: 0.75em;
   }
-thead th:first-child{
-    padding-inline-start: 0;
-  }
-thead th:last-child{
-    padding-inline-end: 0;
-  }
 tbody td, tfoot td{
     padding-top: 0.75em;
     padding-inline-end: 0.75em;
     padding-bottom: 0.75em;
     padding-inline-start: 0.75em;
-  }
-tbody td:first-child, tfoot td:first-child{
-    padding-inline-start: 0;
-  }
-tbody td:last-child, tfoot td:last-child{
-    padding-inline-end: 0;
   }
 figure{
     margin-top: 1.7777778em;
@@ -916,9 +858,6 @@ p{
   color: var(--white-text-90);
   letter-spacing: 0.033em;
 }
-:scope > p:first-of-type{
-  font-weight: 500;
-}
 h1, h2, h3, h4, h5, h6{
   font-family: var(--font-sans);
   color: var(--white-text-100);
@@ -945,6 +884,7 @@ h3{
   font-weight: 800;
 }
 ul, ol{
+  line-height: 2;
   padding: 0 0 0.5rem 2rem;
   margin: 1.5rem 0 1.5rem 0.5rem;
 }
@@ -1001,8 +941,9 @@ img{
   height: auto;
 }
 table{
+  display: table;
   width: auto;
-  border-collapse: separate;
+  border-collapse: collapse;
   border-spacing: 0;
   overflow: hidden;
   margin: 3rem 0;
@@ -1010,33 +951,34 @@ table{
 }
 table th{
   background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  padding: 0.75rem 1.25rem;
+  color: var(--white-text-90);
+  padding: calc(8px + 0.2rem) calc(8px + 0.5rem);
   text-align: center;
+  vertical-align: middle;
   text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-}
-table th p{
-  padding: 0;
-  margin: 0.2em 0.5em;
   font-size: 1rem;
   font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: 0.033em;
 }
 table td{
-  padding: 0rem 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
-}
-table td p{
-  padding: 0;
-  margin: 0.2em 0.5em;
+  color: var(--white-text-90);
+  padding: calc(8px + 0.16rem) calc(8px + 0.4rem);
+  vertical-align: baseline;
   font-size: 0.8rem;
+  font-weight: 300;
+  line-height: 1.75;
+  letter-spacing: 0.033em;
 }
 table th, table td{
   border: 1px solid rgb(48, 47, 47) !important;
+}
+table th p, table td p{
+  margin: 0 !important;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
 }
 blockquote{
   position: relative;
@@ -1062,13 +1004,19 @@ blockquote:hover{
   box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6);
 }
 blockquote p{
-  font-size: 0.9rem;
+  font-size: inherit;
   font-weight: 300;
-  line-height: 1.9;
-  color: rgba(255, 255, 255, 0.82) !important;
+  line-height: normal;
+  color: var(--white-text-60) !important;
   margin: 0 !important;
-  font-style: normal;
-  letter-spacing: 0.05em;
+  font-style: italic;
+  letter-spacing: normal;
+}
+blockquote p + p{
+  margin-top: 1em !important;
+}
+blockquote p:first-of-type::before, blockquote p:last-of-type::after{
+  content: none !important;
 }
 blockquote strong{
   color: inherit;
@@ -1103,15 +1051,11 @@ h3{
     margin-top: 1.5rem;
   }
 ul, ol{ padding-left: 1.5rem; }
-table th, table td{
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-  }
+table th, table td{ line-height: 1.5; }
 blockquote{
     padding: 1.25rem 1.5rem;
     margin: 2rem 0;
   }
-blockquote p{ font-size: 0.875rem; }
 blockquote::after{
     font-size: 4rem;
     top: -0.15rem;
@@ -1121,14 +1065,14 @@ blockquote::after{
 pre{
   position: relative;
   margin: 2rem 0;
-  padding: 3.6rem 1.5rem 1.5rem;
+  padding: calc(47px + 26px + 24px) 24px calc(26px + 24px);
   overflow-x: auto;
   background: #0d0f14;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   color: #f1f5f9;
-  font-family: var(--font-mono);
+  font-family: "Roboto Mono", monospace;
   font-size: 13px;
   line-height: 1.625;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -1143,22 +1087,62 @@ pre::before{
   top: 0;
   left: 0;
   right: 0;
-  height: 2.6rem;
+  height: 46px;
   background:
-    radial-gradient(circle at 1.6rem 50%, rgba(255, 95, 86, 0.8) 0.42rem, transparent 0.45rem),
-    radial-gradient(circle at 2.85rem 50%, rgba(255, 189, 46, 0.8) 0.42rem, transparent 0.45rem),
-    radial-gradient(circle at 4.1rem 50%, rgba(39, 201, 63, 0.8) 0.42rem, transparent 0.45rem),
+    radial-gradient(circle at 26px 50%, rgba(255, 95, 86, 0.8) 5.5px, transparent 6px),
+    radial-gradient(circle at 46px 50%, rgba(255, 189, 46, 0.8) 5.5px, transparent 6px),
+    radial-gradient(circle at 66px 50%, rgba(39, 201, 63, 0.8) 5.5px, transparent 6px),
     #090b0e;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+pre::after{
+  content: "Plain Text";
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  padding: 1px 10px;
+  border: 1px solid rgba(226, 255, 61, 0.2);
+  border-radius: 9999px;
+  background: rgba(226, 255, 61, 0.1);
+  color: #E2FF3D;
+  font: 500 10px/14px var(--font-sans);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+pre:has(> code.language-javascript)::after{ content: "JavaScript"; }
+pre:has(> code.language-js)::after{ content: "JavaScript"; }
+pre:has(> code.language-typescript)::after{ content: "TypeScript"; }
+pre:has(> code.language-ts)::after{ content: "TypeScript"; }
+pre:has(> code.language-tsx)::after{ content: "TSX"; }
+pre:has(> code.language-jsx)::after{ content: "JSX"; }
+pre:has(> code.language-html)::after{ content: "HTML"; }
+pre:has(> code.language-css)::after{ content: "CSS"; }
+pre:has(> code.language-python)::after{ content: "Python"; }
+pre:has(> code.language-py)::after{ content: "Python"; }
+pre:has(> code.language-bash)::after{ content: "Bash"; }
+pre:has(> code.language-sh)::after{ content: "Shell"; }
+pre:has(> code.language-shell)::after{ content: "Shell"; }
+pre:has(> code.language-zsh)::after{ content: "Zsh"; }
+pre:has(> code.language-json)::after{ content: "JSON"; }
+pre:has(> code.language-sql)::after{ content: "SQL"; }
+pre:has(> code.language-yaml)::after{ content: "YAML"; }
+pre:has(> code.language-yml)::after{ content: "YAML"; }
+pre:has(> code.language-toml)::after{ content: "TOML"; }
+pre:has(> code.language-markdown)::after{ content: "Markdown"; }
+pre:has(> code.language-md)::after{ content: "Markdown"; }
+pre:has(> code.language-text)::after{ content: "Plain Text"; }
+pre:has(> code.language-plaintext)::after{ content: "Plain Text"; }
 pre code{
   display: block;
   white-space: pre;
+  tab-size: 4;
   background: none;
   border: none;
   padding: 0;
-  color: inherit;
-  font-size: inherit;
+  color: #ccc;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  font-size: 13px;
+  line-height: 1.5;
   font-weight: 400;
 }
 :not(pre) > code{
@@ -1248,16 +1232,6 @@ pre code{
    }
 .table-scroll:not(.is-scrollable) .table-scroll__hint{
       display: none;
-   }
-th, td{
-      min-width: 5.5em;
-      max-width: 10em;
-      font-size: 0.95em;
-      padding: 0.45rem 0.65rem;
-   }
-th:first-child, td:first-child{
-      min-width: 3.8em;
-      max-width: 6.5em;
    }
 }
 .tldr{
@@ -1359,12 +1333,6 @@ th img.icons, td img.icons{
 .table-scroll::-webkit-scrollbar-thumb{
    background: var(--line);
    border-radius: 4px;
-}
-table:not(.table-scroll table){
-   display: block;
-   max-width: 100%;
-   overflow-x: auto;
-   -webkit-overflow-scrolling: touch;
 }
 .term{
    
@@ -1566,7 +1534,7 @@ pre.has-copy{ position: relative; }
 .md-copy{
    all: unset;
    position: absolute;
-   top: 0.45rem;
+   top: calc(47px + 0.45rem);   
    right: 0.45rem;
    display: inline-flex;
    align-items: center;
