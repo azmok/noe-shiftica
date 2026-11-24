@@ -25,12 +25,12 @@
   2. どの既存プラグインにも属さない変更は、新規プラグインとして `src/plugins/<name>/` に作る。
 
 ## 記事の運用（noe-posts → Markdown そのまま表示）
-- 記事の正本は非公開リポジトリ `azmok/noe-posts`（`dev/<slug>/<slug>.md` → tech-posts、`blog/<slug>/<slug>.md` → posts）。
+- 記事の入り口は非公開リポジトリ `azmok/noe-posts`（`dev/<slug>/<slug>.md` → tech-posts、`blog/<slug>/<slug>.md` → posts）。**公開したら正本は DB**（公開済みの記事を Git から上書きできるのは、管理画面から書き出した `.md`（frontmatter に `baseRevision`）だけ）。
   iPad の Textastic + Working Copy で書き、作業ブランチへの push で下書き送信、main へのマージで `status: published` の記事を公開（noe-posts の Actions）。
-- noe-posts の記事は `renderMode: 'markdown'` で保存され、表示は `src/plugins/markdownRender/`（markdown-it）。既存記事は `'lexical'` のまま変わらない。
+- noe-posts の記事は `renderMode: 'markdown'` で保存され、表示は `src/plugins/markdownPostManager/`（markdown-it）。既存記事は `'lexical'` のまま変わらない。
 - 記事ページの見た目は「サイト本物の CSS ＋ 上書き CSS（`article.css`。全セレクタに `#article-page` を付けて記事ページ全体に重ねる）」。手元の本番そっくりプレビューも同じ重ね方。**正本は noe-posts の `_assets/`**（CSS / JS / アイコン）。noe-posts の main で `_assets/` が変わると、Action が noe-shiftica の `public/md-assets/` を更新するプルリクエストを出す（`article.scoped.css` も再生成済み）。
 - 下書きプレビュー（`/dev|blog/<slug>/preview`）は管理画面ログイン必須（`src/plugins/draftPreviewGuard/`）。
-- 設計書：`docs/markdown-render-mode.md`
+- 設計書：`docs/markdown-render-mode.md`（表示）／`docs/markdown-post-manager-and-style-editor.md`（プラグイン全体・上書きガード）
 
 ## クラウド環境での DB マイグレーション
 Claude Code のクラウド環境は外向き通信が HTTPS（443）だけなので、Postgres の通常接続（5432）を使う

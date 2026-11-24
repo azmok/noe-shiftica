@@ -5,8 +5,9 @@ import { parseMarkdownToLexical } from '../../markdownImport'
 import { extractCustomMetaData, mergeCustomMetaData, revisedAtFromFrontmatter } from '../../markdownImport/frontmatter'
 import { type Operation, canAccess, isActiveUser, isApiClient } from '../../api-clients/permissions'
 import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '../markdown'
-import { prepareMarkdownSource, referencedMarkdownImages } from '../../markdownRender/prepare'
-import { RENDER_MODES } from '../../markdownRender'
+import { prepareMarkdownSource, referencedMarkdownImages } from '../../markdownPostManager/prepare'
+import { RENDER_MODES } from '../../markdownPostManager'
+import { checkGitOverwrite, markdownRevision } from '../../markdownPostManager/revision'
 
 /**
  * AI 用の記事 API（Payload のルートエンドポイント。URL は /api/ai/posts）。
@@ -34,6 +35,9 @@ import { RENDER_MODES } from '../../markdownRender'
  *   - renderMode          "lexical"（既定）/ "markdown"。markdown のとき、前処理した原文を markdownSource に、
  *                         本文画像（./xxx.png。ai-box の中や <img> も含む）の対応表を markdownMedia に保存し、
  *                         表示は Lexical ではなく原文をそのまま HTML にする（content は今まで通り生成する）
+ *                         公開済みの記事は DB が正本なので、Git からの上書きは frontmatter の baseRevision が
+ *                         DB の markdownRevision と一致するときだけ受け付ける（違えば 409 / code: "db-is-newer"）。
+ *                         成功時の返事には保存後の markdownRevision が入る
  *   - status              "draft"（既定）/ "published"
  *   - markdown を省略して { slug, collection, status: "published" } だけ送ると、
  *     既存の最新下書きをそのまま公開する（下書き確認 → 公開の2段階運用向け）
@@ -582,6 +586,37 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
     if (renderMode === 'lexical') markdownFields = { renderMode: 'lexical' }
     if (renderMode === 'markdown') {
       const source = prepareMarkdownSource(matter(markdown.trimStart()).content ?? '')
+
+      // 上書きガード：公開済みの記事は DB が正本。古い .md で上書きしない
+      //（設計書 docs/markdown-post-manager-and-style-editor.md §2.4）
+      if (existingDoc) {
+        const latest: any = await payload
+          .findByID({ collection: targetCollection, id: existingDoc.id, draft: true, depth: 0 })
+          .catch(() => existingDoc)
+        const baseRevision = typeof frontmatterData.baseRevision === 'string' ? frontmatterData.baseRevision : null
+        const guard = checkGitOverwrite({
+          existing: {
+            published: existingDoc._status === 'published',
+            markdownRevision: latest?.markdownRevision ?? existingDoc.markdownRevision ?? null,
+          },
+          incomingRevision: markdownRevision(source),
+          baseRevision,
+        })
+        if (!guard.ok) {
+          await recordApiLog(payload, user, {
+            action: 'post',
+            status: 'error',
+            responseStatus: 409,
+            postTitle: title,
+            postSlug: slug,
+            postId: String(existingDoc.id),
+            clientIp,
+            requestSummary: summary,
+            errorMessage: guard.reason,
+          })
+          return Response.json({ error: guard.reason, code: 'db-is-newer' }, { status: 409 })
+        }
+      }
       const files = referencedMarkdownImages(source)
       const mdImages = await resolveImages(
         payload,
@@ -729,6 +764,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
         adminUrl: `/admin/collections/${targetCollection}/${docId}`,
         mediaIds: imageResult.mediaIds,
         ...(heroImageId !== undefined ? { heroImageId } : {}),
+        ...(savedDoc.markdownRevision ? { markdownRevision: savedDoc.markdownRevision } : {}),
       },
       { status: operation === 'create' ? 201 : 200 },
     )

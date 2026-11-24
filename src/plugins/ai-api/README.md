@@ -3,7 +3,7 @@
 AI（外部AI連携の API キー）から記事を投稿・公開・削除するための API と、その呼び出しログをまとめたプラグイン。
 
 ## 登録するもの
-- **`POST /api/ai/posts`**（`endpoints/posts.ts`）: 記事フォルダの `.md` と画像（base64）から記事を作成・更新する。`{ slug, collection, status: "published" }` だけ送ると最新の下書きをそのまま公開する。`heroImage`（ファイル名 or media ID）で Hero 画像も設定できる（posts / tech-posts 共通）。`renderMode: "markdown"` を付けると、本文を Lexical ではなく Markdown 原文のまま表示するモードで保存する（`markdownRender` プラグイン。原文は `markdownSource`、本文画像は ai-box の中や `<img>` も含めて `markdownMedia` に入る。`content` も従来どおり生成）。クライアントは `scripts/publish-article.mjs draft <md> --render markdown [--status published]`。
+- **`POST /api/ai/posts`**（`endpoints/posts.ts`）: 記事フォルダの `.md` と画像（base64）から記事を作成・更新する。`{ slug, collection, status: "published" }` だけ送ると最新の下書きをそのまま公開する。`heroImage`（ファイル名 or media ID）で Hero 画像も設定できる（posts / tech-posts 共通）。`renderMode: "markdown"` を付けると、本文を Lexical ではなく Markdown 原文のまま表示するモードで保存する（`markdownPostManager` プラグイン。原文は `markdownSource`、本文画像は ai-box の中や `<img>` も含めて `markdownMedia` に入る。`content` も従来どおり生成）。クライアントは `scripts/publish-article.mjs draft <md> --render markdown [--status published]`。
 - frontmatter の扱いは管理画面の Markdown インポートと同じ（`markdownImport/frontmatter.ts` を共有）。title / slug / description 以外のキー（`og_title` / `seo_title` など）は `customMetaData` に**マージ**する。書いていないキーは残り、`キー: null` で削除できる。`updated:` は記事の「更新日」（`revisedAt`、revisedDate プラグイン）に入る。`date` は公開日を変えないよう API では使わない。
 - **`DELETE /api/ai/posts?id=` / `?slug=`**: 記事を削除する。
 - **`api-logs` コレクション**（`collection.ts`）: 上記の呼び出し結果を記録する。一覧の上部に API ガイド（`components/ApiEndpointGuide.tsx`）を出す。

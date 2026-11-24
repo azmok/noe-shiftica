@@ -15,9 +15,9 @@ import { ArticleTocSidebar } from "@/plugins/articleToc/ArticleTocSidebar"
 import { HeadingAnchorBehavior } from "@/plugins/articleToc/HeadingAnchorBehavior"
 import { headingWithAnchor } from "@/plugins/articleToc/headingConverter"
 import { extractHeadings } from "@/plugins/articleToc/headings"
-import { isMarkdownMode } from "@/plugins/markdownRender"
-import { renderMarkdownArticle, type MarkdownMedia } from "@/plugins/markdownRender/render"
-import { MarkdownBody } from "@/plugins/markdownRender/MarkdownBody"
+import { isMarkdownMode } from "@/plugins/markdownPostManager"
+import { renderMarkdownArticle, type MarkdownMedia } from "@/plugins/markdownPostManager/render"
+import { MarkdownBody } from "@/plugins/markdownPostManager/MarkdownBody"
 import { TwitterEmbedLoader } from "@/plugins/twitterEmbed/TwitterEmbedLoader"
 import { hasTwitterEmbed } from "@/plugins/twitterEmbed/hasTwitterEmbed"
 import { toInternalHref } from "@/lib/articleLinks"
@@ -292,7 +292,7 @@ export const PostArticle: React.FC<{
                 <div key={i} dangerouslySetInnerHTML={{ __html: html }} />
             ))}
             {/* 記事ページの上書き CSS（正本：noe-posts/_assets/md/article.css）。全セレクタに #article-page が付いているので、
-                サイトの CSS より強く、ナビとフッターには効かない。markdownRender プラグインの README 参照 */}
+                サイトの CSS より強く、ナビとフッターには効かない。markdownPostManager プラグインの README 参照 */}
             {/* eslint-disable-next-line @next/next/no-css-tags -- 記事ページだけで読む上書き CSS。React 19 の precedence で head に集約される */}
             <link rel="stylesheet" href="/md-assets/md/article.scoped.css" precedence="article-overrides" />
             <ArticleCustomAssets scopeId={scopeId} css={(post as any).customCss} js={(post as any).customJs} />

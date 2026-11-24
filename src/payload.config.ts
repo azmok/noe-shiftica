@@ -29,7 +29,7 @@ import { Passkeys } from './collections/Passkeys'
 import { markdownImportPlugin } from './plugins/markdownImport'
 import { customAssetsPlugin } from './plugins/customAssets'
 import { revisedDatePlugin } from './plugins/revisedDate'
-import { markdownRenderPlugin } from './plugins/markdownRender'
+import { markdownPostManager } from './plugins/markdownPostManager'
 import { htmlFileManagerPlugin } from './plugins/html-file-manager'
 import { htmlHostingPlugin } from './plugins/html-hosting'
 import { apiClientsPlugin } from './plugins/api-clients'
@@ -161,7 +161,7 @@ const configPromise = buildConfig({
     // Per-post custom CSS / JS fields (General + Dev)
     customAssetsPlugin({ collections: ['posts', 'tech-posts'] }),
     // noe-posts の Markdown をそのまま表示するモード（renderMode / markdownSource / markdownMedia）
-    markdownRenderPlugin({ collections: ['posts', 'tech-posts'] }),
+    markdownPostManager({ collections: ['posts', 'tech-posts'] }),
     // 読者向けの「更新日」（frontmatter `updated:` から入る）
     revisedDatePlugin({ collections: ['posts', 'tech-posts'] }),
     aiContentOptimizerPlugin({ collections: ['posts', 'tech-posts'] }),

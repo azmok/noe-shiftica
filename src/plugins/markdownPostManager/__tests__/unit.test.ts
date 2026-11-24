@@ -5,7 +5,8 @@ import path from 'node:path'
 import { renderMarkdownArticle, rewriteUrl } from '../render'
 import { scopeMarkdownCss, scopeSelector } from '../scopeCss'
 import { prepareMarkdownSource, referencedMarkdownImages } from '../prepare'
-import { markdownRenderPlugin, markdownRenderFields, isMarkdownMode } from '../index'
+import { markdownPostManager, markdownPostFields, isMarkdownMode } from '../index'
+import { markdownRevision, checkGitOverwrite } from '../revision'
 
 const ai = `
 <div class="ai-box ai-box--claude">
@@ -195,16 +196,16 @@ describe('referencedMarkdownImages', () => {
   })
 })
 
-describe('markdownRenderPlugin', () => {
+describe('markdownPostManager', () => {
   it('adds the fields only to the listed collections', () => {
     const cfg: any = { collections: [{ slug: 'posts', fields: [] }, { slug: 'media', fields: [] }] }
-    const out: any = markdownRenderPlugin({ collections: ['posts'] })(cfg)
-    expect(out.collections[0].fields.map((f: any) => f.name)).toEqual(['renderMode', 'markdownSource', 'markdownMedia'])
+    const out: any = markdownPostManager({ collections: ['posts'] })(cfg)
+    expect(out.collections[0].fields.map((f: any) => f.name)).toEqual(['renderMode', 'markdownSource', 'markdownMedia', 'markdownRevision'])
     expect(out.collections[1].fields).toEqual([])
   })
 
   it('validates renderMode and defaults to lexical', () => {
-    const f: any = markdownRenderFields.find((x: any) => x.name === 'renderMode')
+    const f: any = markdownPostFields.find((x: any) => x.name === 'renderMode')
     expect(f.defaultValue).toBe('lexical')
     expect(f.validate('markdown')).toBe(true)
     expect(f.validate(undefined)).toBe(true)
@@ -217,5 +218,44 @@ describe('markdownRenderPlugin', () => {
     expect(isMarkdownMode({ renderMode: 'markdown', markdownSource: '' })).toBe(false)
     expect(isMarkdownMode({ renderMode: 'markdown', markdownSource: '# a' })).toBe(true)
     expect(isMarkdownMode(null)).toBe(false)
+  })
+})
+
+describe('markdownRevision', () => {
+  it('is stable across CRLF / LF and trailing blank lines', () => {
+    expect(markdownRevision('a\r\nb\r\n\r\n')).toBe(markdownRevision('a\nb'))
+    expect(markdownRevision('a\nb')).not.toBe(markdownRevision('a\nc'))
+    expect(markdownRevision('x')).toMatch(/^[0-9a-f]{16}$/)
+  })
+
+  it('is filled by the field hook from markdownSource (incoming or existing)', () => {
+    const f: any = markdownPostFields.find((x: any) => x.name === 'markdownRevision')
+    const hook = f.hooks.beforeChange[0]
+    expect(hook({ siblingData: { markdownSource: 'hello' } })).toBe(markdownRevision('hello'))
+    expect(hook({ siblingData: {}, originalDoc: { markdownSource: 'old' } })).toBe(markdownRevision('old'))
+    expect(hook({ siblingData: {} })).toBeNull()
+  })
+})
+
+describe('checkGitOverwrite', () => {
+  const cur = markdownRevision('current body')
+  it('lets Git write new and never-published articles', () => {
+    expect(checkGitOverwrite({ existing: null, incomingRevision: 'x' }).ok).toBe(true)
+    expect(checkGitOverwrite({ existing: { published: false, markdownRevision: cur }, incomingRevision: 'x' }).ok).toBe(true)
+  })
+  it('accepts an identical resend of a published article', () => {
+    expect(checkGitOverwrite({ existing: { published: true, markdownRevision: cur }, incomingRevision: cur }).ok).toBe(true)
+  })
+  it('accepts an edit based on the current DB version (baseRevision)', () => {
+    expect(checkGitOverwrite({ existing: { published: true, markdownRevision: cur }, incomingRevision: 'new', baseRevision: cur }).ok).toBe(true)
+  })
+  it('rejects an old .md without baseRevision once the article is published', () => {
+    const r = checkGitOverwrite({ existing: { published: true, markdownRevision: cur }, incomingRevision: 'old' })
+    expect(r.ok).toBe(false)
+  })
+  it('rejects when the DB changed after the export', () => {
+    const r = checkGitOverwrite({ existing: { published: true, markdownRevision: cur }, incomingRevision: 'new', baseRevision: 'stale' })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.reason).toContain('stale')
   })
 })

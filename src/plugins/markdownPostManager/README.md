@@ -1,4 +1,4 @@
-# markdownRender — Markdown そのまま表示
+# markdownPostManager — Markdown 記事を DB で持ち、そのまま表示する
 
 設計書: [`docs/markdown-render-mode.md`](../../../docs/markdown-render-mode.md)
 
@@ -34,3 +34,10 @@ noe-posts の `.md` を、ローカルプレビュー（Textastic など）と�
 - 記事ページの部品には名前が付いている：`.article-hero` `.article-title` `.article-meta` `.article-insights` `.article-toc` `.article-body` `.article-tags` `.article-nav` `.article-card` `.article-toc-sidebar`（`data-slot` は手元の本番そっくりプレビューが中身を差し込む目印）。
 - 既存記事（Lexical）には、上書き CSS を足しても見た目が変わらないことを確認済み（本番 2 記事 × デスクトップ / モバイルで計算済みスタイルの差分 0）。
 - `textastic.css` は Textastic のプレビュー専用（本番では読まない）。
+
+## 上書きガード（`revision.ts`）
+公開済みの記事は DB が正本。Git（noe-posts）からの上書きで DB の新しい内容を消さないための仕組み。
+- `markdownRevision`：`markdownSource` から計算する版の印（改行コードと末尾の空白行の違いは無視）。保存のたびに field hook で入る。
+- `/api/ai/posts` は、公開済みの記事に Markdown が送られてきたとき `checkGitOverwrite()` で判定する。受け入れるのは、同じ内容の再送か、frontmatter の `baseRevision` が DB の今の版と一致するときだけ。それ以外は 409（`code: "db-is-newer"`）。
+- 公開前の記事（下書き）は、今までどおり Git 側が上書きする。
+- 詳しくは `docs/markdown-post-manager-and-style-editor.md` §2.4。
