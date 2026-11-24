@@ -21,6 +21,14 @@
   1. 既存プラグイン（`src/plugins/*`）の守備範囲に入る変更は、そのプラグインを変更・追加する。
   2. どの既存プラグインにも属さない変更は、新規プラグインとして `src/plugins/<name>/` に作る。
 
+## 記事の運用（noe-posts → Markdown そのまま表示）
+- 記事の正本は非公開リポジトリ `azmok/noe-posts`（`dev/<slug>/<slug>.md` → tech-posts、`blog/<slug>/<slug>.md` → posts）。
+  iPad の Textastic + Working Copy で書き、作業ブランチへの push で下書き送信、main へのマージで `status: published` の記事を公開（noe-posts の Actions）。
+- noe-posts の記事は `renderMode: 'markdown'` で保存され、表示は `src/plugins/markdownRender/`（markdown-it）。既存記事は `'lexical'` のまま変わらない。
+- 共通 CSS / JS / アイコンの正本は `public/md-assets/`（noe-posts の `_assets/` はその写し）。`ini.md.css` を変えたら `pnpm md-assets:build` で `ini.md.scoped.css` も更新してコミットする。
+- 下書きプレビュー（`/dev|blog/<slug>/preview`）は管理画面ログイン必須（`src/plugins/draftPreviewGuard/`）。
+- 設計書：`docs/markdown-render-mode.md`
+
 ## クラウド環境での DB マイグレーション
 Claude Code のクラウド環境は外向き通信が HTTPS（443）だけなので、Postgres の通常接続（5432）を使う
 `pnpm db:migrate` は動かない。代わりに Neon の HTTPS ドライバで流す `pnpm db:migrate:https` を使う
