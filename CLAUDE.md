@@ -15,10 +15,19 @@
 
 ## Standing instructions (Azuma)
 - バックグラウンドコマンド（App Hosting のロールアウト、長時間ビルド等）の**出力ファイルは確認しなくてよい**。完了通知 / exit code 0 だけで十分とみなす。
+- 修正したら `git add` → **`git commit` → `git push` までクラやんの判断で実行してよい**（あずま承認済み 2026-11-24）。作業ブランチに push する。保護ファイルの編集・マイグレーションの本実行・本番公開は、従来どおり事前にあずまの承認を取る。
 - デプロイ後の本番反映確認・ロールアウトの追跡は待たなくてよい（Azuma が確認する）。
 - **機能はプラグイン単位で作る**（詳細は `AGENTS.md` の Standing instructions）:
   1. 既存プラグイン（`src/plugins/*`）の守備範囲に入る変更は、そのプラグインを変更・追加する。
   2. どの既存プラグインにも属さない変更は、新規プラグインとして `src/plugins/<name>/` に作る。
+
+## 記事の運用（noe-posts → Markdown そのまま表示）
+- 記事の正本は非公開リポジトリ `azmok/noe-posts`（`dev/<slug>/<slug>.md` → tech-posts、`blog/<slug>/<slug>.md` → posts）。
+  iPad の Textastic + Working Copy で書き、作業ブランチへの push で下書き送信、main へのマージで `status: published` の記事を公開（noe-posts の Actions）。
+- noe-posts の記事は `renderMode: 'markdown'` で保存され、表示は `src/plugins/markdownRender/`（markdown-it）。既存記事は `'lexical'` のまま変わらない。
+- 記事の見た目は `article.css`（サイトの記事デザイン＋部品）1枚で、手元プレビューと本番が同じファイルを使う。**正本は noe-posts の `_assets/`**（CSS / JS / アイコン）。noe-posts の main で `_assets/` が変わると、Action が noe-shiftica の `public/md-assets/` を更新するプルリクエストを出す（`article.scoped.css` も再生成済み）。
+- 下書きプレビュー（`/dev|blog/<slug>/preview`）は管理画面ログイン必須（`src/plugins/draftPreviewGuard/`）。
+- 設計書：`docs/markdown-render-mode.md`
 
 ## クラウド環境での DB マイグレーション
 Claude Code のクラウド環境は外向き通信が HTTPS（443）だけなので、Postgres の通常接続（5432）を使う

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { BlogFallbackHero } from "../../components/BlogFallbackHero"
 import { GcsImage } from "@/lib/GcsImage"
 import { withOriginalImageLink } from "@/plugins/originalImageLink/converter"
+import { withVideoEmbed } from "@/plugins/videoEmbed/converter"
 import { calculateReadingTime } from "@/lib/calculateReadingTime"
 import { HtmlEmbedBlock } from "@/plugins/html-file-manager/components/HtmlEmbedBlock"
 import { ArticleCustomAssets } from "@/plugins/customAssets/ArticleCustomAssets"
@@ -14,6 +15,9 @@ import { ArticleTocSidebar } from "@/plugins/articleToc/ArticleTocSidebar"
 import { HeadingAnchorBehavior } from "@/plugins/articleToc/HeadingAnchorBehavior"
 import { headingWithAnchor } from "@/plugins/articleToc/headingConverter"
 import { extractHeadings } from "@/plugins/articleToc/headings"
+import { isMarkdownMode } from "@/plugins/markdownRender"
+import { renderMarkdownArticle, type MarkdownMedia } from "@/plugins/markdownRender/render"
+import { MarkdownBody } from "@/plugins/markdownRender/MarkdownBody"
 import { TwitterEmbedLoader } from "@/plugins/twitterEmbed/TwitterEmbedLoader"
 import { hasTwitterEmbed } from "@/plugins/twitterEmbed/hasTwitterEmbed"
 import { toInternalHref } from "@/lib/articleLinks"
@@ -137,7 +141,8 @@ const customConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
     link: (args) => asSiteLink(typeof defaultConverters.link === 'function' ? defaultConverters.link(args) : null),
     autolink: (args) => asSiteLink(typeof defaultConverters.autolink === 'function' ? defaultConverters.autolink(args) : null),
     // Body images open their original (full-size) file in a new tab
-    upload: withOriginalImageLink(defaultConverters.upload),
+    // Videos play inline; images open their original in a new tab
+    upload: withVideoEmbed(withOriginalImageLink(defaultConverters.upload)),
     // Re-apply inline text styling (color / font-size / gradient) that the
     // default text converter drops. We let the default converter handle the
     // format flags (bold/italic/…), then wrap its output in a styled <span>.
@@ -268,7 +273,15 @@ export const PostArticle: React.FC<{
     const scopeId = `article-${post.id}`
     const lastUpdate = displayedUpdate(post)
     const svgDefs = extractSvgDefs(post.content)
-    const { headings, idByNode } = extractHeadings(post.content)
+    // renderMode === 'markdown' の記事は、Lexical ではなく markdownSource をそのまま HTML にして出す。
+    // 本文はモバイル用・デスクトップ用の2回描画されるので、id を持つのはモバイル側だけ（Lexical と同じ方針）。
+    // 目次は Markdown 側の見出しから作る（<div> の中の見出しは Lexical 側では目次から漏れるため）。
+    const mdPost = post as typeof post & { renderMode?: string | null; markdownSource?: string | null; markdownMedia?: unknown }
+    const mdMode = isMarkdownMode(mdPost)
+    const mdMedia = (mdPost.markdownMedia ?? {}) as MarkdownMedia
+    const mdMobile = mdMode ? renderMarkdownArticle(mdPost.markdownSource ?? '', mdMedia, { ids: true }) : null
+    const mdDesktop = mdMode ? renderMarkdownArticle(mdPost.markdownSource ?? '', mdMedia, { ids: false }) : null
+    const { headings, idByNode } = mdMobile ? { headings: mdMobile.headings, idByNode: new WeakMap<object, string>() } : extractHeadings(post.content)
     const toc = tocEntries(headings)
     const mobileConverters = withHeadingAnchors(idByNode, true)
     const desktopConverters = withHeadingAnchors(idByNode, false)
@@ -366,9 +379,10 @@ export const PostArticle: React.FC<{
 
                         <ArticleToc entries={toc} />
 
-                        <div className={`prose prose-sm prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
+                        <div className={mdMode ? 'native-link-cursor' : `prose prose-sm prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                             {(() => {
+                                if (mdMobile) return <MarkdownBody html={mdMobile.html} />;
                                 try {
                                     if (post.content && typeof post.content === 'object' && 'root' in post.content) {
                                         return <RichText data={post.content as any} converters={mobileConverters} />;
@@ -521,9 +535,10 @@ export const PostArticle: React.FC<{
                                     <div className="mb-12">
                                         <ArticleToc entries={toc} />
                                     </div>
-                                    <div className={`prose prose-lg prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
+                                    <div className={mdMode ? 'native-link-cursor' : `prose prose-lg prose-invert max-w-none font-sans native-link-cursor ${styles.postContent}`}>
 
                                         {(() => {
+                                            if (mdDesktop) return <MarkdownBody html={mdDesktop.html} />;
                                             try {
                                                 if (post.content && typeof post.content === 'object' && 'root' in post.content) {
                                                     return <RichText data={post.content as any} converters={desktopConverters} />;

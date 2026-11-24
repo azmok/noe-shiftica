@@ -5,6 +5,8 @@ import { parseMarkdownToLexical } from '../../markdownImport'
 import { extractCustomMetaData, mergeCustomMetaData, revisedAtFromFrontmatter } from '../../markdownImport/frontmatter'
 import { type Operation, canAccess, isActiveUser, isApiClient } from '../../api-clients/permissions'
 import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } from '../markdown'
+import { prepareMarkdownSource, referencedMarkdownImages } from '../../markdownRender/prepare'
+import { RENDER_MODES } from '../../markdownRender'
 
 /**
  * AI 用の記事 API（Payload のルートエンドポイント。URL は /api/ai/posts）。
@@ -29,6 +31,9 @@ import { openLinksInNewTab, prepareArticleMarkdown, replaceImagePlaceholders } f
  *                         ファイル名、または media ID。本文に無い画像でもよい
  *   - categories          [ID or カテゴリ名, ...]（旧 `category` 単数も可）
  *   - 本文のリンクはすべて「新しいタブで開く」（target="_blank"）で保存する
+ *   - renderMode          "lexical"（既定）/ "markdown"。markdown のとき、前処理した原文を markdownSource に、
+ *                         本文画像（./xxx.png。ai-box の中や <img> も含む）の対応表を markdownMedia に保存し、
+ *                         表示は Lexical ではなく原文をそのまま HTML にする（content は今まで通り生成する）
  *   - status              "draft"（既定）/ "published"
  *   - markdown を省略して { slug, collection, status: "published" } だけ送ると、
  *     既存の最新下書きをそのまま公開する（下書き確認 → 公開の2段階運用向け）
@@ -40,6 +45,30 @@ const IMAGE_MIME: Record<string, string> = {
   jpeg: 'image/jpeg',
   gif: 'image/gif',
   webp: 'image/webp',
+  svg: 'image/svg+xml',
+}
+
+/**
+ * SVG は文字のファイルなので、スクリプトなどを仕込める。<img> で表示する限りスクリプトは動かないが、
+ * 画像の URL を直接開くと動くので、危ない要素を含むものは受け付けない（Payload の validateSvg と同じ方針）。
+ */
+const UNSAFE_SVG_PATTERNS = [
+  /<script[\s>]/i,
+  /\son\w+\s*=/i,
+  /javascript:/i,
+  /data:text\/html/i,
+  /<foreignObject[\s>]/i,
+  /<iframe[\s>]/i,
+  /<object[\s>]/i,
+  /<embed[\s>]/i,
+  /<!ENTITY/i,
+  /<!DOCTYPE[^>]*\[/i,
+  /@import/i,
+]
+
+export function isSafeSvg(buffer: Buffer): boolean {
+  const text = buffer.toString('utf8')
+  return !UNSAFE_SVG_PATTERNS.some((re) => re.test(text))
 }
 
 /** 1リクエストで受け付ける画像の合計サイズ（デコード後）。base64 で約1.33倍になり、App Hosting（Cloud Run）のリクエスト上限 32MB に収まるように */
@@ -155,9 +184,12 @@ async function resolveImages(
     const name = baseName(img.filename)
     const mimetype = IMAGE_MIME[name.split('.').pop()?.toLowerCase() ?? '']
     if (!mimetype) {
-      return { error: `Unsupported image type: ${name} (png / jpg / gif / webp only)`, status: 400 }
+      return { error: `Unsupported image type: ${name} (png / jpg / gif / webp / svg only)`, status: 400 }
     }
     const buffer = Buffer.from(img.data.replace(/^data:[^;,]+;base64,/, ''), 'base64')
+    if (mimetype === 'image/svg+xml' && !isSafeSvg(buffer)) {
+      return { error: `SVG contains scripts or other unsafe content: ${name}`, status: 400 }
+    }
     totalBytes += buffer.length
     if (totalBytes > MAX_IMAGE_BYTES) {
       return { error: `Images exceed ${MAX_IMAGE_BYTES / 1024 / 1024}MB in total`, status: 413 }
@@ -397,10 +429,14 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
     heroImage,
     customCss,
     customJs,
+    renderMode,
   } = body
   const images: ImageInput[] = Array.isArray(body.images) ? body.images : []
 
   const targetCollection: PostCollection = collection === 'tech-posts' ? 'tech-posts' : 'posts'
+  if (renderMode !== undefined && !(RENDER_MODES as readonly string[]).includes(renderMode)) {
+    return Response.json({ error: `"renderMode" must be one of: ${RENDER_MODES.join(', ')}` }, { status: 400 })
+  }
   const wantsPublish = status === 'published'
 
   // markdown 無しの publish は「既存の下書きをそのまま公開」
@@ -539,6 +575,54 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
       heroImageId = heroResult.id
     }
 
+    // 6c. renderMode: 'markdown' — keep the (preprocessed) source and the image map for display.
+    //     Images are collected from the whole body (not only standalone image lines) and uploaded
+    //     / reused the same way; their media URLs are stored so rendering needs no extra lookup.
+    let markdownFields: Record<string, unknown> = {}
+    if (renderMode === 'lexical') markdownFields = { renderMode: 'lexical' }
+    if (renderMode === 'markdown') {
+      const source = prepareMarkdownSource(matter(markdown.trimStart()).content ?? '')
+      const files = referencedMarkdownImages(source)
+      const mdImages = await resolveImages(
+        payload,
+        user,
+        files.map((src) => ({ src, alt: baseName(src).replace(/\.[^./]+$/, '') })),
+        images,
+      )
+      if ('error' in mdImages) {
+        await recordApiLog(payload, user, {
+          action: 'post',
+          status: 'error',
+          responseStatus: mdImages.status,
+          postTitle: title,
+          postSlug: slug,
+          clientIp,
+          requestSummary: summary,
+          errorMessage: mdImages.error,
+        })
+        return Response.json({ error: mdImages.error }, { status: mdImages.status })
+      }
+      const found = mdImages.mediaIds.length
+        ? await payload.find({
+            collection: 'media',
+            where: { id: { in: mdImages.mediaIds } },
+            limit: mdImages.mediaIds.length,
+            depth: 0,
+            pagination: false,
+          })
+        : { docs: [] }
+      const urlById = new Map<string, string>(
+        (found.docs as Array<{ id: number | string; url?: string | null }>).map((d) => [String(d.id), d.url ?? '']),
+      )
+      const markdownMedia: Record<string, { id: number | string; url: string }> = {}
+      files.forEach((file, i) => {
+        const id = mdImages.mediaIds[i]
+        const url = urlById.get(String(id))
+        if (url) markdownMedia[file] = { id, url }
+      })
+      markdownFields = { renderMode: 'markdown', markdownSource: source, markdownMedia }
+    }
+
     // 7. Parse Markdown into Lexical AST and embed the uploaded images
     // Payload のルートエンドポイントは管理画面と同じ lexical を使うので、変換を直接呼べる
     // （旧 Next.js ルートでは lexical が二重に読み込まれ、Lexical error #290 で落ちていた）
@@ -598,6 +682,7 @@ export const aiPostsCreateHandler: PayloadHandler = async (req) => {
       ...(heroImageId !== undefined ? { heroImage: heroImageId } : {}),
       ...(customCss ? { customCss } : {}),
       ...(customJs ? { customJs } : {}),
+      ...markdownFields,
     }
 
     // Write as the caller so collection access (the 外部AI連携 matrix) is enforced again.

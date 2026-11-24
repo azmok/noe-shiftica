@@ -78,9 +78,8 @@ export async function enrichPostContent(title: string, content: string, options:
         reqFields.push(`${index++}. seo_description: SEO Description (max 160 characters).`)
         reqFields.push(`${index++}. og_title: OpenGraph Title.`)
         reqFields.push(`${index++}. og_image: A suggested image description or URL-ready keyword for the OG image.`)
-        reqFields.push(`${index++}. canonical: A suggested canonical URL suffix (the slug).`)
         reqFields.push(`${index++}. noindex: Boolean, set to false unless the content is low quality or duplicate.`)
-        jsonStruct.push(`"seo_title": "..."`, `"seo_description": "..."`, `"og_title": "..."`, `"og_image": "..."`, `"canonical": "..."`, `"noindex": false`)
+        jsonStruct.push(`"seo_title": "..."`, `"seo_description": "..."`, `"og_title": "..."`, `"og_image": "..."`, `"noindex": false`)
     }
 
     if (opts.tags) {

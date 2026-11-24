@@ -6,7 +6,8 @@
  * - それ以外のキーはすべて customMetaData（og_title / seo_title など）に入る
  */
 
-export const KNOWN_FRONTMATTER_FIELDS = ['title', 'slug', 'publishedAt', 'content', 'description', 'date', 'updated']
+// status は noe-posts の Action が使うだけのキー（draft / published）なので、customMetaData には入れない
+export const KNOWN_FRONTMATTER_FIELDS = ['title', 'slug', 'publishedAt', 'content', 'description', 'date', 'updated', 'status']
 
 /** customMetaData に入れるキーだけを取り出す */
 export function extractCustomMetaData(frontmatter: Record<string, unknown>): Record<string, unknown> {
