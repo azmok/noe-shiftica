@@ -50,12 +50,13 @@ export function rewriteUrl(value: string, attr: 'src' | 'href', media: MarkdownM
  * `&quot;` になっているので、このパターンにはマッチしない。
  */
 function rewriteHtmlUrls(html: string, media: MarkdownMedia): string {
-  return html.replace(/\b(src|href)=("([^"]*)"|'([^']*)')/g, (match, attr: 'src' | 'href', quoted: string, dq?: string, sq?: string) => {
+  // 直前が空白の src / href だけ（data-src などの別の属性は書き換えない）
+  return html.replace(/(\s)(src|href)=("([^"]*)"|'([^']*)')/g, (match, sp: string, attr: 'src' | 'href', quoted: string, dq?: string, sq?: string) => {
     const value = dq ?? sq ?? ''
     const next = rewriteUrl(value, attr, media)
     if (next === value) return match
     const q = quoted[0]
-    return `${attr}=${q}${next.replace(q === '"' ? /"/g : /'/g, q === '"' ? '&quot;' : '&#39;')}${q}`
+    return `${sp}${attr}=${q}${next.replace(q === '"' ? /"/g : /'/g, q === '"' ? '&quot;' : '&#39;')}${q}`
   })
 }
 
