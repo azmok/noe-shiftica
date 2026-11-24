@@ -45,6 +45,30 @@ const IMAGE_MIME: Record<string, string> = {
   jpeg: 'image/jpeg',
   gif: 'image/gif',
   webp: 'image/webp',
+  svg: 'image/svg+xml',
+}
+
+/**
+ * SVG は文字のファイルなので、スクリプトなどを仕込める。<img> で表示する限りスクリプトは動かないが、
+ * 画像の URL を直接開くと動くので、危ない要素を含むものは受け付けない（Payload の validateSvg と同じ方針）。
+ */
+const UNSAFE_SVG_PATTERNS = [
+  /<script[\s>]/i,
+  /\son\w+\s*=/i,
+  /javascript:/i,
+  /data:text\/html/i,
+  /<foreignObject[\s>]/i,
+  /<iframe[\s>]/i,
+  /<object[\s>]/i,
+  /<embed[\s>]/i,
+  /<!ENTITY/i,
+  /<!DOCTYPE[^>]*\[/i,
+  /@import/i,
+]
+
+export function isSafeSvg(buffer: Buffer): boolean {
+  const text = buffer.toString('utf8')
+  return !UNSAFE_SVG_PATTERNS.some((re) => re.test(text))
 }
 
 /** 1リクエストで受け付ける画像の合計サイズ（デコード後）。base64 で約1.33倍になり、App Hosting（Cloud Run）のリクエスト上限 32MB に収まるように */
@@ -160,9 +184,12 @@ async function resolveImages(
     const name = baseName(img.filename)
     const mimetype = IMAGE_MIME[name.split('.').pop()?.toLowerCase() ?? '']
     if (!mimetype) {
-      return { error: `Unsupported image type: ${name} (png / jpg / gif / webp only)`, status: 400 }
+      return { error: `Unsupported image type: ${name} (png / jpg / gif / webp / svg only)`, status: 400 }
     }
     const buffer = Buffer.from(img.data.replace(/^data:[^;,]+;base64,/, ''), 'base64')
+    if (mimetype === 'image/svg+xml' && !isSafeSvg(buffer)) {
+      return { error: `SVG contains scripts or other unsafe content: ${name}`, status: 400 }
+    }
     totalBytes += buffer.length
     if (totalBytes > MAX_IMAGE_BYTES) {
       return { error: `Images exceed ${MAX_IMAGE_BYTES / 1024 / 1024}MB in total`, status: 413 }

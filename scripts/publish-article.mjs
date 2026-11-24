@@ -78,7 +78,7 @@ export function referencedImagesAll(markdown) {
     } catch {
       // keep as written
     }
-    if (/\.(png|jpe?g|gif|webp)$/i.test(src)) files.add(src.replace(/^\.\//, ''))
+    if (/\.(png|jpe?g|gif|webp|svg)$/i.test(src)) files.add(src.replace(/^\.\//, ''))
   }
   for (const line of markdown.split('\n')) {
     if (/^\s*(```|~~~)/.test(line)) {

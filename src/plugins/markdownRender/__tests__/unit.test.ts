@@ -122,18 +122,25 @@ describe('scopeMarkdownCss', () => {
     expect(out.slice(out.indexOf('@scope'))).not.toContain('@keyframes')
   })
 
-  it('braces stay balanced for the real ini.md.css', () => {
-    const css = fs.readFileSync(path.resolve(process.cwd(), 'public/md-assets/md/ini.md.css'), 'utf8')
+  it('braces stay balanced for the real article.css', () => {
+    const css = fs.readFileSync(path.resolve(process.cwd(), 'public/md-assets/md/article.css'), 'utf8')
     const out = scopeMarkdownCss(css)
     const count = (c: string) => out.split(c).length - 1
     expect(count('{')).toBe(count('}'))
-    expect(out).not.toMatch(/(^|[\s,}])(html|body)\s*[{,]/m)
+    // no selector may start with html / body (they would match the whole site page)
+    expect(out).not.toMatch(/(^|,)\s*(html|body)\b/m)
   })
 
-  it('the committed ini.md.scoped.css is up to date (run `pnpm md-assets:build`)', () => {
+  it('local-preview-only rules can never match inside the site container', () => {
+    expect(scopeSelector('html > body')).toBe(':scope > body')
+    expect(scopeSelector('html:not(.md-render)')).toBe(':scope:not(.md-render)')
+    expect(scopeSelector(':where(html > body) *')).toBe(':where(html > body) *')
+  })
+
+  it('the committed article.scoped.css is up to date (run `pnpm md-assets:build`)', () => {
     const dir = path.resolve(process.cwd(), 'public/md-assets/md')
-    const fresh = scopeMarkdownCss(fs.readFileSync(path.join(dir, 'ini.md.css'), 'utf8'))
-    expect(fs.readFileSync(path.join(dir, 'ini.md.scoped.css'), 'utf8')).toBe(fresh)
+    const fresh = scopeMarkdownCss(fs.readFileSync(path.join(dir, 'article.css'), 'utf8'))
+    expect(fs.readFileSync(path.join(dir, 'article.scoped.css'), 'utf8')).toBe(fresh)
   })
 })
 
@@ -176,11 +183,12 @@ describe('referencedMarkdownImages', () => {
       '<img class="icons" src="../../_assets/icons/c.svg">',
       '![u](https://e.com/u.png)',
       '![svg](./d.svg)',
+      '![gif](./e.gif)',
       '```',
       '![z](./zz.png)',
       '```',
     ].join('\n')
-    expect(referencedMarkdownImages(md)).toEqual(['01.png', '02 x.jpg', '03.webp'])
+    expect(referencedMarkdownImages(md)).toEqual(['01.png', '02 x.jpg', '03.webp', 'd.svg', 'e.gif'])
   })
 })
 
