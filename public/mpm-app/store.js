@@ -205,6 +205,28 @@
     branchesFor: function (path) {
       return (onBranches['main:' + path] ? ['main'] : []).concat(onBranches[path] || [])
     },
+    /** 指定したブランチでファイルを読む（無ければ null）。差分表示用 */
+    readAt: async function (path, ref) {
+      try {
+        var r = await api('/repos/' + REPO + '/contents/' + enc(path) + '?ref=' + encodeURIComponent(ref), { raw: true, headers: { Accept: 'application/vnd.github.raw' } })
+        return await r.text()
+      } catch (e) { if (/ 404 /.test(e.message + ' ')) return null; throw e }
+    },
+    /** 記事のまとまり（フォルダ）の中で、2つのブランチで違うファイル（.md 本体以外。画像など） */
+    folderDiff: async function (path, refA, refB) {
+      var unit = unitOf(path)
+      if (!unit.dir) return []
+      var a = shaMap(await entriesUnder(refA, unit)), b = shaMap(await entriesUnder(refB, unit)), out = []
+      Object.keys(Object.assign({}, a, b)).sort().forEach(function (p) {
+        if (p === path) return
+        if (!a[p]) out.push({ path: p, status: 'added' })
+        else if (!b[p]) out.push({ path: p, status: 'removed' })
+        else if (a[p].sha !== b[p].sha) out.push({ path: p, status: 'changed' })
+      })
+      return out
+    },
+    /** GitHub の「ブランチを比べる」画面の URL */
+    compareUrl: function (refA, refB) { return 'https://github.com/' + REPO + '/compare/' + enc(refA) + '...' + enc(refB) },
     /** いま表示しているブランチ */
     currentRef: function (path) { return refFor(path) },
     /** 表示・保存するブランチを選ぶ（null で自動：下書きブランチがあればそちら、無ければ main） */

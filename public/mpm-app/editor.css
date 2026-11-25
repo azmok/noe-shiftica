@@ -96,6 +96,31 @@ body.mode-style .style-only { display: inline-block; }
 body.view-md .mdpane { display: block; }
 body.view-md .stage { display: none; }
 body.view-split .mdpane { display: block; width: 50%; border-left: 1px solid var(--line); }
+/* ---- 差分（ブランチ同士の違い） ---- */
+.diffpane { display: none; position: absolute; inset: 0; overflow: auto; -webkit-overflow-scrolling: touch; background: #0b0c10; }
+body.view-diff .diffpane { display: block; }
+body.view-diff .stage, body.view-diff .mdpane { display: none; }
+.diff-head { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; }
+.diff-head select { max-width: 60vw; }
+.diff-head .grow { flex: 1; }
+.diff-arrow { color: var(--muted); }
+.diff-opt { color: var(--muted); white-space: nowrap; }
+.diff-stats .a { color: #7ee2b8; } .diff-stats .d { color: #ff8a8a; }
+.primary-link { color: var(--accent); text-decoration: none; white-space: nowrap; }
+.diff-files { padding: 0 14px; font-size: 12px; color: var(--muted); }
+.diff-files:not(:empty) { padding: 8px 14px; border-bottom: 1px solid var(--line); }
+.diff-body { padding: 6px 0 40vh; font-size: 13px; line-height: 1.6; }
+.diff-body .dl { display: grid; grid-template-columns: 3.2em 3.2em 1.4em 1fr; }
+.diff-body .n { color: #5c6370; text-align: right; padding-right: 6px; user-select: none; }
+.diff-body .s { color: #5c6370; text-align: center; user-select: none; }
+.diff-body .t { white-space: pre-wrap; overflow-wrap: anywhere; padding-right: 14px; }
+.diff-body .dl.add { background: rgba(46, 160, 67, .16); } .diff-body .dl.add .s { color: #7ee2b8; }
+.diff-body .dl.del { background: rgba(248, 81, 73, .16); } .diff-body .dl.del .s { color: #ff8a8a; }
+.diff-body ins { text-decoration: none; background: rgba(46, 160, 67, .45); border-radius: 2px; }
+.diff-body del { text-decoration: none; background: rgba(248, 81, 73, .45); border-radius: 2px; }
+.diff-body .skip { padding: 4px 14px; color: var(--muted); background: #12141a; font-family: inherit; font-size: 12px; cursor: pointer; }
+.diff-body .empty { padding: 24px 14px; color: var(--muted); font-family: -apple-system, "Hiragino Sans", sans-serif; }
+@media (max-width: 600px) { .diff-body .dl { grid-template-columns: 2.4em 2.4em 1.1em 1fr; } .diff-body { font-size: 12px; } }
 body.view-split .stage { right: 50%; }
 @media (max-width: 700px) {
   body.view-split .stage { right: 0; bottom: 50%; }
