@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "mcp__github__create_pull_request",
+      "mcp__github__merge_pull_request"
+    ]
+  }
+}
