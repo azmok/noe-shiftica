@@ -9,7 +9,7 @@
 | 記事の正本 | **DB（Payload）**。noe-posts は「公開前の下書き置き場（入り口）」 |
 | 公開後の noe-posts の .md | publish の Action が DB への反映を確認してから**自動で削除**する（Git の履歴には残る） |
 | 公開後の編集 | 管理画面で **Markdown のまま**（案 A）。Lexical には変換しない |
-| もう一度 Textastic で書きたいとき | 管理画面の「Git に書き出す」で `draft/<slug>` ブランチを作って借りる |
+| もう一度 Textastic で書きたいとき | **作らない**（2026-11-26 あずまの判断）。公開後は管理画面の Markdown エディタ（§2.3）で直す |
 | プラグインの分け方 | `markdownPostManager`（記事）と `styleEditor`（見た目）の2本。styleEditor は Markdown に依存しない |
 | GitHub 連携 | markdownPostManager の**任意機能**（設定でオフにすれば、開発者でないクライアントには普通の Markdown 記事機能として渡せる） |
 | 既存の公開済み記事 | DB と同じ slug の .md は noe-posts から削除済み（2026-11-25, `14202c4`）。DB は触っていない |
@@ -89,7 +89,10 @@ markdownPostManager({
 
 フォルダに複数の記事がある場合（例：`best-ai-model-comparison-guide-2026-11/`）は、公開した .md と、その記事だけが使っている画像だけを消す。
 
-### 2.6 Git に書き出す
+### 2.6 Git に書き出す（作らない：2026-11-26 あずまの判断で不要に）
+
+公開後の記事は管理画面（§2.3）だけで直す。以下は検討時のメモとして残す。上書きガード（§2.4）はそのまま有効なので、公開済みの記事は Git から上書きできない（`baseRevision` を持つ .md を作る手段が無いため）。
+
 
 - 管理画面の記事に「Git に書き出す」ボタンを付ける（`git` を設定したときだけ表示）。
 - サーバー側で GitHub API を呼ぶ。
@@ -149,13 +152,13 @@ markdownPostManager({
 
 ## 5. フェーズ
 
-進み具合（2026-11-25）：フェーズ1 完了（#29）／フェーズ2 完了（管理画面の MD エディタ＋プレビュー＋クリック編集。Q1 の答え「クリック編集も入れる」を反映）／§2.7 管理画面のタブ（Netlify エディタの引っ越し）実装済み。
+進み具合（2026-11-25）：フェーズ1 完了（#29）／フェーズ2 完了（管理画面の MD エディタ＋プレビュー＋クリック編集。Q1 の答え「クリック編集も入れる」を反映）／§2.7 管理画面のタブ（Netlify エディタの引っ越し）実装済み／フェーズ3 完了（自動削除。「Git に書き出す」は不要になった）。次はフェーズ4（styleEditor）。
 
 | # | 内容 | DB の変更 | noe-posts の変更 |
 |---|---|---|---|
 | 1 | markdownPostManager の土台：markdownRender などを引っ越し、`markdownRevision` を追加、上書きガード | 列追加（マイグレーション：dry-run → 承認 → 本実行 → マージ） | — |
 | 2 | 管理画面の MD エディタ＋プレビュー（案 A） | — | — |
-| 3 | 公開時の自動削除（Action）＋「Git に書き出す」 | — | publish.yml 変更。**自動削除は実装済み（2026-11-25）**：鍵は Actions の GITHUB_TOKEN（contents: write）で足りるので `NOE_POSTS_TOKEN` は不要。「Git に書き出す」は未着手 |
+| 3 | 公開時の自動削除（Action）＋「Git に書き出す」 | — | publish.yml 変更。**自動削除は実装済み（2026-11-25）**：鍵は Actions の GITHUB_TOKEN（contents: write）で足りるので `NOE_POSTS_TOKEN` は不要。「Git に書き出す」は作らない（2026-11-26） |
 | 4 | styleEditor（コレクション、本物ページでの編集画面、CSS の出力） | テーブル追加（マイグレーション） | GUI ブロックを取り込んだあと、snapshot を停止 |
 | 5 | packages/ への切り出し | — | — |
 
