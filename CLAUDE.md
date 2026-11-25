@@ -16,7 +16,7 @@
 > + the original instruction before retrying (original instruction + Signs win over the latest failure log).
 > Memory layer contract: `.antigravity/memory-schema.md`.
 
-> **新しいセッションは最初に `docs/HANDOFF.md`（引き継ぎメモ：進行中の作業・未解決の問題・次にやること）を読む。** 作業を終えるときは更新する。
+> **新しいセッションは最初に、非公開の学習リポジトリ（場所は `node scripts/ai-learning.mjs sync` で表示）の `docs/HANDOFF.md`（引き継ぎメモ：進行中の作業・未解決の問題・次にやること）を読む。** 作業を終えるときは更新する（学習リポジトリの作業ブランチで。main への取り込みはあずまの承認）。設計の質問は、同じ場所の `docs/design-map/index.html` を見て、実物と照らしてから答える。
 
 ## Standing instructions (Azuma)
 - バックグラウンドコマンド（App Hosting のロールアウト、長時間ビルド等）の**出力ファイルは確認しなくてよい**。完了通知 / exit code 0 だけで十分とみなす。

@@ -40,6 +40,7 @@ before retrying (the original instruction + Signs win over your latest failure l
 - 同じ種類のミスが2回目なら、作業を一度止めてあずまに報告し、防ぐ仕組みを提案する。
   優先順位：①テストか lint ②hook ③スキル ④`lessons.md` への1行追記（機械で判定できない場合だけ）
 - あずまが承認するまで、提案した仕組みは実装しない。①〜③を実装したら、学習リポジトリの `automated.md` に追記する。
+- 資料の置き場所：公開してよいものは `docs/`、AI運用・バックアップ・弱点・引き継ぎなど公開しないものは学習リポジトリの `docs/`。
 - 学習リポジトリで自動 commit / push してよいのは、クラウドでの `mistakes/` の追加だけ（作業ブランチ限定。あずま承認済み 2026-11-25）。
   `lessons.md` と `automated.md` の変更、main への取り込みは、あずまの承認が要る。
 
