@@ -1077,6 +1077,35 @@
     }
   }
 
+  // ================================================================ 公開（PR なしで main に直接）
+  async function publishArticle() {
+    if (editing) commitEdit()
+    if (!state.path) { status('記事を選んでください', 'err'); return }
+    if (state.dirtyMd || state.dirtyCss) { alert('保存していない変更があります。先に保存して、プレビューを確認してから公開してください'); return }
+    var path = state.path, raw = state.raw, front = splitFront(raw).front, url = previewUrl().replace(/\/preview$/, '')
+    var btn = $('#publish'); btn.disabled = true
+    var report = function (kind, icon, title, detail, link) { status(title, kind); showReport([{ icon: icon, kind: kind, title: title, detail: detail, link: link }]) }
+    try {
+      status('画像を確認中…')
+      var missing = await store.missingImages(path, raw)
+      if (missing.length) { report('err', '⏸', '公開していません', '画像が足りません：' + missing.join('、')); return }
+      if (!confirm('本当に公開しますか？\n\n' + (front.title || path) + '\n' + url + '\n\nすぐに誰でも読めるようになります。公開できた記事は noe-posts の main から自動で消え、正本はサイトの DB に移ります。')) { status('公開をやめました'); return }
+      if (state.path !== path || state.raw !== raw) throw new Error('確認中に記事が変わりました。もう一度やり直してください')
+      status('公開の準備中…')
+      var r = await store.publish(path, raw, setFrontKey(raw, 'status', 'published'))
+      report('', '⏳', '公開を送信中', 'main に入れました（commit ' + r.sha.slice(0, 7) + '）。サイトへの反映を待っています…')
+      store.watchSend(r.sha, function (u) {
+        var log = u.url && { href: u.url, text: 'ログ' }
+        if (u.state === 'success') report('ok', '✅', '公開の処理が終わりました', '記事を確認してください：', { href: url, text: '開く' })
+        else if (u.state === 'failure') report('err', '❌', '公開の処理が失敗しました', (u.reason || '理由はログで確認してください') + '（main には入っています。直ったあとは GitHub の Actions から Re-run）', log)
+        else if (u.state === 'noperm' || u.state === 'none') report('', 'ℹ️', '公開の結果は確認できません', 'main には入っています。GitHub の Actions で確認してください')
+        else report('', '⏳', '公開を送信中', 'サイトへの反映を待っています…', log)
+      }, 'publish')
+    } catch (e) {
+      report('err', '❌', '公開できませんでした', saveError(e))
+    } finally { btn.disabled = false }
+  }
+
   // ================================================================ 起動
   var started = false
   async function start() {
@@ -1124,6 +1153,7 @@
     $('#priority').addEventListener('change', function () { changePriority($('#priority').value) })
     $('#ghLink').addEventListener('click', copyGhLink)
     $('#fileBtn').addEventListener('click', openFileDlg)
+    $('#publish').addEventListener('click', publishArticle)
     $('#moveBtn').addEventListener('click', moveArticle)
     $('#deleteBtn').addEventListener('click', deleteArticle)
     $('#drawerClose').addEventListener('click', closeDrawer); $('#drawerScrim').addEventListener('click', closeDrawer)
