@@ -10,7 +10,8 @@ import { readRepoSettings } from './settings'
  */
 
 const GITHUB = 'https://api.github.com'
-const METHODS = ['GET', 'PUT', 'POST'] as const
+/** PATCH＝ブランチを進める（記事の移動・削除の commit）、DELETE＝下書きブランチを消す */
+const METHODS = ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'] as const
 
 /** 中継してよい GitHub API のパスか（設定したリポジトリの中だけ） */
 export function allowedPath(path: string, repo: string): boolean {
@@ -47,7 +48,7 @@ const proxyHandler: PayloadHandler = async (req) => {
       'User-Agent': 'markdown-post-manager',
       ...(method !== 'GET' ? { 'Content-Type': 'application/json' } : {}),
     },
-    ...(method !== 'GET' && req.text ? { body: await req.text() } : {}),
+    ...(method !== 'GET' && method !== 'DELETE' && req.text ? { body: await req.text() } : {}),
     redirect: 'follow',
   }
   const res = await fetch(GITHUB + path, init)
@@ -63,5 +64,5 @@ const proxyHandler: PayloadHandler = async (req) => {
 
 export const managerEndpoints: Endpoint[] = [
   { path: '/mpm/config', method: 'get', handler: configHandler },
-  ...METHODS.map((m) => ({ path: '/mpm/github', method: m.toLowerCase() as 'get' | 'put' | 'post', handler: proxyHandler })),
+  ...METHODS.map((m) => ({ path: '/mpm/github', method: m.toLowerCase() as Lowercase<(typeof METHODS)[number]>, handler: proxyHandler })),
 ]

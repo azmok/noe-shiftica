@@ -248,7 +248,11 @@
       state.raw = raw.replace(/\r\n/g, '\n'); state.path = path; state.dirtyMd = false; markDirty()
       remember('article', path)
       $('#articleName').textContent = path.split('/').pop().replace(/\.md$/, '')
+      state.front = splitFront(state.raw).front
+      priorities[path] = normPriority(state.front.priority); savePriorities()
+      $('#priority').value = priorities[path] || ''
       renderArticleList()
+      updateGhLink()
       $('#mdText').value = state.raw
       $('#stage').scrollTop = 0; $('#mdText').scrollTop = 0
       await renderPreview()
@@ -814,6 +818,7 @@
       var failed = rows.some(function (r) { return r.kind === 'err' })
       status(failed ? '保存できなかったものがあります（右下を見てください）' : '保存しました', failed ? 'err' : 'ok')
       showReport(rows)
+      updateGhLink() // 初めての保存で下書きブランチができたら、リンクもそちらへ
     } finally { $('#save').disabled = false; markDirty() }
   }
 
@@ -927,16 +932,137 @@
         })
         if (!items.length) return
         box.appendChild(el('h4', { text: sub[1] }))
+        items.sort(function (a, b) { return (PRIO_ORDER[priorities[a] || ''] - PRIO_ORDER[priorities[b] || '']) || (a < b ? -1 : 1) })
         items.forEach(function (p) {
           var name = p.split('/').pop().replace(/\.md$/, '')
           var isDraft = store.draftBranch && drafts.indexOf(store.draftBranch(p)) >= 0
-          var b = el('button', { class: p === state.path ? 'on' : '', html: '<span class="t">' + esc(name) + (isDraft ? '<span class="badge">下書き</span>' : '') + '</span><span class="p">' + esc(p) + '</span>' })
+          var b = el('button', { class: p === state.path ? 'on' : '', html: '<span class="t">' + (priorities[p] ? '<span class="prio ' + priorities[p] + '" title="優先度：' + PRIO_LABEL[priorities[p]] + '"></span>' : '') + esc(name) + (isDraft ? '<span class="badge">下書き</span>' : '') + '</span><span class="p">' + esc(p) + '</span>' })
           b.addEventListener('click', function () { if (p === state.path) closeDrawer(); else openArticle(p) })
           box.appendChild(b)
         })
       })
     })
     if (!box.children.length) box.appendChild(el('p', { class: 'hint', style: 'margin:12px', text: q ? '見つかりません' : '記事がありません' }))
+  }
+
+  // ================================================================ 優先度（frontmatter の priority: high / medium / low）
+  var PRIO_ORDER = { high: 0, medium: 1, low: 2, '': 3 }
+  var PRIO_LABEL = { high: '高', medium: '中', low: '低' }
+  var priorities = (function () { try { return JSON.parse(load('priorities') || '{}') || {} } catch (e) { return {} } })()
+  function savePriorities() { remember('priorities', JSON.stringify(priorities)) }
+  function normPriority(v) {
+    v = String(v || '').trim().toLowerCase()
+    if (/^(high|h|高|1)$/.test(v)) return 'high'
+    if (/^(medium|mid|m|中|2)$/.test(v)) return 'medium'
+    if (/^(low|l|低|3)$/.test(v)) return 'low'
+    return ''
+  }
+  /** frontmatter の1行を書き換える（value が空なら消す）。frontmatter が無ければ先頭に作る */
+  function setFrontKey(raw, key, value) {
+    var line = key + ': ' + value
+    var m = raw.match(/^(﻿?\s*---\n)([\s\S]*?)(\n---\n?)/)
+    if (!m) return value ? '---\n' + line + '\n---\n' + raw : raw
+    var lines = m[2].split('\n'), re = new RegExp('^' + key + '\\s*:'), i = lines.findIndex(function (l) { return re.test(l) })
+    if (i >= 0) { if (value) lines[i] = line; else lines.splice(i, 1) }
+    else if (value) lines.push(line)
+    return m[1] + lines.join('\n') + m[3] + raw.slice(m[0].length)
+  }
+  /** 一覧の優先度を、裏で少しずつ読んで埋める（前回の結果はこの端末に覚えておく） */
+  async function loadPriorities() {
+    var queue = articles.slice(), found = {}
+    var refresh = debounce(renderArticleList, 300)
+    async function worker() {
+      while (queue.length) {
+        var p = queue.shift()
+        try { found[p] = normPriority(splitFront(await store.read(p)).front.priority) } catch (e) { continue }
+        if ((priorities[p] || '') !== found[p]) { priorities[p] = found[p]; refresh() }
+      }
+    }
+    await Promise.all([1, 2, 3, 4, 5, 6].map(worker))
+    Object.keys(priorities).forEach(function (p) { if (articles.indexOf(p) < 0) delete priorities[p] })
+    savePriorities()
+  }
+  async function changePriority(v) {
+    if (!state.path) return
+    var wasDirty = state.dirtyMd || state.dirtyCss
+    var text = setFrontKey(state.raw, 'priority', v)
+    if (text === state.raw) return
+    setRaw(text, true)
+    state.front = splitFront(state.raw).front
+    priorities[state.path] = v; savePriorities(); renderArticleList()
+    // ほかに未保存の変更が無ければ、そのまま保存する（フラグだけの commit）
+    if (!wasDirty) await save()
+    else status('優先度を変えました（保存で GitHub に入ります）')
+  }
+
+  // ================================================================ GitHub で開く・移動・削除
+  var ghUrl = ''
+  async function updateGhLink() {
+    ghUrl = ''; $('#ghLink').href = '#'
+    if (!store.webUrl || !state.path) return
+    var path = state.path
+    try { var u = await store.webUrl(path); if (path === state.path) { ghUrl = u; $('#ghLink').href = u } } catch (e) {}
+  }
+  function copyGhLink(ev) {
+    if (!ghUrl) { ev.preventDefault(); status('GitHub の場所を確認中です。少し待ってからもう一度', 'err'); return }
+    // 開くのはリンクそのもの（target=_blank）。ついでにクリップボードにも入れる
+    try { navigator.clipboard.writeText(ghUrl).then(function () { status('GitHub のリンクをコピーしました', 'ok') }, function () {}) } catch (e) {}
+  }
+  function parentOf(p) { return p.replace(/\/[^/]+$/, '') }
+  function moveTargets() {
+    var set = { 'dev': 1, 'blog': 1, 'dev/_fin': 1, 'blog/_fin': 1, 'dev/_archived': 1, 'blog/_archived': 1 }
+    articles.forEach(function (p) { set[parentOf(store.unitOf(p).path)] = 1 })
+    var here = parentOf(store.unitOf(state.path).path)
+    return Object.keys(set).filter(function (d) { return d !== here }).sort()
+  }
+  function openFileDlg() {
+    if (!state.path) return
+    var unit = store.unitOf(state.path)
+    $('#fileDlgPath').textContent = state.path
+    $('#fileDlgUnit').textContent = unit.dir ? 'フォルダ「' + unit.path + '」ごと（画像も一緒に）動かす／消す' : 'この .md ファイルだけを動かす／消す'
+    var sel = $('#moveDest'); sel.innerHTML = ''
+    moveTargets().forEach(function (d) { sel.appendChild(el('option', { value: d, text: d + '/' })) })
+    $('#fileDlg').showModal()
+  }
+  function needSaved() {
+    if (!state.dirtyMd) return false
+    alert('保存していない変更があります。先に保存してから、移動・削除してください')
+    return true
+  }
+  async function moveArticle() {
+    if (needSaved()) return
+    var dest = $('#moveDest').value, from = state.path; if (!dest) return
+    if (!confirm(store.unitOf(from).path + '\n→ ' + dest + '/\nに移動します。よろしいですか？')) return
+    $('#fileDlg').close(); status('移動中…')
+    try {
+      var r = await store.move(from, dest)
+      articles = await store.list()
+      if (priorities[from] != null) { priorities[r.path] = priorities[from]; delete priorities[from]; savePriorities() }
+      await openArticle(r.path)
+      status('移動しました', 'ok')
+      showReport([{ icon: '✅', kind: 'ok', title: '移動しました', detail: from + ' → ' + r.path }].concat(r.done.map(function (d) { return { icon: '・', title: d.where, detail: d.detail } })))
+    } catch (e) {
+      status('移動できませんでした', 'err')
+      showReport([{ icon: '❌', kind: 'err', title: '移動できませんでした', detail: saveError(e) }])
+    }
+  }
+  async function deleteArticle() {
+    if (needSaved()) return
+    var path = state.path, unit = store.unitOf(path)
+    if (!confirm((unit.dir ? 'フォルダ「' + unit.path + '」を画像ごと' : '「' + path + '」を') + '削除します。\n（Git の履歴からは戻せます）よろしいですか？')) return
+    $('#fileDlg').close(); status('削除中…')
+    try {
+      var done = await store.remove(path)
+      delete priorities[path]; savePriorities()
+      articles = await store.list()
+      state.path = null; state.raw = ''; state.dirtyMd = false; markDirty()
+      $('#articleName').textContent = '記事'; renderArticleList(); openDrawer()
+      status('削除しました', 'ok')
+      showReport([{ icon: '🗑', kind: 'ok', title: '削除しました', detail: path }].concat(done.map(function (d) { return { icon: '・', title: d.where, detail: d.detail } })))
+    } catch (e) {
+      status('削除できませんでした', 'err')
+      showReport([{ icon: '❌', kind: 'err', title: '削除できませんでした', detail: saveError(e) }])
+    }
   }
 
   // ================================================================ 起動
@@ -956,6 +1082,7 @@
       state.edits = parseGui(splitGui(state.articleCss).gui); renderEdits(); renderGroups()
       articles = await store.list()
       renderArticleList()
+      loadPriorities()
       var last = load('article'), first = articles.indexOf(last) >= 0 ? last : articles[0]
       if (first) openArticle(first); else openDrawer()
     } catch (e) { started = false; status('読み込めませんでした：' + e.message, 'err') }
@@ -981,6 +1108,12 @@
     $('#barShow').addEventListener('click', function () { document.body.classList.remove('bar-hidden'); setTimeout(function () { fitStage(false) }, 0) })
     $('#reload').addEventListener('click', function () { if (state.dirtyMd && !confirm('保存していない記事の変更を捨てて読み直しますか？')) return; cache = {}; if (state.path) { state.dirtyMd = false; openArticle(state.path) } })
     $('#articleBtn').addEventListener('click', openDrawer)
+    if (store.remove && store.move) document.body.classList.add('has-file-ops')
+    $('#priority').addEventListener('change', function () { changePriority($('#priority').value) })
+    $('#ghLink').addEventListener('click', copyGhLink)
+    $('#fileBtn').addEventListener('click', openFileDlg)
+    $('#moveBtn').addEventListener('click', moveArticle)
+    $('#deleteBtn').addEventListener('click', deleteArticle)
     $('#drawerClose').addEventListener('click', closeDrawer); $('#drawerScrim').addEventListener('click', closeDrawer)
     $('#articleSearch').addEventListener('input', renderArticleList)
     $('#panelToggle').addEventListener('click', function () { setPanelCollapsed(!document.body.classList.contains('panel-collapsed')) })

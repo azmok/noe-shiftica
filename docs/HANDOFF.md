@@ -1,9 +1,16 @@
 # 引き継ぎメモ（次のセッション用）
 
-> 最終更新：2026-11-25 16:10 JST。新しいセッションは、まずこのファイル → `CLAUDE.md` → `docs/markdown-post-manager-and-style-editor.md` の順に読む。
+> 最終更新：2026-11-25 17:45 JST。新しいセッションは、まずこのファイル → `CLAUDE.md` → `docs/markdown-post-manager-and-style-editor.md` の順に読む。
 > 作業が進んだら、このファイルを更新してから終える。
 
-## 1. いま最優先：本番デプロイが失敗している
+## 0. 2026-11-25 夕方の作業（最新）
+
+- あずまから「Markdown Post Manager いい感じ」の返事あり（本番で動いている）。下の §1 のデプロイ失敗は #34（フォントの自前ホスト）で解消済みの見込み
+- noe-posts の整理（noe-posts PR #4、マージ済み）：本番に公開済みの記事（似た版・重複も）を削除。REA vs Craft は新しい版を `dev/rea-vs-craft-anything-where-humans-stand/` に寄せた（画像 01〜03.png は相変わらず GitHub に無い）
+  - 未公開なので残したもの：`blog/_archived` の共同経営者2本・ベンチマーク・情報9割・転スラ、`dev/_fin/AI×Obsidian批判` の連載（日本語版以外）、`blog/best-ai-model-comparison-guide-2026-11` など
+- Markdown Post Manager に追加：優先度フラグ（frontmatter `priority`）、GitHub で開くアイコン、📁 移動・削除（詳細は `manager/APP.md`）
+
+## 1. （解決済みの見込み）本番デプロイが失敗していた
 
 - **#29〜#32 をマージしたあと、Firebase App Hosting のデプロイ（ロールアウト）が失敗している**。本番は前の版のまま：
   - `/api/mpm/config` と `/mpm-app/index.html` が 404
