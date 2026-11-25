@@ -920,7 +920,7 @@
     var GROUP = [['dev', 'Dev Journal'], ['blog', 'Blog']]
     var SUB = [['', '執筆中'], ['_fin', '公開済み（_fin）'], ['_archived', 'アーカイブ（_archived）'], ['other', 'その他']]
     GROUP.forEach(function (g) {
-      var inGroup = articles.filter(function (p) { return p.indexOf(g[0] + '/') === 0 && (!q || p.toLowerCase().indexOf(q) >= 0) })
+      var inGroup = articles.filter(function (p) { return p.indexOf(g[0] + '/') === 0 && (!q || p.toLowerCase().indexOf(q) >= 0) && prioMatch(p) })
       if (!inGroup.length) return
       box.appendChild(el('h3', { text: g[1] + '（' + inGroup.length + '）' }))
       SUB.forEach(function (sub) {
@@ -932,7 +932,7 @@
         })
         if (!items.length) return
         box.appendChild(el('h4', { text: sub[1] }))
-        items.sort(function (a, b) { return (PRIO_ORDER[priorities[a] || ''] - PRIO_ORDER[priorities[b] || '']) || (a < b ? -1 : 1) })
+        items.sort(function (a, b) { return (listSort === 'prio' ? PRIO_ORDER[priorities[a] || ''] - PRIO_ORDER[priorities[b] || ''] : 0) || (a < b ? -1 : 1) })
         items.forEach(function (p) {
           var name = p.split('/').pop().replace(/\.md$/, '')
           var isDraft = store.draftBranch && drafts.indexOf(store.draftBranch(p)) >= 0
@@ -942,7 +942,7 @@
         })
       })
     })
-    if (!box.children.length) box.appendChild(el('p', { class: 'hint', style: 'margin:12px', text: q ? '見つかりません' : '記事がありません' }))
+    if (!box.children.length) box.appendChild(el('p', { class: 'hint', style: 'margin:12px', text: q || prioFilter !== 'all' ? '見つかりません（検索・絞り込みを確認）' : '記事がありません' }))
   }
 
   // ================================================================ 優先度（frontmatter の priority: high / medium / low）
@@ -950,6 +950,18 @@
   var PRIO_LABEL = { high: '高', medium: '中', low: '低' }
   var priorities = (function () { try { return JSON.parse(load('priorities') || '{}') || {} } catch (e) { return {} } })()
   function savePriorities() { remember('priorities', JSON.stringify(priorities)) }
+  // 一覧の絞り込み（all / none / "high,medium" など）と並べ方（prio / name）。この端末に覚えておく
+  var prioFilter = load('prioFilter') || 'all', listSort = load('listSort') || 'prio'
+  function prioMatch(p) {
+    if (prioFilter === 'all') return true
+    var v = priorities[p] || ''
+    return prioFilter === 'none' ? !v : prioFilter.split(',').indexOf(v) >= 0
+  }
+  function setListSort(v) {
+    listSort = v; remember('listSort', v)
+    document.querySelectorAll('#sortMode button').forEach(function (b) { b.classList.toggle('on', b.dataset.s === v) })
+    renderArticleList()
+  }
   function normPriority(v) {
     v = String(v || '').trim().toLowerCase()
     if (/^(high|h|高|1)$/.test(v)) return 'high'
@@ -1116,6 +1128,10 @@
     $('#deleteBtn').addEventListener('click', deleteArticle)
     $('#drawerClose').addEventListener('click', closeDrawer); $('#drawerScrim').addEventListener('click', closeDrawer)
     $('#articleSearch').addEventListener('input', renderArticleList)
+    $('#prioFilter').value = prioFilter
+    $('#prioFilter').addEventListener('change', function () { prioFilter = $('#prioFilter').value; remember('prioFilter', prioFilter); renderArticleList() })
+    document.querySelectorAll('#sortMode button').forEach(function (b) { b.addEventListener('click', function () { setListSort(b.dataset.s) }) })
+    setListSort(listSort)
     $('#panelToggle').addEventListener('click', function () { setPanelCollapsed(!document.body.classList.contains('panel-collapsed')) })
     $('#save').addEventListener('click', save); $('#undo').addEventListener('click', undo)
     $('#reportClose').addEventListener('click', function () { showReport([]) })

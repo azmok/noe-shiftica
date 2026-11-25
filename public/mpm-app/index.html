@@ -52,6 +52,19 @@
     <input id="articleSearch" type="search" placeholder="記事を探す（ファイル名）" autocomplete="off" autocapitalize="off" spellcheck="false">
     <button id="drawerClose" title="閉じる">✕</button>
   </div>
+  <div class="drawer-tools">
+    <select id="prioFilter" title="優先度で絞り込む" aria-label="優先度で絞り込む">
+      <option value="all">すべて</option>
+      <option value="high">🔴 高だけ</option>
+      <option value="high,medium">🔴🟡 高・中</option>
+      <option value="high,medium,low">優先度あり</option>
+      <option value="none">優先度なし</option>
+    </select>
+    <div class="seg" id="sortMode" role="group" aria-label="並べ方">
+      <button data-s="prio" title="優先度の高い順（同じなら名前順）">優先度順</button>
+      <button data-s="name" title="ファイル名の順">名前順</button>
+    </div>
+  </div>
   <div id="articleList" class="article-list"></div>
 </aside>
 
