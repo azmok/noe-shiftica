@@ -1,6 +1,8 @@
 import type { Field, Plugin } from 'payload'
 import { markdownRevision } from './revision'
 import { syncContentFromMarkdown } from './contentSync'
+import { settingsGlobal } from './manager/settings'
+import { managerEndpoints } from './manager/endpoints'
 
 /**
  * markdownPostManager — Markdown 記事を DB で持ち、そのまま表示するプラグイン
@@ -18,6 +20,11 @@ import { syncContentFromMarkdown } from './contentSync'
 export interface MarkdownPostManagerOptions {
   /** Collection slugs that get the markdown render fields */
   collections: string[]
+  /**
+   * 管理画面のタブ「Markdown Post Manager」（GitHub の非公開リポジトリにある公開前の記事を編集する）。
+   * 既定 true。リポジトリの URL と鍵は管理画面の設定（Markdown Post Manager 設定）で入れる
+   */
+  manager?: boolean
 }
 
 export const RENDER_MODES = ['lexical', 'markdown'] as const
@@ -97,6 +104,29 @@ export const markdownPostManager =
   (options: MarkdownPostManagerOptions): Plugin =>
   (config) => ({
     ...config,
+    ...(options.manager === false
+      ? {}
+      : {
+          globals: [...(config.globals ?? []), settingsGlobal],
+          endpoints: [...(config.endpoints ?? []), ...managerEndpoints],
+          admin: {
+            ...config.admin,
+            components: {
+              ...config.admin?.components,
+              views: {
+                ...config.admin?.components?.views,
+                markdownPostManager: {
+                  Component: '@/plugins/markdownPostManager/manager/ManagerView#ManagerView',
+                  path: '/markdown-post-manager',
+                },
+              },
+              afterNavLinks: [
+                ...(config.admin?.components?.afterNavLinks ?? []),
+                '@/plugins/markdownPostManager/manager/NavLink#NavLink',
+              ],
+            },
+          },
+        }),
     collections: (config.collections ?? []).map((collection) =>
       options.collections.includes(collection.slug)
         ? {

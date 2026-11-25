@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="noe-editor-version" content="2026-11-25">
+<title>Markdown Post Manager</title>
+<link rel="stylesheet" href="editor.css">
+</head>
+<body class="view-preview">
+<header class="bar" id="bar">
+  <button id="articleBtn" class="article-btn" title="記事を選ぶ">☰ <span id="articleName">記事</span></button>
+  <div class="seg" id="view" role="group" aria-label="表示">
+    <button data-v="preview" class="on">プレビュー</button>
+    <button data-v="split">並べて</button>
+    <button data-v="md">MD</button>
+  </div>
+  <div class="seg" id="mode" role="group" aria-label="モード">
+    <button data-m="text" title="文章をクリックして、その場で書き換える">✏️ 文章</button>
+    <button data-m="style" title="要素の見た目（CSS）を変える">🎨 スタイル</button>
+  </div>
+  <div class="seg" id="device" role="group" aria-label="画面幅">
+    <button data-w="390" title="iPhone">390</button>
+    <button data-w="820" title="iPad">820</button>
+    <button data-w="1280" class="on" title="デスクトップ">1280</button>
+    <button data-w="1440" title="ワイド">1440</button>
+  </div>
+  <button id="reload" title="読み直す">↻</button>
+  <span class="grow"></span>
+  <span id="status" class="status"></span>
+  <button id="undo" class="style-only" title="スタイルの変更をひとつ戻す" disabled>↶</button>
+  <button id="save" class="primary" title="保存">保存</button>
+  <button id="settings" title="設定">⚙︎</button>
+  <button id="barHide" title="ツールバーを隠す">⌃</button>
+</header>
+<button id="barShow" class="bar-show" title="ツールバーを出す">⌄</button>
+
+<div class="drawer-scrim" id="drawerScrim"></div>
+<aside class="drawer" id="drawer" aria-label="記事">
+  <div class="drawer-head">
+    <input id="articleSearch" type="search" placeholder="記事を探す（ファイル名）" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button id="drawerClose" title="閉じる">✕</button>
+  </div>
+  <div id="articleList" class="article-list"></div>
+</aside>
+
+<button id="panelToggle" class="panel-toggle" title="スタイルパネルの表示・非表示">⟩</button>
+
+<div class="textbar" id="textbar">
+  <button data-cmd="bold" title="太字"><b>B</b></button>
+  <button data-cmd="italic" title="斜体"><i>I</i></button>
+  <button data-cmd="code" title="コード" class="mono">&lt;/&gt;</button>
+  <button data-cmd="link" title="リンク">🔗</button>
+  <span class="grow"></span>
+  <span class="hint" id="textbarHint"></span>
+  <button data-cmd="cancel">取消</button>
+  <button data-cmd="commit" class="primary">確定</button>
+</div>
+
+<main class="layout" id="layout">
+  <section class="stage" id="stage">
+    <div class="sizer" id="sizer"><div class="frame-wrap" id="frameWrap"><iframe id="frame" title="プレビュー" scrolling="no"></iframe></div></div>
+  </section>
+
+  <section class="mdpane" id="mdpane">
+    <textarea id="mdText" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+  </section>
+
+  <aside class="panel" id="panel">
+    <div class="sel-head">
+      <div class="picked" id="picked">プレビューの中の要素をタップして選んでください</div>
+      <select id="selector" class="mono" disabled></select>
+      <input id="selectorCustom" class="mono" type="text" placeholder="セレクタを直接書く（例：.article-body h2）" hidden>
+      <div class="scope">
+        <label><input type="radio" name="media" value="all" checked> 全サイズ</label>
+        <label><input type="radio" name="media" value="mobile"> モバイル</label>
+        <label><input type="radio" name="media" value="desktop"> PC</label>
+      </div>
+    </div>
+    <div id="groups"></div>
+    <details class="group" id="moreGroup">
+      <summary>その他のプロパティ（検索）</summary>
+      <input id="propSearch" type="search" placeholder="例：text-stroke / word-break / transform …" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div id="moreRows"></div>
+    </details>
+    <details class="group">
+      <summary>変更した内容 <span class="hint" id="editCount"></span></summary>
+      <div id="edits" class="edits"></div>
+      <pre id="guiCss" class="mono cssout"></pre>
+    </details>
+  </aside>
+</main>
+
+<aside id="report" class="report" hidden aria-live="polite">
+  <div class="report-head"><b>保存の結果</b><button id="reportClose" title="閉じる">✕</button></div>
+  <ol id="reportList"></ol>
+</aside>
+
+<dialog id="saveDlg">
+  <form method="dialog">
+    <h2>保存の前に：画像が見つかりません</h2>
+    <p class="hint">本文が使っている次の画像が、GitHub 上に見つかりません（ファイルが無いか、パスが違う）。このまま保存すると GitHub には保存されますが、<b>サイトへの下書き送信は失敗します</b>（画像が全部そろわないと送れないため）。</p>
+    <ul id="saveDlgList" class="mono"></ul>
+    <p class="hint">画像を Working Copy などで記事フォルダに入れるか、本文のパスを直してから、もう一度保存してください。</p>
+    <div class="dlg-actions">
+      <button value="cancel" class="primary">やめる</button>
+      <button value="save">それでも保存</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="settingsDlg">
+  <form method="dialog">
+    <h2>設定</h2>
+    <p id="storeLabel" class="hint"></p>
+    <div id="payloadBox" hidden>
+      <p id="payloadState" class="hint"></p>
+      <p class="hint">リポジトリの URL と GitHub の鍵は、管理画面の「Markdown Post Manager 設定」で入れます。鍵はサーバーにだけ暗号化して保存され、このブラウザには渡りません。</p>
+      <p><a id="payloadLink" class="primary-link" href="/admin/globals/markdown-post-manager-settings" target="_top">設定を開く →</a></p>
+    </div>
+    <div id="tokenBox">
+      <label>GitHub の鍵（Fine-grained token）<br>
+        <input id="tokenInput" type="password" autocomplete="off" placeholder="github_pat_…" style="width:100%">
+      </label>
+      <p class="hint">azmok/noe-posts だけに「Contents：Read and write」を付けた鍵。この端末の中だけに保存され、外には送られません（GitHub との通信だけに使う）。</p>
+      <p id="tokenResult" class="hint"></p>
+    </div>
+    <div class="dlg-actions">
+      <button value="cancel">閉じる</button>
+      <button id="tokenClear" value="cancel" type="button">鍵を消す</button>
+      <button id="tokenSave" class="primary" type="button">確認して保存</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="vendor/markdown-it.min.js"></script>
+<script src="scope-css.js"></script>
+<script src="store.js"></script>
+<script src="editor.js"></script>
+</body>
+</html>

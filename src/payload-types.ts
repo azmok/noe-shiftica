@@ -112,8 +112,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'markdown-post-manager-settings': MarkdownPostManagerSetting;
+  };
+  globalsSelect: {
+    'markdown-post-manager-settings': MarkdownPostManagerSettingsSelect<false> | MarkdownPostManagerSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -341,7 +345,7 @@ export interface Post {
    */
   renderMode?: string | null;
   /**
-   * noe-posts から送られた原文（前処理済み）。ここでは編集せず、noe-posts 側で直して再送してください。
+   * 本文の Markdown。公開後はここ（DB）が正本です。プレビューの段落・見出し・表のセルをクリックしても直せます。保存すると検索・読了時間用の本文（Lexical）も作り直します。
    */
   markdownSource?: string | null;
   /**
@@ -470,7 +474,7 @@ export interface TechPost {
    */
   renderMode?: string | null;
   /**
-   * noe-posts から送られた原文（前処理済み）。ここでは編集せず、noe-posts 側で直して再送してください。
+   * 本文の Markdown。公開後はここ（DB）が正本です。プレビューの段落・見出し・表のセルをクリックしても直せます。保存すると検索・読了時間用の本文（Lexical）も作り直します。
    */
   markdownSource?: string | null;
   /**
@@ -1319,6 +1323,43 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * 記事の入り口にする GitHub のリポジトリと、読み書きに使う鍵。鍵は暗号化して保存し、画面やブラウザには二度と表示しません（入れ直すときは新しい鍵で上書き）。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "markdown-post-manager-settings".
+ */
+export interface MarkdownPostManagerSetting {
+  id: number;
+  /**
+   * Git の HTTPS の URL（owner/repo の形でもよい）
+   */
+  repoUrl?: string | null;
+  /**
+   * このリポジトリだけを選び、Contents: Read and write と Actions: Read-only を付けた鍵。空のまま保存すると、今の鍵をそのまま使います。
+   */
+  token?: string | null;
+  tokenEncrypted?: string | null;
+  /**
+   * 末尾4文字だけ表示しています
+   */
+  tokenHint?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "markdown-post-manager-settings_select".
+ */
+export interface MarkdownPostManagerSettingsSelect<T extends boolean = true> {
+  repoUrl?: T;
+  token?: T;
+  tokenEncrypted?: T;
+  tokenHint?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

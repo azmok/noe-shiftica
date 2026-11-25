@@ -13,6 +13,7 @@ import * as migration_20261026_080000_add_revised_at from './20261026_080000_add
 import * as migration_20261031_120000_add_videos_collection from './20261031_120000_add_videos_collection';
 import * as migration_20261124_180000_add_markdown_render from './20261124_180000_add_markdown_render';
 import * as migration_20261125_030000_add_markdown_revision from './20261125_030000_add_markdown_revision';
+import * as migration_20261125_040000_add_markdown_post_manager_settings from './20261125_040000_add_markdown_post_manager_settings';
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20261125_030000_add_markdown_revision.up,
     down: migration_20261125_030000_add_markdown_revision.down,
     name: '20261125_030000_add_markdown_revision'
+  },
+  {
+    up: migration_20261125_040000_add_markdown_post_manager_settings.up,
+    down: migration_20261125_040000_add_markdown_post_manager_settings.down,
+    name: '20261125_040000_add_markdown_post_manager_settings'
   },
 ];
