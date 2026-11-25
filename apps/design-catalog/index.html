@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>記事デザインカタログ · Noe Shiftica</title>
-  <link rel="stylesheet" href="./catalog.css">
-  <script type="module" src="./catalog.mjs"></script>
+  <link rel="stylesheet" href="./catalog.css?v=3">
+  <script type="module" src="./catalog.mjs?v=3"></script>
 </head>
 <body>
   <header class="masthead">
@@ -59,24 +59,41 @@
         <h2></h2>
         <span class="panel-theme"></span>
         <button class="panel-edit" type="button" aria-controls="editor">調整</button>
+        <button class="panel-fullscreen" type="button" aria-label="全画面" title="全画面" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="fullscreen-enter" d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/>
+            <path class="fullscreen-exit" d="M3 9h6V3m6 0v6h6M3 15h6v6m12-6h-6v6"/>
+          </svg>
+        </button>
       </header>
+      <p class="fullscreen-hint" role="status" hidden><kbd>Esc</kbd> キーで全画面を終了</p>
       <div class="preview-scroll" tabindex="0" role="region">
         <div class="spread-track">
           <div class="spread-window">
-            <div class="spread-pane">
-              <div class="spread-stream">
-                <article class="preview">
-                  <header class="story-header">
-                    <p class="story-kind"></p>
-                    <h2 class="story-title"></h2>
-                    <p class="story-intro"></p>
-                  </header>
-                  <figure class="story-hero"><img alt="" fetchpriority="high"></figure>
-                  <div class="story-body"></div>
-                </article>
+            <div class="spread-pane spread-left">
+              <div class="spread-rail spread-rail-top" aria-hidden="true"></div>
+              <div class="spread-clip">
+                <div class="spread-stream">
+                  <article class="preview">
+                    <header class="story-header">
+                      <p class="story-kind"></p>
+                      <h2 class="story-title"></h2>
+                      <p class="story-intro"></p>
+                    </header>
+                    <figure class="story-hero"><img alt="" fetchpriority="high"></figure>
+                    <div class="story-body"></div>
+                  </article>
+                </div>
               </div>
+              <div class="spread-rail spread-rail-bottom" aria-hidden="true"><span>続きは右列の上へ ↗</span></div>
             </div>
-            <div class="spread-pane spread-mirror" aria-hidden="true" inert></div>
+            <div class="spread-pane spread-right" aria-hidden="true">
+              <div class="spread-rail spread-rail-top" aria-hidden="true"><span>↙ 左列の下から続く</span></div>
+              <div class="spread-clip">
+                <div class="spread-stream"></div>
+              </div>
+              <div class="spread-rail spread-rail-bottom" aria-hidden="true"></div>
+            </div>
           </div>
         </div>
       </div>

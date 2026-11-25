@@ -11,7 +11,7 @@ const fields = {
   paragraph: ['段落間隔', 0, 64, 1, 'px'],
   media: ['画像の余白', 0, 88, 1, 'px'],
 };
-const storageKey = 'noe-design-catalog-v1';
+const storageKey = 'noe-design-catalog-v3';
 const defaultPanels = [
   { theme: 'apple', layout: 'auto', viewport: 0 },
   { theme: 'airbnb', layout: 'one', viewport: 0 },
@@ -33,6 +33,7 @@ const own = (object, key) => Object.hasOwn(object, key);
 const option = (value, label) => new Option(label, value);
 const message = (text) => { $('#status').textContent = text; };
 const spreadGap = 20;
+const railHeight = 24;
 
 function readSession(value) {
   if (value?.version !== 1 || ![1, 2, 3].includes(value.count) ||
@@ -124,13 +125,70 @@ function setEditor(open, trigger) {
   }
 }
 
+let expandedPanel = null;
+let fullscreenHintSeen = false;
+const fullscreenHintKey = 'noe-design-catalog-fullscreen-hint-seen';
+
+function showFullscreenHint(node) {
+  if (fullscreenHintSeen) return;
+  fullscreenHintSeen = true;
+  try {
+    if (localStorage.getItem(fullscreenHintKey)) return;
+    localStorage.setItem(fullscreenHintKey, '1');
+  } catch { /* Keep the one-time behavior for this page when storage is unavailable. */ }
+  const hint = node.querySelector('.fullscreen-hint');
+  hint.hidden = false;
+  setTimeout(() => { hint.hidden = true; }, 5000);
+}
+
+function updateFullscreenButtons() {
+  const active = expandedPanel || document.fullscreenElement;
+  for (const { node } of panels) {
+    const button = node.querySelector('.panel-fullscreen');
+    const isActive = node === active;
+    const label = isActive ? '全画面を閉じる' : '全画面';
+    button.setAttribute('aria-pressed', String(isActive));
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    if (isActive) showFullscreenHint(node);
+    else node.querySelector('.fullscreen-hint').hidden = true;
+  }
+}
+
+function setExpandedPanel(node) {
+  expandedPanel?.removeAttribute('data-expanded');
+  expandedPanel = node;
+  node?.setAttribute('data-expanded', '');
+  document.documentElement.toggleAttribute('data-preview-expanded', Boolean(node));
+  for (const element of document.querySelectorAll('.masthead, .toolbar, #editor, #panels > .panel')) {
+    element.inert = Boolean(node && element !== node);
+  }
+  updateFullscreenButtons();
+}
+
+async function toggleFullscreen(node) {
+  if (expandedPanel === node) {
+    setExpandedPanel(null);
+  } else if (document.fullscreenElement === node) {
+    await document.exitFullscreen();
+  } else if (document.fullscreenEnabled && node.requestFullscreen) {
+    try {
+      await node.requestFullscreen();
+    } catch {
+      setExpandedPanel(node);
+    }
+  } else {
+    setExpandedPanel(node);
+  }
+}
+
 function makePanel(index) {
   const data = state.panels[index];
   const node = $('#panel-template').content.firstElementChild.cloneNode(true);
   const scroll = node.querySelector('.preview-scroll');
   const preview = node.querySelector('.preview');
   const track = node.querySelector('.spread-track');
-  const mirror = node.querySelector('.spread-mirror');
+  const rightStream = node.querySelector('.spread-right .spread-stream');
   const properties = $('#editor-template').content.firstElementChild.cloneNode(true);
   const controls = properties.querySelector('.controls');
   const heading = node.querySelector('.panel-bar h2');
@@ -143,6 +201,9 @@ function makePanel(index) {
   edit.addEventListener('click', () => {
     editingIndex = index;
     setEditor(true, edit);
+  });
+  node.querySelector('.panel-fullscreen').addEventListener('click', () => {
+    toggleFullscreen(node).catch(() => message('全画面表示を切り替えられませんでした。'));
   });
   properties.querySelector('[data-field="theme"]').append(...Object.entries(themes).map(([id, theme]) => option(id, theme.label)));
   for (const select of properties.querySelectorAll('[data-field]')) {
@@ -191,112 +252,89 @@ function makePanel(index) {
     positionSpread(panel);
     syncScroll(scroll);
   }, { passive: true });
-  const panel = { data, node, scroll, preview, track, mirror, properties, inputs, linear: [], spreadKey: '', slotHeight: 0 };
+  const panel = {
+    data, node, scroll, preview, track, rightStream, properties, inputs,
+    contentHeight: 0, maxOffset: 0, articleToken: 0,
+  };
   return panel;
 }
 
-function positionSpread({ scroll, track }) {
-  if (scroll.hasAttribute('data-spread')) {
-    track.style.setProperty('--spread-offset', `${scroll.scrollTop}px`);
+function clearBoundarySpacers(preview) {
+  for (const el of preview.querySelectorAll('[data-spread-pushed]')) {
+    el.style.marginTop = '';
+    el.removeAttribute('data-spread-pushed');
   }
 }
 
-function measureSpread(panel) {
-  const { scroll, preview, track } = panel;
+function alignMediaAcrossColumnBreaks(preview, contentHeight, zoom) {
+  clearBoundarySpacers(preview);
+  if (!contentHeight || !zoom) return;
+
+  // Keep figures, hero images, and tables from getting sliced across the column-height seam (y = k * contentHeight).
+  const targets = [
+    ...preview.querySelectorAll('.story-hero:not([hidden]), .story-body figure, .story-body .table-scroll'),
+  ];
+  for (const el of targets) {
+    const baseTop = preview.getBoundingClientRect().top;
+    const rect = el.getBoundingClientRect();
+    const height = rect.height;
+    if (height <= 0 || height >= contentHeight * 0.96) continue;
+    const relTop = rect.top - baseTop;
+    const relBottom = rect.bottom - baseTop;
+    const pageStart = Math.floor(relTop / contentHeight) * contentHeight;
+    const seam = pageStart + contentHeight;
+    if (relTop < seam - 1 && relBottom > seam + 1) {
+      const pushPx = (seam - relTop) / zoom;
+      const currentMargin = parseFloat(getComputedStyle(el).marginTop) || 0;
+      el.style.marginTop = `${currentMargin + pushPx}px`;
+      el.setAttribute('data-spread-pushed', '1');
+    }
+  }
+}
+
+function positionSpread(panel) {
+  const { scroll, track, maxOffset } = panel;
   if (!scroll.hasAttribute('data-spread')) return;
-  const frame = scroll.clientHeight;
-  const article = preview.getBoundingClientRect().height;
-  // One scrollbar moves both readings. Stop when the right window reaches the end.
-  track.style.setProperty('--frame-height', `${frame}px`);
-  track.style.setProperty('--track-height', `${Math.max(frame, Math.ceil(article - frame))}px`);
-  positionSpread(panel);
+  const offset = Math.max(0, Math.min(maxOffset, scroll.scrollTop));
+  track.style.setProperty('--spread-offset', `${offset}px`);
 }
 
 function refreshMirror(panel) {
-  const { preview, mirror } = panel;
-  const stream = document.createElement('div');
-  stream.className = 'spread-stream';
-  stream.append(preview.cloneNode(true));
-  mirror.replaceChildren(stream);
+  const { preview, rightStream } = panel;
+  const clone = preview.cloneNode(true);
+  clone.removeAttribute('id');
+  rightStream.replaceChildren(clone);
 }
 
-function spreadUnits([header, hero, body]) {
-  const title = header.cloneNode(true);
-  const intro = title.querySelector('.story-intro');
-  intro.remove();
-  const units = [title];
-  if (intro.textContent.trim()) {
-    const deck = document.createElement('div');
-    deck.className = 'story-header';
-    deck.append(intro);
-    units.push(deck);
-  }
-  if (!hero.hidden) units.push(hero.cloneNode(true));
-  const blocks = [...body.childNodes].filter(node => node.nodeType === Node.ELEMENT_NODE || node.textContent.trim());
-  for (let index = 0; index < blocks.length; index++) {
-    const block = blocks[index];
-    const unit = document.createElement('div');
-    unit.className = 'story-body';
-    unit.append(block.cloneNode(true));
-    if (block.matches?.('h2, h3, h4, h5, h6') && blocks[index + 1]?.matches?.('p')) {
-      unit.append(blocks[++index].cloneNode(true));
-    }
-    units.push(unit);
-  }
-  return units;
-}
-
-function packSpread(panel) {
-  const { scroll, preview, linear } = panel;
+function measureSpread(panel, preserveRatio = true) {
+  const { scroll, preview, track } = panel;
+  if (!scroll.hasAttribute('data-spread')) return;
   const frame = scroll.clientHeight;
-  const key = `${frame};${preview.dataset.theme};${preview.style.cssText}`;
-  if (!frame || !linear.length || panel.spreadKey === key) return;
-  const oldSlotHeight = panel.slotHeight;
-  const scrollUnits = oldSlotHeight ? scroll.scrollTop / oldSlotHeight : 0;
-  const slotHeight = frame / 2;
-  const zoom = Number(preview.style.getPropertyValue('--zoom'));
-  preview.style.setProperty('--slot-height', `${slotHeight / zoom}px`);
+  if (!frame) return;
+  const oldMax = panel.maxOffset;
+  const ratio = preserveRatio && oldMax > 0 ? scroll.scrollTop / oldMax : 0;
 
-  const rack = document.createElement('div');
-  rack.className = 'spread-rack';
-  const units = spreadUnits(linear).map((content) => {
-    const item = document.createElement('div');
-    item.className = 'spread-unit';
-    item.append(content);
-    return item;
-  });
-  rack.append(...units);
-  preview.replaceChildren(rack);
-  const limits = rack.getBoundingClientRect();
-  const start = rack.firstElementChild.getBoundingClientRect().top;
-  const capacity = slotHeight - 2 * (start - limits.top) - 1;
-  const heights = units.map(unit => unit.getBoundingClientRect().height);
-  const pages = [];
-  let remaining = 0;
-  let page;
-  units.forEach((unit, index) => {
-    const height = heights[index];
-    if (!page || height > remaining) {
-      page = document.createElement('div');
-      page.className = 'spread-slot';
-      page.dataset.slot = String(pages.length + 1);
-      pages.push(page);
-      remaining = capacity;
-    }
-    if (height > capacity && capacity > 0) {
-      // Keep an oversized figure or table intact at the rest positions.
-      unit.style.transform = `scale(${capacity / height})`;
-      unit.style.transformOrigin = 'top center';
-    }
-    page.append(unit);
-    remaining -= height;
-  });
-  preview.replaceChildren(...pages);
-  panel.slotHeight = slotHeight;
-  panel.spreadKey = `${frame};${preview.dataset.theme};${preview.style.cssText}`;
+  const contentHeight = Math.max(180, frame - railHeight * 2);
+  const zoom = Number(preview.style.getPropertyValue('--zoom')) || 1;
+  panel.contentHeight = contentHeight;
+  track.style.setProperty('--frame-height', `${frame}px`);
+  track.style.setProperty('--rail-h', `${railHeight}px`);
+  track.style.setProperty('--content-height', `${contentHeight}px`);
+  preview.style.setProperty('--content-height', `${contentHeight}px`);
+
+  alignMediaAcrossColumnBreaks(preview, contentHeight, zoom);
+
+  const articleHeight = preview.getBoundingClientRect().height;
+  // Left shows [s, s + contentHeight], right shows [s + contentHeight, s + 2 * contentHeight].
+  // Stop scrolling when right reaches the end of the article: s_max = articleHeight - 2 * contentHeight.
+  const maxOffset = Math.max(0, Math.ceil(articleHeight - contentHeight * 2));
+  panel.maxOffset = maxOffset;
+  track.style.setProperty('--track-height', `${frame + maxOffset}px`);
+
   refreshMirror(panel);
-  measureSpread(panel);
-  scroll.scrollTop = scrollUnits * slotHeight;
+  if (preserveRatio && oldMax > 0 && maxOffset > 0) {
+    scroll.scrollTop = Math.round(ratio * maxOffset);
+  }
   positionSpread(panel);
 }
 
@@ -329,15 +367,14 @@ function applyStyle(panel) {
   };
   for (const [name, value] of Object.entries(cssProperties)) preview.style.setProperty(`--${name}`, value);
   if (spread) {
-    packSpread(panel);
-  } else if (panel.spreadKey) {
-    preview.replaceChildren(...panel.linear);
-    panel.mirror.replaceChildren();
-    panel.spreadKey = '';
-    panel.slotHeight = 0;
+    if (changedLayout) scroll.scrollTop = 0;
+    measureSpread(panel, !changedLayout);
+  } else {
+    clearBoundarySpacers(preview);
+    panel.rightStream.replaceChildren();
+    panel.maxOffset = 0;
+    if (changedLayout) scroll.scrollTop = 0;
   }
-  if (changedLayout) scroll.scrollTop = 0;
-  measureSpread(panel);
   for (const [field, { input, output }] of Object.entries(inputs)) {
     input.value = String(tokens[field]);
     if (field !== 'font') output.value = Number(tokens[field].toFixed(3)) + fields[field][4];
@@ -375,18 +412,16 @@ function renderArticle(panel) {
     table.replaceWith(wrap);
     wrap.append(table);
   }
-  const linear = [...preview.children];
-  panel.linear = linear;
-  panel.spreadKey = '';
-  panel.slotHeight = 0;
+  const token = ++panel.articleToken;
+  panel.maxOffset = 0;
   scroll.scrollTop = 0;
+
   const images = [...preview.querySelectorAll('img[src]')];
   Promise.allSettled(images.map(image => image.decode())).then(() => {
-    if (panel.linear !== linear || !preview.isConnected || !scroll.hasAttribute('data-spread')) return;
-    panel.spreadKey = '';
-    packSpread(panel);
+    if (panel.articleToken !== token || !preview.isConnected || !scroll.hasAttribute('data-spread')) return;
+    measureSpread(panel, true);
   });
-  if (scroll.hasAttribute('data-spread')) packSpread(panel);
+  if (scroll.hasAttribute('data-spread')) measureSpread(panel, false);
 }
 
 function renderPanels() {
@@ -401,7 +436,7 @@ function renderPanels() {
     for (const entry of entries) {
       const panel = panels.find(item => item.scroll === entry.target || item.preview === entry.target);
       if (panel?.scroll === entry.target) applyStyle(panel);
-      else if (panel) measureSpread(panel);
+      else if (panel && panel.scroll.hasAttribute('data-spread')) measureSpread(panel, true);
     }
   });
   panels.forEach(panel => {
@@ -434,6 +469,7 @@ async function start() {
   } catch { message('前回の設定を読み込めなかったため、初期値を表示しました。'); }
   $('#sample').append(...samples.map(sample => option(sample.id, `[${sample.kind}] ${sample.title}`)));
   renderPanels();
+  document.addEventListener('fullscreenchange', updateFullscreenButtons);
   for (const input of document.querySelectorAll('[name="appearance"]')) {
     input.addEventListener('change', () => {
       state.appearance = input.value;
@@ -448,7 +484,12 @@ async function start() {
     showEditorTarget();
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !$('#editor').hidden) {
+    if (event.key !== 'Escape') return;
+    const panel = expandedPanel || document.fullscreenElement;
+    if (panel?.matches('.panel')) {
+      event.preventDefault();
+      toggleFullscreen(panel).catch(() => message('全画面表示を終了できませんでした。'));
+    } else if (!$('#editor').hidden) {
       event.preventDefault();
       setEditor(false);
     }

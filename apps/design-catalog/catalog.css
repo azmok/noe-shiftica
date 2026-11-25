@@ -89,12 +89,12 @@ input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
   gap: 16px;
   max-width: 1680px;
   margin-inline: auto;
-  padding: clamp(24px, 4vw, 55px) clamp(18px, 4vw, 60px) clamp(18px, 2vw, 26px);
+  padding: clamp(14px, 2.2vw, 28px) clamp(18px, 4vw, 60px) clamp(10px, 1.4vw, 16px);
 }
 .identity, .file-actions { display: flex; align-items: center; gap: 10px; }
 .brand { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--muted); }
 .brand span { padding-inline: .4em; color: var(--accent); }
-.masthead h1 { margin: 8px 0 0; font-size: clamp(23px, 3.3vw, 46px); line-height: 1.15; font-weight: 760; letter-spacing: -.045em; }
+.masthead h1 { margin: 4px 0 0; font-size: clamp(22px, 2.6vw, 34px); line-height: 1.15; font-weight: 760; letter-spacing: -.04em; }
 .file-actions { flex-wrap: wrap; }
 .file-actions button { min-height: 42px; padding-inline: 14px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .file-actions .primary { background: var(--accent-fill); color: var(--accent-text); border-color: transparent; }
@@ -114,7 +114,7 @@ input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
 .appearance span { display: block; min-width: 58px; padding: 7px 9px; border-radius: 999px; text-align: center; color: var(--muted); font-size: 12px; font-weight: 700; }
 .appearance input:checked + span { color: var(--ink); background: var(--control); box-shadow: var(--raise); }
 .appearance input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-main { max-width: 1680px; margin-inline: auto; padding: 0 clamp(12px, 4vw, 60px) 32px; }
+main { max-width: 1680px; margin-inline: auto; padding: 0 clamp(12px, 4vw, 60px) 14px; }
 .toolbar, .panel, .editor {
   background: var(--glass);
   backdrop-filter: blur(18px);
@@ -164,6 +164,52 @@ main { max-width: 1680px; margin-inline: auto; padding: 0 clamp(12px, 4vw, 60px)
 }
 .panel-theme { min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
 .panel-edit { margin-inline-start: auto; min-height: 34px; font-size: 12px; font-weight: 700; }
+.panel-fullscreen { display: grid; place-items: center; width: 40px; min-height: 40px; padding: 0; flex-shrink: 0; }
+.panel-fullscreen svg { width: 21px; height: 21px; }
+.panel-fullscreen[aria-pressed="false"] .fullscreen-exit,
+.panel-fullscreen[aria-pressed="true"] .fullscreen-enter { display: none; }
+.fullscreen-hint {
+  position: absolute;
+  z-index: 2;
+  inset: max(68px, calc(env(safe-area-inset-top) + 60px)) 0 auto;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  margin: 0 auto;
+  padding: 8px 13px;
+  color: var(--ink);
+  background: var(--glass-strong);
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
+  font-size: 13px;
+  font-weight: 650;
+  pointer-events: none;
+}
+.fullscreen-hint kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--control);
+}
+@media (min-width: 660px) {
+  .fullscreen-hint { inset-block-start: max(13px, calc(env(safe-area-inset-top) + 5px)); }
+}
+html[data-preview-expanded] { overflow: hidden; }
+.panel[data-expanded] { position: fixed; z-index: 20; inset: 0; }
+.panel:is(:fullscreen, [data-expanded]) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  border-radius: 0;
+  background: var(--surface);
+}
+.panel:is(:fullscreen, [data-expanded]) .panel-edit { display: none; }
+.panel:is(:fullscreen, [data-expanded]) .panel-fullscreen { margin-inline-start: auto; }
+.panel:is(:fullscreen, [data-expanded]) .preview-scroll { flex: 1; height: auto; min-height: 0; }
 .editor { padding: 14px; background: var(--glass-strong); }
 .editor-header {
   position: sticky;
@@ -198,7 +244,7 @@ main { max-width: 1680px; margin-inline: auto; padding: 0 clamp(12px, 4vw, 60px)
 textarea { width: 100%; resize: vertical; padding: 10px; background: var(--well); box-shadow: var(--recess); }
 .preview-scroll {
   min-width: 0;
-  height: clamp(320px, calc(100dvh - 340px), 850px);
+  height: clamp(340px, calc(100dvh - 296px), 640px);
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -206,8 +252,14 @@ textarea { width: 100%; resize: vertical; padding: 10px; background: var(--well)
   border: 1px solid var(--line);
   border-radius: 15px;
 }
-.spread-mirror { display: none; }
-.preview-scroll[data-spread] .spread-track { min-height: var(--track-height, 100%); }
+.spread-right, .spread-rail { display: none; }
+.preview-scroll[data-spread] {
+  overflow-anchor: none;
+}
+.preview-scroll[data-spread] .spread-track {
+  position: relative;
+  min-height: var(--track-height, 100%);
+}
 .preview-scroll[data-spread] .spread-window {
   position: sticky;
   top: 0;
@@ -220,34 +272,62 @@ textarea { width: 100%; resize: vertical; padding: 10px; background: var(--well)
   margin-inline: auto;
   overflow: clip;
 }
-.preview-scroll[data-spread] .spread-pane { display: block; min-width: 0; overflow: clip; background: var(--paper); }
-.preview-scroll[data-spread] .spread-stream { transform: translateY(calc(-1 * var(--spread-offset, 0px))); }
-.preview-scroll[data-spread] .spread-mirror .spread-stream {
-  transform: translateY(calc(-1 * (var(--spread-offset, 0px) + var(--frame-height, 0px))));
-}
-.preview-scroll[data-spread] { overflow-anchor: none; }
-.preview-scroll[data-spread] .preview {
-  --spread-media-gap: min(var(--media-gap), calc(var(--slot-height) / 6));
+.preview-scroll[data-spread] .spread-pane {
+  display: grid;
+  grid-template-rows: var(--rail-h, 24px) var(--content-height, 1fr) var(--rail-h, 24px);
   position: relative;
+  min-width: 0;
+  height: 100%;
+  overflow: clip;
+  background: var(--paper);
+}
+.preview-scroll[data-spread] .spread-left {
+  box-shadow: inset -14px 0 18px -16px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.preview-scroll[data-spread] .spread-right {
+  box-shadow: inset 14px 0 18px -16px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.preview-scroll[data-spread] .spread-rail {
+  display: flex;
+  align-items: center;
+  padding-inline: 18px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--muted);
+  user-select: none;
+}
+.preview-scroll[data-spread] .spread-left .spread-rail-bottom {
+  justify-content: flex-end;
+  border-top: 1px dashed color-mix(in srgb, var(--line) 55%, transparent);
+}
+.preview-scroll[data-spread] .spread-right .spread-rail-top {
+  justify-content: flex-start;
+  border-bottom: 1px dashed color-mix(in srgb, var(--line) 55%, transparent);
+}
+.preview-scroll[data-spread] .spread-clip {
+  height: var(--content-height, 100%);
+  overflow: clip;
+}
+.preview-scroll[data-spread] .spread-left .spread-stream {
+  transform: translate3d(0, calc(-1 * var(--spread-offset, 0px)), 0);
+  will-change: transform;
+}
+.preview-scroll[data-spread] .spread-right .spread-stream {
+  transform: translate3d(0, calc(-1 * (var(--spread-offset, 0px) + var(--content-height, 0px))), 0);
+  will-change: transform;
+}
+.preview-scroll[data-spread] .preview {
   min-height: 0;
   padding-block: 0;
 }
-.spread-rack, .spread-slot {
-  display: flow-root;
-  padding-block: 12px;
-}
-.spread-rack { position: absolute; visibility: hidden; inset-inline: min(var(--inset), 8%); }
-.spread-slot { height: var(--slot-height); overflow: clip; }
-.spread-slot + .spread-slot { box-shadow: inset 0 1px var(--article-divider); }
-.spread-unit { display: flow-root; }
-.spread-unit > :first-child { margin-block: 0; }
-.spread-unit .story-body { display: flow-root; }
-.spread-unit :is(.story-hero, .story-body figure) { margin-block: 0 var(--spread-media-gap); }
-.spread-unit :is(.story-hero img, .story-body img) {
-  max-height: calc(var(--slot-height) - 26px - var(--spread-media-gap));
+.preview-scroll[data-spread] :is(.story-hero img, .story-body img) {
+  max-height: calc(var(--content-height, 540px) * 0.56 / var(--zoom, 1));
+  width: auto;
+  max-width: 100%;
   object-fit: contain;
+  margin-inline: auto;
 }
-.spread-unit .story-body > :is(h2, h3, h4, h5, h6):first-child { margin-block-start: 0; }
 .preview {
   min-height: calc(100% / var(--zoom, 1));
   width: var(--screen, 100%);
