@@ -83,7 +83,7 @@ markdownPostManager({
 ### 2.5 公開時の自動削除（noe-posts 側の Action）
 
 1. main にマージされたら、`status: published` の記事を送る（今と同じ）。
-2. API の返事にある `markdownRevision` と、手元で計算したハッシュを突き合わせる。
+2. API の返事が「公開済み＋`markdownRevision` あり」かを確かめる（`publish-article.mjs` が `noe-result status=… revision=…` の1行を出す）。※手元でのハッシュ計算は、本番の前処理（prepareMarkdownSource）を Action に持ち込む必要があるため見送り。DB が保存後の版の印を返した＝反映済み、とみなす
 3. 一致したら、その記事のフォルダを main から削除してコミットする（`published → DB: <slug> [skip ci]`）。
 4. 送信に失敗した、またはハッシュが違ったら**消さない**。Action を失敗させて知らせる。
 
@@ -155,7 +155,7 @@ markdownPostManager({
 |---|---|---|---|
 | 1 | markdownPostManager の土台：markdownRender などを引っ越し、`markdownRevision` を追加、上書きガード | 列追加（マイグレーション：dry-run → 承認 → 本実行 → マージ） | — |
 | 2 | 管理画面の MD エディタ＋プレビュー（案 A） | — | — |
-| 3 | 公開時の自動削除（Action）＋「Git に書き出す」 | — | publish.yml 変更。環境変数 `NOE_POSTS_TOKEN` はあずまが登録 |
+| 3 | 公開時の自動削除（Action）＋「Git に書き出す」 | — | publish.yml 変更。**自動削除は実装済み（2026-11-25）**：鍵は Actions の GITHUB_TOKEN（contents: write）で足りるので `NOE_POSTS_TOKEN` は不要。「Git に書き出す」は未着手 |
 | 4 | styleEditor（コレクション、本物ページでの編集画面、CSS の出力） | テーブル追加（マイグレーション） | GUI ブロックを取り込んだあと、snapshot を停止 |
 | 5 | packages/ への切り出し | — | — |
 

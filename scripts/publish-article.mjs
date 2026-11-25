@@ -166,6 +166,8 @@ async function draft(mdPath, opts) {
   if (res.heroImageId !== undefined) console.log(`  Hero 画像: media #${res.heroImageId}`)
   console.log(`  管理画面: ${BASE}${res.adminUrl}`)
   console.log(`  公開URL（公開後）: ${BASE}${res.url}`)
+  // noe-posts の publish Action が読む1行（DB に入ったことの確認用。公開済み＋版の印があれば、Git から消してよい）
+  console.log(`noe-result status=${res.status || body.status} revision=${res.markdownRevision || ''}`)
 }
 
 async function publish(slug, opts) {

@@ -9,6 +9,7 @@
   - GitHub アイコン：その記事を GitHub で開く（下書きブランチがあればそちら）。リンクはクリップボードにもコピー（AI に渡す用）
   - 📁：移動・削除。`dev/<slug>/<slug>.md` はフォルダごと（画像も）、それ以外は .md だけ。main と下書きブランチの両方に git trees API で1 commit ずつ。
     1枚の .md を dev/・blog/ 直下へ移すと `<slug>/<slug>.md` の形にする。下書きブランチ名が変わるなら付け替え、削除ではブランチも消す
+  - 一覧のドロワー：優先度で絞り込み（すべて／高だけ／高・中／優先度あり／なし）と、優先度順・名前順の切り替え（この端末に記憶）
   - 中継（`/api/mpm/github`）は ref の更新と削除のため PATCH・DELETE も通す
 - GitHub との通信は `/api/mpm/github?path=…`（`manager/endpoints.ts`）。管理画面のセッションで呼び、鍵はサーバーが付ける。
   中継するのは設定したリポジトリ（`/repos/<owner>/<repo>…`）だけ
