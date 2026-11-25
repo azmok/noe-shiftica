@@ -13,6 +13,8 @@
 > + the original instruction before retrying (original instruction + Signs win over the latest failure log).
 > Memory layer contract: `.antigravity/memory-schema.md`.
 
+> **新しいセッションは最初に `docs/HANDOFF.md`（引き継ぎメモ：進行中の作業・未解決の問題・次にやること）を読む。** 作業を終えるときは更新する。
+
 ## Standing instructions (Azuma)
 - バックグラウンドコマンド（App Hosting のロールアウト、長時間ビルド等）の**出力ファイルは確認しなくてよい**。完了通知 / exit code 0 だけで十分とみなす。
 - 修正したら `git add` → **`git commit` → `git push` までクラやんの判断で実行してよい**（あずま承認済み 2026-11-24）。作業ブランチに push する。
