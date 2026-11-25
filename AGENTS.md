@@ -31,6 +31,19 @@ before retrying (the original instruction + Signs win over your latest failure l
      `payload.config.ts` → `plugins` (that file is protected: get approval first).
   Check `ls src/plugins` and each plugin's `index.ts` / README before deciding where a change goes.
 
+## AIのミスから学ぶループ（ローカル・クラウド共通）
+記録は非公開リポジトリ `azmok/noe-shiftica-ais-self-learning` に置く。このリポジトリは公開なので、失敗の記録や教訓を置かない。
+- 作業を始める前に `node scripts/ai-learning.mjs sync` を実行し、表示された lessons に従う。失敗したら黙って進めず、あずまに伝える。
+- ミスをしたら1件記録する。先に `node scripts/ai-learning.mjs classes` を見て、同じ種類なら同じ分類名を使う。
+  `node scripts/ai-learning.mjs record --class <分類> --what "何が起きたか" --cause "原因" --fix "対策"`
+- 秘密情報、個人情報、生のログは書かない。
+- 同じ種類のミスが2回目なら、作業を一度止めてあずまに報告し、防ぐ仕組みを提案する。
+  優先順位：①テストか lint ②hook ③スキル ④`lessons.md` への1行追記（機械で判定できない場合だけ）
+- あずまが承認するまで、提案した仕組みは実装しない。①〜③を実装したら、学習リポジトリの `automated.md` に追記する。
+- 資料の置き場所：公開してよいものは `docs/`、AI運用・バックアップ・弱点・引き継ぎなど公開しないものは学習リポジトリの `docs/`。
+- 学習リポジトリで自動 commit / push してよいのは、クラウドでの `mistakes/` の追加だけ（作業ブランチ限定。あずま承認済み 2026-11-25）。
+  `lessons.md` と `automated.md` の変更、main への取り込みは、あずまの承認が要る。
+
 ## Protected files (editing requires explicit approval — HARD STOP)
 - src/collections/*
 - src/payload.config.ts

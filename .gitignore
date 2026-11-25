@@ -75,6 +75,16 @@ lexical-test.json
 # Secret text files
 secret.txt
 
+# AI の記憶・個人設定（このリポジトリは公開。共有するのは .claude/settings.json だけ）
+.antigravity/
+.claude/*
+!.claude/settings.json
+.gemini/
+GEMINI.md
+
+# 学習リポジトリ（非公開）の予備の置き場所
+.ai/
+
 # Backup system
 backup-staging/
 .github/*
