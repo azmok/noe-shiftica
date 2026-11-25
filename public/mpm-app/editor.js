@@ -258,6 +258,7 @@
       $('#stage').scrollTop = 0; $('#mdText').scrollTop = 0
       await renderPreview()
       buildMirror()
+      if (state.view === 'diff') renderDiff()
       status('')
     } catch (e) { status('読み込めませんでした：' + e.message, 'err') }
   }
@@ -870,6 +871,7 @@
     document.querySelectorAll('#view button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v) })
     if (v !== 'preview' && state.mode === 'style') setMode('style')
     setTimeout(function () { fitStage(false); buildMirror(); if (state.path) scrollToLine(anchor) }, 0)
+    if (v === 'diff') renderDiff()
   }
   function setMode(m) {
     if (m === 'style' && store.allowStyle === false) return
@@ -1030,6 +1032,79 @@
     status('🌿 ' + ref + ' を表示中（保存先：' + store.describeSave(state.path) + '）', 'ok')
   }
 
+  // ================================================================ 差分（ブランチ同士の違い）
+  var diffSeq = 0
+  /** 比べる相手のブランチ（左）→ いま表示しているブランチ（右。未保存の変更も含む）の違いを出す */
+  async function renderDiff() {
+    var body = $('#diffBody'); if (!body || !state.path || !window.NoeDiff || !store.readAt) return
+    var seq = ++diffSeq, path = state.path
+    var cur = await store.currentRef(path)
+    var others = store.branchesFor(path).filter(function (b) { return b !== cur })
+    var sel = $('#diffBase'); sel.innerHTML = ''
+    $('#diffCur').textContent = '🌿 ' + cur + (state.dirtyMd ? '（未保存の変更を含む）' : '')
+    if (!others.length) {
+      $('#diffStats').textContent = ''; $('#diffFiles').innerHTML = ''; $('#diffGh').removeAttribute('href'); sel.disabled = true
+      body.innerHTML = '<div class="empty">比べる相手がありません。この記事は ' + esc(cur) + ' にしか無いか、ほかのブランチでも中身が同じです。</div>'
+      return
+    }
+    sel.disabled = false
+    others.forEach(function (b) { sel.appendChild(el('option', { value: b, text: '🌿 ' + b })) })
+    var base = others.indexOf(state.diffBase) >= 0 ? state.diffBase : others.indexOf('main') >= 0 ? 'main' : others[0]
+    sel.value = base; state.diffBase = base
+    $('#diffGh').href = store.compareUrl(base, cur)
+    body.innerHTML = '<div class="empty">読み込み中…</div>'
+    try {
+      var results = await Promise.all([store.readAt(path, base), store.folderDiff ? store.folderDiff(path, base, cur).catch(function () { return [] }) : []])
+      if (seq !== diffSeq || path !== state.path) return
+      var oldText = results[0], files = results[1]
+      var rows = NoeDiff.lines(oldText, state.raw), st = NoeDiff.stats(rows)
+      $('#diffStats').innerHTML = '<span class="a">+' + st.added + '</span> <span class="d">−' + st.removed + '</span> 行'
+      $('#diffFiles').innerHTML = files.length ? '同じフォルダのほかのファイル：' + files.map(function (f) {
+        return { added: '＋', removed: '−', changed: '～' }[f.status] + ' ' + esc(f.path.split('/').pop())
+      }).join('　') : ''
+      if (oldText == null) { body.innerHTML = '<div class="empty">' + esc(base) + ' にはこの記事がありません（全部が新しい行です）。</div>'; appendRows(body, rows); return }
+      if (!st.added && !st.removed) { body.innerHTML = '<div class="empty">' + esc(base) + ' と同じ内容です。</div>'; return }
+      body.innerHTML = ''
+      if (!$('#diffOnly').checked) { appendRows(body, rows); return }
+      var hs = NoeDiff.hunks(rows, 3)
+      hs.forEach(function (h) {
+        if (h.skippedBefore) body.appendChild(skipRow(h.skippedBefore))
+        appendRows(body, h.rows)
+      })
+      if (hs.skippedAfter) body.appendChild(skipRow(hs.skippedAfter))
+    } catch (e) {
+      if (seq === diffSeq) body.innerHTML = '<div class="empty">差分を出せませんでした：' + esc(saveError(e)) + '</div>'
+    }
+  }
+  function skipRow(n) {
+    var d = el('div', { class: 'skip', text: '⋯ 同じ行が ' + n + ' 行（タップで全部表示）' })
+    d.addEventListener('click', function () { $('#diffOnly').checked = false; renderDiff() })
+    return d
+  }
+  /** 行を並べる。続けて消えた行と増えた行は、順に組にして、行の中の変わった文字に色を付ける */
+  function appendRows(box, rows) {
+    var frag = document.createDocumentFragment()
+    for (var i = 0; i < rows.length; ) {
+      if (rows[i].op !== '-') { frag.appendChild(diffLine(rows[i], null)); i++; continue }
+      var dels = [], adds = []
+      while (i < rows.length && rows[i].op === '-') dels.push(rows[i++])
+      while (i < rows.length && rows[i].op === '+') adds.push(rows[i++])
+      var pairs = dels.map(function (d, k) { return adds[k] ? NoeDiff.chars(d.text, adds[k].text) : null })
+      dels.forEach(function (d, k) { frag.appendChild(diffLine(d, pairs[k])) })
+      adds.forEach(function (a, k) { frag.appendChild(diffLine(a, pairs[k])) })
+    }
+    box.appendChild(frag)
+  }
+  function diffLine(r, parts) {
+    var cls = r.op === '+' ? 'add' : r.op === '-' ? 'del' : 'ctx', html
+    if (parts && r.op !== ' ') {
+      html = parts.filter(function (p) { return p.op === ' ' || p.op === r.op }).map(function (p) {
+        return p.op === ' ' ? esc(p.text) : (r.op === '+' ? '<ins>' : '<del>') + esc(p.text) + (r.op === '+' ? '</ins>' : '</del>')
+      }).join('')
+    } else html = esc(r.text)
+    return el('div', { class: 'dl ' + cls, html: '<span class="n">' + (r.a || '') + '</span><span class="n">' + (r.b || '') + '</span><span class="s">' + (r.op === ' ' ? '' : r.op === '-' ? '−' : '+') + '</span><span class="t">' + (html || '&#8203;') + '</span>' })
+  }
+
   // ================================================================ GitHub で開く・移動・削除
   var ghUrl = ''
   async function updateGhLink() {
@@ -1175,6 +1250,8 @@
     if (store.remove && store.move) document.body.classList.add('has-file-ops')
     $('#priority').addEventListener('change', function () { changePriority($('#priority').value) })
     $('#branchSel').addEventListener('change', function () { changeBranch($('#branchSel').value) })
+    $('#diffBase').addEventListener('change', function () { state.diffBase = $('#diffBase').value; renderDiff() })
+    $('#diffOnly').addEventListener('change', renderDiff)
     $('#ghLink').addEventListener('click', copyGhLink)
     $('#fileBtn').addEventListener('click', openFileDlg)
     $('#publish').addEventListener('click', publishArticle)
@@ -1204,7 +1281,7 @@
     ta.addEventListener('scroll', syncPreviewFromMd, { passive: true })
     $('#stage').addEventListener('scroll', syncMdFromPreview, { passive: true })
     textbarState(false)
-    setView(load('view') || 'preview')
+    var v0 = load('view') || 'preview'; setView(v0 === 'diff' && !store.readAt ? 'preview' : v0)
     start()
   }
   // テスト用（ブラウザのコンソールから行の位置を確かめられる）
