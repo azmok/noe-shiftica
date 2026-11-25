@@ -102,6 +102,9 @@
   // ------------------------------------------------------------------ github
   var shaCache = {}      // "ref:path" → sha（上書き保存に必要）
   var branchCache = null // 下書きブランチの一覧
+  var allBranchCache = null // main 以外の全ブランチ
+  var onBranches = {}    // 記事のパス → main と中身が違う（または main に無い）ブランチの一覧（list() で作る）
+  var refOverride = {}   // 記事フォルダ → 表示・保存に使うブランチ（ツールバーで選んだもの）
   var blobCache = {}
 
   function token() { return lsGet(TOKEN_KEY) }
@@ -139,17 +142,26 @@
     var list = [], page = 1
     for (;;) {
       var bs = await api('/repos/' + REPO + '/branches?per_page=100&page=' + page)
-      bs.forEach(function (b) { if (/^draft\//.test(b.name)) list.push(b.name) })
+      bs.forEach(function (b) { if (b.name !== 'main') list.push(b.name) })
       if (bs.length < 100) break
       page++
     }
-    branchCache = list
-    return list
+    allBranchCache = list
+    branchCache = list.filter(function (b) { return /^draft\//.test(b) })
+    return branchCache
   }
   async function refFor(path) {
-    if (!isArticle(path)) return 'main'
+    if (!isArticle(path) && !/^(dev|blog)\//.test(path)) return 'main'
+    var o = refOverride[dirOf(path)]
+    if (o) return o
+    if (!isArticle(path)) path = dirOf(path) + '/x.md'
     var b = draftBranch(path)
-    return (await draftBranches()).indexOf(b) >= 0 ? b : 'main'
+    if ((await draftBranches()).indexOf(b) >= 0) return b
+    // main に無く、ほかのブランチ（editorial/ など）にだけある記事は、そのブランチから読む
+    var d = dirOf(path), only = Object.keys(onBranches).filter(function (k) {
+      return k.indexOf('main:') !== 0 && dirOf(k) === d && !onBranches['main:' + k]
+    })[0]
+    return only ? onBranches[only][0] : 'main'
   }
   async function ensureBranch(branch) {
     try { await api('/repos/' + REPO + '/git/ref/heads/' + enc(branch)); return }
@@ -168,17 +180,37 @@
     check: async function () { var r = await api('/repos/' + REPO); return r.full_name + (r.private ? '（非公開）' : '') },
     list: async function () {
       var tree = await api('/repos/' + REPO + '/git/trees/main?recursive=1')
-      var set = {}
-      tree.tree.forEach(function (n) { if (n.type === 'blob' && isArticle(n.path)) set[n.path] = 1 })
-      // 下書きブランチにしか無い新しい記事も出す
-      var branches = await draftBranches(true)
-      await Promise.all(branches.map(async function (b) {
+      var set = {}, mainSha = {}, found = {}
+      tree.tree.forEach(function (n) { if (n.type === 'blob' && isArticle(n.path)) { set[n.path] = 1; mainSha[n.path] = n.sha } })
+      // ほかのブランチで中身が違う記事（ブランチにしか無い新しい記事も）を集める
+      await draftBranches(true)
+      await Promise.all(allBranchCache.map(async function (b) {
         try {
           var t = await api('/repos/' + REPO + '/git/trees/' + enc(b) + '?recursive=1')
-          t.tree.forEach(function (n) { if (n.type === 'blob' && isArticle(n.path) && draftBranch(n.path) === b) set[n.path] = 1 })
+          t.tree.forEach(function (n) {
+            if (n.type !== 'blob' || !isArticle(n.path) || mainSha[n.path] === n.sha) return
+            // 下書きブランチは、そのフォルダの記事だけ（main を取り込んだときの古い版を拾わない）
+            if (/^draft\//.test(b) && draftBranch(n.path) !== b) return
+            set[n.path] = 1
+            ;(found[n.path] = found[n.path] || []).push(b)
+          })
         } catch (e) {}
       }))
+      Object.keys(found).forEach(function (p) { found[p].sort() })
+      onBranches = found
+      Object.keys(mainSha).forEach(function (p) { onBranches['main:' + p] = true })
       return sortArticles(Object.keys(set))
+    },
+    /** この記事を表示できるブランチ（main にあれば main、ほかは main と中身が違うもの） */
+    branchesFor: function (path) {
+      return (onBranches['main:' + path] ? ['main'] : []).concat(onBranches[path] || [])
+    },
+    /** いま表示しているブランチ */
+    currentRef: function (path) { return refFor(path) },
+    /** 表示・保存するブランチを選ぶ（null で自動：下書きブランチがあればそちら、無ければ main） */
+    setRef: function (path, ref) {
+      var d = dirOf(path)
+      if (ref) refOverride[d] = ref; else delete refOverride[d]
     },
     read: async function (path) {
       var ref = await refFor(path)
@@ -190,19 +222,21 @@
       return r.text()
     },
     assetUrl: async function (path) {
-      if (blobCache[path]) return blobCache[path]
-      var ref = await refFor(path.replace(/\/[^/]+$/, '/x.md'))
+      var ref = await refFor(path), key = ref + ':' + path
+      if (blobCache[key]) return blobCache[key]
       try {
         var r = await api('/repos/' + REPO + '/contents/' + enc(path) + '?ref=' + encodeURIComponent(ref), { raw: true, headers: { Accept: 'application/vnd.github.raw' } })
         var blob = await r.blob()
         var type = /\.svg$/i.test(path) ? 'image/svg+xml' : blob.type
-        blobCache[path] = URL.createObjectURL(type !== blob.type ? new Blob([blob], { type: type }) : blob)
-      } catch (e) { blobCache[path] = '' }
-      return blobCache[path]
+        blobCache[key] = URL.createObjectURL(type !== blob.type ? new Blob([blob], { type: type }) : blob)
+      } catch (e) { blobCache[key] = '' }
+      return blobCache[key]
     },
     write: async function (path, content) {
-      var branch = isArticle(path) ? draftBranch(path) : 'main'
-      if (branch !== 'main') await ensureBranch(branch)
+      // 記事：選んだブランチ（main 以外）があればそこへ、無ければ下書きブランチへ。main には直接書かない
+      var picked = isArticle(path) && refOverride[dirOf(path)]
+      var branch = isArticle(path) ? (picked && picked !== 'main' ? picked : draftBranch(path)) : 'main'
+      if (branch !== 'main' && branch !== picked) await ensureBranch(branch)
       var key = branch + ':' + path, sha = shaCache[key]
       if (!sha) { try { sha = (await api('/repos/' + REPO + '/contents/' + enc(path) + '?ref=' + encodeURIComponent(branch))).sha } catch (e) { if (e.status !== 404) throw e } }
       var msg = isArticle(path) ? 'draft: ' + path.split('/').pop() + '（エディタから）' : 'style: ' + path + '（エディタから）'
@@ -249,7 +283,10 @@
         await new Promise(function (r) { setTimeout(r, 6000) })
       }
     },
-    describeSave: function (path) { return isArticle(path) ? draftBranch(path) + ' ブランチに commit' : 'main に commit' },
+    describeSave: function (path) {
+      var picked = isArticle(path) && refOverride[dirOf(path)]
+      return isArticle(path) ? (picked && picked !== 'main' ? picked : draftBranch(path)) + ' ブランチに commit' : 'main に commit'
+    },
 
     /** GitHub でこのファイルを開く URL（下書きブランチがあればそちら） */
     webUrl: async function (path) {

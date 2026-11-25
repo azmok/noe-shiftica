@@ -251,6 +251,7 @@
       state.front = splitFront(state.raw).front
       priorities[path] = normPriority(state.front.priority); savePriorities()
       $('#priority').value = priorities[path] || ''
+      await fillBranches(path)
       renderArticleList()
       updateGhLink()
       $('#mdText').value = state.raw
@@ -936,7 +937,8 @@
         items.forEach(function (p) {
           var name = p.split('/').pop().replace(/\.md$/, '')
           var isDraft = store.draftBranch && drafts.indexOf(store.draftBranch(p)) >= 0
-          var b = el('button', { class: p === state.path ? 'on' : '', html: '<span class="t">' + (priorities[p] ? '<span class="prio ' + priorities[p] + '" title="優先度：' + PRIO_LABEL[priorities[p]] + '"></span>' : '') + esc(name) + (isDraft ? '<span class="badge">下書き</span>' : '') + '</span><span class="p">' + esc(p) + '</span>' })
+          var others = store.branchesFor ? store.branchesFor(p).filter(function (b) { return b !== 'main' && !/^draft\//.test(b) }) : []
+          var b = el('button', { class: p === state.path ? 'on' : '', html: '<span class="t">' + (priorities[p] ? '<span class="prio ' + priorities[p] + '" title="優先度：' + PRIO_LABEL[priorities[p]] + '"></span>' : '') + esc(name) + (isDraft ? '<span class="badge">下書き</span>' : '') + others.map(function (b) { return '<span class="badge br" title="このブランチにも別の版があります">🌿 ' + esc(b) + '</span>' }).join('') + '</span><span class="p">' + esc(p) + '</span>' })
           b.addEventListener('click', function () { if (p === state.path) closeDrawer(); else openArticle(p) })
           box.appendChild(b)
         })
@@ -1005,6 +1007,27 @@
     // ほかに未保存の変更が無ければ、そのまま保存する（フラグだけの commit）
     if (!wasDirty) await save()
     else status('優先度を変えました（保存で GitHub に入ります）')
+  }
+
+  // ================================================================ ブランチの切り替え
+  /** ツールバーのブランチ選択を、この記事がある（main と中身が違う）ブランチで埋める */
+  async function fillBranches(path) {
+    var sel = $('#branchSel'); if (!sel || !store.branchesFor) return
+    var list = store.branchesFor(path), cur = await store.currentRef(path)
+    if (list.indexOf(cur) < 0) list = list.concat([cur])
+    sel.innerHTML = ''
+    list.forEach(function (b) { sel.appendChild(el('option', { value: b, text: '🌿 ' + b })) })
+    sel.value = cur
+    sel.disabled = list.length < 2
+    sel.title = list.length < 2 ? 'この記事は ' + cur + ' にしかありません' : '表示するブランチ（保存もこのブランチに入る。main のときは ' + store.draftBranch(path) + ' に保存）'
+  }
+  async function changeBranch(ref) {
+    if (!state.path) return
+    if (state.dirtyMd && !confirm('保存していない記事の変更があります。破棄してブランチを切り替えますか？')) { await fillBranches(state.path); return }
+    state.dirtyMd = false
+    store.setRef(state.path, ref)
+    await openArticle(state.path)
+    status('🌿 ' + ref + ' を表示中（保存先：' + store.describeSave(state.path) + '）', 'ok')
   }
 
   // ================================================================ GitHub で開く・移動・削除
@@ -1151,6 +1174,7 @@
     $('#articleBtn').addEventListener('click', openDrawer)
     if (store.remove && store.move) document.body.classList.add('has-file-ops')
     $('#priority').addEventListener('change', function () { changePriority($('#priority').value) })
+    $('#branchSel').addEventListener('change', function () { changeBranch($('#branchSel').value) })
     $('#ghLink').addEventListener('click', copyGhLink)
     $('#fileBtn').addEventListener('click', openFileDlg)
     $('#publish').addEventListener('click', publishArticle)
