@@ -1,5 +1,8 @@
 # CLAUDE.md — Noe Shiftica (project rules for Claude Code / Kura-yan)
 
+@AGENTS.md
+@../noe-shiftica-ais-self-learning/lessons.md
+
 > Agent identity and the universal workflow (Startup Protocol / HARD STOP /
 > Coder–Tester loop / Self-Check) live in global config (`~/.claude/CLAUDE.md`,
 > `~/.gemini/AGENTS.md`) and project `AGENTS.md`. This file holds only Azuma's
