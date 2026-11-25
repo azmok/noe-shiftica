@@ -248,6 +248,110 @@
       }
     },
     describeSave: function (path) { return isArticle(path) ? draftBranch(path) + ' ブランチに commit' : 'main に commit' },
+
+    /** GitHub でこのファイルを開く URL（下書きブランチがあればそちら） */
+    webUrl: async function (path) {
+      var ref = await refFor(path)
+      return 'https://github.com/' + REPO + '/blob/' + enc(ref) + '/' + enc(path)
+    },
+
+    /**
+     * 記事を消す。dev/<slug>/<slug>.md ならフォルダ（画像ごと）、それ以外は .md だけ。
+     * main から消す commit を作り、フォルダごとの記事なら下書きブランチも消す。
+     * 返り値：何をしたかの一覧（[{ where, detail }]）
+     */
+    remove: async function (path) {
+      var unit = unitOf(path), done = []
+      var main = await entriesUnder('main', unit)
+      if (main.length) {
+        var ch = {}; main.forEach(function (n) { ch[n.path] = { mode: n.mode, sha: null } })
+        var sha = await commitTree('main', ch, 'remove: ' + unit.path + '（エディタから）')
+        done.push({ where: 'main', detail: main.length + ' ファイルを削除（commit ' + sha.slice(0, 7) + '）' })
+      }
+      var b = draftBranch(path)
+      if ((await draftBranches(true)).indexOf(b) >= 0) {
+        if (unit.dir) {
+          await api('/repos/' + REPO + '/git/refs/heads/' + enc(b), { method: 'DELETE' })
+          branchCache = (branchCache || []).filter(function (x) { return x !== b })
+          done.push({ where: b, detail: '下書きブランチを削除' })
+        } else {
+          var onDraft = await entriesUnder(b, unit)
+          if (onDraft.length) {
+            var ch2 = {}; onDraft.forEach(function (n) { ch2[n.path] = { mode: n.mode, sha: null } })
+            await commitTree(b, ch2, 'remove: ' + unit.path + '（エディタから）')
+            done.push({ where: b, detail: '下書きブランチからも削除' })
+          }
+        }
+      }
+      if (!done.length) throw new Error('GitHub 上にこの記事が見つかりませんでした')
+      return done
+    },
+
+    /**
+     * 記事を別のフォルダ（例：dev / blog / blog/_fin / dev/_archived）へ移す。
+     * まとまりの決め方は remove と同じ。main と下書きブランチの両方で移す。
+     * 返り値：{ path: 移したあとの .md のパス, done: [...] }
+     */
+    move: async function (path, destDir) {
+      destDir = String(destDir || '').replace(/^\/+|\/+$/g, '')
+      if (!/^(dev|blog)(\/[^/]+)*$/.test(destDir) || destDir.indexOf('..') >= 0) throw new Error('移動先は dev か blog の中を選んでください')
+      var unit = unitOf(path), base = unit.path.split('/').pop(), newUnit = destDir + '/' + base
+      // 1枚の .md を dev/・blog/ の直下へ移すときは、公開できる形（<slug>/<slug>.md）にする
+      if (!unit.dir && /^(dev|blog)$/.test(destDir)) newUnit = destDir + '/' + base.replace(/\.md$/, '') + '/' + base
+      if (newUnit === unit.path) throw new Error('いまと同じ場所です')
+      var newPath = unit.dir ? newUnit + '/' + path.split('/').pop() : newUnit
+      var oldBranch = draftBranch(path), newBranch = draftBranch(newPath), done = []
+      var branches = ['main'].concat((await draftBranches(true)).indexOf(oldBranch) >= 0 ? [oldBranch] : [])
+      for (var i = 0; i < branches.length; i++) {
+        var br = branches[i], list = await entriesUnder(br, unit)
+        if (!list.length) continue
+        var clash = await entriesUnder(br, { dir: unit.dir, path: newUnit })
+        if (clash.length) throw new Error('移動先に同じ名前のものがあります：' + newUnit + '（' + br + '）')
+        var ch = {}
+        list.forEach(function (n) {
+          ch[n.path] = { mode: n.mode, sha: null }
+          ch[newUnit + n.path.slice(unit.path.length)] = { mode: n.mode, sha: n.sha }
+        })
+        var sha = await commitTree(br, ch, 'move: ' + unit.path + ' → ' + newUnit + '（エディタから）')
+        done.push({ where: br, detail: list.length + ' ファイルを移動（commit ' + sha.slice(0, 7) + '）' })
+        // 下書きブランチの名前はフォルダ名から決まる。変わるなら付け替える
+        if (br !== 'main' && newBranch !== oldBranch) {
+          await api('/repos/' + REPO + '/git/refs', { method: 'POST', body: JSON.stringify({ ref: 'refs/heads/' + newBranch, sha: sha }) })
+          await api('/repos/' + REPO + '/git/refs/heads/' + enc(oldBranch), { method: 'DELETE' })
+          branchCache = null
+          done.push({ where: newBranch, detail: '下書きブランチの名前を ' + oldBranch + ' から変更' })
+        }
+      }
+      if (!done.length) throw new Error('GitHub 上にこの記事が見つかりませんでした')
+      return { path: newPath, done: done }
+    },
+  }
+
+  /** 記事の「まとまり」：dev/<slug>/<slug>.md はフォルダごと（画像も一緒）、それ以外は .md だけ */
+  function unitOf(path) {
+    var parts = path.split('/'), file = parts[parts.length - 1].replace(/\.md$/, ''), folder = parts[parts.length - 2]
+    if (parts.length >= 3 && folder === file && folder[0] !== '_') return { dir: true, path: parts.slice(0, -1).join('/') }
+    return { dir: false, path: path }
+  }
+  /** ブランチの中で、まとまりに入るファイル（blob）の一覧 */
+  async function entriesUnder(branch, unit) {
+    var t = await api('/repos/' + REPO + '/git/trees/' + enc(branch) + '?recursive=1')
+    if (t.truncated) throw new Error('リポジトリが大きすぎて一覧を取り切れませんでした')
+    return t.tree.filter(function (n) { return n.type === 'blob' && (unit.dir ? n.path.indexOf(unit.path + '/') === 0 : n.path === unit.path) })
+  }
+  /** changes（パス → { mode, sha }。sha が null なら削除）を1つの commit にしてブランチを進める */
+  async function commitTree(branch, changes, message) {
+    var ref = await api('/repos/' + REPO + '/git/ref/heads/' + enc(branch))
+    var head = ref.object.sha
+    var parent = await api('/repos/' + REPO + '/git/commits/' + head)
+    var tree = await api('/repos/' + REPO + '/git/trees', { method: 'POST', body: JSON.stringify({
+      base_tree: parent.tree.sha,
+      tree: Object.keys(changes).map(function (p) { return { path: p, mode: changes[p].mode || '100644', type: 'blob', sha: changes[p].sha } }),
+    }) })
+    var c = await api('/repos/' + REPO + '/git/commits', { method: 'POST', body: JSON.stringify({ message: message, tree: tree.sha, parents: [head] }) })
+    await api('/repos/' + REPO + '/git/refs/heads/' + enc(branch), { method: 'PATCH', body: JSON.stringify({ sha: c.sha }) })
+    Object.keys(shaCache).forEach(function (k) { if (k.indexOf(branch + ':') === 0) delete shaCache[k] })
+    return c.sha
   }
 
   /** 失敗した Action の理由（send-articles.sh が ::error で残した一文）。取れなければ空 */
@@ -289,4 +393,5 @@
   global.NoeStore.isArticle = isArticle
   global.NoeStore.draftBranch = draftBranch
   global.NoeStore.referencedImages = referencedImages
+  global.NoeStore.unitOf = unitOf
 })(window)

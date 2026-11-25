@@ -51,6 +51,11 @@ describe('GitHub proxy', () => {
     expect(allowedPath('https://evil.test/x', 'azmok/noe-posts')).toBe(false)
   })
 
+  it('also relays PATCH and DELETE (moving / deleting articles updates and removes refs)', () => {
+    const methods = managerEndpoints.filter((e) => e.path === '/mpm/github').map((e) => e.method).sort()
+    expect(methods).toEqual(['delete', 'get', 'patch', 'post', 'put'])
+  })
+
   const enc = () => encryptSecret('tok-123')
   const reqOf = (over: any = {}) =>
     ({
