@@ -254,21 +254,45 @@
       } catch (e) { blobCache[key] = '' }
       return blobCache[key]
     },
-    write: async function (path, content) {
+    write: async function (path, content, images, original) {
       // 記事：選んだブランチ（main 以外）があればそこへ、無ければ下書きブランチへ。main には直接書かない
       var picked = isArticle(path) && refOverride[dirOf(path)]
       var branch = isArticle(path) ? (picked && picked !== 'main' ? picked : draftBranch(path)) : 'main'
       if (branch !== 'main' && branch !== picked) await ensureBranch(branch)
+      var msg = isArticle(path) ? 'draft: ' + path.split('/').pop() + '（エディタから）' : 'style: ' + path + '（エディタから）'
+      if (images && Object.keys(images).length) {
+        var head = (await api('/repos/' + REPO + '/git/ref/heads/' + enc(branch))).object.sha
+        var current = await github.readAt(path, head)
+        if (current == null || current.replace(/\r\n/g, '\n') !== original) {
+          throw new Error('保存先の記事が先に更新されました。変更を確認してからやり直してください')
+        }
+        var contents = Object.assign({}, images)
+        contents[path] = b64encode(content)
+        var changes = {}
+        await Promise.all(Object.keys(contents).map(async function (file) {
+          var blob = await api('/repos/' + REPO + '/git/blobs', {
+            method: 'POST', body: JSON.stringify({ content: contents[file], encoding: 'base64' }),
+          })
+          changes[file] = { sha: blob.sha }
+        }))
+        var commit = await commitTree(branch, changes, msg, head)
+        refOverride[dirOf(path)] = branch
+        await draftBranches(true).catch(function () {})
+        return { where: branch + ' ブランチ', branch: branch, sha: commit }
+      }
       var key = branch + ':' + path, sha = shaCache[key]
       if (!sha) { try { sha = (await api('/repos/' + REPO + '/contents/' + enc(path) + '?ref=' + encodeURIComponent(branch))).sha } catch (e) { if (e.status !== 404) throw e } }
-      var msg = isArticle(path) ? 'draft: ' + path.split('/').pop() + '（エディタから）' : 'style: ' + path + '（エディタから）'
       var res = await api('/repos/' + REPO + '/contents/' + enc(path), { method: 'PUT', body: JSON.stringify({ message: msg, content: b64encode(content), sha: sha, branch: branch }) })
       shaCache[key] = res.content.sha
       return { where: branch + ' ブランチ', branch: branch, sha: res.commit && res.commit.sha }
     },
     /** 本文が使っている画像のうち、保存先ブランチ（無ければ main）のフォルダに無いもの */
-    missingImages: async function (path, md) {
-      var refs = referencedImages(md); if (!refs.length) return []
+    missingImages: async function (path, md, pending) {
+      var refs = referencedImages(md)
+      var frontmatter = md.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)
+      var hero = frontmatter && frontmatter[1].match(/^hero:\s*\.\/(mpm-hero-[\da-f-]+\.webp)[ \t]*\r?$/m)
+      if (hero && refs.indexOf(hero[1]) < 0) refs.push(hero[1])
+      if (!refs.length) return []
       var ref = await refFor(path), dir = dirOf(path), have = {}
       var dirs = {}
       refs.forEach(function (rel) { dirs[dirOf(joinPath(dir, rel))] = 1 })
@@ -278,7 +302,10 @@
           ;(Array.isArray(list) ? list : []).forEach(function (n) { have[n.path] = 1 })
         } catch (e) { if (e.status !== 404) throw e }
       }))
-      return refs.filter(function (rel) { return !have[joinPath(dir, rel)] }).sort()
+      return refs.filter(function (rel) {
+        var file = joinPath(dir, rel)
+        return !have[file] && !(pending && pending[file])
+      }).sort()
     },
     /**
      * commit をきっかけに動いた Action（既定は下書き送信の draft.yml）の結果を待つ。

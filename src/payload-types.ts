@@ -1345,6 +1345,9 @@ export interface MarkdownPostManagerSetting {
    * 末尾4文字だけ表示しています
    */
   tokenHint?: string | null;
+  openaiKey?: string | null;
+  openaiKeyEncrypted?: string | null;
+  openaiKeyHint?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1357,6 +1360,9 @@ export interface MarkdownPostManagerSettingsSelect<T extends boolean = true> {
   token?: T;
   tokenEncrypted?: T;
   tokenHint?: T;
+  openaiKey?: T;
+  openaiKeyEncrypted?: T;
+  openaiKeyHint?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

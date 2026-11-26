@@ -1,5 +1,5 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto'
-import type { GlobalConfig, Payload } from 'payload'
+import { ValidationError, type GlobalConfig, type Payload } from 'payload'
 import { isHumanUser } from '../../api-clients/permissions'
 
 /**
@@ -9,6 +9,7 @@ import { isHumanUser } from '../../api-clients/permissions'
  *     API やブラウザには一切返さない（読めるのはサーバーの中の GitHub 中継だけ）
  */
 export const SETTINGS_SLUG = 'markdown-post-manager-settings'
+export const isOpenAIKey = (value: string) => /^sk-[A-Za-z0-9_-]{20,509}$/.test(value)
 
 const human = ({ req }: { req: { user?: unknown } }) => isHumanUser(req.user)
 
@@ -77,6 +78,30 @@ export const settingsGlobal: GlobalConfig = {
     // API やブラウザには返さない（read: false）。読むのはサーバーの readRepoSettings（overrideAccess）だけ
     { name: 'tokenEncrypted', type: 'text', access: { read: () => false }, admin: { hidden: true } },
     { name: 'tokenHint', type: 'text', label: '保存されている鍵', admin: { readOnly: true, description: '末尾4文字だけ表示しています' } },
+    {
+      name: 'openaiKey',
+      type: 'text',
+      label: '画像生成用 OpenAI API キー',
+      virtual: true,
+      access: { read: () => false },
+      admin: {
+        description: '変更するときだけ入力して保存してください。画像生成と編集を許可したプロジェクトキーを使います。',
+        components: { Field: '@/plugins/markdownPostManager/manager/TokenField#TokenField' },
+      },
+    },
+    {
+      name: 'openaiKeyEncrypted',
+      type: 'text',
+      access: { read: () => false, create: () => false, update: () => false },
+      admin: { hidden: true },
+    },
+    {
+      name: 'openaiKeyHint',
+      type: 'text',
+      label: '画像生成キー（末尾4文字）',
+      access: { create: () => false, update: () => false },
+      admin: { readOnly: true },
+    },
   ],
   hooks: {
     beforeChange: [
@@ -86,6 +111,21 @@ export const settingsGlobal: GlobalConfig = {
         if (token) {
           data.tokenEncrypted = encryptSecret(token)
           data.tokenHint = '…' + token.slice(-4)
+        }
+        const openaiKey = typeof data.openaiKey === 'string' ? data.openaiKey.trim() : ''
+        delete data.openaiKey
+        // These storage fields are only populated from the write-only input.
+        delete data.openaiKeyEncrypted
+        delete data.openaiKeyHint
+        if (openaiKey && !isOpenAIKey(openaiKey)) {
+          throw new ValidationError({
+            global: SETTINGS_SLUG,
+            errors: [{ path: 'openaiKey', message: 'OpenAI の API キーを入力してください' }],
+          })
+        }
+        if (openaiKey) {
+          data.openaiKeyEncrypted = encryptSecret(openaiKey)
+          data.openaiKeyHint = '…' + openaiKey.slice(-4)
         }
         if (typeof data.repoUrl === 'string') data.repoUrl = data.repoUrl.trim()
         return data

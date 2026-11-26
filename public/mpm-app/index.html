@@ -44,6 +44,7 @@
   <button id="undo" class="style-only" title="スタイルの変更をひとつ戻す" disabled>↶</button>
   <button id="save" class="primary" title="保存">保存</button>
   <button id="publish" class="file-only" title="PR なしで公開する（確認が出ます）">🚀 公開</button>
+  <button id="imageStudioOpen" type="button" hidden>画像生成</button>
   <button id="settings" title="設定">⚙︎</button>
   <button id="barHide" title="ツールバーを隠す">⌃</button>
 </header>
@@ -172,6 +173,7 @@
     <div id="payloadBox" hidden>
       <p id="payloadState" class="hint"></p>
       <p class="hint">リポジトリの URL と GitHub の鍵は、管理画面の「Markdown Post Manager 設定」で入れます。鍵はサーバーにだけ暗号化して保存され、このブラウザには渡りません。</p>
+      <p><button id="imageSettingsOpen" type="button">画像生成の設定</button></p>
       <p><a id="payloadLink" class="primary-link" href="/admin/globals/markdown-post-manager-settings" target="_top">設定を開く →</a></p>
     </div>
     <div id="tokenBox">
@@ -189,10 +191,61 @@
   </form>
 </dialog>
 
+<dialog id="imageModes" aria-labelledby="imageModesTitle">
+  <form method="dialog">
+    <h2 id="imageModesTitle">ChatGPT で画像を作る</h2>
+    <p class="hint">作りたい画像を選んでください。本文には、入れる場所を選んで1枚ずつ追加できます。</p>
+    <div class="image-modes">
+      <button value="hero">ヒーローイメージを作成</button>
+      <button value="body">本文中の画像を作成</button>
+      <button value="both">ヒーローと本文画像を作成</button>
+    </div>
+    <div class="dlg-actions"><button value="cancel">閉じる</button></div>
+  </form>
+</dialog>
+
+<dialog id="imageStudio" aria-labelledby="imageStudioTitle">
+  <h2 id="imageStudioTitle">ChatGPT で画像を作る</h2>
+  <div class="image-connection">
+    <span id="imageKeyStatus" aria-live="polite"></span>
+    <button id="imageKeyChange" type="button" hidden>キーを変更</button>
+  </div>
+  <div id="imageKeySection" hidden>
+    <p class="hint">OpenAI Platform で画像生成・編集を許可したキーを作成し、ここに入力してください。生成には OpenAI API の利用料がかかります。</p>
+    <p><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI の API キー画面を開く ↗</a></p>
+    <label for="imageKey">OpenAI API キー</label>
+    <input id="imageKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="dlg-actions"><button id="imageKeySave" class="primary" type="button">キーを保存</button></div>
+  </div>
+  <div id="imageWork" hidden>
+    <h3 id="imageStage"></h3>
+    <label id="imagePlan">本文の画像枚数
+      <select id="imageCount"><option>1</option><option>2</option><option selected>3</option></select>
+    </label>
+    <label id="imageLocationField">挿入するセクション <select id="imageLocation"></select></label>
+    <label for="imagePrompt">作りたい画像・変更したいところ</label>
+    <textarea id="imagePrompt" rows="3" maxlength="2000" placeholder="例：青を基調にした、文字なしの図解"></textarea>
+    <p class="hint">「画像を生成」を押すと、指示と記事の一部が OpenAI に送信されます。</p>
+    <div class="dlg-actions"><button id="imageGenerate" type="button" class="primary">画像を生成</button></div>
+    <div id="imageHistory" class="image-history" aria-label="生成した画像の候補"></div>
+    <img id="imagePreview" hidden alt="選択中の生成画像">
+    <label id="imageAltField">画像の短い説明
+      <input id="imageAlt" type="text" maxlength="200" placeholder="例：画像編集ツールの比較図">
+    </label>
+    <div class="dlg-actions">
+      <button id="imageSkip" type="button">この画像をスキップ</button>
+      <button id="imageAdopt" type="button" class="primary" disabled>この画像を採用</button>
+    </div>
+  </div>
+  <p id="imageMessage" class="hint" role="status"></p>
+  <div class="dlg-actions"><button id="imageClose" type="button">閉じる</button></div>
+</dialog>
+
 <script src="vendor/markdown-it.min.js"></script>
 <script src="scope-css.js"></script>
 <script src="store.js"></script>
 <script src="diff.js"></script>
+<script src="image-studio.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

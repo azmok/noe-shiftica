@@ -1,5 +1,6 @@
 import type { Endpoint, PayloadHandler } from 'payload'
 import { isHumanUser } from '../../api-clients/permissions'
+import { imageEndpoints } from './imageEndpoints'
 import { readRepoSettings } from './settings'
 
 /**
@@ -65,6 +66,7 @@ const proxyHandler: PayloadHandler = async (req) => {
 }
 
 export const managerEndpoints: Endpoint[] = [
+  ...imageEndpoints,
   { path: '/mpm/config', method: 'get', handler: configHandler },
   ...METHODS.map((m) => ({ path: '/mpm/github', method: m.toLowerCase() as Lowercase<(typeof METHODS)[number]>, handler: proxyHandler })),
 ]
