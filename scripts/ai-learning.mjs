@@ -97,6 +97,13 @@ function sync() {
   else if (!pulled) console.log('警告: origin/main を取り込めていない（未作成、または手元と分岐）。')
   const lessons = path.join(dir, 'lessons.md')
   console.log(existsSync(lessons) ? readFileSync(lessons, 'utf8') : 'lessons.md はまだない。')
+  // 引き継ぎ（設計は学習リポジトリの docs/handoff/README.md）。始めに今の状態とタスクを見せる
+  const tasks = path.join(dir, 'docs', 'handoff', 'tasks.md')
+  if (existsSync(tasks)) {
+    console.log(`\n---- 引き継ぎ: ${tasks} ----`)
+    console.log(readFileSync(tasks, 'utf8'))
+    console.log('続けて decisions.md と log/ の最新月の末尾を読む。終わるときは log/ に追記し、tasks.md を直す（書き方は docs/handoff/README.md）。')
+  } else console.log('\n引き継ぎ（docs/handoff/tasks.md）はまだない。')
 }
 
 function classes() {
