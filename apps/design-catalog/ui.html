@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UI全般デザインカタログ · Noe Shiftica</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./fonts.css">
+  <link rel="stylesheet" href="./catalog.css">
+  <link rel="stylesheet" href="./ui.css">
+  <script type="module" src="./ui.mjs"></script>
+</head>
+<body>
+  <header class="side">
+    <div class="title">
+      <p class="brand">Noe Shiftica</p>
+      <nav class="views" aria-label="カタログ">
+        <a href="./">記事</a>
+        <a href="./pages.html">ページ</a>
+        <a href="./ui.html" aria-current="page">UI全般</a>
+      </nav>
+      <h1>UI全般<br>デザイン<br>カタログ</h1>
+    </div>
+
+    <section class="group" aria-label="カテゴリ">
+      <div id="cat-list" class="page-list"></div>
+    </section>
+
+    <section class="group" aria-label="絞り込みと表示">
+      <label class="field">キーワード検索
+        <input id="search" type="search" class="ui-search" placeholder="dark, pill, mono, dock...">
+      </label>
+      <fieldset class="seg appearance">
+        <legend>配色</legend>
+        <label><input type="radio" name="appearance" value="dark"><span>ダーク</span></label>
+        <label><input type="radio" name="appearance" value="light"><span>ライト</span></label>
+      </fieldset>
+    </section>
+
+    <section class="group files" aria-label="抽出トークン">
+      <button id="copy-tokens" type="button">統合CSSコピー</button>
+      <button id="export-tokens" type="button" class="primary">JSON保存</button>
+    </section>
+    <p id="status" class="status" role="status"></p>
+  </header>
+
+  <main class="workspace ui-workspace">
+    <header class="ui-top">
+      <div>
+        <p class="ui-eyebrow">AWWWARDS MEASURED PATTERNS · 2026-11-26</p>
+        <h2 id="heading">すべての UI パターン</h2>
+      </div>
+      <div class="ui-counts">
+        <span id="count-pill" class="ui-pill">6 パターン</span>
+        <span class="ui-pill">実測トークン + CSS + JS + スクショ</span>
+      </div>
+    </header>
+
+    <section id="cards" class="ui-grid" aria-label="UIパターン一覧"></section>
+  </main>
+</body>
+</html>
