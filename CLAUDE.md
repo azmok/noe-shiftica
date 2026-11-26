@@ -1,5 +1,8 @@
 # CLAUDE.md — Noe Shiftica (project rules for Claude Code / Kura-yan)
 
+@AGENTS.md
+@../noe-shiftica-ais-self-learning/lessons.md
+
 > Agent identity and the universal workflow (Startup Protocol / HARD STOP /
 > Coder–Tester loop / Self-Check) live in global config (`~/.claude/CLAUDE.md`,
 > `~/.gemini/AGENTS.md`) and project `AGENTS.md`. This file holds only Azuma's
@@ -13,9 +16,10 @@
 > + the original instruction before retrying (original instruction + Signs win over the latest failure log).
 > Memory layer contract: `.antigravity/memory-schema.md`.
 
-> **新しいセッションは最初に `docs/HANDOFF.md`（引き継ぎメモ：進行中の作業・未解決の問題・次にやること）を読む。** 作業を終えるときは更新する。
+> **新しいセッションは最初に `node scripts/ai-learning.mjs sync` を実行し、表示される引き継ぎ（非公開の学習リポジトリの `docs/handoff/`：今の状態・タスク・決定事項・時系列）を読む。** 作業を終えるときは `docs/handoff/log/` に追記し、`tasks.md` を直す（書き方と設計目的は `docs/handoff/README.md`。`docs/handoff/` の変更は AI の判断で main にマージしてよい）。詳しいルールは AGENTS.md の「引き継ぎ」。設計の質問は、同じ場所の `docs/design-map/index.html` を見て、実物と照らしてから答える。
 
 ## Standing instructions (Azuma)
+- **説明はかみ砕く**（あずまの指示 2026-11-25）：結論を最初に1〜2文。あずまがやることは番号付き（なければ「やることなし」）。専門用語は避け、使うならその場で言い換える。1文は短く、聞かれてない細部や長い表は出さない。質問は一度に1〜2個まで。ただし失敗・未確認・危険なことは省かない。
 - バックグラウンドコマンド（App Hosting のロールアウト、長時間ビルド等）の**出力ファイルは確認しなくてよい**。完了通知 / exit code 0 だけで十分とみなす。
 - 修正したら `git add` → **`git commit` → `git push` までクラやんの判断で実行してよい**（あずま承認済み 2026-11-24）。作業ブランチに push する。
 - **プルリクエストの作成と main へのマージもクラやんの判断で行ってよい**（あずま承認済み 2026-11-25）。noe-posts の Action が出す md-assets 同期のプルリクエストも同じ。マージ前にテスト（tsc / vitest）が通っていることを確認する。

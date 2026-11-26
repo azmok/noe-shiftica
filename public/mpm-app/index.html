@@ -11,10 +11,22 @@
 <body class="view-preview">
 <header class="bar" id="bar">
   <button id="articleBtn" class="article-btn" title="記事を選ぶ">☰ <span id="articleName">記事</span></button>
+  <select id="branchSel" class="file-only mono" title="表示するブランチ（保存もこのブランチに入る。main のときは draft/ に保存）" aria-label="ブランチ"></select>
+  <select id="priority" class="file-only" title="優先度（frontmatter の priority）" aria-label="優先度">
+    <option value="">優先度 —</option>
+    <option value="high">🔴 高</option>
+    <option value="medium">🟡 中</option>
+    <option value="low">🔵 低</option>
+  </select>
+  <a id="ghLink" class="icon-btn file-only" href="#" target="_blank" rel="noopener" title="GitHub で開く（リンクもコピーします。AI に渡す用）" aria-label="GitHub で開く">
+    <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+  </a>
+  <button id="fileBtn" class="file-only" title="記事の移動・削除">📁</button>
   <div class="seg" id="view" role="group" aria-label="表示">
     <button data-v="preview" class="on">プレビュー</button>
     <button data-v="split">並べて</button>
     <button data-v="md">MD</button>
+    <button data-v="diff" class="file-only" title="ほかのブランチとの違いを見る">差分</button>
   </div>
   <div class="seg" id="mode" role="group" aria-label="モード">
     <button data-m="text" title="文章をクリックして、その場で書き換える">✏️ 文章</button>
@@ -31,6 +43,7 @@
   <span id="status" class="status"></span>
   <button id="undo" class="style-only" title="スタイルの変更をひとつ戻す" disabled>↶</button>
   <button id="save" class="primary" title="保存">保存</button>
+  <button id="publish" class="file-only" title="PR なしで公開する（確認が出ます）">🚀 公開</button>
   <button id="settings" title="設定">⚙︎</button>
   <button id="barHide" title="ツールバーを隠す">⌃</button>
 </header>
@@ -41,6 +54,19 @@
   <div class="drawer-head">
     <input id="articleSearch" type="search" placeholder="記事を探す（ファイル名）" autocomplete="off" autocapitalize="off" spellcheck="false">
     <button id="drawerClose" title="閉じる">✕</button>
+  </div>
+  <div class="drawer-tools">
+    <select id="prioFilter" title="優先度で絞り込む" aria-label="優先度で絞り込む">
+      <option value="all">すべて</option>
+      <option value="high">🔴 高だけ</option>
+      <option value="high,medium">🔴🟡 高・中</option>
+      <option value="high,medium,low">優先度あり</option>
+      <option value="none">優先度なし</option>
+    </select>
+    <div class="seg" id="sortMode" role="group" aria-label="並べ方">
+      <button data-s="prio" title="優先度の高い順（同じなら名前順）">優先度順</button>
+      <button data-s="name" title="ファイル名の順">名前順</button>
+    </div>
   </div>
   <div id="articleList" class="article-list"></div>
 </aside>
@@ -65,6 +91,20 @@
 
   <section class="mdpane" id="mdpane">
     <textarea id="mdText" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+  </section>
+
+  <section class="diffpane" id="diffpane" aria-label="差分">
+    <div class="diff-head">
+      <label>比べる相手 <select id="diffBase" class="mono"></select></label>
+      <span class="diff-arrow">→</span>
+      <span id="diffCur" class="mono"></span>
+      <label class="diff-opt"><input type="checkbox" id="diffOnly" checked> 変更のまわりだけ</label>
+      <span class="grow"></span>
+      <span id="diffStats" class="diff-stats"></span>
+      <a id="diffGh" class="primary-link" target="_blank" rel="noopener">GitHub で比べる ↗</a>
+    </div>
+    <div id="diffFiles" class="diff-files"></div>
+    <div id="diffBody" class="diff-body mono"></div>
   </section>
 
   <aside class="panel" id="panel">
@@ -110,6 +150,21 @@
   </form>
 </dialog>
 
+<dialog id="fileDlg">
+  <form method="dialog">
+    <h2>記事の移動・削除</h2>
+    <p id="fileDlgPath" class="mono"></p>
+    <p id="fileDlgUnit" class="hint"></p>
+    <label>移動先<br><select id="moveDest" class="mono" style="width:100%"></select></label>
+    <p class="hint">GitHub の main に commit します（下書きブランチがあれば、そちらも一緒に動かす／消す）。サイトにある記事（DB）はそのまま残ります。dev/ や blog/ の直下に移した記事は、main の Action でサイトに送られます（frontmatter の status に従う）。</p>
+    <div class="dlg-actions">
+      <button value="cancel">閉じる</button>
+      <button id="deleteBtn" type="button" class="danger">🗑 削除</button>
+      <button id="moveBtn" type="button" class="primary">移動</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="settingsDlg">
   <form method="dialog">
     <h2>設定</h2>
@@ -137,6 +192,7 @@
 <script src="vendor/markdown-it.min.js"></script>
 <script src="scope-css.js"></script>
 <script src="store.js"></script>
+<script src="diff.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

@@ -96,6 +96,31 @@ body.mode-style .style-only { display: inline-block; }
 body.view-md .mdpane { display: block; }
 body.view-md .stage { display: none; }
 body.view-split .mdpane { display: block; width: 50%; border-left: 1px solid var(--line); }
+/* ---- 差分（ブランチ同士の違い） ---- */
+.diffpane { display: none; position: absolute; inset: 0; overflow: auto; -webkit-overflow-scrolling: touch; background: #0b0c10; }
+body.view-diff .diffpane { display: block; }
+body.view-diff .stage, body.view-diff .mdpane { display: none; }
+.diff-head { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; }
+.diff-head select { max-width: 60vw; }
+.diff-head .grow { flex: 1; }
+.diff-arrow { color: var(--muted); }
+.diff-opt { color: var(--muted); white-space: nowrap; }
+.diff-stats .a { color: #7ee2b8; } .diff-stats .d { color: #ff8a8a; }
+.primary-link { color: var(--accent); text-decoration: none; white-space: nowrap; }
+.diff-files { padding: 0 14px; font-size: 12px; color: var(--muted); }
+.diff-files:not(:empty) { padding: 8px 14px; border-bottom: 1px solid var(--line); }
+.diff-body { padding: 6px 0 40vh; font-size: 13px; line-height: 1.6; }
+.diff-body .dl { display: grid; grid-template-columns: 3.2em 3.2em 1.4em 1fr; }
+.diff-body .n { color: #5c6370; text-align: right; padding-right: 6px; user-select: none; }
+.diff-body .s { color: #5c6370; text-align: center; user-select: none; }
+.diff-body .t { white-space: pre-wrap; overflow-wrap: anywhere; padding-right: 14px; }
+.diff-body .dl.add { background: rgba(46, 160, 67, .16); } .diff-body .dl.add .s { color: #7ee2b8; }
+.diff-body .dl.del { background: rgba(248, 81, 73, .16); } .diff-body .dl.del .s { color: #ff8a8a; }
+.diff-body ins { text-decoration: none; background: rgba(46, 160, 67, .45); border-radius: 2px; }
+.diff-body del { text-decoration: none; background: rgba(248, 81, 73, .45); border-radius: 2px; }
+.diff-body .skip { padding: 4px 14px; color: var(--muted); background: #12141a; font-family: inherit; font-size: 12px; cursor: pointer; }
+.diff-body .empty { padding: 24px 14px; color: var(--muted); font-family: -apple-system, "Hiragino Sans", sans-serif; }
+@media (max-width: 600px) { .diff-body .dl { grid-template-columns: 2.4em 2.4em 1.1em 1fr; } .diff-body { font-size: 12px; } }
 body.view-split .stage { right: 50%; }
 @media (max-width: 700px) {
   body.view-split .stage { right: 0; bottom: 50%; }
@@ -138,6 +163,8 @@ body.drawer-open .drawer { transform: none; }
 body.drawer-open .drawer-scrim { display: block; }
 .drawer-head { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid var(--line); }
 .drawer-head input { flex: 1; min-width: 0; }
+.drawer-tools { display: flex; gap: 6px; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.drawer-tools select { flex: 1; min-width: 0; }
 .article-list { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 4px 0 40px; }
 .article-list h3 { margin: 12px 12px 4px; font-size: 12px; color: var(--accent); letter-spacing: .05em; }
 .article-list h4 { margin: 8px 12px 2px; font-size: 11px; color: var(--muted); font-weight: 600; }
@@ -181,3 +208,14 @@ body.store-payload #tokenSave, body.store-payload #tokenClear { display: none; }
   body.mode-style.panel-collapsed .panel-toggle { right: 8px; bottom: 12px; }
   body.mode-style.panel-collapsed .stage { bottom: 0; }
 }
+
+/* ---- 記事の操作（優先度・GitHub・移動/削除） ---- */
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 8px; background: #1d2029; color: var(--fg); text-decoration: none; }
+.icon-btn:hover { color: var(--accent); }
+#priority { flex-shrink: 0; }
+#branchSel { flex-shrink: 0; max-width: 220px; }
+.article-list .badge.br { background: #2a3040; color: var(--fg); }
+button.danger { background: #3a1a1d; border-color: #7a2b33; color: #ffb3b3; }
+body:not(.has-file-ops) .file-only { display: none; }
+.article-list .prio { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.article-list .prio.high { background: #ff5a5a; } .article-list .prio.medium { background: #ffc53d; } .article-list .prio.low { background: #4aa8ff; }
