@@ -117,12 +117,15 @@ async function draft(mdPath, opts) {
 
   // --hero はファイル名か media ID。ファイルなら（本文で参照済みでなければ）images に足して送る
   let heroImage
-  if (opts.hero) {
-    if (/^\d+$/.test(opts.hero)) heroImage = Number(opts.hero)
+  const frontmatter = markdown.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1]
+  const generatedHero = frontmatter?.match(/^hero:\s*\.\/(mpm-hero-[\da-f-]+\.webp)[ \t]*\r?$/m)?.[1]
+  const hero = opts.hero || generatedHero
+  if (hero) {
+    if (/^\d+$/.test(hero)) heroImage = Number(hero)
     else {
-      const file = path.join(dir, opts.hero)
+      const file = path.join(dir, hero)
       if (!fs.existsSync(file)) throw new Error(`Hero 画像が見つかりません: ${file}`)
-      heroImage = path.basename(opts.hero)
+      heroImage = path.basename(hero)
       if (!images.some((i) => i.filename === heroImage)) {
         images.push({ filename: heroImage, data: fs.readFileSync(file).toString('base64') })
       }

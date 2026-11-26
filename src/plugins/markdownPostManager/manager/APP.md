@@ -22,3 +22,9 @@
 - リポジトリの URL と鍵は、管理画面の「Markdown Post Manager 設定」（global `markdown-post-manager-settings`）。鍵は暗号化して保存し、API では返さない
 - 見た目の調整（スタイルモード）は出さない（`store.allowStyle = false`）。styleEditor（設計書フェーズ4）で行う
 - `store.js` は local（noe-posts の preview_server.py）/ github（鍵をブラウザに持つ旧 Netlify 方式）/ payload（このタブ）の3通りで動く
+
+## OpenAI image generation
+
+- From the image menu, choose the hero, body images, or both. For each body image, select a section. Generate one candidate at a time and choose a candidate before asking for a revision or adopting it.
+- Set or replace the OpenAI project key from the image dialog or the existing Markdown Post Manager settings page. Only the final four characters are displayed after saving. A project key needs write access to the Images API, including image edits.
+- Adopting an image updates the working Markdown preview. Use the regular Save button to persist both the Markdown and its images in the same draft commit. The article delivery script reads the generated hero's relative path from the frontmatter.

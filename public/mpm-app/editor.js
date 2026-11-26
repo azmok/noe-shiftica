@@ -27,7 +27,7 @@
     articleCss: '', edits: [], history: [],
     el: null, selector: null, media: 'all', width: 1280,
     view: 'preview', mode: null,
-    dirtyMd: false, dirtyCss: false,
+    dirtyMd: false, dirtyCss: false, originalMd: '', pendingImages: {},
   }
   var cache = {}   // 型・本物の CSS・共通 JS の中身
 
@@ -130,15 +130,54 @@
     })
     return { html: html, headings: headings }
   }
+  function previewAsset(path) {
+    var pending = state.pendingImages[path]
+    return pending ? Promise.resolve('data:image/webp;base64,' + pending) : store.assetUrl(path)
+  }
   async function resolveAssets(html) {
     var paths = {}, re = /noe-asset:([^"'\s)]+)/g, m
     while ((m = re.exec(html))) paths[m[1]] = 1
     var map = {}
-    await Promise.all(Object.keys(paths).map(async function (p) { map[p] = await store.assetUrl(p) }))
+    await Promise.all(Object.keys(paths).map(async function (p) { map[p] = await previewAsset(p) }))
     return html.replace(/noe-asset:([^"'\s)]+)/g, function (_, p) { return map[p] || '' })
   }
 
   // ================================================================ 本番の型に流し込む
+  function renderHero(doc, hero, title) {
+    doc.querySelectorAll('[data-slot="hero"]').forEach(function (slot) {
+      var media = slot.firstElementChild
+      if (!hero) {
+        // Match BlogFallbackHero in the static preview, where React is unavailable.
+        var fallback = doc.createElement('div')
+        fallback.style.cssText = 'position:relative;width:100%;height:100%;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#e0e5ec;border-radius:12px;overflow:hidden;font-family:var(--font-sans, sans-serif)'
+        fallback.innerHTML = [
+          '<svg aria-hidden="true" viewBox="0 0 800 400" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.6">',
+          '<g fill="none" stroke="#a3b1c6" stroke-width="2" stroke-linecap="round" stroke-dasharray="1000" style="filter:blur(1px)">',
+          '<path d="M100,200 C150,100 300,300 400,200 S650,100 700,200"><animate attributeName="stroke-dashoffset" values="1000;0;1000" dur="20s" repeatCount="indefinite"/></path>',
+          '<path d="M200,350 Q400,150 600,350" opacity=".3"><animate attributeName="stroke-dashoffset" values="1000;0;1000" begin="-2s" dur="20s" repeatCount="indefinite"/></path>',
+          '</g></svg>',
+          '<span aria-hidden="true" style="position:absolute;top:15%;right:15%;width:12px;height:12px;border-radius:50%;box-shadow:inset 2px 2px 5px #a3b1c6,inset -2px -2px 5px #fff;display:grid;place-items:center"><span style="width:4px;height:4px;border-radius:50%;background:#4caf50;box-shadow:0 0 10px #4caf50"></span></span>',
+          '<div style="color:#e0e5ec;font-size:clamp(2.5rem,8vw,5rem);font-weight:900;letter-spacing:-.05em;line-height:1;text-transform:uppercase;text-shadow:2px 2px 3px #a3b1c6,-2px -2px 3px #fff">Noe Shiftica</div>',
+          '<div style="margin-top:24px;font-size:.7rem;font-weight:700;letter-spacing:.5em;text-transform:uppercase">Cognitive Architecture</div>'
+        ].join('')
+        media.replaceWith(fallback)
+        return
+      }
+      var img = media.matches('img') ? media : media.querySelector('img')
+      if (!img) {
+        img = doc.createElement('img')
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain'
+        media.replaceWith(img)
+      }
+      img.removeAttribute('srcset')
+      img.removeAttribute('sizes')
+      img.style.removeProperty('background-image')
+      img.alt = title
+      var pic = img.closest('picture')
+      if (pic) pic.querySelectorAll('source').forEach(function (source) { source.remove() })
+      img.src = hero
+    })
+  }
   function rebuildToc(doc, headings) {
     doc.querySelectorAll('[data-slot="toc"] ol, .article-toc-sidebar ol, .article-toc-sidebar ul').forEach(function (list) {
       var items = Array.prototype.slice.call(list.children).filter(function (li) { return li.querySelector('a[href^="#"]') })
@@ -176,11 +215,8 @@
       e.innerHTML = '<div class="md-render" data-md-root>' + h + '</div>'
     })
     var heroSrc = parts.front.hero || parts.front.heroImage || parts.front.image || parts.front.cover
-    var hero = heroSrc ? (/^https?:/.test(heroSrc) ? heroSrc : await store.assetUrl(dirPath + '/' + heroSrc.replace(/^\.\//, ''))) : (html.match(/<img\b(?![^>]*class="icons")[^>]*\bsrc="([^"]+)"/) || [])[1]
-    if (hero) doc.querySelectorAll('[data-slot="hero"] img').forEach(function (img) {
-      img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.src = hero
-      var pic = img.closest('picture'); if (pic) pic.querySelectorAll('source').forEach(function (s) { s.remove() })
-    })
+    var hero = heroSrc && (/^https?:/.test(heroSrc) ? heroSrc : await previewAsset(dirPath + '/' + heroSrc.replace(/^\.\//, '')))
+    renderHero(doc, hero, title)
     rebuildToc(doc, rendered.headings)
     if (title) doc.title = title
     ;['__overrides', '__gui'].forEach(function (id) { var s = doc.createElement('style'); s.id = id; doc.head.appendChild(s) })
@@ -246,6 +282,8 @@
       var raw = await store.read(path)
       state.crlf = raw.indexOf('\r\n') >= 0
       state.raw = raw.replace(/\r\n/g, '\n'); state.path = path; state.dirtyMd = false; markDirty()
+      state.originalMd = state.raw
+      state.pendingImages = {}
       remember('article', path)
       $('#articleName').textContent = path.split('/').pop().replace(/\.md$/, '')
       state.front = splitFront(state.raw).front
@@ -775,12 +813,19 @@
     if (editing) commitEdit()
     if (!state.dirtyMd && !state.dirtyCss) { status('変更はありません'); showReport([{ icon: 'ℹ️', title: '変更はありません', detail: '保存するものがありませんでした' }]); return }
     $('#save').disabled = true
-    var rows = [], missing = []
+    var rows = [], missing = [], pending = {}
+    var path = state.path, raw = state.raw, original = state.originalMd, crlf = state.crlf
+    var dir = path ? path.split('/').slice(0, -1).join('/') : ''
+    var hero = splitFront(raw).front.hero
+    var usedImages = new Set(store.referencedImages(raw).concat(hero ? [hero.replace(/^\.\//, '')] : []))
+    Object.keys(state.pendingImages).forEach(function (file) {
+      if (usedImages.has(file.slice(dir.length + 1))) pending[file] = state.pendingImages[file]
+    })
     try {
       // 1. 保存の前に、本文が使っている画像がフォルダにそろっているか確かめる
       if (state.dirtyMd && store.missingImages) {
         status('画像を確認中…')
-        try { missing = await store.missingImages(state.path, state.raw) } catch (e) { missing = [] }
+        try { missing = await store.missingImages(path, raw, pending) } catch (e) { missing = [] }
         if (missing.length && !(await askSaveAnyway(missing))) {
           status('保存をやめました')
           showReport([{ icon: '⏸', title: '保存していません', detail: '画像が足りないため、保存をやめました：' + missing.join('、') }])
@@ -788,11 +833,24 @@
         }
       }
       // 2. 記事
-      if (state.dirtyMd) {
+      if (state.dirtyMd && state.path === path && state.raw === raw) {
         status('記事を保存中…')
-        var text = state.crlf ? state.raw.replace(/\n/g, '\r\n') : state.raw
+        var text = crlf ? raw.replace(/\n/g, '\r\n') : raw
         try {
-          var r1 = await store.write(state.path, text); state.dirtyMd = false
+          var r1 = await store.write(path, text, pending, original)
+          if (state.path === path && state.originalMd === original) {
+            state.originalMd = raw
+            if (state.raw === raw) {
+              state.pendingImages = {}
+              state.dirtyMd = false
+            } else {
+              Object.keys(pending).forEach(function (file) { delete state.pendingImages[file] })
+            }
+            if (Object.keys(pending).length) {
+              await fillBranches(path).catch(function () {})
+              updateGhLink()
+            }
+          }
           rows.push({ icon: '✅', kind: 'ok', title: '記事を保存しました', detail: r1.where + ' に保存（' + (r1.sha ? 'commit ' + r1.sha.slice(0, 7) : '手元のファイル') + '）' })
           if (r1.sha && store.watchSend) {
             var idx = rows.length
@@ -1227,7 +1285,71 @@
       if (first) openArticle(first); else openDrawer()
     } catch (e) { started = false; status('読み込めませんでした：' + e.message, 'err') }
   }
+  function imageSections() {
+    var parts = splitFront(state.raw), lines = parts.body.split('\n')
+    var tokens = md.parse(prepareKeepLines(parts.body), {})
+    var headings = tokens.filter(function (token) {
+      return token.type === 'heading_open' && token.level === 0 && /^h[23]$/.test(token.tag)
+    })
+    var sections = headings.map(function (heading, i) {
+      var title = tokens[tokens.indexOf(heading) + 1].content
+      var end = headings[i + 1] ? headings[i + 1].map[0] : lines.length
+      return { label: title || 'セクション ' + (i + 1), end: parts.fmLines + end, text: lines.slice(heading.map[0], end).join('\n') }
+    })
+    return sections.length ? sections : [{ label: '本文の末尾', end: parts.fmLines + lines.length, text: parts.body }]
+  }
+
+  function openImageStudio(mode) {
+    var path = state.path
+    window.NoeImageStudio.open(mode, {
+      sections: imageSections,
+      context: function (section) {
+        var parts = splitFront(state.raw)
+        return [parts.front.title, parts.front.description, section ? section.text : parts.body].filter(Boolean).join('\n').slice(0, 6000)
+      },
+      adopt: function (kind, section, description, image) {
+        if (state.path !== path || $('#save').disabled) throw new Error('記事を開き直して、もう一度お試しください')
+        var name = 'mpm-' + kind + '-' + crypto.randomUUID() + '.webp'
+        var dir = path.split('/').slice(0, -1).join('/')
+        var text
+        if (kind === 'hero') text = setFrontKey(state.raw, 'hero', './' + name)
+        else {
+          if (!section) throw new Error('画像を入れるセクションを選んでください')
+          var lines = state.raw.split('\n')
+          var caption = description.replace(/[\\[\]]/g, '\\$&')
+          var before = lines.slice(0, section.end).join('\n').trimEnd()
+          var after = lines.slice(section.end).join('\n')
+          text = before + '\n\n![' + caption + '](./' + name + ')\n' + (after ? '\n' + after : '')
+        }
+        state.pendingImages[dir + '/' + name] = image
+        setRaw(text, true)
+        status('画像を採用しました。記事と画像を保存できます', 'ok')
+      },
+    })
+  }
+
+  function initImageStudio() {
+    if (store.kind !== 'payload') return
+    var menu = $('#imageModes')
+    $('#imageStudioOpen').hidden = false
+    $('#imageStudioOpen').addEventListener('click', function () {
+      if (!state.path) { status('先に記事を選んでください'); return }
+      if ($('#save').disabled) return
+      if (editing) commitEdit()
+      menu.returnValue = ''
+      menu.showModal()
+    })
+    menu.addEventListener('close', function () {
+      if (['hero', 'body', 'both'].includes(menu.returnValue)) openImageStudio(menu.returnValue)
+    })
+    $('#imageSettingsOpen').addEventListener('click', function () {
+      this.closest('dialog').close()
+      openImageStudio('settings')
+    })
+  }
+
   function init() {
+    initImageStudio()
     if (store.allowStyle === false) document.body.classList.add('no-style')
     document.body.classList.add('store-' + store.kind)
     document.querySelectorAll('#device button').forEach(function (b) {

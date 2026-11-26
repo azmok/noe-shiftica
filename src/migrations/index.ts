@@ -14,6 +14,7 @@ import * as migration_20261031_120000_add_videos_collection from './20261031_120
 import * as migration_20261124_180000_add_markdown_render from './20261124_180000_add_markdown_render';
 import * as migration_20261125_030000_add_markdown_revision from './20261125_030000_add_markdown_revision';
 import * as migration_20261125_040000_add_markdown_post_manager_settings from './20261125_040000_add_markdown_post_manager_settings';
+import * as migration_20261126_080000_add_mpm_openai_key from './20261126_080000_add_mpm_openai_key';
 
 export const migrations = [
   {
@@ -95,5 +96,10 @@ export const migrations = [
     up: migration_20261125_040000_add_markdown_post_manager_settings.up,
     down: migration_20261125_040000_add_markdown_post_manager_settings.down,
     name: '20261125_040000_add_markdown_post_manager_settings'
+  },
+  {
+    up: migration_20261126_080000_add_mpm_openai_key.up,
+    down: migration_20261126_080000_add_mpm_openai_key.down,
+    name: '20261126_080000_add_mpm_openai_key',
   },
 ];
