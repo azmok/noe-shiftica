@@ -1,5 +1,7 @@
 # Airbnb Newsroom Japan
 
+> **2026-11-26 correction.** This audit was made without the site's webfonts. Measured live, the hero radius is 24px on desktop and 16px elsewhere, the deck is 22px, and the section headings in this article render at 700. See the [reproduction guide](reproduction-guide.md) and [tokens.json](tokens.json) for the current values.
+
 Audited November 25, 2026. The [Japanese fall update](https://news.airbnb.com/ja/airbnb-2026-fallupdate) is the initial reference. Its saved HTML and linked public stylesheets were measured in Windows Chromium. Metrics describe this article template. Cereal webfonts were not loaded in the offline measurement, so the font family is the declared CSS stack.
 
 | Role | 1440px | 1024px | 768px | 390px |

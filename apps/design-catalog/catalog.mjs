@@ -11,11 +11,11 @@ const fields = {
   paragraph: ['段落間隔', 0, 64, 1, 'px'],
   media: ['画像の余白', 0, 88, 1, 'px'],
 };
-const storageKey = 'noe-design-catalog-v3';
+const storageKey = 'noe-design-catalog-v4';
 const defaultPanels = [
-  { theme: 'apple', layout: 'auto', viewport: 0 },
-  { theme: 'airbnb', layout: 'one', viewport: 0 },
-  { theme: 'apple', layout: 'auto', viewport: 768 },
+  { theme: 'apple', layout: 'one', viewport: 1440 },
+  { theme: 'airbnb', layout: 'one', viewport: 1440 },
+  { theme: 'apple', layout: 'one', viewport: 390 },
 ];
 const defaults = () => ({
   version: 1, sample: 'essay', count: 1, sync: true,
@@ -160,7 +160,7 @@ function setExpandedPanel(node) {
   expandedPanel = node;
   node?.setAttribute('data-expanded', '');
   document.documentElement.toggleAttribute('data-preview-expanded', Boolean(node));
-  for (const element of document.querySelectorAll('.masthead, .toolbar, #editor, #panels > .panel')) {
+  for (const element of document.querySelectorAll('.side, #editor, #panels > .panel')) {
     element.inert = Boolean(node && element !== node);
   }
   updateFullscreenButtons();
@@ -215,6 +215,25 @@ function makePanel(index) {
       applyStyle(panel);
       saveLocal();
     });
+  }
+
+  const segments = {
+    theme: Object.entries(themes).map(([id, theme]) => [id, theme.label.replace(/ (Newsroom|Blog)$/, '')]),
+    viewport: [['1440', 'PC'], ['768', 'iPad'], ['390', 'スマホ'], ['0', '実寸']],
+  };
+  for (const [field, items] of Object.entries(segments)) {
+    node.querySelector(`[data-seg="${field}"]`).append(...items.map(([value, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.value = value;
+      button.textContent = label;
+      button.addEventListener('click', () => {
+        const select = properties.querySelector(`[data-field="${field}"]`);
+        select.value = value;
+        select.dispatchEvent(new Event('change'));
+      });
+      return button;
+    }));
   }
 
   const font = document.createElement('select');
@@ -345,7 +364,7 @@ function applyStyle(panel) {
   if (!available) return;
   const width = data.viewport || available;
   const tokens = { ...theme.tokens(width), ...data.overrides };
-  const spread = data.layout === 'two' || (data.layout === 'auto' && width >= 768);
+  const spread = (data.layout === 'two' && width >= 640) || (data.layout === 'auto' && width >= 768);
   const changedLayout = scroll.hasAttribute('data-spread') !== spread;
   const canvas = Math.min(available, width);
   const zoom = canvas / width;
@@ -354,16 +373,17 @@ function applyStyle(panel) {
   track.style.setProperty('--spread-width', px(canvas));
   track.style.setProperty('--spread-gap', px(spreadGap));
   preview.dataset.theme = data.theme;
+  preview.dataset.size = theme.size(spread ? (canvas - spreadGap) / (2 * zoom) : width);
   const cssProperties = {
     screen: spread ? px((canvas - spreadGap) / (2 * zoom)) : data.viewport ? px(width) : '100%', zoom,
-    family: fonts[tokens.font].css, size: px(tokens.size), leading: tokens.leading,
+    family: fonts[tokens.font].css, features: fonts[tokens.font].features, size: px(tokens.size), leading: tokens.leading,
     tracking: `${tokens.tracking}em`, weight: tokens.weight, rail: px(tokens.rail),
     inset: px(tokens.inset), 'paragraph-gap': px(tokens.paragraph), 'media-gap': px(tokens.media),
     'title-size': px(tokens.title), 'title-leading': px(tokens.titleLeading),
-    'title-weight': tokens.titleWeight, 'title-gap': px(tokens.titleGap),
+    'title-weight': tokens.titleWeight, 'title-tracking': `${tokens.titleTracking}em`, 'title-gap': px(tokens.titleGap),
     'section-size': px(tokens.section), 'section-leading': px(tokens.sectionLeading),
     'section-tracking': `${tokens.sectionTracking}em`, 'section-weight': tokens.sectionWeight,
-    'section-before': px(tokens.sectionBefore), 'section-after': px(tokens.sectionAfter),
+    lede: px(tokens.lede ?? tokens.section), 'section-before': px(tokens.sectionBefore), 'section-after': px(tokens.sectionAfter),
   };
   for (const [name, value] of Object.entries(cssProperties)) preview.style.setProperty(`--${name}`, value);
   if (spread) {
@@ -380,6 +400,9 @@ function applyStyle(panel) {
     if (field !== 'font') output.value = Number(tokens[field].toFixed(3)) + fields[field][4];
   }
   node.querySelector('.panel-theme').textContent = theme.label;
+  for (const button of node.querySelectorAll('.seg button')) {
+    button.setAttribute('aria-pressed', String(button.value === String(data[button.parentElement.dataset.seg])));
+  }
   properties.querySelector('.rationale').textContent = theme.rationale;
   properties.querySelector('.reference').href = theme.source;
 }
@@ -396,12 +419,35 @@ function renderArticle(panel) {
   preview.querySelector('.story-kind').textContent = sample.kind;
   preview.querySelector('.story-title').textContent = sample.title;
   preview.querySelector('.story-intro').textContent = sample.intro;
+  preview.querySelector('.story-intro').hidden = !sample.intro;
+  preview.querySelector('.related-list').replaceChildren(...samples.map(item => {
+    const row = document.createElement('div');
+    row.className = 'related-item';
+    const image = new Image();
+    image.alt = '';
+    image.src = item.hero || samples.find(other => other.hero).hero;
+    const text = document.createElement('div');
+    for (const [name, value] of [['kind', item.kind], ['title', item.title], ['date', '2026年11月26日']]) {
+      const line = document.createElement('p');
+      line.className = `related-${name}`;
+      line.textContent = value;
+      text.append(line);
+    }
+    row.append(image, text);
+    return row;
+  }));
   const hero = preview.querySelector('.story-hero');
   hero.hidden = !sample.hero;
   if (sample.hero) hero.querySelector('img').src = sample.hero;
   const body = preview.querySelector('.story-body');
   // These snapshots are shipped with the app and reduced to editorial markup.
   body.innerHTML = sample.body;
+  for (const node of [...body.childNodes]) {
+    if (node.nodeType !== Node.TEXT_NODE || !node.data.trim()) continue;
+    const line = document.createElement('p');
+    node.replaceWith(line);
+    line.append(node);
+  }
   for (const image of body.querySelectorAll('img')) image.loading = 'eager';
   for (const table of body.querySelectorAll('table')) {
     const wrap = document.createElement('div');
@@ -412,6 +458,12 @@ function renderArticle(panel) {
     table.replaceWith(wrap);
     wrap.append(table);
   }
+  preview.style.setProperty('--hero', sample.hero ? `url("${new URL(sample.hero, location.href)}")` : 'none');
+  preview.querySelector('.toc').replaceChildren(...[...body.querySelectorAll(':scope > h2')].slice(0, 6).map(heading => {
+    const item = document.createElement('li');
+    item.textContent = heading.textContent;
+    return item;
+  }));
   const token = ++panel.articleToken;
   panel.maxOffset = 0;
   scroll.scrollTop = 0;
@@ -497,7 +549,7 @@ async function start() {
   $('#sample').addEventListener('change', event => {
     state.sample = event.target.value;
     $('#original').href = currentSample().source;
-    panels.forEach(renderArticle);
+    panels.forEach(panel => { renderArticle(panel); applyStyle(panel); });
     saveLocal();
   });
   $('#count').addEventListener('change', event => {
@@ -517,7 +569,7 @@ async function start() {
     link.download = 'noe-design-catalog.json';
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    message('比較設定とメモをJSONに保存したで。');
+    message('比較設定とメモをJSONに保存しました。');
   });
   $('#import').addEventListener('click', () => $('#file').click());
   $('#file').addEventListener('change', async event => {

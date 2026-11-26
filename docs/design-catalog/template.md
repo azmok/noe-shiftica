@@ -12,6 +12,8 @@ Pick a listing and several detail pages with different content structures. Inclu
 
 ## Extract the roles
 
+Measure the live page with its own webfonts loaded. Compare glyph advance widths before choosing a substitute font, then verify line breaks with the same text on both pages. The steps are in the [reproduction guide](reproduction-guide.md).
+
 Inspect the rendered element, its parent, and the neighboring block. Start with viewport widths representative of desktop, tablet in both orientations, and phone. Add measurements on either side of any breakpoint that changes the hierarchy. Wait for fonts and content to settle. For client-rendered areas, capture the populated view or mark the result as a stylesheet probe.
 
 | Role and selector | Viewport | Family and rendered font | Size / leading / weight / tracking | Width and spacing | Color or surface |

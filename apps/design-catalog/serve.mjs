@@ -12,6 +12,7 @@ const types = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.webp': 'image/webp',
+  '.png': 'image/png',
 };
 
 createServer(async (request, response) => {
@@ -21,7 +22,7 @@ createServer(async (request, response) => {
   }
   try {
     const route = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const file = resolve(root, route === '/' ? 'index.html' : '.' + route);
+    const file = resolve(root, '.' + (route.endsWith('/') ? `${route}index.html` : route));
     const type = types[extname(file)];
     if (!file.startsWith(rootPath) || !type || file === resolve(root, 'serve.mjs')) {
       response.writeHead(404).end();
@@ -30,7 +31,7 @@ createServer(async (request, response) => {
     const content = await readFile(file);
     response.writeHead(200, {
       'Content-Type': type,
-      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'",
+      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com; base-uri 'none'; object-src 'none'; frame-ancestors 'self'",
       'Cache-Control': 'no-store',
     });
     response.end(request.method === 'HEAD' ? undefined : content);

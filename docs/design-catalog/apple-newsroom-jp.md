@@ -1,5 +1,7 @@
 # Apple Newsroom Japan
 
+> **2026-11-26 correction.** This audit was made without the site's webfonts. Measured live, the Japanese glyphs advance about 86% of the font size, so the 653px rail holds roughly 40 to 43 characters, not 34. See the [reproduction guide](reproduction-guide.md) and [tokens.json](tokens.json) for the current values.
+
 Audited November 25, 2026. Scope includes the [Newsroom homepage](https://www.apple.com/jp/newsroom/), the [Store News](https://www.apple.com/jp/newsroom/topics/store-news/), [Company News](https://www.apple.com/jp/newsroom/topics/company-news/), and [Apple Stories](https://www.apple.com/jp/newsroom/apple-stories/) listings, plus 11 distinct article pages. Measurements use Windows Chromium at 1440, 1024, 768, and 390 CSS px, at default zoom with `lang="ja-JP"`. Article and topic measurements use downloaded HTML and its Newsroom CSS. The homepage loads its feed with JavaScript, so homepage card values are computed from minimal class probes using its published stylesheets. Apple webfonts, imagery, and JavaScript were excluded from the offline run. Font families below describe the declared CSS stack. Image measurements describe box widths and margins.
 
 ## Article type and spacing
