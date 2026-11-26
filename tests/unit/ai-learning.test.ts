@@ -156,6 +156,16 @@ describe('ai-learning push', () => {
     expect(readFileSync(path.join(data, 'common/lessons.md'), 'utf8')).toBe('承認待ちの教訓\n') // 手元からは消さない
   })
 
+  it('すでにあるファイルの書き換え（新規ではない）も、名前を欠かさずに反映する', () => {
+    write('projects/demo/handoff/tasks.md', '- [ ] a\n')
+    run(['push'])
+    write('projects/demo/handoff/tasks.md', '- [x] a\n')
+    const result = run(['push'])
+    expect(result.status).toBe(0)
+    expect(result.out).toContain('main に反映した: projects/demo/handoff/tasks.md')
+    expect(git(origin, 'show', 'main:projects/demo/handoff/tasks.md')).toBe('- [x] a')
+  })
+
   it('ほかのセッションが先に push していても、取り込んでから反映する', () => {
     const other = path.join(tmp, 'other')
     git(tmp, 'clone', origin, other)
