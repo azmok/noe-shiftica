@@ -123,7 +123,18 @@ function sync() {
 const isFree = (file) => /^projects\/[^/]+\/handoff\//.test(file) || /^mistakes\//.test(file)
 
 function changedFiles(dir) {
-  const out = tryGit(dir, 'status', '--porcelain', '-z', '--untracked-files=all') || ''
+  // 行頭の空白（" M" = 変更）に意味があるので、git() のように前後を削らずに読む
+  let out = ''
+  try {
+    out = execFileSync('git', ['status', '--porcelain', '-z', '--untracked-files=all'], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 60_000,
+    })
+  } catch {
+    return []
+  }
   const files = []
   const parts = out.split('\0').filter(Boolean)
   for (let i = 0; i < parts.length; i++) {
