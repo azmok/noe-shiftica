@@ -7,8 +7,8 @@
 # documentation-level "please don't touch" rule into a hard requirement.
 #
 # Source of truth for the protected list:
-#   AGENTS.md "Protected files" == .antigravity/rules.md §4-B.
-# NOTE: .antigravity/notouch.md currently holds a SCOPE-LOCK *template*
+#   AGENTS.md "Protected files" == ai-brains projects/noe-shiftica/rules/rules.md §4-B.
+# NOTE: ai-brains projects/noe-shiftica/rules/notouch.md holds a SCOPE-LOCK *template*
 #       (TASK / SURGICAL SCOPE / FORBIDDEN ACTIONS), NOT a parseable file
 #       list, so the canonical list is hardcoded below. Keep it in sync with
 #       AGENTS.md if the protected set changes.
@@ -63,7 +63,7 @@ if [ -n "$violations" ]; then
   printf '%s' "$violations"
   echo "------------------------------------------------------------------"
   echo "  These files require EXPLICIT human approval"
-  echo "  (AGENTS.md \"Protected files\" / .antigravity/rules.md 4-B)."
+  echo "  (AGENTS.md \"Protected files\" / ai-brains rules/rules.md 4-B)."
   echo ""
   echo "  AI AGENTS: do NOT bypass. Unstage and stop, e.g."
   echo "      git restore --staged <file>"

@@ -1,7 +1,7 @@
 # Pre-commit guardrails for noe-shiftica (mechanical enforcement layer).
 #
-# WHY: turn the documentation-level rules (AGENTS.md / .antigravity/rules.md /
-#      .antigravity/GUARDRAILS.md) into hard, commit-time requirements so fast
+# WHY: turn the documentation-level rules (AGENTS.md / ai-brains rules/rules.md /
+#      Signs in ai-brains memory.db) into hard, commit-time requirements so fast
 #      agents cannot silently (1) leak secrets or (2) edit protected core files.
 #
 # Setup is performed by a human (Azuma) — see the install steps in chat / README.

@@ -9,15 +9,16 @@
 > `~/.gemini/AGENTS.md`) and project `AGENTS.md`. This file holds only Azuma's
 > standing shortcuts that override those defaults.
 
-> **Before starting any task, MUST recall the pre-task Signs** — they now live as
-> `type='sign'` events in `.antigravity/memory.db` (readable mirror:
-> `.antigravity/memory/signs.md`). Recall with
-> `uv run .antigravity/db/query.py "<what you're about to do>" --type sign`.
+> **Before starting any task, MUST recall the pre-task Signs** — they live as
+> `type='sign'` events in `../ai-brains/projects/noe-shiftica/memory/memory.db` (readable mirror:
+> `../ai-brains/projects/noe-shiftica/memory/mirror/signs.md`). Recall with
+> `uv run ../ai-brains/projects/noe-shiftica/memory/db/query.py "<what you're about to do>" --type sign`.
 > If you hit the **same error twice**, stop trial-and-error and re-read the Signs
 > + the original instruction before retrying (original instruction + Signs win over the latest failure log).
-> Memory layer contract: `.antigravity/memory-schema.md`.
+> Memory layer contract: `../ai-brains/projects/noe-shiftica/memory/memory-schema.md`.
+> （2026-11-26 に `.antigravity/` の中身は ai-brains の `projects/noe-shiftica/` へ移した。`.antigravity/` に残るのはバックアップ用の設定とパスワードだけ。）
 
-> **AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開の `azmok/ai-brains` にある**（クラウドなら `../ai-brains`、手元の PC なら `ai-brains/`）。Claude Code では SessionStart フックが `node scripts/ai-learning.mjs sync` を実行し、教訓と引き継ぎ（`projects/noe-shiftica/handoff/tasks.md`）を表示する。続けて `decisions.md` と `log/` の最新月の末尾を読む。作業を終えるときは `log/` に追記し、`tasks.md` を直す（書き方は ai-brains の `common/handoff.md`）。詳しくは AGENTS.md の「AI 共通の脳」。設計の質問は、ai-brains の `projects/noe-shiftica/design-map/index.html` を見て、実物と照らしてから答える。
+> **AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開の `azmok/ai-brains` にある**（クラウドも手元の PC も `../ai-brains`。無いときだけ `sync` が `ai-brains/` にクローンする）。Claude Code では SessionStart フックが `node scripts/ai-learning.mjs sync` を実行し、教訓と引き継ぎ（`projects/noe-shiftica/handoff/tasks.md`）を表示する。続けて `decisions.md` と `log/` の最新月の末尾を読む。作業を終えるときは `log/` に追記し、`tasks.md` を直す（書き方は ai-brains の `common/handoff.md`）。詳しくは AGENTS.md の「AI 共通の脳」。設計の質問は、ai-brains の `projects/noe-shiftica/design-map/index.html` を見て、実物と照らしてから答える。
 
 ## Standing instructions (Azuma)
 - **説明はかみ砕く**（あずまの指示 2026-11-25）：結論を最初に1〜2文。あずまがやることは番号付き（なければ「やることなし」）。専門用語は避け、使うならその場で言い換える。1文は短く、聞かれてない細部や長い表は出さない。質問は一度に1〜2個まで。ただし失敗・未確認・危険なことは省かない。
@@ -52,11 +53,11 @@ Windows 環境＋複数エージェントで作業するため、ソースに **
 “静かな文字化け事故”が起きうる（実例: `TagsField.tsx` が NUL 237個で `Bin` blob 化）。
 - ソース編集後は **UTF-8・NUL 0** を確認: `file FILE` が `UTF-8 text`／`tr -d '\000' < FILE | wc -c == wc -c < FILE`。
 - git diff で **text ファイルが `Bin …` や `0 insertions/0 deletions`** になってたら blob 破損を疑う。
-- 直すときは部分パッチでなく**全文をクリーン UTF-8 で書き直す**。詳細は `.antigravity/rules.md` 冒頭 IMPORTANT。
+- 直すときは部分パッチでなく**全文をクリーン UTF-8 で書き直す**。詳細は `../ai-brains/projects/noe-shiftica/rules/rules.md` 冒頭 IMPORTANT。
 
 ## Payload Admin カスタム Field の必読ナレッジ（実装前に必ず読む）
 Payload v3 の `admin.components.Field` で UI フィールドを自作するときは、先に
-`.antigravity/knowledge/backend/admin-ui/custom-field-keyboard-and-shared-json.md` を読むこと。
+下の2つの罠を読むこと（元の詳しいメモ `.antigravity/knowledge/...` は、2026-11-26 時点で見当たらない）。
 気づきにくい既知の罠が2つある：
 - **罠1: `<input>` の Enter が React `onKeyDown` では効かない/ログも出ない** → 編集画面全体が `<form>` で
   Enter を先に横取りされるため。対策＝input の DOM に **capture フェーズ**でネイティブ keydown を張り、
