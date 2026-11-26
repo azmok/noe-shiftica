@@ -42,7 +42,7 @@ AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開�
 - 次に ai-brains の `common/rules.md`（共通ルール）を読み、それに従う。引き継ぎ・ミスの記録（`record --scope`）・教訓の置き場所は、そこに書いてある。
 - 取得できなければ黙って進めず、あずまに伝える。
 - このプロジェクトの引き継ぎは `projects/noe-shiftica/handoff/`、設計マップは `projects/noe-shiftica/design-map/index.html`。
-- `handoff/` と `mistakes/` の変更は、Claude Code では Stop フック（`node scripts/ai-learning.mjs push`）が自動で main に反映する。ほかの AI は、終わるときに自分で `push` を実行する。それ以外の変更は、作業ブランチ → プルリクエストで、あずまの承認を待つ。
+- `handoff/`・`memory/`・`mistakes/` の変更は、Claude Code では Stop フック（`node scripts/ai-learning.mjs push`）が自動で main に反映する。ほかの AI は、終わるときに自分で `push` を実行する。それ以外の変更は、作業ブランチ → プルリクエストにする（マージは、Claude Code は自分の判断でしてよい。ほかの AI はあずまの承認を待つ）。
 
 ## Protected files (editing requires explicit approval — HARD STOP)
 - src/collections/*
