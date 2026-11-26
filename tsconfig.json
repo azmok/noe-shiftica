@@ -44,6 +44,8 @@
   ],
   "exclude": [
     "node_modules",
+    "ai-brains",
+    ".ai",
     "functions",
     "NS_v3.1",
     "_sideprojects",

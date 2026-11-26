@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // AI 共通の脳（別リポジトリ。手元ではプロジェクトの中にクローンされる）
+    "ai-brains/**",
+    ".ai/**",
   ]),
 ]);
 

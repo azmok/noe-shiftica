@@ -31,27 +31,15 @@ before retrying (the original instruction + Signs win over your latest failure l
      `payload.config.ts` → `plugins` (that file is protected: get approval first).
   Check `ls src/plugins` and each plugin's `index.ts` / README before deciding where a change goes.
 
-## 引き継ぎ（すべての AI・すべての端末で共通）
-あずまが同じ指示や説明を何度もしなくていいように、AI どうしはファイルで仕事を引き継ぐ。
-置き場所は非公開リポジトリ `azmok/noe-shiftica-ais-self-learning` の `docs/handoff/`。設計目的と書き方は、そこの `README.md`。
-- 始めに `node scripts/ai-learning.mjs sync` を実行する。`tasks.md`（今の状態・タスク・あずま待ち）が表示される。続けて `decisions.md`（あずまの決定事項）と `log/` の最新月の末尾を読む。
-- 取得できなければ黙って進めず、あずまに伝える（クラウドなら、セッションに学習リポジトリが入っていない可能性が高い）。
-- `decisions.md` に書いてあることを、あずまにもう一度聞かない。
-- 終わるときは、`log/YYYY-MM.md` に1件追記する（やったこと・気になったこと）。`tasks.md` の該当行を直す。あずまが何か決めたら `decisions.md` に1行足す。
-- `docs/handoff/` の変更は、作業ブランチ → プルリクエスト → main へ、AI の判断でマージしてよい（あずま承認 2026-11-26）。
-
-## AIのミスから学ぶループ（ローカル・クラウド共通）
-記録は非公開リポジトリ `azmok/noe-shiftica-ais-self-learning` に置く。このリポジトリは公開なので、失敗の記録や教訓を置かない。
-- 作業を始める前に `node scripts/ai-learning.mjs sync` を実行し、表示された lessons に従う。失敗したら黙って進めず、あずまに伝える。
-- ミスをしたら1件記録する。先に `node scripts/ai-learning.mjs classes` を見て、同じ種類なら同じ分類名を使う。
-  `node scripts/ai-learning.mjs record --class <分類> --what "何が起きたか" --cause "原因" --fix "対策"`
-- 秘密情報、個人情報、生のログは書かない。
-- 同じ種類のミスが2回目なら、作業を一度止めてあずまに報告し、防ぐ仕組みを提案する。
-  優先順位：①テストか lint ②hook ③スキル ④`lessons.md` への1行追記（機械で判定できない場合だけ）
-- あずまが承認するまで、提案した仕組みは実装しない。①〜③を実装したら、学習リポジトリの `automated.md` に追記する。
-- 資料の置き場所：公開してよいものは `docs/`、AI運用・バックアップ・弱点・引き継ぎなど公開しないものは学習リポジトリの `docs/`。
-- 学習リポジトリで自動 commit / push してよいのは、クラウドでの `mistakes/` の追加だけ（作業ブランチ限定。あずま承認済み 2026-11-25）。
-  `lessons.md` と `automated.md` の変更、main への取り込みは、あずまの承認が要る。
+## AI 共通の脳（ai-brains）— すべての AI・すべての端末で共通
+AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開リポジトリ `azmok/ai-brains` にまとめてある（2026-11-26 に `noe-shiftica-ais-self-learning` から改名）。
+このリポジトリは公開なので、失敗の記録・教訓・引き継ぎは置かない。全体の設計は ai-brains の `README.md`。
+- **始めに** `node scripts/ai-learning.mjs sync` を実行する。手元の PC では、無ければプロジェクトの中の `ai-brains/` にクローンする（クラウドはセッションに `azmok/ai-brains` を入れる。`../ai-brains` に置かれる）。
+  共通・技術・このプロジェクトの教訓と、引き継ぎの `tasks.md` が表示される。
+- 次に ai-brains の `common/rules.md`（共通ルール）を読み、それに従う。引き継ぎ・ミスの記録（`record --scope`）・教訓の置き場所は、そこに書いてある。
+- 取得できなければ黙って進めず、あずまに伝える。
+- このプロジェクトの引き継ぎは `projects/noe-shiftica/handoff/`、設計マップは `projects/noe-shiftica/design-map/index.html`。
+- `handoff/` と `mistakes/` の変更は、Claude Code では Stop フック（`node scripts/ai-learning.mjs push`）が自動で main に反映する。ほかの AI は、終わるときに自分で `push` を実行する。それ以外の変更は、作業ブランチ → プルリクエストで、あずまの承認を待つ。
 
 ## Protected files (editing requires explicit approval — HARD STOP)
 - src/collections/*
