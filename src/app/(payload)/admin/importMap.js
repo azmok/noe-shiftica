@@ -49,6 +49,7 @@ import { ApiEndpointGuide as ApiEndpointGuide_125f1c5d5dc04998c19f20c7335a6325 }
 import { TokenField as TokenField_471d4e9d7b8fc5678129ceb32bae45bd } from '@/plugins/markdownPostManager/manager/TokenField'
 import { PasskeyLoginButton as PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5 } from '@/components/admin/PasskeyLoginButton'
 import { NavLink as NavLink_d83026ee864eb0ea147e17bd51c1c061 } from '@/plugins/markdownPostManager/manager/NavLink'
+import { DashboardCard as DashboardCard_efd9a6222b51a23ae390e16de1d261da } from '@/plugins/markdownPostManager/manager/DashboardCard'
 import { ImageCompressionProvider as ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc } from '@/components/admin/ImageCompressionProvider'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { PanelResizerProvider as PanelResizerProvider_e663389a985a61c76b0f3ac628630696 } from '@/plugins/panelResizer/Provider'
@@ -108,6 +109,7 @@ export const importMap = {
   "@/plugins/markdownPostManager/manager/TokenField#TokenField": TokenField_471d4e9d7b8fc5678129ceb32bae45bd,
   "@/components/admin/PasskeyLoginButton#PasskeyLoginButton": PasskeyLoginButton_d7a1b4b0077cb667ecf280d863b00ba5,
   "@/plugins/markdownPostManager/manager/NavLink#NavLink": NavLink_d83026ee864eb0ea147e17bd51c1c061,
+  "@/plugins/markdownPostManager/manager/DashboardCard#DashboardCard": DashboardCard_efd9a6222b51a23ae390e16de1d261da,
   "@/components/admin/ImageCompressionProvider#ImageCompressionProvider": ImageCompressionProvider_c34b7dbb3c2c11e547e0da439e2c7bbc,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@/plugins/panelResizer/Provider#PanelResizerProvider": PanelResizerProvider_e663389a985a61c76b0f3ac628630696,
