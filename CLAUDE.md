@@ -16,7 +16,7 @@
 > + the original instruction before retrying (original instruction + Signs win over the latest failure log).
 > Memory layer contract: `.antigravity/memory-schema.md`.
 
-> **新しいセッションは最初に、非公開の学習リポジトリ（場所は `node scripts/ai-learning.mjs sync` で表示）の `docs/HANDOFF.md`（引き継ぎメモ：進行中の作業・未解決の問題・次にやること）を読む。** 作業を終えるときは更新する（学習リポジトリの作業ブランチで。main への取り込みはあずまの承認）。設計の質問は、同じ場所の `docs/design-map/index.html` を見て、実物と照らしてから答える。
+> **新しいセッションは最初に `node scripts/ai-learning.mjs sync` を実行し、表示される引き継ぎ（非公開の学習リポジトリの `docs/handoff/`：今の状態・タスク・決定事項・時系列）を読む。** 作業を終えるときは `docs/handoff/log/` に追記し、`tasks.md` を直す（書き方と設計目的は `docs/handoff/README.md`。`docs/handoff/` の変更は AI の判断で main にマージしてよい）。詳しいルールは AGENTS.md の「引き継ぎ」。設計の質問は、同じ場所の `docs/design-map/index.html` を見て、実物と照らしてから答える。
 
 ## Standing instructions (Azuma)
 - **説明はかみ砕く**（あずまの指示 2026-11-25）：結論を最初に1〜2文。あずまがやることは番号付き（なければ「やることなし」）。専門用語は避け、使うならその場で言い換える。1文は短く、聞かれてない細部や長い表は出さない。質問は一度に1〜2個まで。ただし失敗・未確認・危険なことは省かない。

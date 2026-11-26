@@ -8,7 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
@@ -108,6 +108,23 @@ describe('ai-learning record', () => {
     const result = record('Bad Class')
     expect(result.status).toBe(1)
     expect(existsSync(path.join(data, 'mistakes'))).toBe(false)
+  })
+})
+
+describe('ai-learning sync', () => {
+  it('引き継ぎの tasks.md があれば、中身と次に読むものを表示する', () => {
+    mkdirSync(path.join(data, 'docs', 'handoff'), { recursive: true })
+    writeFileSync(path.join(data, 'docs', 'handoff', 'tasks.md'), '# タスク\n\n- [ ] 次にやること\n', 'utf8')
+    const result = run(['sync'])
+    expect(result.status).toBe(0)
+    expect(result.out).toContain('- [ ] 次にやること')
+    expect(result.out).toContain('decisions.md')
+  })
+
+  it('tasks.md が無くても失敗せず、無いことを伝える', () => {
+    const result = run(['sync'])
+    expect(result.status).toBe(0)
+    expect(result.out).toContain('docs/handoff/tasks.md）はまだない')
   })
 })
 
