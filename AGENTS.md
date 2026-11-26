@@ -7,12 +7,15 @@ The universal workflow (Startup Protocol / HARD STOP / Learning Loop / Coder–T
 loop / Post-Edit Self-Check) lives in global `~/.gemini/AGENTS.md`. **Read it at startup.**
 
 ## Files to ALWAYS read at startup (before touching anything)
-- `.antigravity/rules.md`          ← project master constraints. MUST read FIRST.
-- `.antigravity/memory-schema.md`  ← unified memory-layer contract (how recall/write works).
-- `.antigravity/notouch.md` / `.antigravity/sessions.md`
-- **Pre-task Signs, bugs, knowledge and risks** now live in `.antigravity/memory.db`
-  (readable mirror under `.antigravity/memory/`). Recall the relevant Signs before
-  a task: `uv run .antigravity/db/query.py "<what you're about to do>" --type sign`.
+Project rules and memory live in the private `azmok/ai-brains` repo, next to this
+project (`../ai-brains`), under `projects/noe-shiftica/` (moved from `.antigravity/` on 2026-11-26).
+- `../ai-brains/projects/noe-shiftica/rules/rules.md`          ← project master constraints. MUST read FIRST.
+- `../ai-brains/projects/noe-shiftica/memory/memory-schema.md` ← unified memory-layer contract (how recall/write works).
+- `../ai-brains/projects/noe-shiftica/rules/notouch.md` / handoff: `../ai-brains/projects/noe-shiftica/handoff/tasks.md`, `decisions.md`, latest `log/YYYY-MM.md`
+- **Pre-task Signs, bugs, knowledge and risks** live in `../ai-brains/projects/noe-shiftica/memory/memory.db`
+  (readable mirror under `../ai-brains/projects/noe-shiftica/memory/mirror/`). Recall the relevant Signs before
+  a task: `uv run ../ai-brains/projects/noe-shiftica/memory/db/query.py "<what you're about to do>" --type sign`.
+- `.antigravity/` now only holds the local backup config and password. Do not add memory there.
 
 **Two-strike rule**: if you hit the *same* error twice, STOP trial-and-error and
 re-read the relevant Signs (`query.py --type sign`) + the original instruction
