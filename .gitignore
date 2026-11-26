@@ -1,48 +1,91 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ============================================================
+# Noe Shiftica — Git Ignore Configuration
+# ============================================================
+#
+# Policy:
+#   Public  : Source code, architecture, documentation,
+#             AI instructions, skills, CI/CD workflows.
+#
+#   Private : Credentials, local configurations, AI sessions,
+#             personal data, runtime data, and backups.
+#
+# Reference:
+# https://git-scm.com/docs/gitignore
+#
+# ============================================================
 
-# dependencies
-/node_modules
+
+# ============================================================
+# 01. Dependencies
+# ============================================================
+
+node_modules/
 /.pnp
 .pnp.*
+
 .yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/versions/
 
-# testing
-/coverage
 
-# next.js
+# ============================================================
+# 02. Testing & Coverage
+# ============================================================
+
+/coverage/
+/playwright-report/
+/test-results/
+/.nyc_output/
+
+
+# ============================================================
+# 03. Next.js & Build Artifacts
+# ============================================================
+
 /.next/
 /out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
+/build/
+/dist/
+.turbo/
 *.tsbuildinfo
 next-env.d.ts
 
-# keys for GCS / Service Accounts
-noe-shiftica-*.json
-# Firebase App Hosting operation files (may contain secrets)
+
+# ============================================================
+# 04. Environment Variables
+# ============================================================
+
+.env
+.env.*
+
+# Public environment templates
+!.env.example
+!.env.test.example
+!.env.development.example
+!.env.production.example
+!.env.local.example
+
+
+# ============================================================
+# 05. Cloud & Hosting Platforms
+# ============================================================
+
+# Vercel
+.vercel/
+
+# Netlify
+.netlify/
+
+# Firebase
+.firebase/
+firebase-debug.log*
+firebase-debug.*.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Firebase App Hosting operation files
 *_backends.json
 backends.json
 apphosting_backends.json
@@ -50,33 +93,310 @@ apphosting_backends.json
 rollouts.json
 apphosting_rollouts.json
 
-# Service account / credential JSON files
+# Neon
+.neon/
+
+
+# ============================================================
+# 06. Credentials & Service Accounts
+# ============================================================
+
+# Google Cloud / GCS
+noe-shiftica-*.json
+
+# Service account credentials
 *-adminsdk*.json
 service-account*.json
 *-credentials.json
 firebase-admin*.json
 
+credentials.json
+credentials.local.json
+oauth_creds.json
+auth.json
+
+# Secret files
+secret.txt
+secrets.json
+secrets.local.json
+secrets/
+.secrets/
+
 # Private keys and certificates
+*.pem
 *.key
 *.p12
 *.pfx
 *.cert
 *.crt
 
-# Debug / build log snapshots
+# Package manager credentials
+.npmrc.local
+.pypirc
+
+# SSH credentials
+id_rsa
+id_ed25519
+
+
+# ============================================================
+# 07. Claude Code
+# ============================================================
+
+# Public files intentionally tracked:
+# CLAUDE.md
+# .claude/settings.json
+# .claude/skills/
+# .claude/agents/
+# .claude/commands/
+# .claude/rules/
+
+# Local configuration
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/**/*.local.json
+.claude/**/*.local.md
+
+# Private runtime data
+.claude/sessions/
+.claude/projects/
+.claude/history/
+.claude/memory/
+.claude/debug/
+.claude/cache/
+.claude/logs/
+.claude/plans/
+.claude/tasks/
+.claude/todos/
+.claude/transcripts/
+.claude/worktrees/
+.claude/file-history/
+.claude/shell-snapshots/
+.claude/session-env/
+.claude/telemetry/
+.claude/statsig/
+.claude/plugins/
+
+# History & credentials
+.claude/history.jsonl
+.claude/.credentials.json
+.claude.json
+.claude.json.backup
+
+
+# ============================================================
+# 08. OpenAI Codex
+# ============================================================
+
+# Public files intentionally tracked:
+# AGENTS.md
+# .agents/skills/
+
+# Local instructions
+AGENTS.override.md
+
+# Private configuration
+.codex/config.toml
+.codex/auth.json
+.codex/.env
+
+# Runtime data
+.codex/sessions/
+.codex/archived_sessions/
+.codex/history/
+.codex/history.jsonl
+.codex/log/
+.codex/logs/
+.codex/cache/
+.codex/tmp/
+.codex/memories/
+.codex/shell_snapshots/
+.codex/state/
+.codex/*.sqlite
+.codex/*.sqlite-*
+
+
+# ============================================================
+# 09. Google Gemini CLI
+# ============================================================
+
+# Public files intentionally tracked:
+# GEMINI.md
+# .gemini/commands/
+# .gemini/skills/
+
+# Local configuration
+.gemini/settings.json
+.gemini/.env
+.gemini/oauth_creds.json
+.gemini/google_accounts.json
+
+# Private runtime data
+.gemini/tmp/
+.gemini/cache/
+.gemini/sessions/
+.gemini/history/
+.gemini/memory/
+.gemini/logs/
+.gemini/checkpoints/
+
+
+# ============================================================
+# 10. MCP — Model Context Protocol
+# ============================================================
+
+# Private connection configurations
+.mcp.json
+.mcp.local.json
+.mcp/
+mcp.local.json
+
+# Public configuration template
+!.mcp.example.json
+
+
+# ============================================================
+# 11. Other AI Development Tools
+# ============================================================
+
+# Cursor
+.cursor/memory/
+.cursor/cache/
+.cursor/sessions/
+.cursor/logs/
+.cursor/mcp.json
+
+# Windsurf
+.windsurf/memory/
+.windsurf/memories/
+.windsurf/cache/
+.windsurf/sessions/
+.windsurf/logs/
+
+# Aider
+.aider*
+!.aider.conf.example.yml
+
+# Generic AI runtime data
+.ai-cache/
+.ai-sessions/
+.ai-history/
+.ai-memory/
+.ai-private/
+
+# Private AI development documentation
+docs/private/
+docs/sessions/
+docs/handoff-private/
+
+# Local-only instructions and notes
+*.private.md
+*.local.md
+
+
+# ============================================================
+# 12. Database & Local Storage
+# ============================================================
+
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+
+/dumps/
+/db-dumps/
+/database-backups/
+
+
+# ============================================================
+# 13. Debug & Log Files
+# ============================================================
+
+*.log
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
 build_error*.json
 build_error*.txt
 logs.json
 lexical-test.json
 
-# Neon CLI config
-.neon
+/logs/
+/debug/
+/tmp/
+/temp/
+/.cache/
 
-# Secret text files
-secret.txt
 
-# Backup system
-backup-staging/
-.github/*
-_sideprojects/*
+# ============================================================
+# 14. IDE & Editor Configuration
+# ============================================================
+
 .vscode/
+.idea/
+.history/
+
+*.swp
+*.swo
+*~
+
+
+# ============================================================
+# 15. Operating System Files
+# ============================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+
+# ============================================================
+# 16. Backups & Temporary Projects
+# ============================================================
+
+backup-staging/
+/backups/
+/backup/
+_sideprojects/
+
+*.bak
+*.backup
+*.tmp
+*.orig
+
+
+# ============================================================
+# 17. GitHub — Public Development Workflows
+# ============================================================
+
+# GitHub Actions, issue templates, pull request templates,
+# and Copilot instructions are intentionally tracked.
+#
+# .github/workflows/
+# .github/ISSUE_TEMPLATE/
+# .github/PULL_REQUEST_TEMPLATE.md
+# .github/copilot-instructions.md
+
+# Private GitHub-related files
+.github/private/
+.github/secrets/
+.github/**/*.local.json
+.github/**/*.local.yml
+.github/**/*.local.yaml
+.github/**/*.local.md
+
+
+# ============================================================
+# End of Configuration
+# ============================================================
