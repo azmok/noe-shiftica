@@ -867,7 +867,8 @@
     if (editing) commitEdit()
     var anchor = state.path ? currentLine() : 0
     state.view = v; remember('view', v)
-    document.body.classList.remove('view-preview', 'view-split', 'view-md'); document.body.classList.add('view-' + v)
+    // 表示の印は1つだけにする（view-diff を外し忘れると、差分のあとプレビューに戻れず、別の記事も古い差分の下に隠れていた）
+    document.body.classList.remove('view-preview', 'view-split', 'view-md', 'view-diff'); document.body.classList.add('view-' + v)
     document.querySelectorAll('#view button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v) })
     if (v !== 'preview' && state.mode === 'style') setMode('style')
     setTimeout(function () { fitStage(false); buildMirror(); if (state.path) scrollToLine(anchor) }, 0)
