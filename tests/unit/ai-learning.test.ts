@@ -4,7 +4,7 @@
  * ai-brains（AI 共通の脳）の入口スクリプトの動きを固定する。
  * - record：同じ分類で2回目になったら作業を止めて報告する／範囲（scope）を書く／main に反映する
  * - sync：教訓と引き継ぎを表示する
- * - push：handoff/ と mistakes/ だけを main に反映し、それ以外は残して知らせる
+ * - push：handoff/・memory/・mistakes/ だけを main に反映し、それ以外は残して知らせる
  * スクリプトは import しただけで動くため、サブプロセスとして呼ぶ。
  * ai-brains の代わりに、一時ディレクトリに作った本物の git リポジトリ（origin は手元の bare）を使う。
  */
@@ -144,14 +144,19 @@ describe('ai-learning push', () => {
     expect(result.out).toBe('')
   })
 
-  it('handoff/ と mistakes/ は main に反映し、それ以外は残して知らせる', () => {
+  it('handoff/・memory/ と mistakes/ は main に反映し、それ以外は残して知らせる', () => {
     write('projects/demo/handoff/log/2026-11.md', '### やったこと\n')
+    write('projects/demo/memory/mirror/signs.md', '# Signs\n')
+    write('projects/demo/rules/rules.md', '承認待ちのルール\n')
     write('common/lessons.md', '承認待ちの教訓\n')
     const result = run(['push'])
     expect(result.status).toBe(0)
-    expect(result.out).toContain('main に反映した: projects/demo/handoff/log/2026-11.md')
+    expect(result.out).toContain('projects/demo/handoff/log/2026-11.md')
+    expect(result.out).toContain('projects/demo/memory/mirror/signs.md')
     expect(result.out).toContain('あずまの承認が要る変更が残っている')
     expect(onMain('projects/demo/handoff/log/2026-11.md')).toBe(true)
+    expect(onMain('projects/demo/memory/mirror/signs.md')).toBe(true)
+    expect(onMain('projects/demo/rules/rules.md')).toBe(false)
     expect(onMain('common/lessons.md')).toBe(false)
     expect(readFileSync(path.join(data, 'common/lessons.md'), 'utf8')).toBe('承認待ちの教訓\n') // 手元からは消さない
   })

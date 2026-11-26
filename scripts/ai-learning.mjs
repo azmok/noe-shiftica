@@ -2,7 +2,7 @@
 // AI 共通の脳（azmok/ai-brains）の入口。Windows / クラウド共通、依存なし。
 // 設計は ai-brains の README.md と common/rules.md。
 //   node scripts/ai-learning.mjs sync      … 無ければクローン、あれば最新にして、教訓と引き継ぎを表示（SessionStart フック）
-//   node scripts/ai-learning.mjs push      … handoff/ と mistakes/ の変更を main に反映（Stop フック）
+//   node scripts/ai-learning.mjs push      … handoff/・memory/・mistakes/ の変更を main に反映（Stop フック）
 //   node scripts/ai-learning.mjs classes   … ミスの分類ごとの件数
 //   node scripts/ai-learning.mjs record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..."
 import { execFileSync } from 'node:child_process'
@@ -119,8 +119,8 @@ function sync() {
 }
 
 // ---------------------------------------------------------------- push
-// AI が直接 main に反映してよい場所（あずま承認 2026-11-26）
-const isFree = (file) => /^projects\/[^/]+\/handoff\//.test(file) || /^mistakes\//.test(file)
+// AI が直接 main に反映してよい場所（あずま承認 2026-11-26。memory/ も同日に追加）
+const isFree = (file) => /^projects\/[^/]+\/(handoff|memory)\//.test(file) || /^mistakes\//.test(file)
 
 function changedFiles(dir) {
   // 行頭の空白（" M" = 変更）に意味があるので、git() のように前後を削らずに読む
@@ -145,7 +145,7 @@ function changedFiles(dir) {
   return files
 }
 
-// handoff/ と mistakes/ の変更だけを commit して main に push する。結果を文字列で返す（失敗は投げる）
+// handoff/・memory/・mistakes/ の変更だけを commit して main に push する。結果を文字列で返す（失敗は投げる）
 function publish(dir, files, message) {
   if (!files.length) return null
   const branch = branchOf(dir)
@@ -175,7 +175,7 @@ function push() {
   const free = files.filter(isFree)
   const others = files.filter((f) => !isFree(f))
   try {
-    const result = publish(dir, free, `ai-brains: ${projectName()} の引き継ぎ・ミスの記録（自動）`)
+    const result = publish(dir, free, `ai-brains: ${projectName()} の引き継ぎ・記憶・ミスの記録（自動）`)
     if (result) console.log(`ai-brains: ${result}`)
   } catch (error) {
     fail(`main に反映できなかった。\n${reason(error)}`)
