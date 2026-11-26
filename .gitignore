@@ -372,7 +372,9 @@ $RECYCLE.BIN/
 .gemini/
 GEMINI.md
 
-# 学習リポジトリ（非公開）の予備の置き場所
+# AI 共通の脳（非公開の azmok/ai-brains）。手元の PC では scripts/ai-learning.mjs がここにクローンする
+/ai-brains/
+# 旧名（学習リポジトリ）の予備の置き場所
 .ai/
 
 # Backup system
