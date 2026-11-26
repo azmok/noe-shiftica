@@ -124,6 +124,10 @@ export const markdownPostManager =
                 ...(config.admin?.components?.afterNavLinks ?? []),
                 '@/plugins/markdownPostManager/manager/NavLink#NavLink',
               ],
+              beforeDashboard: [
+                ...(config.admin?.components?.beforeDashboard ?? []),
+                '@/plugins/markdownPostManager/manager/DashboardCard#DashboardCard',
+              ],
             },
           },
         }),

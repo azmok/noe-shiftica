@@ -11,6 +11,7 @@
 <body class="view-preview">
 <header class="bar" id="bar">
   <button id="articleBtn" class="article-btn" title="記事を選ぶ">☰ <span id="articleName">記事</span></button>
+  <select id="branchSel" class="file-only mono" title="表示するブランチ（保存もこのブランチに入る。main のときは draft/ に保存）" aria-label="ブランチ"></select>
   <select id="priority" class="file-only" title="優先度（frontmatter の priority）" aria-label="優先度">
     <option value="">優先度 —</option>
     <option value="high">🔴 高</option>
@@ -25,6 +26,7 @@
     <button data-v="preview" class="on">プレビュー</button>
     <button data-v="split">並べて</button>
     <button data-v="md">MD</button>
+    <button data-v="diff" class="file-only" title="ほかのブランチとの違いを見る">差分</button>
   </div>
   <div class="seg" id="mode" role="group" aria-label="モード">
     <button data-m="text" title="文章をクリックして、その場で書き換える">✏️ 文章</button>
@@ -41,6 +43,7 @@
   <span id="status" class="status"></span>
   <button id="undo" class="style-only" title="スタイルの変更をひとつ戻す" disabled>↶</button>
   <button id="save" class="primary" title="保存">保存</button>
+  <button id="publish" class="file-only" title="PR なしで公開する（確認が出ます）">🚀 公開</button>
   <button id="settings" title="設定">⚙︎</button>
   <button id="barHide" title="ツールバーを隠す">⌃</button>
 </header>
@@ -88,6 +91,20 @@
 
   <section class="mdpane" id="mdpane">
     <textarea id="mdText" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+  </section>
+
+  <section class="diffpane" id="diffpane" aria-label="差分">
+    <div class="diff-head">
+      <label>比べる相手 <select id="diffBase" class="mono"></select></label>
+      <span class="diff-arrow">→</span>
+      <span id="diffCur" class="mono"></span>
+      <label class="diff-opt"><input type="checkbox" id="diffOnly" checked> 変更のまわりだけ</label>
+      <span class="grow"></span>
+      <span id="diffStats" class="diff-stats"></span>
+      <a id="diffGh" class="primary-link" target="_blank" rel="noopener">GitHub で比べる ↗</a>
+    </div>
+    <div id="diffFiles" class="diff-files"></div>
+    <div id="diffBody" class="diff-body mono"></div>
   </section>
 
   <aside class="panel" id="panel">
@@ -175,6 +192,7 @@
 <script src="vendor/markdown-it.min.js"></script>
 <script src="scope-css.js"></script>
 <script src="store.js"></script>
+<script src="diff.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

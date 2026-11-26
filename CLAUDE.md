@@ -1,7 +1,8 @@
 # CLAUDE.md — Noe Shiftica (project rules for Claude Code / Kura-yan)
 
 @AGENTS.md
-@../noe-shiftica-ais-self-learning/lessons.md
+@../ai-brains/common/rules.md
+@ai-brains/common/rules.md
 
 > Agent identity and the universal workflow (Startup Protocol / HARD STOP /
 > Coder–Tester loop / Self-Check) live in global config (`~/.claude/CLAUDE.md`,
@@ -16,7 +17,7 @@
 > + the original instruction before retrying (original instruction + Signs win over the latest failure log).
 > Memory layer contract: `.antigravity/memory-schema.md`.
 
-> **新しいセッションは最初に、非公開の学習リポジトリ（場所は `node scripts/ai-learning.mjs sync` で表示）の `docs/HANDOFF.md`（引き継ぎメモ：進行中の作業・未解決の問題・次にやること）を読む。** 作業を終えるときは更新する（学習リポジトリの作業ブランチで。main への取り込みはあずまの承認）。設計の質問は、同じ場所の `docs/design-map/index.html` を見て、実物と照らしてから答える。
+> **AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開の `azmok/ai-brains` にある**（クラウドなら `../ai-brains`、手元の PC なら `ai-brains/`）。Claude Code では SessionStart フックが `node scripts/ai-learning.mjs sync` を実行し、教訓と引き継ぎ（`projects/noe-shiftica/handoff/tasks.md`）を表示する。続けて `decisions.md` と `log/` の最新月の末尾を読む。作業を終えるときは `log/` に追記し、`tasks.md` を直す（書き方は ai-brains の `common/handoff.md`）。詳しくは AGENTS.md の「AI 共通の脳」。設計の質問は、ai-brains の `projects/noe-shiftica/design-map/index.html` を見て、実物と照らしてから答える。
 
 ## Standing instructions (Azuma)
 - **説明はかみ砕く**（あずまの指示 2026-11-25）：結論を最初に1〜2文。あずまがやることは番号付き（なければ「やることなし」）。専門用語は避け、使うならその場で言い換える。1文は短く、聞かれてない細部や長い表は出さない。質問は一度に1〜2個まで。ただし失敗・未確認・危険なことは省かない。

@@ -1,6 +1,17 @@
 {
   "hooks": {
-    "PreToolUse": [
+		"SessionStart": [
+		  {
+		    "hooks": [
+		      {
+		        "type": "command",
+		        "command": "node \"$CLAUDE_PROJECT_DIR/scripts/ai-learning.mjs\" sync",
+		        "timeout": 60
+		      }
+		    ]
+		  }
+		],
+		"PreToolUse": [
       {
         "matcher": "Bash",
         "hooks": [

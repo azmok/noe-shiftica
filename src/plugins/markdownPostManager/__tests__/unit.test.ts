@@ -204,6 +204,16 @@ describe('markdownPostManager', () => {
     expect(out.collections[1].fields).toEqual([])
   })
 
+  it('adds the manager link to the left menu and a card to the dashboard, keeping existing ones', () => {
+    const cfg: any = { collections: [], admin: { components: { afterNavLinks: ['a#A'], beforeDashboard: ['b#B'] } } }
+    const out: any = markdownPostManager({ collections: [] })(cfg)
+    expect(out.admin.components.afterNavLinks).toEqual(['a#A', '@/plugins/markdownPostManager/manager/NavLink#NavLink'])
+    expect(out.admin.components.beforeDashboard).toEqual([
+      'b#B',
+      '@/plugins/markdownPostManager/manager/DashboardCard#DashboardCard',
+    ])
+  })
+
   it('validates renderMode and defaults to lexical', () => {
     const f: any = markdownPostFields.find((x: any) => x.name === 'renderMode')
     expect(f.defaultValue).toBe('lexical')

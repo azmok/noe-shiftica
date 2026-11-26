@@ -15,9 +15,11 @@ const METHODS = ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'] as const
 
 /** 中継してよい GitHub API のパスか（設定したリポジトリの中だけ） */
 export function allowedPath(path: string, repo: string): boolean {
-  if (!path.startsWith('/') || path.includes('..') || /[\s#]/.test(path)) return false
+  if (!path.startsWith('/') || /[\s#\\]/.test(path)) return false
   const base = '/repos/' + repo
   const pathname = path.split('?')[0]
+  // フォルダを遡る「..」（%2e%2e も）は通さない。compare/A...B の「...」は通す
+  if (pathname.split('/').some((seg) => /^(\.|%2e){1,2}$/i.test(seg))) return false
   return pathname === base || pathname.toLowerCase().startsWith(base.toLowerCase() + '/')
 }
 
