@@ -188,6 +188,6 @@ vitest（unit）。
 
 1. **`renderMode` を text にする方針**（§3）。select（enum）でなく text でいい？ → 推奨：text
 2. **`markdownMedia` に URL も保存する方針**（§3）でいい？ → 推奨：保存する
-3. **DB バックアップ**：このクラウド環境に `.antigravity/` が無く、DB Sanctuary の手順が読めない。バックアップブランチの作り方を教えてほしい（またはあずまが先に取る）。
+3. **DB バックアップ**：（2026-11-27 追記：解決済み。手順は ai-brains の `projects/noe-shiftica/rules/procedures/backup.md` に移り、クラウドからも読める）このクラウド環境に `.antigravity/` が無く、DB Sanctuary の手順が読めない。バックアップブランチの作り方を教えてほしい（またはあずまが先に取る）。
 4. **共通アセットの置き場所**：`public/md-assets/` が正本で、noe-posts の `_assets/` がその写し、という整理で合ってる？（指示書どおり）
 5. **Phase 3（下書きプレビューの保護）**は、この設計書の外。A（Payload ログイン時のみ）か B（`?token=` + `PREVIEW_SECRET`）は、Phase 2 の実装後に改めて聞く。

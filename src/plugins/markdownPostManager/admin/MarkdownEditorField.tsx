@@ -16,7 +16,7 @@ import { MarkdownPreview } from './previewController'
  * - 「MD / 並べて / プレビュー」の切り替えと、全画面表示
  *
  * 入力は手元の state で即座に描き、フォームへの setValue は少し遅らせてまとめる（打鍵ごとに重くしない）。
- * markdownMedia（json）への setValue は別 tick で行う（.antigravity の既知の罠2：json の setValue は重い）。
+ * markdownMedia（json）への setValue は別 tick で行う（既知の罠2：json の setValue は重い。ai-brains の stacks/payload/lessons.md）。
  */
 
 type View = 'md' | 'split' | 'preview'

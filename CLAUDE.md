@@ -4,10 +4,13 @@
 @../ai-brains/common/rules.md
 @ai-brains/common/rules.md
 
-> Agent identity and the universal workflow (Startup Protocol / HARD STOP /
-> Coder–Tester loop / Self-Check) live in global config (`~/.claude/CLAUDE.md`,
-> `~/.gemini/AGENTS.md`) and project `AGENTS.md`. This file holds only Azuma's
-> standing shortcuts that override those defaults.
+> The universal workflow (Startup Protocol / HARD STOP / Coder–Tester loop / Self-Check),
+> the reporting rule and the shared rules live in ai-brains (`../ai-brains/common/workflow.md`,
+> `common/reporting.md`, `common/rules.md`) so cloud and local agents read the same text.
+> The global configs (`~/.claude/CLAUDE.md`, `~/.gemini/AGENTS.md`) only point to ai-brains.
+> This file holds only Azuma's standing shortcuts for this project.
+>
+> **報告**：作業の区切りは HTML にして渡す。ai-brains の `tools/report/template.oui` をコピーして書き、`node scripts/ai-learning.mjs report <報告.oui>`（決まりは `common/reporting.md`。クラウドの Claude は Artifact で公開してリンクを渡す）。
 
 > **Before starting any task, MUST recall the pre-task Signs** — they live as
 > `type='sign'` events in `../ai-brains/projects/noe-shiftica/memory/memory.db` (readable mirror:
@@ -57,7 +60,7 @@ Windows 環境＋複数エージェントで作業するため、ソースに **
 
 ## Payload Admin カスタム Field の必読ナレッジ（実装前に必ず読む）
 Payload v3 の `admin.components.Field` で UI フィールドを自作するときは、先に
-下の2つの罠を読むこと（元の詳しいメモ `.antigravity/knowledge/...` は、2026-11-26 時点で見当たらない）。
+下の2つの罠を読むこと（詳しくは ai-brains の `projects/noe-shiftica/memory/mirror/knowledge.md` の「Payload Admin カスタム Field の罠」と、`stacks/payload/lessons.md`）。
 気づきにくい既知の罠が2つある：
 - **罠1: `<input>` の Enter が React `onKeyDown` では効かない/ログも出ない** → 編集画面全体が `<form>` で
   Enter を先に横取りされるため。対策＝input の DOM に **capture フェーズ**でネイティブ keydown を張り、

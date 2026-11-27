@@ -17,6 +17,9 @@ describe('claude-shell-guard', () => {
     "sed --in-place 's/a\\.b/c/' f",
     "cat > a.html <<'EOF'\n<p>\nEOF",
     "tee docs/a.html <<EOF\n<p>\nEOF",
+    'python -c "open(\'C:\\Users\\genta\\a.txt\')"',
+    'uv run --no-project python -c "print(r\'D:\\BU\\x\')"',
+    'node -e "require(\'fs\').readFileSync(\'C:\\\\p\\\\a\')"',
   ])('blocks %j', (command) => expect(bash(command)).toBe(2))
 
   it.each([
@@ -25,6 +28,10 @@ describe('claude-shell-guard', () => {
     "sed -i 's/a/b/' \\\n f.md",
     "cat > a.md <<'EOF'\nx\nEOF",
     'cat a.html',
+    'python -c "print(1)"',
+    'python -c "open(\'C:/Users/genta/a.txt\')"',
+    'node scripts/a.mjs C:\\Users\\genta',
+    "printf 'a\\nb'",
     '',
     '\n',
   ])('allows %j', (command) => expect(bash(command)).toBe(0))

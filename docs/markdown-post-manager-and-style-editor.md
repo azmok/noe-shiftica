@@ -67,7 +67,7 @@ markdownPostManager({
 - プレビューには、本番と同じ `renderMarkdownArticle()` の結果を、本番の CSS と一緒に表示する。
 - 画像：`markdownMedia` の一覧を出し、追加や差し替えは Payload の Media アップロードで行う。本文には相対パスのまま書く（今の仕組みと同じ）。
 - Payload の版の履歴（versions / drafts）をそのまま使う。保存の取り消しや、前の版に戻すのは標準機能でできる。
-- 先に `.antigravity/knowledge/backend/admin-ui/custom-field-keyboard-and-shared-json.md` の2つの罠を読んでから作る（Enter キーの横取り、重い `setValue`）。
+- 先に CLAUDE.md の「Payload Admin カスタム Field の必読ナレッジ」（ai-brains の `stacks/payload/lessons.md` にもある）の2つの罠を読んでから作る（Enter キーの横取り、重い `setValue`）。
 
 ### 2.4 上書きガード（Git ⇄ DB の衝突を防ぐ）
 

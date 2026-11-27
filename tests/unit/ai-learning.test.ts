@@ -196,6 +196,57 @@ describe('ai-learning push', () => {
   })
 })
 
+describe('ai-learning push（同時に書いたとき）', () => {
+  it('log は .gitattributes の union で、ほかのセッションの追記と両方残る', () => {
+    write('.gitattributes', 'projects/*/handoff/log/*.md merge=union\n')
+    write('projects/demo/handoff/log/2026-11.md', '# log\n')
+    git(data, 'add', '.')
+    git(data, 'commit', '-m', 'base')
+    git(data, 'push', 'origin', 'main')
+
+    const other = path.join(tmp, 'other')
+    git(tmp, 'clone', origin, other)
+    writeFileSync(path.join(other, 'projects/demo/handoff/log/2026-11.md'), '# log\n- ほかのセッション\n', 'utf8')
+    git(other, 'commit', '-am', 'other')
+    git(other, 'push', 'origin', 'main')
+
+    write('projects/demo/handoff/log/2026-11.md', '# log\n- このセッション\n')
+    const result = run(['push'])
+    expect(result.status).toBe(0)
+    const merged = git(origin, 'show', 'main:projects/demo/handoff/log/2026-11.md')
+    expect(merged).toContain('- ほかのセッション')
+    expect(merged).toContain('- このセッション')
+  })
+})
+
+describe('ai-learning report と sync の案内', () => {
+  // ai-brains の tools の代わりに、受け取った引数を出すだけの小さなスクリプトを置く
+  const stub = (file: string) => write(file, 'console.log("STUB " + process.argv.slice(2).join(" "))\n')
+
+  it('report は ai-brains の tools/report/build.mjs に、プロジェクト名を付けて渡す', () => {
+    stub('tools/report/build.mjs')
+    const result = run(['report', 'a.oui', '--open'])
+    expect(result.status).toBe(0)
+    expect(result.out).toContain('STUB a.oui --open --project demo')
+  })
+
+  it('report の道具が無ければ、sync で最新にするよう伝えて止まる', () => {
+    const result = run(['report', 'a.oui'])
+    expect(result.status).toBe(1)
+    expect(result.err).toContain('sync で最新にする')
+  })
+
+  it('sync は報告の決まりを案内し、全体の設定への案内は手元の PC でだけ入れる', () => {
+    stub('tools/report/build.mjs')
+    stub('tools/setup/link-global.mjs')
+    const cloud = run(['sync'])
+    expect(cloud.out).toContain('common/reporting.md')
+    expect(cloud.out).not.toContain('STUB')
+    const local = run(['sync'], { CLAUDE_CODE_REMOTE: 'false' })
+    expect(local.out).toContain('STUB')
+  })
+})
+
 describe('ai-learning classes', () => {
   it('記録が無いときは「記録はまだない。」', () => {
     expect(run(['classes']).out).toContain('記録はまだない。')
