@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
   // Fix stays framework-native: CMS-backed pages export `revalidate = 60`, and
   // `expireTime` below caps the stale-while-revalidate window, giving
   // `s-maxage=60, stale-while-revalidate=240` → the edge is at most ~5 min behind a save.
-  // (See .antigravity/bugs/isr-caching.md and rules.md §4-E.)
+  // (See ai-brains projects/noe-shiftica/memory/mirror/bugs.md and rules/rules.md §4-E.)
   expireTime: 300,
   async redirects() {
     return [

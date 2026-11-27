@@ -22,3 +22,7 @@ if (/\bsed\b[^\n|&]*?\s(?:-[a-zA-Z]*i|--in-place)[^\n]*\\/.test(text))
 
 if (/<<-?\s*['"]?\w+/.test(text) && /(?:>|\btee\b(?:\s+-a)?)\s*["']?[^\s"'<>|;&]*\.html?\b/.test(text))
   block('heredoc で HTML を作ると引用符で壊れやすい。Write ツールを使う。')
+
+// 3回目（2026-11-26、Git Bash でインラインの Python に書いた Windows のパスの \ が減った）を受けて追加（あずま「全部任せる」2026-11-27）
+if (/\b(?:python3?|py|node)\b[^\n|&;]*?\s(?:-c|-e|--eval)\s/.test(text) && /[A-Za-z]:\\/.test(text))
+  block('コマンドの中に直接書いたコード（python -c / node -e）に Windows のパス（C:\\…）があると、Git Bash で \\ が減って壊れる。コードをファイルに書いて実行するか、パスを / で書く。')

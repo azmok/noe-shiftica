@@ -15,8 +15,13 @@ const makeRequest = (body: unknown) =>
     body: JSON.stringify(body),
   })
 
+// The route pre-warms each path with a real fetch to the live site. Under a busy test run that
+// network call sometimes outlived vitest's 5s timeout, so the suite failed at random. Stub it.
+const fetchMock = vi.fn(async () => new Response(null, { status: 200 }))
+
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.stubGlobal('fetch', fetchMock)
   process.env.REVALIDATE_SECRET = 'test-secret-abc'
 })
 
@@ -56,6 +61,9 @@ describe('POST /api/revalidate', () => {
     expect(revalidatePath).toHaveBeenCalledWith('/blog')
     expect(revalidatePath).toHaveBeenCalledWith('/blog/my-post')
     expect(revalidatePath).toHaveBeenCalledTimes(2)
+    // pre-warm hits each revalidated path once (stubbed, no network)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(body.prewarmed).toEqual({ '/blog': 200, '/blog/my-post': 200 })
   })
 
   it('revalidates only /p/[slug] for hosted-pages (no index page)', async () => {

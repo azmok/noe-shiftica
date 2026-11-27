@@ -4,7 +4,14 @@
 
 ## Universal rules (single source of truth)
 The universal workflow (Startup Protocol / HARD STOP / Learning Loop / Coder–Tester
-loop / Post-Edit Self-Check) lives in global `~/.gemini/AGENTS.md`. **Read it at startup.**
+loop / Post-Edit Self-Check) lives in ai-brains: `../ai-brains/common/workflow.md`, with the
+shared rules in `common/rules.md`. **Read them at startup.** (Global configs such as
+`~/.gemini/AGENTS.md` only point to ai-brains, so cloud and local agents follow the same text.)
+
+**Reporting to Azuma**: turn each work report into HTML with ai-brains' report tool —
+copy `../ai-brains/tools/report/template.oui`, write it in OpenUI Lang, then run
+`node scripts/ai-learning.mjs report <report.oui>` (rules: `common/reporting.md`). Same look for every agent;
+no hand-written HTML. Locally it lands in `~/ai-reports/`; in the cloud, hand it over where Azuma can open it.
 
 ## Files to ALWAYS read at startup (before touching anything)
 Project rules and memory live in the private `azmok/ai-brains` repo, next to this

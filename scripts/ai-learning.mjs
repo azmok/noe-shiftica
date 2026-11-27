@@ -5,7 +5,8 @@
 //   node scripts/ai-learning.mjs push      … handoff/・memory/・mistakes/ の変更を main に反映（Stop フック）
 //   node scripts/ai-learning.mjs classes   … ミスの分類ごとの件数
 //   node scripts/ai-learning.mjs record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..."
-import { execFileSync } from 'node:child_process'
+//   node scripts/ai-learning.mjs report <報告.oui> [--open など]  … あずまへの報告を HTML にする（ai-brains の tools/report）
+import { execFileSync, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -66,6 +67,25 @@ function findDir() {
   return found ? path.resolve(found) : null
 }
 
+// 改名前の場所（noe-shiftica-ais-self-learning・.ai）を使っているときは知らせる。
+// CLAUDE.md は ai-brains の場所を読むので、ここだと共通ルールが読まれない。昔の仕組みで push していない記録も残っているかもしれない
+function warnLegacy(dir) {
+  const name = path.basename(dir)
+  if (name === NAME || process.env.AI_BRAINS_DIR || process.env.AI_LEARNING_DIR) return
+  console.log(`警告: 改名前の場所（${dir}）を使っている。隣に ai-brains としてクローンし直す（git clone ${REPO} ${path.join(path.dirname(dir), NAME)}）。`)
+  const left = tryGit(dir, 'status', '--porcelain') || ''
+  if (left) console.log(`警告: そこに push していない変更がある。消す前に中身を ai-brains へ移す:\n${left}`)
+}
+
+// 各 AI の全体の設定（~/.claude/CLAUDE.md など）に「ai-brains を先に読む」案内を入れる。手元の PC だけ（クラウドは使い捨て）
+function linkGlobal(dir) {
+  const script = path.join(dir, 'tools', 'setup', 'link-global.mjs')
+  if (isCloud || !existsSync(script)) return
+  const r = spawnSync(process.execPath, [script], { encoding: 'utf8', timeout: 30_000 })
+  if (r.stdout?.trim()) console.log(r.stdout.trim())
+  if (r.status !== 0) console.log(`警告: 全体の設定に案内を入れられなかった。${(r.stderr || '').trim()}`)
+}
+
 // 無ければプロジェクトの中の ai-brains/ にクローンする（手元の PC 向け。クラウドはセッションに入れる）
 function dataDir() {
   const found = findDir()
@@ -101,6 +121,8 @@ function sync() {
   console.log(`ai-brains: ${dir}（プロジェクト: ${project}）`)
   if (!fetched) console.log('警告: 最新を取得できない。手元の内容を表示する。')
   else if (!pulled) console.log(`警告: origin/main を取り込めていない（今のブランチ: ${branchOf(dir) || '不明'}、または手元と分岐）。`)
+  warnLegacy(dir)
+  linkGlobal(dir)
 
   const show = (title, file) => {
     const text = read(file)
@@ -116,6 +138,20 @@ function sync() {
   if (show('引き継ぎ', tasks)) {
     console.log('続けて decisions.md と log/ の最新月の末尾を読む。終わるときは log/ に追記し、tasks.md を直す（書き方は common/handoff.md）。')
   } else console.log(`\n引き継ぎ（projects/${project}/handoff/tasks.md）はまだない。`)
+  if (existsSync(path.join(dir, 'tools', 'report', 'build.mjs'))) {
+    console.log('報告：作業の区切りは HTML にして渡す。ひな形 tools/report/template.oui をコピーして書き、node scripts/ai-learning.mjs report <報告.oui>（決まりは common/reporting.md）。')
+  }
+}
+
+// ---------------------------------------------------------------- report
+// ai-brains の tools/report/build.mjs に任せる。ai-brains の場所（隣・中・クラウド）をここで吸収する
+function report(args) {
+  const dir = dataDir()
+  const build = path.join(dir, 'tools', 'report', 'build.mjs')
+  if (!existsSync(build)) fail(`ai-brains に報告の道具が無い（${build}）。sync で最新にする。`)
+  const hasProject = args.includes('--project')
+  const r = spawnSync(process.execPath, [build, ...args, ...(hasProject ? [] : ['--project', projectName()])], { stdio: 'inherit' })
+  process.exit(r.status ?? 1)
 }
 
 // ---------------------------------------------------------------- push
@@ -260,4 +296,5 @@ if (command === 'sync' && !rest.length) sync()
 else if (command === 'push' && !rest.length) push()
 else if (command === 'classes' && !rest.length) classes()
 else if (command === 'record') record(rest)
-else fail('使い方: sync | push | classes | record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..."')
+else if (command === 'report' && rest.length) report(rest)
+else fail('使い方: sync | push | classes | record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..." | report <報告.oui> [--open]')
