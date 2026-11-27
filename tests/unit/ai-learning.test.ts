@@ -308,3 +308,24 @@ describe('ai-learning 置き場所（プロジェクトの隣のみ）', () => {
     expect(result.stderr).toContain('ai-brains を取得できない')
   })
 })
+
+describe('ai-learning now', () => {
+  const now = (args: string[], tz: string) =>
+    spawnSync(process.execPath, [SCRIPT, 'now', ...args], { encoding: 'utf8', env: { ...process.env, TZ: tz } })
+  const jst = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo', ...opts }).format(new Date())
+
+  it('今の日本時間を出す。シェルの TZ がずれていても同じ（time-guess 対策）', () => {
+    const a = now([], 'UTC')
+    const b = now([], 'America/Los_Angeles')
+    expect(a.status).toBe(0)
+    expect(a.stdout.trim()).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+    expect(a.stdout).toBe(b.stdout) // 分が変わる瞬間でなければ同じ
+    expect(now(['--date'], 'UTC').stdout.trim()).toBe(jst({ year: 'numeric', month: '2-digit', day: '2-digit' }))
+    expect(now(['--long'], 'UTC').stdout.trim()).toMatch(/^\d{4}\/\d{2}\/\d{2}\([日月火水木金土]\)\/\d{2}:\d{2}$/)
+  })
+
+  it('知らない引数・余分な引数は止まる', () => {
+    expect(now(['--nope'], 'UTC').status).toBe(1)
+    expect(now(['--date', 'x'], 'UTC').status).toBe(1)
+  })
+})
