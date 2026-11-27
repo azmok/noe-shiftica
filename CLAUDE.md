@@ -2,7 +2,11 @@
 
 @AGENTS.md
 @../ai-brains/common/rules.md
+@../ai-brains/common/workflow.md
+@../ai-brains/common/reporting.md
 @ai-brains/common/rules.md
+@ai-brains/common/workflow.md
+@ai-brains/common/reporting.md
 
 > The universal workflow (Startup Protocol / HARD STOP / Coder–Tester loop / Self-Check),
 > the reporting rule and the shared rules live in ai-brains (`../ai-brains/common/workflow.md`,
