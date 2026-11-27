@@ -5,6 +5,7 @@
 //   node scripts/ai-learning.mjs push      … handoff/・memory/・mistakes/ の変更を main に反映（Stop フック）
 //   node scripts/ai-learning.mjs classes   … ミスの分類ごとの件数
 //   node scripts/ai-learning.mjs record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..."
+//   node scripts/ai-learning.mjs now [--date | --long]  … 今の日本時間（log の見出しなど。推測で書かない。ai-brains の tools/now.mjs と同じ）
 //   node scripts/ai-learning.mjs report <報告.oui> [--open など]  … あずまへの報告を HTML にする（ai-brains の tools/report）
 import { execFileSync, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
@@ -301,10 +302,26 @@ function record(args) {
   }
 }
 
+// 今の日本時間。Node の Intl で計算するので、OS やシェルの TZ に左右されない（time-guess 対策。2026-11-28）
+function now(args) {
+  const mode = { undefined: 'log', '--date': 'date', '--long': 'long' }[args[0]]
+  if (!mode || args.length > 1) fail('使い方: now [--date | --long]')
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' })
+      .formatToParts(new Date())
+      .map((x) => [x.type, x.value]),
+  )
+  const week = '日月火水木金土'[['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday)]
+  if (mode === 'date') console.log(`${p.year}-${p.month}-${p.day}`)
+  else if (mode === 'long') console.log(`${p.year}/${p.month}/${p.day}(${week})/${p.hour}:${p.minute}`)
+  else console.log(`${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`)
+}
+
 const [command, ...rest] = process.argv.slice(2)
 if (command === 'sync' && !rest.length) sync()
 else if (command === 'push' && !rest.length) push()
 else if (command === 'classes' && !rest.length) classes()
 else if (command === 'record') record(rest)
+else if (command === 'now') now(rest)
 else if (command === 'report' && rest.length) report(rest)
-else fail('使い方: sync | push | classes | record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..." | report <報告.oui> [--open]')
+else fail('使い方: sync | push | classes | now [--date | --long] | record --class <slug> [--scope <範囲>] --what "..." --cause "..." --fix "..." | report <報告.oui> [--open]')
