@@ -12,10 +12,10 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const REPO = 'https://github.com/azmok/ai-brains.git'
+const REPO = process.env.AI_BRAINS_REPO || 'https://github.com/azmok/ai-brains.git'
 const NAME = 'ai-brains'
 const LEGACY = 'noe-shiftica-ais-self-learning' // 2026-11-26 に ai-brains へ改名
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const root = path.resolve(process.env.AI_BRAINS_PROJECT_ROOT || path.join(path.dirname(fileURLToPath(import.meta.url)), '..'))
 const isCloud = process.env.CLAUDE_CODE_REMOTE === 'true'
 
 const git = (cwd, ...args) =>
@@ -47,6 +47,17 @@ function projectName() {
   return (fromUrl || path.basename(root)).toLowerCase()
 }
 
+// 本体リポジトリのルート（worktree でも本体を返す）
+function baseDir() {
+  const common = tryGit(root, 'rev-parse', '--path-format=absolute', '--git-common-dir')
+  return common ? path.dirname(common) : root
+}
+
+// 正規の置き場所はプロジェクトの隣（../ai-brains）の1か所だけ
+function defaultDir() {
+  return path.resolve(baseDir(), '..', NAME)
+}
+
 // ai-brains の場所を探す。無ければ null
 function findDir() {
   const given = process.env.AI_BRAINS_DIR || process.env.AI_LEARNING_DIR
@@ -55,10 +66,8 @@ function findDir() {
     if (!existsSync(path.join(dir, '.git'))) fail(`AI_BRAINS_DIR が git リポジトリではない: ${dir}`)
     return dir
   }
-  // worktree から呼ばれても、本体リポジトリの隣と中を見る
-  const common = tryGit(root, 'rev-parse', '--path-format=absolute', '--git-common-dir')
-  const bases = [root]
-  if (common) bases.unshift(path.dirname(common))
+  const bases = [baseDir()]
+  if (bases[0] !== root) bases.push(root)
   const candidates = []
   for (const base of bases) {
     candidates.push(path.join(base, '..', NAME), path.join(base, NAME), path.join(base, '..', LEGACY), path.join(base, '.ai'))
@@ -67,12 +76,13 @@ function findDir() {
   return found ? path.resolve(found) : null
 }
 
-// 改名前の場所（noe-shiftica-ais-self-learning・.ai）を使っているときは知らせる。
-// CLAUDE.md は ai-brains の場所を読むので、ここだと共通ルールが読まれない。昔の仕組みで push していない記録も残っているかもしれない
+// 正規の場所（../ai-brains）以外を使っているときは知らせる。
+// CLAUDE.md は ../ai-brains だけを読むので、プロジェクトの中や改名前の場所だと共通ルールが読まれない。
 function warnLegacy(dir) {
-  const name = path.basename(dir)
-  if (name === NAME || process.env.AI_BRAINS_DIR || process.env.AI_LEARNING_DIR) return
-  console.log(`警告: 改名前の場所（${dir}）を使っている。隣に ai-brains としてクローンし直す（git clone ${REPO} ${path.join(path.dirname(dir), NAME)}）。`)
+  if (process.env.AI_BRAINS_DIR || process.env.AI_LEARNING_DIR) return
+  const expected = defaultDir()
+  if (path.resolve(dir) === expected) return
+  console.log(`警告: 正規の場所（${expected}）ではない場所（${dir}）を使っている。プロジェクトの隣に ai-brains として置き直す（git clone ${REPO} ${expected}）。`)
   const left = tryGit(dir, 'status', '--porcelain') || ''
   if (left) console.log(`警告: そこに push していない変更がある。消す前に中身を ai-brains へ移す:\n${left}`)
 }
@@ -86,13 +96,13 @@ function linkGlobal(dir) {
   if (r.status !== 0) console.log(`警告: 全体の設定に案内を入れられなかった。${(r.stderr || '').trim()}`)
 }
 
-// 無ければプロジェクトの中の ai-brains/ にクローンする（手元の PC 向け。クラウドはセッションに入れる）
+// 無ければプロジェクトの隣（../ai-brains）にクローンする（手元の PC 向け。クラウドはセッションに入れる）
 function dataDir() {
   const found = findDir()
   if (found) return found
-  const target = path.join(root, NAME)
+  const target = defaultDir()
   try {
-    git(root, 'clone', REPO, target)
+    git(path.dirname(target), 'clone', REPO, target)
   } catch (error) {
     fail(
       `ai-brains を取得できない。${isCloud ? 'クラウドなら、セッションに azmok/ai-brains を追加する。' : 'GitHub にログインできているか確認する。'}\n${reason(error)}`,

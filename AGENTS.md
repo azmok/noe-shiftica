@@ -2,6 +2,8 @@
 # Read by ALL agents (Codex / Claude Code / Gemini / etc.).
 # Codex loads this file automatically; Claude/Gemini honor it alongside CLAUDE.md / GEMINI.md.
 
+> **必読 / STOP if missing**：`../ai-brains` が無ければ作業を始めず、あずまに伝える（クラウドではセッションに `azmok/ai-brains` を追加してもらう）。
+
 ## Universal rules (single source of truth)
 The universal workflow (Startup Protocol / HARD STOP / Learning Loop / Coder–Tester
 loop / Post-Edit Self-Check) lives in ai-brains: `../ai-brains/common/workflow.md`, with the
@@ -44,7 +46,7 @@ before retrying (the original instruction + Signs win over your latest failure l
 ## AI 共通の脳（ai-brains）— すべての AI・すべての端末で共通
 AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開リポジトリ `azmok/ai-brains` にまとめてある（2026-11-26 に `noe-shiftica-ais-self-learning` から改名）。
 このリポジトリは公開なので、失敗の記録・教訓・引き継ぎは置かない。全体の設計は ai-brains の `README.md`。
-- **始めに** `node scripts/ai-learning.mjs sync` を実行する。手元の PC では、無ければプロジェクトの中の `ai-brains/` にクローンする（クラウドはセッションに `azmok/ai-brains` を入れる。`../ai-brains` に置かれる）。
+- **始めに** `node scripts/ai-learning.mjs sync` を実行する。置き場所はプロジェクトの隣（`../ai-brains`）の1か所だけ。手元の PC では、無ければ隣の `../ai-brains` にクローンする（クラウドはセッションに `azmok/ai-brains` を入れる）。
   共通・技術・このプロジェクトの教訓と、引き継ぎの `tasks.md` が表示される。
 - 次に ai-brains の `common/rules.md`（共通ルール）を読み、それに従う。引き継ぎ・ミスの記録（`record --scope`）・教訓の置き場所は、そこに書いてある。
 - 取得できなければ黙って進めず、あずまに伝える。

@@ -261,3 +261,50 @@ describe('ai-learning classes', () => {
     expect(out).toContain('kind-b: 1')
   })
 })
+
+describe('ai-learning 置き場所（プロジェクトの隣のみ）', () => {
+  it('ai-brains が無ければプロジェクトの隣（../ai-brains）にクローンする', () => {
+    const ws = path.join(tmp, 'ws')
+    const proj = path.join(ws, 'my-proj')
+    mkdirSync(proj, { recursive: true })
+    git(proj, 'init', '-b', 'main')
+    const result = spawnSync('node', [SCRIPT, 'sync'], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        AI_BRAINS_DIR: '',
+        AI_LEARNING_DIR: '',
+        AI_BRAINS_PROJECT: 'demo',
+        AI_BRAINS_PROJECT_ROOT: proj,
+        AI_BRAINS_REPO: origin,
+        CLAUDE_CODE_REMOTE: 'true',
+        ...ENV,
+      },
+    })
+    expect(result.status).toBe(0)
+    expect(existsSync(path.join(ws, 'ai-brains', '.git'))).toBe(true)
+    expect(existsSync(path.join(proj, 'ai-brains'))).toBe(false)
+  })
+
+  it('ai-brains が取得できなければエラーで止まる', () => {
+    const ws = path.join(tmp, 'ws-fail')
+    const proj = path.join(ws, 'my-proj')
+    mkdirSync(proj, { recursive: true })
+    git(proj, 'init', '-b', 'main')
+    const result = spawnSync('node', [SCRIPT, 'sync'], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        AI_BRAINS_DIR: '',
+        AI_LEARNING_DIR: '',
+        AI_BRAINS_PROJECT: 'demo',
+        AI_BRAINS_PROJECT_ROOT: proj,
+        AI_BRAINS_REPO: path.join(tmp, 'missing-repo.git'),
+        CLAUDE_CODE_REMOTE: 'true',
+        ...ENV,
+      },
+    })
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('ai-brains を取得できない')
+  })
+})
