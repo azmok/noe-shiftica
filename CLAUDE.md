@@ -1,12 +1,11 @@
 # CLAUDE.md — Noe Shiftica (project rules for Claude Code / Kura-yan)
 
+> **必読**：`../ai-brains` が無ければ作業を始めず、あずまに伝える（クラウドではセッションに `azmok/ai-brains` を追加してもらう）。
+
 @AGENTS.md
 @../ai-brains/common/rules.md
 @../ai-brains/common/workflow.md
 @../ai-brains/common/reporting.md
-@ai-brains/common/rules.md
-@ai-brains/common/workflow.md
-@ai-brains/common/reporting.md
 
 > The universal workflow (Startup Protocol / HARD STOP / Coder–Tester loop / Self-Check),
 > the reporting rule and the shared rules live in ai-brains (`../ai-brains/common/workflow.md`,
@@ -25,7 +24,7 @@
 > Memory layer contract: `../ai-brains/projects/noe-shiftica/memory/memory-schema.md`.
 > （2026-11-26 に `.antigravity/` の中身は ai-brains の `projects/noe-shiftica/` へ移した。`.antigravity/` に残るのはバックアップ用の設定とパスワードだけ。）
 
-> **AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開の `azmok/ai-brains` にある**（クラウドも手元の PC も `../ai-brains`。無いときだけ `sync` が `ai-brains/` にクローンする）。Claude Code では SessionStart フックが `node scripts/ai-learning.mjs sync` を実行し、教訓と引き継ぎ（`projects/noe-shiftica/handoff/tasks.md`）を表示する。続けて `decisions.md` と `log/` の最新月の末尾を読む。作業を終えるときは `log/` に追記し、`tasks.md` を直す（書き方は ai-brains の `common/handoff.md`）。詳しくは AGENTS.md の「AI 共通の脳」。設計の質問は、ai-brains の `projects/noe-shiftica/design-map/index.html` を見て、実物と照らしてから答える。
+> **AI の共通ルール・教訓・ミスの記録・引き継ぎは、非公開の `azmok/ai-brains` にある**（クラウドも手元の PC もプロジェクトの隣 `../ai-brains`。無いときだけ手元 PC の `sync` が隣の `../ai-brains` にクローンする）。Claude Code では SessionStart フックが `node scripts/ai-learning.mjs sync` を実行し、教訓と引き継ぎ（`projects/noe-shiftica/handoff/tasks.md`）を表示する。続けて `decisions.md` と `log/` の最新月の末尾を読む。作業を終えるときは `log/` に追記し、`tasks.md` を直す（書き方は ai-brains の `common/handoff.md`）。詳しくは AGENTS.md の「AI 共通の脳」。設計の質問は、ai-brains の `projects/noe-shiftica/design-map/index.html` を見て、実物と照らしてから答える。
 
 ## Standing instructions (Azuma)
 - **説明はかみ砕く**（あずまの指示 2026-11-25）：結論を最初に1〜2文。あずまがやることは番号付き（なければ「やることなし」）。専門用語は避け、使うならその場で言い換える。1文は短く、聞かれてない細部や長い表は出さない。質問は一度に1〜2個まで。ただし失敗・未確認・危険なことは省かない。
