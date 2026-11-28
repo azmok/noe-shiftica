@@ -8,7 +8,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   type NeonBranch,
+  BACKUP_KEEP_TOTAL,
   ON_SAVE_PREFIX,
+  backupsToDelete,
+  isBackup,
   generationName,
   generationsToDelete,
   isGeneration,
@@ -48,6 +51,24 @@ describe('generation helpers', () => {
       branch('d', 'backup/pre-deploy-1', '2026-10-18T00:00:00Z'),
     ]
     expect(generationsToDelete(branches, ON_SAVE_PREFIX, 2).map((b) => b.id)).toEqual(['a'])
+  })
+
+  it('keeps the newest 3 backups of every kind and never touches production or other branches', () => {
+    const branches = [
+      main,
+      branch('dev', 'dev', '2026-10-17T00:00:00Z'),
+      branch('prod-default', 'backup/looks-like-backup', '2026-10-16T00:00:00Z', false),
+      branch('s1', 'backup/on-save-1', '2026-10-18T05:00:00Z'),
+      branch('d1', 'backup/pre-deploy-1', '2026-10-18T04:00:00Z'),
+      branch('m1', 'backup/pre-mpm-settings-20261018', '2026-10-18T03:00:00Z'),
+      branch('legacy', 'backup-pre-hosted-pages-20260617', '2026-06-17T00:00:00Z'),
+    ]
+    branches[2].default = true // a default branch is never a backup, whatever its name
+    expect(isBackup(main)).toBe(false)
+    expect(isBackup(branches[1])).toBe(false)
+    expect(isBackup(branches[2])).toBe(false)
+    expect(backupsToDelete(branches, BACKUP_KEEP_TOTAL).map((b) => b.id)).toEqual(['legacy'])
+    expect(BACKUP_KEEP_TOTAL).toBe(3)
   })
 
   it('is too soon only while the latest generation is younger than the interval', () => {
@@ -93,15 +114,16 @@ describe('triggerNeonBackup', () => {
     vi.restoreAllMocks()
   })
 
-  it('creates a new generation from production, then deletes only the ones beyond 2', async () => {
+  it('creates a new generation from production, then keeps only the newest 3 backups of every kind', async () => {
     await triggerNeonBackup(now)
 
     const [, create] = calls('POST')[0]
     expect(JSON.parse(create!.body!)).toEqual({
       branch: { name: 'backup/on-save-20261018-220000', parent_id: 'main' },
     })
+    // created (13:00), newer (11:00), old (01:00) stay; the pre-deploy one (00:00) is the 4th newest
     const deleted = calls('DELETE').map(([url]) => url.split('/').pop())
-    expect(deleted).toEqual(['old'])
+    expect(deleted).toEqual(['deploy'])
 
     // create happens before any delete
     const methods = fetchMock.mock.calls.map(([, init]) => init?.method ?? 'GET')
