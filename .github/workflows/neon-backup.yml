@@ -13,10 +13,12 @@ jobs:
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
           PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
-          # Generations are named backup/pre-deploy-YYYYMMDD-HHMMSS (JST).
-          # The legacy name "backup/pre-deploy" counts as an old generation.
+          # New generations are named backup/pre-deploy-YYYYMMDD-HHMMSS (JST).
           PREFIX: "backup/pre-deploy"
-          KEEP: "2"
+          # Keep the newest 3 backups of every kind in total: pre-deploy, on-save (src/plugins/neon-backup)
+          # and hand-made pre-migration ones (any branch named backup/… or backup-…). Azuma's decision
+          # 2026-11-28. Neon allows 10 branches including production; when full, new backups fail.
+          KEEP: "3"
         run: |
           API="https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches"
 
@@ -48,16 +50,17 @@ jobs:
           fi
           echo "Successfully created backup branch: $NAME ($(echo "$CREATE_RESPONSE" | jq -r '.branch.id'))"
 
-          # 3. Delete generations older than the newest $KEEP (including the one just created)
+          # 3. Keep the newest $KEEP backups of every kind (including the one just created); delete the rest.
+          #    Production, the default branch and branches not named backup/… or backup-… are never touched.
           STALE=$(echo "$RESPONSE" | jq -c --argjson new "$(echo "$CREATE_RESPONSE" | jq -c '.branch')" \
-            --arg prefix "$PREFIX" --argjson keep "$KEEP" '
+            --argjson keep "$KEEP" '
               [.branches[], $new]
-              | map(select(.name == $prefix or (.name | startswith($prefix + "-"))))
+              | map(select((.primary != true) and (.default != true) and (.name | test("^backup[/-]"))))
               | sort_by(.created_at) | reverse | .[$keep:][]
               | {id, name}')
 
           if [ -z "$STALE" ]; then
-            echo "No old generations to delete."
+            echo "No old backups to delete."
           fi
           echo "$STALE" | while read -r BRANCH; do
             [ -z "$BRANCH" ] && continue

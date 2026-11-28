@@ -2,8 +2,11 @@ import type { Config, Plugin, CollectionAfterChangeHook } from 'payload'
 
 /** 記事保存時のバックアップ。名前は `backup/on-save-YYYYMMDD-HHmmss`（JST） */
 export const ON_SAVE_PREFIX = 'backup/on-save'
-/** 残す世代数 */
-export const KEEP_GENERATIONS = 2
+/**
+ * バックアップ全体（`backup/` で始まるブランチ。保存時・デプロイ前・手作りのマイグレーション前）で残す数。
+ * あずまの決定 2026-11-28：直近3つあれば十分。Neon は本番を含めて10個が上限で、超えると新しいバックアップが作れない。
+ */
+export const BACKUP_KEEP_TOTAL = 3
 /** 保存時バックアップの最短間隔（直近の世代がこれより新しければ作らない） */
 export const MIN_INTERVAL_MS = 30 * 60 * 1000
 
@@ -12,6 +15,20 @@ export interface NeonBranch {
   name: string
   created_at: string
   primary?: boolean
+  default?: boolean
+}
+
+/** バックアップのブランチか（`backup/…` と旧形式の `backup-…`）。本番・既定のブランチは決して含めない */
+export function isBackup(branch: NeonBranch): boolean {
+  return !branch.primary && !branch.default && /^backup[/-]/.test(branch.name)
+}
+
+/** バックアップ全体を新しい順に keep 個残し、それより古いものを返す */
+export function backupsToDelete(branches: NeonBranch[], keep: number): NeonBranch[] {
+  return branches
+    .filter(isBackup)
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+    .slice(keep)
 }
 
 /** prefix の世代に属するか（`prefix` そのもの＝旧形式の名前も含む） */
@@ -44,7 +61,7 @@ export function generationName(prefix: string, now: Date): string {
 }
 
 /**
- * 本番（primary）ブランチから新しい世代を作り、作成に成功したときだけ古い世代を消す。
+ * 本番（primary）ブランチから新しい世代を作り、作成に成功したときだけ、バックアップ全体の古いものを消す（新しい3つを残す）。
  * 直近の世代が MIN_INTERVAL_MS 以内なら何もしない。
  */
 export async function triggerNeonBackup(now: Date = new Date()): Promise<void> {
@@ -99,8 +116,8 @@ export async function triggerNeonBackup(now: Date = new Date()): Promise<void> {
   }
   console.log(`[neon-backup] Backup branch created: ${name} (${createData.branch.id}, parent: ${primaryBranch.id})`)
 
-  // 3. Delete generations older than the newest KEEP_GENERATIONS (including the one just created)
-  const stale = generationsToDelete([...branches, createData.branch], ON_SAVE_PREFIX, KEEP_GENERATIONS)
+  // 3. Keep the newest BACKUP_KEEP_TOTAL backups of every kind (including the one just created); delete the rest
+  const stale = backupsToDelete([...branches, createData.branch], BACKUP_KEEP_TOTAL)
   for (const branch of stale) {
     const deleteRes = await fetch(`${baseUrl}/${branch.id}`, { method: 'DELETE', headers })
     if (deleteRes.ok) {
